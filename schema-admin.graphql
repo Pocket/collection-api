@@ -1,0 +1,16 @@
+type Mutation {
+    createCollection(data: CollectionInput!): Collection
+}
+
+type Query {
+    """
+    This is a dummy query that needs to exist to make this schema valid
+    We  can add admin specific queries here in the future
+    """
+    dummy: String!
+}
+
+input CollectionInput {
+    title: String!
+    excerpt: String!
+}

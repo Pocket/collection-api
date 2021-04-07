@@ -1,0 +1,21 @@
+version: '3.1'
+services:
+  redis:
+    image: redis:latest
+    ports:
+      - "6376:6379"
+
+  app:
+    image: node:15
+    working_dir: /app
+    ports:
+      - '4004:4004'
+    volumes:
+      - ./:/app
+    environment:
+      - NODE_ENV=development
+      - AWS_XRAY_LOG_LEVEL=silent
+      - AWS_XRAY_CONTEXT_MISSING=LOG_ERROR
+    command: "bash -c 'cd /app && npm i && npm run start:dev'"
+    depends_on:
+      - redis

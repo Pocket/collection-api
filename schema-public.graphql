@@ -1,0 +1,3 @@
+type Query {
+    getCollection(slug: String!): Collection
+}

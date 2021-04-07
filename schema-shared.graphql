@@ -1,0 +1,23 @@
+scalar Url
+
+enum CacheControlScope {
+    PUBLIC
+    PRIVATE
+}
+
+"""
+We need to manually implement cacheControl in the schema for now
+https://stackoverflow.com/questions/52922080/how-to-implement-caching-on-apollo-server-hapi-graphql
+https://github.com/apollographql/federation/issues/356
+"""
+directive @cacheControl(
+    maxAge: Int
+    scope: CacheControlScope
+) on FIELD_DEFINITION | OBJECT | INTERFACE
+
+type Collection {
+    id: ID!
+    slug: String!
+    title: String!
+    excerpt: String!
+}
