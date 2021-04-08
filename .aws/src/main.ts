@@ -1,10 +1,5 @@
-import { Construct } from 'constructs';
-import {
-  App,
-  DataTerraformRemoteState,
-  RemoteBackend,
-  TerraformStack,
-} from 'cdktf';
+import {Construct} from 'constructs';
+import {App, DataTerraformRemoteState, RemoteBackend, TerraformStack,} from 'cdktf';
 import {
   AwsProvider,
   DataAwsCallerIdentity,
@@ -12,14 +7,16 @@ import {
   DataAwsRegion,
   DataAwsSnsTopic,
 } from '../.gen/providers/aws';
-import { config } from './config';
+import {config} from './config';
 import {
+  ApplicationRDSCluster,
   ApplicationRedis,
   PocketALBApplication,
   PocketPagerDuty,
   PocketVPC,
 } from '@pocket/terraform-modules';
-import { PagerdutyProvider } from '../.gen/providers/pagerduty';
+import {PagerdutyProvider} from '../.gen/providers/pagerduty';
+import {ApplicationRDSClusterConfig} from "@pocket/terraform-modules/dist/src/base/ApplicationRDSCluster";
 
 class CollectionAPI extends TerraformStack {
   constructor(scope: Construct, name: string) {
@@ -76,10 +73,12 @@ class CollectionAPI extends TerraformStack {
       name: `Backend-${config.environment}-ChatBot`,
     });
 
-    const {
-      primaryEndpoint,
-      readerEndpoint,
-    } = CollectionAPI.createElasticache(this);
+    const pocketVpc = new PocketVPC(scope, 'pocket-vpc');
+
+    const {primaryEndpoint, readerEndpoint} = CollectionAPI.createElasticache(
+      this,
+      pocketVpc
+    );
 
     new PocketALBApplication(this, 'application', {
       internal: true,
@@ -91,8 +90,12 @@ class CollectionAPI extends TerraformStack {
       containerConfigs: [
         {
           name: 'app',
-          hostPort: 4004,
-          containerPort: 4004,
+          portMappings: [
+            {
+              hostPort: 4004,
+              containerPort: 4004,
+            },
+          ],
           envVars: [
             {
               name: 'ENVIRONMENT',
@@ -117,9 +120,13 @@ class CollectionAPI extends TerraformStack {
         {
           name: 'xray-daemon',
           containerImage: 'amazon/aws-xray-daemon',
-          hostPort: 2000,
-          containerPort: 2000,
-          protocol: 'udp',
+          portMappings: [
+            {
+              hostPort: 4004,
+              containerPort: 4004,
+              protocol: 'udp',
+            },
+          ],
           command: ['--region', 'us-east-1', '--local-mode'],
         },
       ],
@@ -201,13 +208,13 @@ class CollectionAPI extends TerraformStack {
   /**
    * Creates the elasticache and returns the node address list
    * @param scope
+   * @param pocketVpc
    * @private
    */
   private static createElasticache(
-    scope: Construct
+    scope: Construct,
+    pocketVpc: PocketVPC
   ): { primaryEndpoint: string; readerEndpoint: string } {
-    const pocketVPC = new PocketVPC(scope, 'pocket-vpc');
-
     const elasticache = new ApplicationRedis(scope, 'redis', {
       //Usually we would set the security group ids of the service that needs to hit this.
       //However we don't have the necessary security group because it gets created in PocketALBApplication
@@ -219,18 +226,30 @@ class CollectionAPI extends TerraformStack {
         count: config.cacheNodes,
         size: config.cacheSize,
       },
-      subnetIds: pocketVPC.privateSubnetIds,
+      subnetIds: pocketVpc.privateSubnetIds,
       tags: config.tags,
-      vpcId: pocketVPC.vpc.id,
+      vpcId: pocketVpc.vpc.id,
       prefix: config.prefix,
     });
 
     return {
       primaryEndpoint:
-        elasticache.elasticacheReplicationGroup.primaryEndpointAddress,
+      elasticache.elasticacheReplicationGroup.primaryEndpointAddress,
       readerEndpoint:
-        elasticache.elasticacheReplicationGroup.readerEndpointAddress,
+      elasticache.elasticacheReplicationGroup.readerEndpointAddress,
     };
+  }
+
+  private static createRDS(scope: Construct, pocketVpc: PocketVPC) {
+    new ApplicationRDSCluster(scope, 'rds', {
+      prefix: config.prefix,
+      vpcId: pocketVpc.vpc.id,
+      subnetIds: pocketVpc.privateSubnetIds,
+      rdsConfig: {
+        databaseName: ``
+      },
+      tags: config.tags,
+    });
   }
 }
 
