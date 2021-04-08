@@ -10,17 +10,11 @@ USE `collections`;
 */
 DROP TABLE IF EXISTS `story`;
 CREATE TABLE `story` (
-    id VARCHAR(255) PRIMARY KEY,
+    id INT AUTO_INCREMENT PRIMARY KEY,
     url VARCHAR(1000) NOT NULL UNIQUE,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=INNODB;
-
-/* trigger to achieve default UUID */
-CREATE TRIGGER before_insert_story
-    BEFORE INSERT ON `story`
-    FOR EACH ROW
-    SET new.id = uuid();
 
 /*
     stores all curation authors, whether they be pocket employees or guest curators.
@@ -35,8 +29,9 @@ CREATE TRIGGER before_insert_story
 */
 DROP TABLE IF EXISTS `author`;
 CREATE TABLE `author` (
-    id VARCHAR(255) PRIMARY KEY,
-    name VARCHAR(500) NOT NULL,
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    external_id VARCHAR(255) NULL,
+    name VARCHAR(500) UNIQUE NOT NULL,
     slug VARCHAR(300) NULL DEFAULT NULL,
     bio TEXT NULL DEFAULT NULL,
     imageUrl VARCHAR(500) NULL DEFAULT NULL,
@@ -45,11 +40,11 @@ CREATE TABLE `author` (
     active BOOLEAN DEFAULT TRUE
 ) ENGINE=INNODB;
 
-/* trigger to achieve default UUID */
+/* trigger to achieve external ID */
 CREATE TRIGGER before_insert_author
     BEFORE INSERT ON `author`
     FOR EACH ROW
-    SET new.id = uuid();
+    SET new.external_id = uuid();
 
 /* authors will be looked up by name? */
 CREATE INDEX `idx_author_name` ON `author` (name);
@@ -63,7 +58,8 @@ CREATE INDEX `idx_author_name` ON `author` (name);
 */
 DROP TABLE IF EXISTS `collection`;
 CREATE TABLE `collection` (
-    id VARCHAR(255) PRIMARY KEY,
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    external_id VARCHAR(255) NULL,
     slug VARCHAR(255) UNIQUE NOT NULL,
     title VARCHAR(500) NOT NULL,
     excerpt TEXT NULL,
@@ -75,11 +71,11 @@ CREATE TABLE `collection` (
     updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=INNODB;
 
-/* trigger to achieve default UUID */
+/* trigger to achieve external_id GUID */
 CREATE TRIGGER before_insert_collection
     BEFORE INSERT ON `collection`
     FOR EACH ROW
-    SET new.id = uuid();
+    SET new.external_id = uuid();
 
 /* collections will be queried by slug. */
 CREATE INDEX `idx_collection_slug` ON `collection` (slug);
@@ -95,8 +91,8 @@ CREATE INDEX `idx_collection_title` ON `collection` (title);
 */
 DROP TABLE IF EXISTS `collection_author`;
 CREATE TABLE `collection_author` (
-    collectionId VARCHAR(255),
-    authorId VARCHAR(255),
+    collectionId INT,
+    authorId INT,
     FOREIGN KEY (collectionId) REFERENCES `collection`(id) ON DELETE CASCADE,
     FOREIGN KEY (authorId) REFERENCES author(id) ON DELETE CASCADE,
     PRIMARY KEY(collectionId, authorId)
@@ -117,9 +113,10 @@ CREATE TABLE `collection_author` (
 */
 DROP TABLE IF EXISTS `collection_story`;
 CREATE TABLE `collection_story` (
-    id VARCHAR(255) PRIMARY KEY,
-    storyId VARCHAR(255) NULL,
-    collectionId VARCHAR(255) NOT NULL,
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    external_id VARCHAR(255),
+    storyId INT NULL,
+    collectionId INT NOT NULL,
     title VARCHAR(1000) NOT NULL,
     excerpt TEXT NOT NULL,
     imageUrl VARCHAR(1000) NOT NULL,
@@ -128,15 +125,15 @@ CREATE TABLE `collection_story` (
     sortOrder INT NOT NULL DEFAULT 0,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY(storyId) REFERENCES story(id) ON DELETE SET NULL,
-    FOREIGN KEY(collectionId) REFERENCES `collection`(id) ON DELETE CASCADE
+    FOREIGN KEY(collectionId) REFERENCES `collection`(id) ON DELETE CASCADE,
+    FOREIGN KEY(storyId) REFERENCES story(id) ON DELETE SET NULL
 );
 
-/* trigger to achieve default UUID */
+/* trigger to achieve external_id GUID */
 CREATE TRIGGER before_insert_collection_story
     BEFORE INSERT ON `collection_story`
     FOR EACH ROW
-    SET new.id = uuid();
+    SET new.external_id = uuid();
 
 /* stories will be retrieved by collection. */
 CREATE INDEX `idx_collection_story_collection` ON `collection_story` (collectionId);
@@ -147,7 +144,7 @@ CREATE INDEX `idx_collection_story_collection` ON `collection_story` (collection
 */
 DROP TABLE IF EXISTS `images`;
 CREATE TABLE `images` (
-    id VARCHAR(255) PRIMARY KEY,
+    id INT AUTO_INCREMENT PRIMARY KEY,
     entityId VARCHAR(255) NOT NULL,
     entityType ENUM('collection', 'collection_story') NOT NULL,
     sizeCategory ENUM('small', 'medium', 'large') NOT NULL DEFAULT 'large',
@@ -160,12 +157,6 @@ CREATE TABLE `images` (
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
-/* trigger to achieve default UUID */
-CREATE TRIGGER before_insert_images
-    BEFORE INSERT ON `images`
-    FOR EACH ROW
-    SET new.id = uuid();
 
 /* images will be retrieved by entityId and entityType, e.g. 123abc, 'collection' */
 CREATE INDEX `idx_images_entity_entity_type` ON `images` (entityId, entityType);

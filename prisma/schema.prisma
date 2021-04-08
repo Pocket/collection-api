@@ -8,8 +8,9 @@ datasource db {
 }
 
 model author {
-  id                String              @id @db.VarChar(255)
-  name              String              @db.VarChar(500)
+  id                Int                 @id @default(autoincrement())
+  external_id       String?             @db.VarChar(255)
+  name              String              @unique @db.VarChar(500)
   slug              String?             @db.VarChar(300)
   bio               String?             @db.Text
   imageUrl          String?             @db.VarChar(500)
@@ -22,7 +23,8 @@ model author {
 }
 
 model collection {
-  id                String              @id @db.VarChar(255)
+  id                Int                 @id @default(autoincrement())
+  external_id       String?             @db.VarChar(255)
   slug              String              @unique @db.VarChar(255)
   title             String              @db.VarChar(500)
   excerpt           String?             @db.Text
@@ -40,8 +42,8 @@ model collection {
 }
 
 model collection_author {
-  collectionId String     @db.VarChar(255)
-  authorId     String     @db.VarChar(255)
+  collectionId Int
+  authorId     Int
   author       author     @relation(fields: [authorId], references: [id])
   collection   collection @relation(fields: [collectionId], references: [id])
 
@@ -50,9 +52,10 @@ model collection_author {
 }
 
 model collection_story {
-  id           String     @id @db.VarChar(255)
-  storyId      String?    @db.VarChar(255)
-  collectionId String     @db.VarChar(255)
+  id           Int        @id @default(autoincrement())
+  external_id  String?    @db.VarChar(255)
+  storyId      Int?
+  collectionId Int
   title        String     @db.VarChar(1000)
   excerpt      String     @db.Text
   imageUrl     String     @db.VarChar(1000)
@@ -69,7 +72,7 @@ model collection_story {
 }
 
 model images {
-  id            String              @id @db.VarChar(255)
+  id            Int                 @id @default(autoincrement())
   entityId      String              @db.VarChar(255)
   entityType    images_entityType
   sizeCategory  images_sizeCategory @default(large)
@@ -86,7 +89,7 @@ model images {
 }
 
 model story {
-  id               String             @id @db.VarChar(255)
+  id               Int                @id @default(autoincrement())
   url              String             @unique @db.VarChar(1000)
   createdAt        DateTime           @default(now()) @db.Timestamp(0)
   updatedAt        DateTime           @default(now()) @db.Timestamp(0)
