@@ -8,8 +8,8 @@ USE `collections`;
     NOTE: can we use url as the primary key?
     NOTE: how big should the url field be?
 */
-DROP TABLE IF EXISTS `story`;
-CREATE TABLE `story` (
+DROP TABLE IF EXISTS `stories`;
+CREATE TABLE `stories` (
     id INT AUTO_INCREMENT PRIMARY KEY,
     url VARCHAR(1000) NOT NULL UNIQUE,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -27,8 +27,8 @@ CREATE TABLE `story` (
     NOTE: using a single 'name' field to avoid complexities inherent in breaking
     up names into first, last, middle, initial, suffix, etc.
 */
-DROP TABLE IF EXISTS `author`;
-CREATE TABLE `author` (
+DROP TABLE IF EXISTS `authors`;
+CREATE TABLE `authors` (
     id INT AUTO_INCREMENT PRIMARY KEY,
     external_id VARCHAR(255) NULL,
     name VARCHAR(500) UNIQUE NOT NULL,
@@ -42,12 +42,12 @@ CREATE TABLE `author` (
 
 /* trigger to achieve external ID */
 CREATE TRIGGER before_insert_author
-    BEFORE INSERT ON `author`
+    BEFORE INSERT ON `authors`
     FOR EACH ROW
     SET new.external_id = uuid();
 
 /* authors will be looked up by name? */
-CREATE INDEX `idx_author_name` ON `author` (name);
+CREATE INDEX `idx_author_name` ON `authors` (name);
 
 /*
     stores a collection of stories around a central theme/topic, e.g. women in hip-hop.
@@ -56,8 +56,8 @@ CREATE INDEX `idx_author_name` ON `author` (name);
     - excerpt: displayed beneath the title - MARKDOWN
     - intro: multi-paragraph introduction to the collection written by the curator - MARKDOWN
 */
-DROP TABLE IF EXISTS `collection`;
-CREATE TABLE `collection` (
+DROP TABLE IF EXISTS `collections`;
+CREATE TABLE `collections` (
     id INT AUTO_INCREMENT PRIMARY KEY,
     external_id VARCHAR(255) NULL,
     slug VARCHAR(255) UNIQUE NOT NULL,
@@ -73,15 +73,15 @@ CREATE TABLE `collection` (
 
 /* trigger to achieve external_id GUID */
 CREATE TRIGGER before_insert_collection
-    BEFORE INSERT ON `collection`
+    BEFORE INSERT ON `collections`
     FOR EACH ROW
     SET new.external_id = uuid();
 
 /* collections will be queried by slug. */
-CREATE INDEX `idx_collection_slug` ON `collection` (slug);
+CREATE INDEX `idx_collection_slug` ON `collections` (slug);
 
 /* collections will be searched (in the admin) by title. */
-CREATE INDEX `idx_collection_title` ON `collection` (title);
+CREATE INDEX `idx_collection_title` ON `collections` (title);
 
 /*
     stores authors for a given collection.
@@ -93,8 +93,8 @@ DROP TABLE IF EXISTS `collection_author`;
 CREATE TABLE `collection_author` (
     collectionId INT,
     authorId INT,
-    FOREIGN KEY (collectionId) REFERENCES `collection`(id) ON DELETE CASCADE,
-    FOREIGN KEY (authorId) REFERENCES author(id) ON DELETE CASCADE,
+    FOREIGN KEY (collectionId) REFERENCES `collections`(id) ON DELETE CASCADE,
+    FOREIGN KEY (authorId) REFERENCES authors(id) ON DELETE CASCADE,
     PRIMARY KEY(collectionId, authorId)
 ) ENGINE=INNODB;
 
@@ -125,8 +125,8 @@ CREATE TABLE `collection_story` (
     sortOrder INT NOT NULL DEFAULT 0,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY(collectionId) REFERENCES `collection`(id) ON DELETE CASCADE,
-    FOREIGN KEY(storyId) REFERENCES story(id) ON DELETE SET NULL
+    FOREIGN KEY(collectionId) REFERENCES `collections`(id) ON DELETE CASCADE,
+    FOREIGN KEY(storyId) REFERENCES stories(id) ON DELETE SET NULL
 );
 
 /* trigger to achieve external_id GUID */
