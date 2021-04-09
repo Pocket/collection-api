@@ -55,14 +55,14 @@ async function createCollection(
       data: {
         collectionId: collection.id,
         storyId,
-        title: faker.lorem.sentence,
-        excerpt: faker.lorem.paragraph,
-        imageUrl: faker.image.imageUrl,
+        title: faker.lorem.sentence(),
+        excerpt: faker.lorem.paragraph(),
+        imageUrl: faker.image.imageUrl(),
         authors: JSON.stringify([
           `${faker.firstName} ${faker.lastName}`,
           `${faker.firstName} ${faker.lastName}`,
         ]),
-        publisher: faker.company.companyName,
+        publisher: faker.company.companyName(),
       },
     });
   }
@@ -81,24 +81,7 @@ async function createCollectionAuthor(collectionId: number, authorId: number) {
   });
 }
 
-async function truncateTables(tables: string[]) {
-  await prisma.$queryRaw('SET FOREIGN_KEY_CHECKS=0;');
-  tables.forEach(async (table) => {
-    await prisma.$queryRaw(`TRUNCATE TABLE ${table}`);
-  });
-  await prisma.$queryRaw('SET FOREIGN_KEY_CHECKS=1;');
-}
-
 async function main() {
-  //Truncate
-  // await truncateTables([
-  //   'collection_story',
-  //   'collection_author',
-  //   'collections',
-  //   'authors',
-  //   'stories'
-  // ]);
-
   const kelvin = await createAuthor(1, 'Kelvin');
   const jonathan = await createAuthor(2, 'Jonathan');
   const chelsea = await createAuthor(3, 'Chelsea');
@@ -107,7 +90,7 @@ async function main() {
   const nina = await createAuthor(6, 'Nina');
 
   for (let i = 0; i < 10; i++) {
-    await createStory(i + 1, faker.internet.url);
+    await createStory(i + 1, faker.internet.url());
   }
 
   const collection1 = await createCollection(1, `Kelvin's first collection`, [

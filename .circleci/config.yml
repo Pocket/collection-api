@@ -58,15 +58,20 @@ jobs:
           command: |
             sudo npm install -g apollo
       - run:
+          name: build public schema
+          # We have to send one file for the federated schema which means we have to concat our shared scheme
+          # to the public schema before pushing up to apollo studio (this happens in the next step)
+          command: cat schema-shared.graphql schema-public.graphql > schema.graphql
+      - run:
           name: check service
-          command: apollo service:check --graph=pocket-client-api --localSchemaFile=schema-public.graphql --serviceName=collection --variant=current
+          command: apollo service:check --graph=pocket-client-api --localSchemaFile=schema.graphql --serviceName=collection --variant=current
       - when:
           condition:
             equal: [ main, << pipeline.git.branch >>]
           steps:
             - run:
                 name: push service
-                command: apollo service:push --graph=pocket-client-api --localSchemaFile=schema-public.graphql --serviceURL=https://collection-api.readitlater.com/ --serviceName=collection --variant=current
+                command: apollo service:push --graph=pocket-client-api --localSchemaFile=schema.graphql --serviceURL=https://collection-api.readitlater.com/ --serviceName=collection --variant=current
 
   build:
     docker:
