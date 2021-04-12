@@ -1,3 +1,25 @@
+type CollectionsResult {
+    pagination: CollectionPagination
+    collections: [Collection]
+}
+
+type CollectionPagination {
+    currentPage: Int!
+    totalPages: Int!
+    totalResults: Int!
+    perPage: Int!
+}
+
+input SearchCollectionsFilters {
+    author: String
+    title: String
+    status: CollectionStatus
+}
+
 type Query {
+    getCollections(page: Int, perPage: Int): CollectionsResult
+    searchCollections(filters: SearchCollectionsFilters!, page: Int, perPage: Int): CollectionsResult
     getCollection(slug: String!): Collection
+    getCollectionAuthor(id: Int!): CollectionAuthor
+    getCollectionStory(collectionId: Int!, storyId: Int): CollectionStory
 }

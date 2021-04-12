@@ -1,4 +1,6 @@
 scalar Url
+scalar Markdown
+scalar DateString
 
 enum CacheControlScope {
     PUBLIC
@@ -20,4 +22,41 @@ type Collection {
     slug: String!
     title: String!
     excerpt: String!
+    status: CollectionStatus!
+    intro: Markdown
+    imageUrl: Url
+    publishedAt: DateString
+    authors: [CollectionAuthor]
+    stories: [CollectionStory]
 }
+
+enum CollectionStatus {
+    draft
+    published
+    archived
+}
+
+type CollectionAuthor {
+    id: ID!
+    name: String!
+    slug: String
+    bio: String
+    imageUrl: Url
+}
+
+type CollectionStory {
+    id: ID!
+    url: Url!
+    title: String!
+    excerpt: String!
+    imageUrl: Url
+    authors: [CollectionStoryAuthor]
+    publisher: String
+    sortOrder: Int
+}
+
+type CollectionStoryAuthor {
+    name: String!
+}
+
+

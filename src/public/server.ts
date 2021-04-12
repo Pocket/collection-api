@@ -7,6 +7,7 @@ import responseCachePlugin from 'apollo-server-plugin-response-cache';
 import { GraphQLRequestContext } from 'apollo-server-types';
 import { sentryPlugin } from '@pocket-tools/apollo-utils';
 import { getRedisCache } from '../cache';
+import { client } from '../database/client';
 
 const cache = getRedisCache();
 
@@ -40,4 +41,7 @@ export const server = new ApolloServer({
     }),
     sentryPlugin,
   ],
+  context: {
+    db: client(),
+  },
 });
