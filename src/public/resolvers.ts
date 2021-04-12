@@ -1,6 +1,7 @@
-import { CollectionWithAuthorsAndStories } from '../database/queries';
+import { CollectionAuthor, CollectionStory } from '@prisma/client';
 
 import {
+  CollectionWithAuthorsAndStories,
   countPublishedCollections,
   getAuthor,
   getCollection,
@@ -9,28 +10,14 @@ import {
   searchCollections,
 } from '../database/queries';
 
-export enum CollectionStatus {
-  draft = 'draft',
-  published = 'published',
-  archived = 'archived',
-}
-
-export type Author = {};
-
-export type CollectionStory = {};
-
-export type Collection = {
-  id: number;
-  externalId: string;
-  slug: string;
-  title: string;
-  excerpt: string;
-  status: CollectionStatus;
-  intro: string;
-  imageUrl: string;
-  publishedAt: string;
-  authors: Author[];
-  stories: CollectionStory[];
+export type CollectionsResult = {
+  pagination: {
+    totalResults: number;
+    totalPages: number;
+    currentPage: number;
+    perPage: number;
+  };
+  collections: CollectionWithAuthorsAndStories[];
 };
 
 /**
@@ -58,45 +45,49 @@ export const resolvers = {
       { slug },
       { db }
     ): Promise<CollectionWithAuthorsAndStories> => {
-      const collection = await getCollection(db, slug);
-
-      return {
-        ...collection,
-        collectionStories: collection.collectionStories,
-      };
+      return await getCollection(db, slug);
     },
-    getCollectionAuthor: async (_source, { id }, { db }) => {
+    getCollectionAuthor: async (
+      _source,
+      { id },
+      { db }
+    ): Promise<CollectionAuthor> => {
       return await getAuthor(db, id);
     },
-    getCollectionStory: async (_source, { collectionId, storyId }, { db }) => {
+    getCollectionStory: async (
+      _source,
+      { collectionId, url },
+      { db }
+    ): Promise<CollectionStory> => {
       const collectionStory = await getCollectionStory(
         db,
         collectionId,
-        storyId
+        url
       );
 
       return {
         ...collectionStory,
-        url: collectionStory.story.url,
         authors: JSON.parse(collectionStory.authors),
       };
     },
-    getCollections: async (_source, { page = 1, perPage = 30 }, { db }) => {
+    getCollections: async (
+      _source,
+      { page = 1, perPage = 30 },
+      { db }
+    ): Promise<CollectionsResult> => {
       const totalResults = await countPublishedCollections(db);
-
-      const collections = (
-        await getPublishedCollections(db, page, perPage)
-      ).map((collection) => ({
-        ...collection,
-        stories: collection.collectionStories,
-      }));
+      const collections = await getPublishedCollections(db, page, perPage);
 
       return {
         pagination: getPagination(totalResults, page, perPage),
         collections,
       };
     },
-    searchCollections: async (_source, { filters, page, perPage }, { db }) => {
+    searchCollections: async (
+      _source,
+      { filters, page, perPage },
+      { db }
+    ): Promise<CollectionsResult> => {
       if (!filters || (!filters.author && !filters.title && !filters.status)) {
         throw new Error(
           `At least one filter('author', 'title', 'status') is required`

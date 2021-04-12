@@ -1,9 +1,9 @@
 import {
-  Author,
   Collection,
+  CollectionAuthor,
+  CollectionStatus,
   CollectionStory,
   PrismaClient,
-  CollectionStatus,
 } from '@prisma/client';
 
 export type SearchCollectionsFilters = {
@@ -13,8 +13,8 @@ export type SearchCollectionsFilters = {
 };
 
 export type CollectionWithAuthorsAndStories = Collection & {
-  authors: Author[];
-  collectionStories: CollectionStory[];
+  authors?: CollectionAuthor[];
+  stories?: CollectionStory[];
 };
 
 /**
@@ -29,7 +29,7 @@ export async function getCollection(
     where: { slug },
     include: {
       authors: true,
-      collectionStories: true,
+      stories: true,
     },
   });
 }
@@ -38,23 +38,25 @@ export async function getCollection(
  * @param db
  * @param id
  */
-export async function getAuthor(db: PrismaClient, id: number): Promise<Author> {
-  return db.author.findUnique({ where: { id } });
+export async function getAuthor(
+  db: PrismaClient,
+  id: number
+): Promise<CollectionAuthor> {
+  return db.collectionAuthor.findUnique({ where: { id } });
 }
 
 /**
  * @param db
  * @param collectionId
- * @param storyId
+ * @param url
  */
 export async function getCollectionStory(
   db: PrismaClient,
   collectionId: number,
-  storyId: number
+  url: string
 ): Promise<CollectionStory> {
   return await db.collectionStory.findUnique({
-    where: { collectionIdStoryId: { collectionId, storyId } },
-    include: { story: true },
+    where: { collectionIdUrl: { collectionId, url } },
   });
 }
 
@@ -81,7 +83,7 @@ export async function getPublishedCollections(
     where: { status: 'published' },
     include: {
       authors: true,
-      collectionStories: true,
+      stories: true,
     },
     orderBy: { publishedAt: 'desc' },
     take: perPage,
@@ -100,7 +102,7 @@ export async function searchCollections(
   filters: SearchCollectionsFilters,
   page: number = undefined,
   perPage: number = undefined
-): Promise<Collection[]> {
+): Promise<CollectionWithAuthorsAndStories[]> {
   let queryParams: any = {
     where: {
       status: filters.status,

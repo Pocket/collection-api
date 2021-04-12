@@ -11,8 +11,8 @@ datasource db {
 model CollectionStory {
   id           Int         @id @default(autoincrement())
   externalId   String?     @default(uuid()) @db.VarChar(255)
-  storyId      Int
   collectionId Int
+  url          String      @db.VarChar(500)
   title        String      @db.VarChar(255)
   excerpt      String      @db.Text
   imageUrl     String      @db.VarChar(500)
@@ -22,11 +22,10 @@ model CollectionStory {
   createdAt    DateTime    @default(now()) @db.Timestamp(0)
   updatedAt    DateTime    @default(now()) @db.Timestamp(0)
   collection   Collection  @relation(fields: [collectionId], references: [id])
-  story        Story       @relation(fields: [storyId], references: [id])
 
-  @@unique([collectionId, storyId], name: "collectionIdStoryId")
+  @@unique([collectionId, url], name: "collectionIdUrl")
   @@index([collectionId], name: "collectionId")
-  @@index([storyId], name: "storyId")
+  @@index([url], name: "url")
 }
 
 model Image {
@@ -46,7 +45,7 @@ model Image {
   @@index([entityId, entityType], name: "entityIdEntityType")
 }
 
-model Author {
+model CollectionAuthor {
   id                Int                 @id @default(autoincrement())
   externalId        String?             @default(uuid()) @db.VarChar(255)
   name              String              @unique @db.VarChar(255)
@@ -73,19 +72,11 @@ model Collection {
   status             CollectionStatus?   @default(draft)
   createdAt          DateTime            @default(now()) @db.Timestamp(0)
   updatedAt          DateTime            @default(now()) @db.Timestamp(0)
-  authors            Author[]
-  collectionStories  CollectionStory[]
+  authors            CollectionAuthor[]
+  stories            CollectionStory[]
 
   @@index([slug], name: "slug")
   @@index([title], name: "title")
-}
-
-model Story {
-  id               Int                @id @default(autoincrement())
-  url              String             @unique @db.VarChar(500)
-  createdAt        DateTime           @default(now()) @db.Timestamp(0)
-  updatedAt        DateTime           @default(now()) @db.Timestamp(0)
-  collectionStory  CollectionStory[]
 }
 
 enum ImageEntityType {

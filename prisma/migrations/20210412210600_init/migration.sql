@@ -2,8 +2,8 @@
 CREATE TABLE `CollectionStory` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `externalId` VARCHAR(255),
-    `storyId` INTEGER NOT NULL,
     `collectionId` INTEGER NOT NULL,
+    `url` VARCHAR(500) NOT NULL,
     `title` VARCHAR(255) NOT NULL,
     `excerpt` TEXT NOT NULL,
     `imageUrl` VARCHAR(500) NOT NULL,
@@ -12,9 +12,9 @@ CREATE TABLE `CollectionStory` (
     `sortOrder` INTEGER NOT NULL DEFAULT 0,
     `createdAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
     `updatedAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-UNIQUE INDEX `idx_collection_id_story_id`(`collectionId`, `storyId`),
-INDEX `idx_collection_id`(`collectionId`),
-INDEX `idx_story_id`(`storyId`),
+UNIQUE INDEX `collectionIdUrl`(`collectionId`, `url`),
+INDEX `collectionId`(`collectionId`),
+INDEX `url`(`url`),
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -33,13 +33,13 @@ CREATE TABLE `Image` (
     `path` VARCHAR(255),
     `createdAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
     `updatedAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-INDEX `idx_images_entity_entity_type`(`entityId`, `entityType`),
+INDEX `entityIdEntityType`(`entityId`, `entityType`),
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Author` (
+CREATE TABLE `CollectionAuthor` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `externalId` VARCHAR(255),
     `name` VARCHAR(255) NOT NULL,
@@ -49,8 +49,8 @@ CREATE TABLE `Author` (
     `createdAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
     `updatedAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
     `active` BOOLEAN DEFAULT true,
-UNIQUE INDEX `Author.name_unique`(`name`),
-INDEX `idx_author_name`(`name`),
+UNIQUE INDEX `CollectionAuthor.name_unique`(`name`),
+INDEX `name`(`name`),
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -69,39 +69,25 @@ CREATE TABLE `Collection` (
     `createdAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
     `updatedAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
 UNIQUE INDEX `Collection.slug_unique`(`slug`),
-INDEX `idx_collection_slug`(`slug`),
-INDEX `idx_collection_title`(`title`),
+INDEX `slug`(`slug`),
+INDEX `title`(`title`),
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Story` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `url` VARCHAR(500) NOT NULL,
-    `createdAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `updatedAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-UNIQUE INDEX `Story.url_unique`(`url`),
-
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
-CREATE TABLE `_AuthorToCollection` (
+CREATE TABLE `_CollectionToCollectionAuthor` (
     `A` INTEGER NOT NULL,
     `B` INTEGER NOT NULL,
-UNIQUE INDEX `_AuthorToCollection_AB_unique`(`A`, `B`),
-INDEX `_AuthorToCollection_B_index`(`B`)
+UNIQUE INDEX `_CollectionToCollectionAuthor_AB_unique`(`A`, `B`),
+INDEX `_CollectionToCollectionAuthor_B_index`(`B`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
 ALTER TABLE `CollectionStory` ADD FOREIGN KEY (`collectionId`) REFERENCES `Collection`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `CollectionStory` ADD FOREIGN KEY (`storyId`) REFERENCES `Story`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `_CollectionToCollectionAuthor` ADD FOREIGN KEY (`A`) REFERENCES `Collection`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `_AuthorToCollection` ADD FOREIGN KEY (`A`) REFERENCES `Author`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `_AuthorToCollection` ADD FOREIGN KEY (`B`) REFERENCES `Collection`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `_CollectionToCollectionAuthor` ADD FOREIGN KEY (`B`) REFERENCES `CollectionAuthor`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
