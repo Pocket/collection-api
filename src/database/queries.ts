@@ -1,10 +1,30 @@
-import { Author, PrismaClient } from '@prisma/client';
+import {
+  Author,
+  Collection,
+  CollectionStory,
+  PrismaClient,
+  CollectionStatus,
+} from '@prisma/client';
+
+export type SearchCollectionsFilters = {
+  author?: string;
+  title?: string;
+  status?: CollectionStatus;
+};
+
+export type CollectionWithAuthorsAndStories = Collection & {
+  authors: Author[];
+  collectionStories: CollectionStory[];
+};
 
 /**
  * @param db
  * @param slug
  */
-export async function getCollection(db: PrismaClient, slug) {
+export async function getCollection(
+  db: PrismaClient,
+  slug: string
+): Promise<CollectionWithAuthorsAndStories> {
   return db.collection.findUnique({
     where: { slug },
     include: {
@@ -18,7 +38,7 @@ export async function getCollection(db: PrismaClient, slug) {
  * @param db
  * @param id
  */
-export async function getAuthor(db: PrismaClient, id): Promise<Author> {
+export async function getAuthor(db: PrismaClient, id: number): Promise<Author> {
   return db.author.findUnique({ where: { id } });
 }
 
@@ -29,9 +49,9 @@ export async function getAuthor(db: PrismaClient, id): Promise<Author> {
  */
 export async function getCollectionStory(
   db: PrismaClient,
-  collectionId,
-  storyId
-) {
+  collectionId: number,
+  storyId: number
+): Promise<CollectionStory> {
   return await db.collectionStory.findUnique({
     where: { collectionIdStoryId: { collectionId, storyId } },
     include: { story: true },
@@ -52,7 +72,11 @@ export async function countPublishedCollections(
  * @param page
  * @param perPage
  */
-export async function getPublishedCollections(db: PrismaClient, page, perPage) {
+export async function getPublishedCollections(
+  db: PrismaClient,
+  page: number,
+  perPage: number
+): Promise<Collection[]> {
   return db.collection.findMany({
     where: { status: 'published' },
     include: {
@@ -73,10 +97,10 @@ export async function getPublishedCollections(db: PrismaClient, page, perPage) {
  */
 export async function searchCollections(
   db: PrismaClient,
-  filters,
+  filters: SearchCollectionsFilters,
   page: number = undefined,
   perPage: number = undefined
-) {
+): Promise<Collection[]> {
   let queryParams: any = {
     where: {
       status: filters.status,

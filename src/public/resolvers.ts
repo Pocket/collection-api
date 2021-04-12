@@ -1,3 +1,5 @@
+import { CollectionWithAuthorsAndStories } from '../database/queries';
+
 import {
   countPublishedCollections,
   getAuthor,
@@ -6,6 +8,30 @@ import {
   getPublishedCollections,
   searchCollections,
 } from '../database/queries';
+
+export enum CollectionStatus {
+  draft = 'draft',
+  published = 'published',
+  archived = 'archived',
+}
+
+export type Author = {};
+
+export type CollectionStory = {};
+
+export type Collection = {
+  id: number;
+  externalId: string;
+  slug: string;
+  title: string;
+  excerpt: string;
+  status: CollectionStatus;
+  intro: string;
+  imageUrl: string;
+  publishedAt: string;
+  authors: Author[];
+  stories: CollectionStory[];
+};
 
 /**
  * Returns the pagination response object
@@ -27,12 +53,16 @@ function getPagination(totalResults, page, perPage) {
  */
 export const resolvers = {
   Query: {
-    getCollection: async (_source, { slug }, { db }) => {
+    getCollection: async (
+      _source,
+      { slug },
+      { db }
+    ): Promise<CollectionWithAuthorsAndStories> => {
       const collection = await getCollection(db, slug);
 
       return {
         ...collection,
-        stories: collection.collectionStories,
+        collectionStories: collection.collectionStories,
       };
     },
     getCollectionAuthor: async (_source, { id }, { db }) => {
