@@ -170,7 +170,7 @@ class CollectionAPI extends TerraformStack {
               `arn:aws:secretsmanager:${region.name}:${caller.accountId}:secret:${config.name}/${config.environment}`,
               `arn:aws:secretsmanager:${region.name}:${caller.accountId}:secret:${config.name}/${config.environment}/*`,
               // Get the arn without the version id
-              rds.secretARN.substring(0, rds.secretARN.lastIndexOf('-')),
+              `arn:aws:secretsmanager:${region.name}:${caller.accountId}:secret:${config.prefix}/${rds.rds.clusterIdentifier}`,
             ],
             effect: 'Allow',
           },
