@@ -154,7 +154,7 @@ jobs:
             export $(egrep -v '^#' .docker/local.env | xargs -0) && ./.circleci/scripts/setup.sh --hosts --db
       - run:
           name: run tests
-          command: export $(egrep -v '^#' .docker/local.env | xargs -0) && npm run migrate:reset && npm run test-integrations
+          command: export $(egrep -v '^#' .docker/local.env | xargs -0) && npm run migrate:dev && npm run test-integrations
 
   docker_build:
     parameters:
