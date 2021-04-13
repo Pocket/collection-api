@@ -10,6 +10,7 @@
     "test-integrations": "jest \"\\.integration\\.ts\"",
     "lint-check": "eslint --fix-dry-run \"src/**/*.ts\"",
     "lint-fix": "eslint --fix \"src/**/*.ts\"",
+    "db:generate-client": "prisma generate",
     "migrate:dev": "prisma migrate dev",
     "migrate:deploy": "prisma migrate deploy",
     "migrate:reset": "prisma migrate reset",

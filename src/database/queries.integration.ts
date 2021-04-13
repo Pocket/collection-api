@@ -1,6 +1,10 @@
 import { PrismaClient } from '@prisma/client';
 import { getCollection } from './queries';
-import {clear as clearDb, createAuthor, createCollection} from '../test/helpers';
+import {
+  clear as clearDb,
+  createAuthor,
+  createCollection,
+} from '../test/helpers';
 
 const db = new PrismaClient();
 

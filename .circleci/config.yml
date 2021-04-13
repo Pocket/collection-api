@@ -150,7 +150,9 @@ jobs:
             - ./node_modules
       - run:
           name: run setup.sh
-          command: export $(egrep -v '^#' .docker/local.env | xargs -0) && echo $DATABASE_URL && ./.circleci/scripts/setup.sh --hosts --db
+          command: |
+            export $(egrep -v '^#' .docker/local.env | xargs -0) && ./.circleci/scripts/setup.sh --hosts --db
+            npm run db:generate-client
       - run:
           name: run tests
           command: export $(egrep -v '^#' .docker/local.env | xargs -0) && npm run test-integrations
