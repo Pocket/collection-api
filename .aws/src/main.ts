@@ -140,8 +140,8 @@ class CollectionAPI extends TerraformStack {
           containerImage: 'amazon/aws-xray-daemon',
           portMappings: [
             {
-              hostPort: 4004,
-              containerPort: 4004,
+              hostPort: 2000,
+              containerPort: 2000,
               protocol: 'udp',
             },
           ],
@@ -154,7 +154,7 @@ class CollectionAPI extends TerraformStack {
       },
       exposedContainer: {
         name: 'app',
-        port: 4002,
+        port: 4004,
         healthCheckPath: '/.well-known/apollo/server-health',
       },
       ecsIamConfig: {
