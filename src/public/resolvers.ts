@@ -1,13 +1,8 @@
-import { CollectionAuthor, CollectionStory } from '@prisma/client';
-
 import {
   CollectionWithAuthorsAndStories,
   countPublishedCollections,
-  getAuthor,
   getCollection,
-  getCollectionStory,
   getPublishedCollections,
-  searchCollections,
 } from '../database/queries';
 
 export type CollectionsResult = {
@@ -47,25 +42,6 @@ export const resolvers = {
     ): Promise<CollectionWithAuthorsAndStories> => {
       return await getCollection(db, slug);
     },
-    getCollectionAuthor: async (
-      _source,
-      { id },
-      { db }
-    ): Promise<CollectionAuthor> => {
-      return await getAuthor(db, id);
-    },
-    getCollectionStory: async (
-      _source,
-      { collectionId, url },
-      { db }
-    ): Promise<CollectionStory> => {
-      const collectionStory = await getCollectionStory(db, collectionId, url);
-
-      return {
-        ...collectionStory,
-        authors: JSON.parse(collectionStory.authors),
-      };
-    },
     getCollections: async (
       _source,
       { page = 1, perPage = 30 },
@@ -73,25 +49,6 @@ export const resolvers = {
     ): Promise<CollectionsResult> => {
       const totalResults = await countPublishedCollections(db);
       const collections = await getPublishedCollections(db, page, perPage);
-
-      return {
-        pagination: getPagination(totalResults, page, perPage),
-        collections,
-      };
-    },
-    searchCollections: async (
-      _source,
-      { filters, page, perPage },
-      { db }
-    ): Promise<CollectionsResult> => {
-      if (!filters || (!filters.author && !filters.title && !filters.status)) {
-        throw new Error(
-          `At least one filter('author', 'title', 'status') is required`
-        );
-      }
-
-      const totalResults = (await searchCollections(db, filters)).length;
-      const collections = await searchCollections(db, filters, page, perPage);
 
       return {
         pagination: getPagination(totalResults, page, perPage),

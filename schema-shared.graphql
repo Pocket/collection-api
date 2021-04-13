@@ -18,7 +18,6 @@ directive @cacheControl(
 ) on FIELD_DEFINITION | OBJECT | INTERFACE
 
 type Collection {
-  id: Int!
   externalId: ID!
   slug: String!
   title: String!
@@ -38,7 +37,7 @@ enum CollectionStatus {
 }
 
 type CollectionAuthor {
-  id: ID!
+  externalId: ID!
   name: String!
   slug: String
   bio: String
@@ -46,7 +45,7 @@ type CollectionAuthor {
 }
 
 type CollectionStory {
-  id: ID!
+  externalId: ID!
   url: Url!
   title: String!
   excerpt: String!
