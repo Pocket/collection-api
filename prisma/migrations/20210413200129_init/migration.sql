@@ -1,7 +1,7 @@
 -- CreateTable
 CREATE TABLE `CollectionStory` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `externalId` VARCHAR(255),
+    `externalId` VARCHAR(255) NOT NULL,
     `collectionId` INTEGER NOT NULL,
     `url` VARCHAR(500) NOT NULL,
     `title` VARCHAR(255) NOT NULL,
@@ -41,7 +41,7 @@ INDEX `entityIdEntityType`(`entityId`, `entityType`),
 -- CreateTable
 CREATE TABLE `CollectionAuthor` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `externalId` VARCHAR(255),
+    `externalId` VARCHAR(255) NOT NULL,
     `name` VARCHAR(255) NOT NULL,
     `slug` VARCHAR(300),
     `bio` TEXT,
@@ -58,7 +58,7 @@ INDEX `name`(`name`),
 -- CreateTable
 CREATE TABLE `Collection` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `externalId` VARCHAR(255),
+    `externalId` VARCHAR(255) NOT NULL,
     `slug` VARCHAR(300) NOT NULL,
     `title` VARCHAR(255) NOT NULL,
     `excerpt` TEXT,

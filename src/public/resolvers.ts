@@ -4,31 +4,8 @@ import {
   getCollection,
   getPublishedCollections,
 } from '../database/queries';
-
-export type CollectionsResult = {
-  pagination: {
-    totalResults: number;
-    totalPages: number;
-    currentPage: number;
-    perPage: number;
-  };
-  collections: CollectionWithAuthorsAndStories[];
-};
-
-/**
- * Returns the pagination response object
- * @param totalResults
- * @param page
- * @param perPage
- */
-function getPagination(totalResults, page, perPage) {
-  return {
-    currentPage: page,
-    totalPages: Math.ceil(totalResults / perPage),
-    totalResults,
-    perPage,
-  };
-}
+import { getPagination } from '../utils';
+import { CollectionsResult } from '../typeDefs';
 
 /**
  * Resolvers

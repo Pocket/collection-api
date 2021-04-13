@@ -58,3 +58,15 @@ type CollectionStory {
 type CollectionStoryAuthor {
   name: String!
 }
+
+type CollectionsResult {
+    pagination: CollectionPagination
+    collections: [Collection]
+}
+
+type CollectionPagination {
+    currentPage: Int!
+    totalPages: Int!
+    totalResults: Int!
+    perPage: Int!
+}

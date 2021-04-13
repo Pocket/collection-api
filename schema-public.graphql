@@ -1,21 +1,3 @@
-type CollectionsResult {
-  pagination: CollectionPagination
-  collections: [Collection]
-}
-
-type CollectionPagination {
-  currentPage: Int!
-  totalPages: Int!
-  totalResults: Int!
-  perPage: Int!
-}
-
-input SearchCollectionsFilters {
-  author: String
-  title: String
-  status: CollectionStatus
-}
-
 type Query {
   getCollections(page: Int, perPage: Int): CollectionsResult
   getCollection(slug: String!): Collection

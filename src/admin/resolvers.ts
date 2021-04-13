@@ -1,5 +1,6 @@
 import { CollectionAuthor, CollectionStory } from '@prisma/client';
-import { CollectionsResult } from '../public/resolvers';
+import { CollectionsResult } from '../typeDefs';
+import { getPagination } from '../utils';
 
 import {
   getAuthor,

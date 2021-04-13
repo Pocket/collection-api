@@ -1,18 +1,24 @@
-type Mutation {
-  createCollection(data: CollectionInput!): Collection
-}
-
-type Query {
-  searchCollections(
-    filters: SearchCollectionsFilters!
-    page: Int
-    perPage: Int
-  ): CollectionsResult
-  getCollectionAuthor(id: Int!): CollectionAuthor
-  getCollectionStory(collectionId: Int!, url: String): CollectionStory
-}
-
 input CollectionInput {
   title: String!
   excerpt: String!
+}
+
+input SearchCollectionsFilters {
+    author: String
+    title: String
+    status: CollectionStatus
+}
+
+type Query {
+    searchCollections(
+        filters: SearchCollectionsFilters!
+        page: Int
+        perPage: Int
+    ): CollectionsResult
+    getCollectionAuthor(id: Int!): CollectionAuthor
+    getCollectionStory(collectionId: Int!, url: String): CollectionStory
+}
+
+type Mutation {
+    createCollection(data: CollectionInput!): Collection
 }
