@@ -77,14 +77,14 @@ class CollectionAPI extends TerraformStack {
       name: `Backend-${config.environment}-ChatBot`,
     });
 
-    const pocketVpc = new PocketVPC(scope, 'pocket-vpc');
+    const pocketVpc = new PocketVPC(this, 'pocket-vpc');
 
     const { primaryEndpoint, readerEndpoint } = CollectionAPI.createElasticache(
       this,
       pocketVpc
     );
 
-    const rds = CollectionAPI.createRDS(scope, pocketVpc);
+    const rds = CollectionAPI.createRDS(this, pocketVpc);
 
     new PocketALBApplication(this, 'application', {
       internal: true,
