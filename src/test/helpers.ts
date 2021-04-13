@@ -1,15 +1,20 @@
 import slugify from 'slugify';
 import {
+  Collection,
   CollectionAuthor,
   CollectionStatus,
   PrismaClient,
 } from '@prisma/client';
 import faker from 'faker';
-import config from "../config";
+import config from '../config';
 
 const slugifyConfig = config.slugify;
 
-export async function createAuthor(prisma: PrismaClient, id, name) {
+export async function createAuthor(
+  prisma: PrismaClient,
+  id,
+  name
+): Promise<CollectionAuthor> {
   const slug = slugify(name, slugifyConfig);
   return await prisma.collectionAuthor.upsert({
     where: { id },
@@ -27,7 +32,7 @@ export async function createCollection(
   title,
   author: CollectionAuthor,
   status: CollectionStatus = 'draft'
-) {
+): Promise<Collection> {
   const collection = await prisma.collection.create({
     data: {
       title,
@@ -68,7 +73,7 @@ export async function createCollection(
   return collection;
 }
 
-export async function clear(prisma: PrismaClient) {
+export async function clear(prisma: PrismaClient): Promise<void> {
   ['CollectionStory', 'Collection', 'CollectionAuthor', 'Image'].map(
     async (table) => await prisma.$executeRaw(`DELETE FROM ${table};`)
   );
