@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import {createAuthor, createCollection} from "../src/test/helpers";
+import { createAuthor, createCollection } from '../src/test/helpers';
 
 const prisma = new PrismaClient();
 
@@ -11,54 +11,26 @@ async function main() {
   const daniel = await createAuthor(prisma, 5, 'Daniel');
   const nina = await createAuthor(prisma, 6, 'Nina');
 
-  const collection1 = await createCollection(
-    prisma,
-    `Kelvin's first collection`,
-    kelvin
-  );
-  const collection2 = await createCollection(
+  await createCollection(prisma, `Kelvin's first collection`, kelvin);
+  await createCollection(
     prisma,
     `Daniel's first collection`,
     daniel,
     'published'
   );
-  const collection3 = await createCollection(
-    prisma,
-    `Nina's first collection`,
-    nina
-  );
-  const collection4 = await createCollection(
-    prisma,
-    `Chelsea's first collection`,
-    chelsea
-  );
-  const collection5 = await createCollection(
+  await createCollection(prisma, `Nina's first collection`, nina);
+  await createCollection(prisma, `Chelsea's first collection`, chelsea);
+  await createCollection(
     prisma,
     `Mathijs's' first collection`,
     mathijs,
     'published'
   );
-  const collection6 = await createCollection(
-    prisma,
-    `Jonathan's' first collection`,
-    jonathan
-  );
-  const collection7 = await createCollection(
-    prisma,
-    `Chelsea's second collection`,
-    chelsea
-  );
-  const collection8 = await createCollection(
-    prisma,
-    `Daniel's second collection`,
-    daniel
-  );
-  const collection9 = await createCollection(
-    prisma,
-    `Jonathan's second collection`,
-    jonathan
-  );
-  const collection10 = await createCollection(
+  await createCollection(prisma, `Jonathan's' first collection`, jonathan);
+  await createCollection(prisma, `Chelsea's second collection`, chelsea);
+  await createCollection(prisma, `Daniel's second collection`, daniel);
+  await createCollection(prisma, `Jonathan's second collection`, jonathan);
+  await createCollection(
     prisma,
     `Chelsea's' third collection`,
     chelsea,
