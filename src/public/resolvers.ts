@@ -59,11 +59,7 @@ export const resolvers = {
       { collectionId, url },
       { db }
     ): Promise<CollectionStory> => {
-      const collectionStory = await getCollectionStory(
-        db,
-        collectionId,
-        url
-      );
+      const collectionStory = await getCollectionStory(db, collectionId, url);
 
       return {
         ...collectionStory,

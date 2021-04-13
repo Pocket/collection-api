@@ -5,14 +5,15 @@
     "watch": "tsc -w & nodemon",
     "start": "node dist/main.js",
     "start:dev": "npm run build && npm run watch",
-    "test": "jest",
     "test-ci": "npm test",
+    "test": "jest \"\\.spec\\.ts\"",
+    "test-integrations": "jest \"\\.integration\\.ts\"",
     "lint-check": "eslint --fix-dry-run \"src/**/*.ts\"",
     "lint-fix": "eslint --fix \"src/**/*.ts\"",
     "migrate:dev": "prisma migrate dev",
     "migrate:deploy": "prisma migrate deploy",
-    "migrate:seed": "prisma seed --preview-feature",
-    "migrate:reset": "prisma migrate reset"
+    "migrate:reset": "prisma migrate reset",
+    "db:seed": "prisma seed --preview-feature"
   },
   "dependencies": {
     "@apollo/federation": "^0.23.0",
@@ -27,6 +28,7 @@
     "aws-xray-sdk-core": "^3.2.0",
     "aws-xray-sdk-express": "^3.2.0",
     "graphql": "^15.5.0",
+    "install": "^0.13.0",
     "slugify": "^1.5.0"
   },
   "devDependencies": {

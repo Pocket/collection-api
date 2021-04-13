@@ -1,5 +1,10 @@
-import {Construct} from 'constructs';
-import {App, DataTerraformRemoteState, RemoteBackend, TerraformStack,} from 'cdktf';
+import { Construct } from 'constructs';
+import {
+  App,
+  DataTerraformRemoteState,
+  RemoteBackend,
+  TerraformStack,
+} from 'cdktf';
 import {
   AwsProvider,
   DataAwsCallerIdentity,
@@ -7,7 +12,7 @@ import {
   DataAwsRegion,
   DataAwsSnsTopic,
 } from '../.gen/providers/aws';
-import {config} from './config';
+import { config } from './config';
 import {
   ApplicationRDSCluster,
   ApplicationRedis,
@@ -15,8 +20,7 @@ import {
   PocketPagerDuty,
   PocketVPC,
 } from '@pocket/terraform-modules';
-import {PagerdutyProvider} from '../.gen/providers/pagerduty';
-import {ApplicationRDSClusterConfig} from "@pocket/terraform-modules/dist/src/base/ApplicationRDSCluster";
+import { PagerdutyProvider } from '../.gen/providers/pagerduty';
 
 class CollectionAPI extends TerraformStack {
   constructor(scope: Construct, name: string) {
@@ -75,10 +79,12 @@ class CollectionAPI extends TerraformStack {
 
     const pocketVpc = new PocketVPC(scope, 'pocket-vpc');
 
-    const {primaryEndpoint, readerEndpoint} = CollectionAPI.createElasticache(
+    const { primaryEndpoint, readerEndpoint } = CollectionAPI.createElasticache(
       this,
       pocketVpc
     );
+
+    const rds = CollectionAPI.createRDS(scope, pocketVpc);
 
     new PocketALBApplication(this, 'application', {
       internal: true,
@@ -114,6 +120,18 @@ class CollectionAPI extends TerraformStack {
             {
               name: 'SENTRY_DSN',
               valueFrom: `arn:aws:ssm:${region.name}:${caller.accountId}:parameter/${config.name}/${config.environment}/SENTRY_DSN`,
+            },
+            {
+              name: 'DB_HOST',
+              valueFrom: `${rds.secretARN}:host::`,
+            },
+            {
+              name: 'DB_USERNAME',
+              valueFrom: `${rds.secretARN}:username::`,
+            },
+            {
+              name: 'DB_PASSWORD',
+              valueFrom: `${rds.secretARN}:password::`,
             },
           ],
         },
@@ -234,19 +252,22 @@ class CollectionAPI extends TerraformStack {
 
     return {
       primaryEndpoint:
-      elasticache.elasticacheReplicationGroup.primaryEndpointAddress,
+        elasticache.elasticacheReplicationGroup.primaryEndpointAddress,
       readerEndpoint:
-      elasticache.elasticacheReplicationGroup.readerEndpointAddress,
+        elasticache.elasticacheReplicationGroup.readerEndpointAddress,
     };
   }
 
   private static createRDS(scope: Construct, pocketVpc: PocketVPC) {
-    new ApplicationRDSCluster(scope, 'rds', {
+    return new ApplicationRDSCluster(scope, 'rds', {
       prefix: config.prefix,
       vpcId: pocketVpc.vpc.id,
       subnetIds: pocketVpc.privateSubnetIds,
       rdsConfig: {
-        databaseName: ``
+        databaseName: 'collections',
+        masterUsername: 'pkt_collections',
+        engine: 'aurora-mysql',
+        engineMode: 'serverless',
       },
       tags: config.tags,
     });
