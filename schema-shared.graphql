@@ -21,7 +21,7 @@ type Collection {
   externalId: ID!
   slug: String!
   title: String!
-  excerpt: String!
+  excerpt: Markdown!
   status: CollectionStatus!
   intro: Markdown
   imageUrl: Url
@@ -40,7 +40,7 @@ type CollectionAuthor {
   externalId: ID!
   name: String!
   slug: String
-  bio: String
+  bio: Markdown
   imageUrl: Url
 }
 
@@ -48,7 +48,7 @@ type CollectionStory {
   externalId: ID!
   url: Url!
   title: String!
-  excerpt: String!
+  excerpt: Markdown!
   imageUrl: Url
   authors: [CollectionStoryAuthor]
   publisher: String
@@ -60,13 +60,13 @@ type CollectionStoryAuthor {
 }
 
 type CollectionsResult {
-    pagination: CollectionPagination
-    collections: [Collection]
+  pagination: CollectionPagination
+  collections: [Collection]
 }
 
 type CollectionPagination {
-    currentPage: Int!
-    totalPages: Int!
-    totalResults: Int!
-    perPage: Int!
+  currentPage: Int!
+  totalPages: Int!
+  totalResults: Int!
+  perPage: Int!
 }
