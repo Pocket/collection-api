@@ -5,14 +5,21 @@
     "watch": "tsc -w & nodemon",
     "start": "node dist/main.js",
     "start:dev": "npm run build && npm run watch",
-    "test": "jest",
     "test-ci": "npm test",
+    "test": "jest \"\\.spec\\.ts\"",
+    "test-integrations": "jest \"\\.integration\\.ts\"",
     "lint-check": "eslint --fix-dry-run \"src/**/*.ts\"",
-    "lint-fix": "eslint --fix \"src/**/*.ts\""
+    "lint-fix": "eslint --fix \"src/**/*.ts\"",
+    "db:generate-client": "prisma generate",
+    "migrate:dev": "prisma migrate dev",
+    "migrate:deploy": "prisma migrate deploy",
+    "migrate:reset": "prisma migrate reset",
+    "db:seed": "prisma seed --preview-feature"
   },
   "dependencies": {
     "@apollo/federation": "^0.23.0",
     "@pocket-tools/apollo-utils": "^1.0.3",
+    "@prisma/client": "^2.20.1",
     "@sentry/node": "^6.2.5",
     "@sentry/tracing": "^6.2.5",
     "apollo-server": "^2.22.2",
@@ -21,10 +28,12 @@
     "apollo-server-plugin-response-cache": "^0.7.0",
     "aws-xray-sdk-core": "^3.2.0",
     "aws-xray-sdk-express": "^3.2.0",
-    "graphql": "^15.5.0"
+    "graphql": "^15.5.0",
+    "slugify": "^1.5.0"
   },
   "devDependencies": {
     "@types/chai": "^4.2.16",
+    "@types/faker": "^5.5.1",
     "@types/jest": "^26.0.22",
     "@types/node": "^14.14.37",
     "@typescript-eslint/eslint-plugin": "^4.21.0",
@@ -33,10 +42,12 @@
     "eslint": "^7.23.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-prettier": "^3.3.1",
+    "faker": "^5.5.3",
     "jest": "^26.6.3",
     "nock": "^13.0.11",
     "nodemon": "^2.0.7",
     "prettier": "^2.2.1",
+    "prisma": "^2.20.1",
     "ts-jest": "^26.5.4",
     "ts-node": "^9.1.1",
     "typescript": "^4.2.3"

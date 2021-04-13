@@ -1,3 +1,4 @@
 type Query {
-    getCollection(slug: String!): Collection
+  getCollections(page: Int, perPage: Int): CollectionsResult
+  getCollection(slug: String!): Collection
 }

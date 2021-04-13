@@ -1,0 +1,97 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-1.1.x"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model CollectionStory {
+  id           Int         @id @default(autoincrement())
+  externalId   String      @default(uuid()) @db.VarChar(255)
+  collectionId Int
+  url          String      @db.VarChar(500)
+  title        String      @db.VarChar(255)
+  excerpt      String      @db.Text
+  imageUrl     String      @db.VarChar(500)
+  authors      String      @db.VarChar(255)
+  publisher    String      @db.VarChar(255)
+  sortOrder    Int         @default(0)
+  createdAt    DateTime    @default(now()) @db.Timestamp(0)
+  updatedAt    DateTime    @default(now()) @db.Timestamp(0)
+  collection   Collection  @relation(fields: [collectionId], references: [id])
+
+  @@unique([collectionId, url], name: "collectionIdUrl")
+  @@index([collectionId], name: "collectionId")
+  @@index([url], name: "url")
+}
+
+model Image {
+  id            Int                 @id @default(autoincrement())
+  entityId      String              @db.VarChar(255)
+  entityType    ImageEntityType
+  sizeCategory  ImageSizeCategory   @default(large)
+  width         Int?
+  height        Int?
+  mimeType      String?             @db.VarChar(255)
+  fileSizeBytes Int?
+  fileName      String?             @db.VarChar(255)
+  path          String?             @db.VarChar(255)
+  createdAt     DateTime            @default(now()) @db.Timestamp(0)
+  updatedAt     DateTime            @default(now()) @db.Timestamp(0)
+
+  @@index([entityId, entityType], name: "entityIdEntityType")
+}
+
+model CollectionAuthor {
+  id                Int                 @id @default(autoincrement())
+  externalId        String              @default(uuid()) @db.VarChar(255)
+  name              String              @unique @db.VarChar(255)
+  slug              String?             @db.VarChar(300)
+  bio               String?             @db.Text
+  imageUrl          String?             @db.VarChar(500)
+  createdAt         DateTime            @default(now()) @db.Timestamp(0)
+  updatedAt         DateTime            @default(now()) @db.Timestamp(0)
+  active            Boolean?            @default(true)
+  collections       Collection[]
+
+  @@index([name], name: "name")
+}
+
+model Collection {
+  id                 Int                 @id @default(autoincrement())
+  externalId         String              @default(uuid()) @db.VarChar(255)
+  slug               String              @unique @db.VarChar(300)
+  title              String              @db.VarChar(255)
+  excerpt            String?             @db.Text
+  intro              String?             @db.Text
+  imageUrl           String?             @db.VarChar(500)
+  publishedAt        DateTime            @default(now()) @db.Timestamp(0)
+  status             CollectionStatus?   @default(draft)
+  createdAt          DateTime            @default(now()) @db.Timestamp(0)
+  updatedAt          DateTime            @default(now()) @db.Timestamp(0)
+  authors            CollectionAuthor[]
+  stories            CollectionStory[]
+
+  @@index([slug], name: "slug")
+  @@index([title], name: "title")
+}
+
+enum ImageEntityType {
+  collection
+  collection_story
+}
+
+enum ImageSizeCategory {
+  small
+  medium
+  large
+}
+
+enum CollectionStatus {
+  draft
+  published
+  archived
+}

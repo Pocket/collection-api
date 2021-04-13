@@ -1,8 +1,10 @@
 scalar Url
+scalar Markdown
+scalar DateString
 
 enum CacheControlScope {
-    PUBLIC
-    PRIVATE
+  PUBLIC
+  PRIVATE
 }
 
 """
@@ -11,13 +13,60 @@ https://stackoverflow.com/questions/52922080/how-to-implement-caching-on-apollo-
 https://github.com/apollographql/federation/issues/356
 """
 directive @cacheControl(
-    maxAge: Int
-    scope: CacheControlScope
+  maxAge: Int
+  scope: CacheControlScope
 ) on FIELD_DEFINITION | OBJECT | INTERFACE
 
 type Collection {
-    id: ID!
-    slug: String!
-    title: String!
-    excerpt: String!
+  externalId: ID!
+  slug: String!
+  title: String!
+  excerpt: String!
+  status: CollectionStatus!
+  intro: Markdown
+  imageUrl: Url
+  publishedAt: DateString
+  authors: [CollectionAuthor]
+  stories: [CollectionStory]
+}
+
+enum CollectionStatus {
+  draft
+  published
+  archived
+}
+
+type CollectionAuthor {
+  externalId: ID!
+  name: String!
+  slug: String
+  bio: String
+  imageUrl: Url
+}
+
+type CollectionStory {
+  externalId: ID!
+  url: Url!
+  title: String!
+  excerpt: String!
+  imageUrl: Url
+  authors: [CollectionStoryAuthor]
+  publisher: String
+  sortOrder: Int
+}
+
+type CollectionStoryAuthor {
+  name: String!
+}
+
+type CollectionsResult {
+    pagination: CollectionPagination
+    collections: [Collection]
+}
+
+type CollectionPagination {
+    currentPage: Int!
+    totalPages: Int!
+    totalResults: Int!
+    perPage: Int!
 }
