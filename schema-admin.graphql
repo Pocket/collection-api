@@ -4,21 +4,36 @@ input CollectionInput {
 }
 
 input SearchCollectionsFilters {
-    author: String
-    title: String
-    status: CollectionStatus
+  author: String
+  title: String
+  status: CollectionStatus
 }
 
 type Query {
-    searchCollections(
-        filters: SearchCollectionsFilters!
-        page: Int
-        perPage: Int
-    ): CollectionsResult
-    getCollectionAuthor(id: Int!): CollectionAuthor
-    getCollectionStory(collectionId: Int!, url: String): CollectionStory
+  searchCollections(
+    filters: SearchCollectionsFilters!
+    page: Int
+    perPage: Int
+  ): CollectionsResult
+  getCollectionAuthor(id: Int!): CollectionAuthor
+  getCollectionStory(collectionId: Int!, url: String): CollectionStory
+}
+
+input CreateCollectionAuthorInput {
+  name: String!
+  bio: Markdown
+  imageUrl: Url
+}
+
+input UpdateCollectionAuthorInput {
+  externalId: String!
+  name: String!
+  bio: Markdown
+  imageUrl: Url
+  active: Boolean
 }
 
 type Mutation {
-    createCollection(data: CollectionInput!): Collection
+  createCollectionAuthor(data: CreateCollectionAuthorInput): CollectionAuthor
+  updateCollectionAuthor(data: UpdateCollectionAuthorInput): CollectionAuthor
 }

@@ -3,6 +3,7 @@ export default {
     environment: process.env.NODE_ENV || 'development',
     defaultMaxAge: 0,
   },
+  slugify: { lower: true, remove: /[*+~.()'"!:@]/g },
   redis: {
     primaryEndpoint: process.env.REDIS_PRIMARY_ENDPOINT || 'redis',
     readerEndpoint: process.env.REDIS_READER_ENDPOINT || 'redis',

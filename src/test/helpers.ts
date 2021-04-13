@@ -5,8 +5,9 @@ import {
   PrismaClient,
 } from '@prisma/client';
 import faker from 'faker';
+import config from "../config";
 
-const slugifyConfig = { lower: true, remove: /[*+~.()'"!:@]/g };
+const slugifyConfig = config.slugify;
 
 export async function createAuthor(prisma: PrismaClient, id, name) {
   const slug = slugify(name, slugifyConfig);
