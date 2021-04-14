@@ -42,6 +42,10 @@ export type UpdateCollectionInput = {
   authorExternalId?: string;
 };
 
+/**
+ * @param db
+ * @param data
+ */
 export async function createAuthor(
   db: PrismaClient,
   data: CreateCollectionAuthorInput
@@ -57,6 +61,10 @@ export async function createAuthor(
   return db.collectionAuthor.create({ data: { ...data, slug } });
 }
 
+/**
+ * @param db
+ * @param data
+ */
 export async function updateAuthor(
   db: PrismaClient,
   data: UpdateCollectionAuthorInput
@@ -81,6 +89,10 @@ export async function updateAuthor(
   });
 }
 
+/**
+ * @param db
+ * @param data
+ */
 export async function createCollection(
   db: PrismaClient,
   data: CreateCollectionInput
@@ -93,9 +105,30 @@ export async function createCollection(
     throw new Error(`A collection with the slug ${data.slug} already exists`);
   }
 
-  return db.collection.create({ data });
+  // We have to pull the authorExternalId property out of data
+  // because prisma's generated create/update types do not
+  // have the authorExternalId as a property. We have it
+  // as part of the mutation input to allow connecting
+  // an author to a collection.
+  const authorExternalId = data.authorExternalId;
+  delete data.authorExternalId;
+
+  return db.collection.create({
+    data: {
+      ...data,
+      authors: {
+        connect: {
+          externalId: authorExternalId,
+        },
+      },
+    },
+  });
 }
 
+/**
+ * @param db
+ * @param data
+ */
 export async function updateCollection(
   db: PrismaClient,
   data: UpdateCollectionInput
@@ -110,8 +143,24 @@ export async function updateCollection(
     );
   }
 
+  // We have to pull the authorExternalId property out of data
+  // because prisma's generated create/update types do not
+  // have the authorExternalId as a property. We have it
+  // as part of the mutation input to allow connecting
+  // an author to a collection.
+  const authorExternalId = data.authorExternalId;
+  delete data.authorExternalId;
+
   return db.collection.update({
     where: { externalId: data.externalId },
-    data,
+    data: {
+      ...data,
+      authors: {
+        set: [],
+        connect: {
+          externalId: authorExternalId,
+        },
+      },
+    },
   });
 }
