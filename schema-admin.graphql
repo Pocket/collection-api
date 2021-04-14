@@ -33,7 +33,30 @@ input UpdateCollectionAuthorInput {
   active: Boolean
 }
 
+input CreateCollectionInput {
+  slug: String!
+  title: String!
+  excerpt: Markdown
+  intro: Markdown
+  imageUrl: String
+  status: CollectionStatus
+  authorExternalId: String
+}
+
+input UpdateCollectionInput {
+  externalId: String
+  slug: String!
+  title: String!
+  excerpt: Markdown
+  intro: Markdown
+  imageUrl: String
+  status: CollectionStatus!
+  authorExternalId: String
+}
+
 type Mutation {
   createCollectionAuthor(data: CreateCollectionAuthorInput): CollectionAuthor
   updateCollectionAuthor(data: UpdateCollectionAuthorInput): CollectionAuthor
+  createCollection(data: CreateCollectionInput): Collection
+  updateCollection(data: UpdateCollectionInput): Collection
 }

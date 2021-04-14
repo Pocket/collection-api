@@ -1,4 +1,5 @@
 import {
+  Collection,
   CollectionAuthor,
   CollectionStory,
   PrismaClient,
@@ -84,6 +85,74 @@ export const resolvers = {
 
       try {
         return await db.collectionAuthor.update({
+          where: { externalId: data.externalId },
+          data,
+        });
+      } catch (ex) {
+        console.log(ex);
+        Sentry.captureException(ex);
+        throw new Error(ex);
+      }
+    },
+    createCollection: async (
+      _source,
+      { data },
+      { db }: { db: PrismaClient }
+    ): Promise<Collection> => {
+      let slugExists;
+
+      // make sure a collection with this slug doesn't exist
+      try {
+        slugExists = await db.collection.count({
+          where: { slug: data.slug },
+        });
+      } catch (ex) {
+        console.log(ex);
+        Sentry.captureException(ex);
+        throw new Error(ex);
+      }
+
+      if (slugExists) {
+        throw new Error(
+          `A collection with the slug ${data.slug} already exists`
+        );
+      }
+
+      try {
+        return await db.collection.create({ data });
+      } catch (ex) {
+        console.log(ex);
+        Sentry.captureException(ex);
+        throw new Error(ex);
+      }
+    },
+    updateCollection: async (
+      _source,
+      { data },
+      { db }: { db: PrismaClient }
+    ): Promise<Collection> => {
+      let slugExists;
+
+      // make sure a collection with this slug doesn't exist
+      // (that isn't the collection we're currently editing)
+      try {
+        slugExists = await db.collection.count({
+          where: { slug: data.slug, externalId: { not: data.externalId } },
+        });
+      } catch (ex) {
+        console.log(ex);
+        Sentry.captureException(ex);
+        throw new Error(ex);
+      }
+
+      if (slugExists) {
+        throw new Error(
+          `A different collection with the slug ${data.slug} already exists`
+        );
+      }
+
+      try {
+        return await db.collection.update({
           where: { externalId: data.externalId },
           data,
         });
