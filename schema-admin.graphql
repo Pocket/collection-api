@@ -46,18 +46,18 @@ input CreateCollectionInput {
   intro: Markdown
   imageUrl: String
   status: CollectionStatus
-  authorExternalId: String
+  authorExternalId: String!
 }
 
 input UpdateCollectionInput {
   externalId: String
   slug: String!
   title: String!
-  excerpt: Markdown
+  excerpt: Markdown!
   intro: Markdown
   imageUrl: String
   status: CollectionStatus!
-  authorExternalId: String
+  authorExternalId: String!
 }
 
 type Mutation {
