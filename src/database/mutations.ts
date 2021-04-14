@@ -116,11 +116,7 @@ export async function createCollection(
   return db.collection.create({
     data: {
       ...data,
-      authors: {
-        connect: {
-          externalId: authorExternalId,
-        },
-      },
+      authors: { connect: { externalId: authorExternalId } },
     },
   });
 }
@@ -155,12 +151,7 @@ export async function updateCollection(
     where: { externalId: data.externalId },
     data: {
       ...data,
-      authors: {
-        set: [],
-        connect: {
-          externalId: authorExternalId,
-        },
-      },
+      authors: { set: [], connect: { externalId: authorExternalId } },
     },
   });
 }
