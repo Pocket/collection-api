@@ -44,8 +44,11 @@ publicServer.applyMiddleware({ app, path: '/' });
 app.use(xrayExpress.closeSegment());
 
 // The `listen` method launches a web server.
-app.listen({ port: 4004 }, () =>
+app.listen({ port: 4004 }, () => {
   console.log(
-    `🚀 Server ready at http://localhost:4004${publicServer.graphqlPath}`
-  )
-);
+    `🚀 Public server ready at http://localhost:4004${publicServer.graphqlPath}`
+  );
+  console.log(
+    `🚀 Admin server ready at http://localhost:4004${adminServer.graphqlPath}`
+  );
+});

@@ -24,6 +24,7 @@ model CollectionStory {
   collection   Collection  @relation(fields: [collectionId], references: [id])
 
   @@unique([collectionId, url], name: "collectionIdUrl")
+  @@unique([externalId], name: "externalId")
   @@index([collectionId], name: "collectionId")
   @@index([url], name: "url")
 }
@@ -58,6 +59,7 @@ model CollectionAuthor {
   collections       Collection[]
 
   @@index([name], name: "name")
+  @@unique([externalId], name: "externalId")
 }
 
 model Collection {
@@ -77,6 +79,7 @@ model Collection {
 
   @@index([slug], name: "slug")
   @@index([title], name: "title")
+  @@unique([externalId], name: "externalId")
 }
 
 enum ImageEntityType {
