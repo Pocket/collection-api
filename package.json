@@ -3,8 +3,8 @@
   "scripts": {
     "build": "rm -rf dist && tsc",
     "watch": "tsc -w & nodemon",
-    "start": "node dist/main.js",
-    "start:dev": "npm run build && npm run watch",
+    "start": "npm run migrate:deploy && node dist/main.js",
+    "start:dev": "npm run migrate:deploy && npm run build && npm run watch",
     "test-ci": "npm test",
     "test": "jest \"\\.spec\\.ts\"",
     "test-integrations": "jest \"\\.integration\\.ts\"",
