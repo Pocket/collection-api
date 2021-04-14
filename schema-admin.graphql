@@ -9,13 +9,19 @@ input SearchCollectionsFilters {
   status: CollectionStatus
 }
 
+type CollectionAuthorsResult {
+  pagination: CollectionEntityPagination
+  authors: [CollectionAuthor]
+}
+
 type Query {
   searchCollections(
-    filters: SearchCollectionsFilters!
-    page: Int
+    filters: SearchCollectionsFilters!,
+    page: Int,
     perPage: Int
   ): CollectionsResult
   getCollectionAuthor(id: Int!): CollectionAuthor
+  getCollectionAuthors(page: Int, perPage: Int): CollectionAuthorsResult
   getCollectionStory(collectionId: Int!, url: String): CollectionStory
 }
 
