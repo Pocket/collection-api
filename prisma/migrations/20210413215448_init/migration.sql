@@ -13,6 +13,7 @@ CREATE TABLE `CollectionStory` (
     `createdAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
     `updatedAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
 UNIQUE INDEX `collectionIdUrl`(`collectionId`, `url`),
+UNIQUE INDEX `externalId`(`externalId`),
 INDEX `collectionId`(`collectionId`),
 INDEX `url`(`url`),
 
@@ -51,6 +52,7 @@ CREATE TABLE `CollectionAuthor` (
     `active` BOOLEAN DEFAULT true,
 UNIQUE INDEX `CollectionAuthor.name_unique`(`name`),
 INDEX `name`(`name`),
+UNIQUE INDEX `externalId`(`externalId`),
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -71,6 +73,7 @@ CREATE TABLE `Collection` (
 UNIQUE INDEX `Collection.slug_unique`(`slug`),
 INDEX `slug`(`slug`),
 INDEX `title`(`title`),
+UNIQUE INDEX `externalId`(`externalId`),
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

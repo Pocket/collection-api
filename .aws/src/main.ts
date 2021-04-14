@@ -102,9 +102,19 @@ class CollectionAPI extends TerraformStack {
               containerPort: 4004,
             },
           ],
+          healthCheck: {
+            command: [
+              'CMD-SHELL',
+              'curl -f http://localhost:4004/.well-known/apollo/server-health || exit 1',
+            ],
+            interval: 15,
+            retries: 3,
+            timeout: 5,
+            startPeriod: 0,
+          },
           envVars: [
             {
-              name: 'ENVIRONMENT',
+              name: 'NODE_ENV',
               value: process.env.NODE_ENV, // this gives us a nice lowercase production and development
             },
             {
@@ -138,6 +148,7 @@ class CollectionAPI extends TerraformStack {
         {
           name: 'xray-daemon',
           containerImage: 'amazon/aws-xray-daemon',
+          repositoryCredentialsParam: `arn:aws:secretsmanager:${region.name}:${caller.accountId}:secret:Shared/DockerHub`,
           portMappings: [
             {
               hostPort: 2000,
@@ -167,6 +178,10 @@ class CollectionAPI extends TerraformStack {
               `arn:aws:secretsmanager:${region.name}:${caller.accountId}:secret:Shared`,
               `arn:aws:secretsmanager:${region.name}:${caller.accountId}:secret:Shared/*`,
               secretsManager.targetKeyArn,
+              `arn:aws:secretsmanager:${region.name}:${caller.accountId}:secret:${config.name}/${config.environment}`,
+              `arn:aws:secretsmanager:${region.name}:${caller.accountId}:secret:${config.name}/${config.environment}/*`,
+              `arn:aws:secretsmanager:${region.name}:${caller.accountId}:secret:${config.prefix}`,
+              `arn:aws:secretsmanager:${region.name}:${caller.accountId}:secret:${config.prefix}/*`,
             ],
             effect: 'Allow',
           },
