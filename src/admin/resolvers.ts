@@ -15,8 +15,12 @@ import {
 import {
   createAuthor,
   createCollection,
+  CreateCollectionAuthorInput,
+  CreateCollectionInput,
   updateAuthor,
   updateCollection,
+  UpdateCollectionAuthorInput,
+  UpdateCollectionInput,
 } from '../database/mutations';
 
 /**
@@ -29,7 +33,7 @@ async function executeMutation<T, U>(
   db: PrismaClient,
   data: T,
   callback: (db: PrismaClient, data: T) => Promise<U>
-) {
+): Promise<U> {
   try {
     return await callback(db, data);
   } catch (ex) {
@@ -46,36 +50,42 @@ export const resolvers = {
       { data },
       { db }
     ): Promise<CollectionAuthor> => {
-      return await executeMutation<any, CollectionAuthor>(
-        db,
-        data,
-        createAuthor
-      );
+      return await executeMutation<
+        CreateCollectionAuthorInput,
+        CollectionAuthor
+      >(db, data, createAuthor);
     },
     updateCollectionAuthor: async (
       _source,
       { data },
       { db }
     ): Promise<CollectionAuthor> => {
-      return await executeMutation<any, CollectionAuthor>(
-        db,
-        data,
-        updateAuthor
-      );
+      return await executeMutation<
+        UpdateCollectionAuthorInput,
+        CollectionAuthor
+      >(db, data, updateAuthor);
     },
     createCollection: async (
       _source,
       { data },
       { db }
     ): Promise<Collection> => {
-      return await executeMutation<any, Collection>(db, data, createCollection);
+      return await executeMutation<CreateCollectionInput, Collection>(
+        db,
+        data,
+        createCollection
+      );
     },
     updateCollection: async (
       _source,
       { data },
       { db }
     ): Promise<Collection> => {
-      return await executeMutation<any, Collection>(db, data, updateCollection);
+      return await executeMutation<UpdateCollectionInput, Collection>(
+        db,
+        data,
+        updateCollection
+      );
     },
   },
   Query: {
