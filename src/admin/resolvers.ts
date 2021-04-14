@@ -4,9 +4,7 @@ import {
   CollectionStory,
   PrismaClient,
 } from '@prisma/client';
-import slugify from 'slugify';
 import * as Sentry from '@sentry/node';
-import config from '../config';
 import { CollectionsResult } from '../typeDefs';
 import { getPagination } from '../utils';
 import {
@@ -14,153 +12,70 @@ import {
   getCollectionStory,
   searchCollections,
 } from '../database/queries';
+import {
+  createAuthor,
+  createCollection,
+  updateAuthor,
+  updateCollection,
+} from '../database/mutations';
+
+/**
+ * Executes a mutation, catches exceptions and records to sentry and console
+ * @param db
+ * @param data
+ * @param callback
+ */
+async function executeMutation<T, U>(
+  db: PrismaClient,
+  data: T,
+  callback: (db: PrismaClient, data: T) => Promise<U>
+) {
+  try {
+    return await callback(db, data);
+  } catch (ex) {
+    console.log(ex);
+    Sentry.captureException(ex);
+    throw new Error(ex);
+  }
+}
 
 export const resolvers = {
   Mutation: {
     createCollectionAuthor: async (
       _source,
       { data },
-      { db }: { db: PrismaClient }
+      { db }
     ): Promise<CollectionAuthor> => {
-      let slugExists;
-
-      data.slug = slugify(data.name, config.slugify);
-
-      // check if slug already exists in the db
-      try {
-        slugExists = await db.collectionAuthor.count({
-          where: { slug: data.slug },
-        });
-      } catch (ex) {
-        console.log(ex);
-        Sentry.captureEvent(ex);
-        throw new Error(ex);
-      }
-
-      // if slug does exist, fail! you pick a new name!
-      if (slugExists) {
-        throw new Error(`Author with slug "${data.slug}" already exists`);
-      }
-
-      // create that new author
-      try {
-        return await db.collectionAuthor.create({ data });
-      } catch (ex) {
-        console.log(ex);
-        Sentry.captureException(ex);
-        throw new Error(ex);
-      }
+      return await executeMutation<any, CollectionAuthor>(
+        db,
+        data,
+        createAuthor
+      );
     },
     updateCollectionAuthor: async (
       _source,
       { data },
-      { db }: { db: PrismaClient }
+      { db }
     ): Promise<CollectionAuthor> => {
-      let slugExists;
-
-      // validate required properties are set and send custom error message if not
-      if (!data.externalId) {
-        throw new Error('externalId must be provided.');
-      }
-
-      // create a new slug based on the updated name
-      data.slug = slugify(data.name, config.slugify);
-
-      try {
-        // see if any other entry has this slug
-        slugExists = await db.collectionAuthor.count({
-          where: { slug: data.slug, externalId: { not: data.externalId } },
-        });
-      } catch (ex) {
-        console.log(ex);
-        Sentry.captureException(ex);
-        throw new Error(ex);
-      }
-
-      if (slugExists) {
-        throw new Error(
-          `An author with the slug "${data.slug}" already exists`
-        );
-      }
-
-      try {
-        return await db.collectionAuthor.update({
-          where: { externalId: data.externalId },
-          data,
-        });
-      } catch (ex) {
-        console.log(ex);
-        Sentry.captureException(ex);
-        throw new Error(ex);
-      }
+      return await executeMutation<any, CollectionAuthor>(
+        db,
+        data,
+        updateAuthor
+      );
     },
     createCollection: async (
       _source,
       { data },
-      { db }: { db: PrismaClient }
+      { db }
     ): Promise<Collection> => {
-      let slugExists;
-
-      // make sure a collection with this slug doesn't exist
-      try {
-        slugExists = await db.collection.count({
-          where: { slug: data.slug },
-        });
-      } catch (ex) {
-        console.log(ex);
-        Sentry.captureException(ex);
-        throw new Error(ex);
-      }
-
-      if (slugExists) {
-        throw new Error(
-          `A collection with the slug ${data.slug} already exists`
-        );
-      }
-
-      try {
-        return await db.collection.create({ data });
-      } catch (ex) {
-        console.log(ex);
-        Sentry.captureException(ex);
-        throw new Error(ex);
-      }
+      return await executeMutation<any, Collection>(db, data, createCollection);
     },
     updateCollection: async (
       _source,
       { data },
-      { db }: { db: PrismaClient }
+      { db }
     ): Promise<Collection> => {
-      let slugExists;
-
-      // make sure a collection with this slug doesn't exist
-      // (that isn't the collection we're currently editing)
-      try {
-        slugExists = await db.collection.count({
-          where: { slug: data.slug, externalId: { not: data.externalId } },
-        });
-      } catch (ex) {
-        console.log(ex);
-        Sentry.captureException(ex);
-        throw new Error(ex);
-      }
-
-      if (slugExists) {
-        throw new Error(
-          `A different collection with the slug ${data.slug} already exists`
-        );
-      }
-
-      try {
-        return await db.collection.update({
-          where: { externalId: data.externalId },
-          data,
-        });
-      } catch (ex) {
-        console.log(ex);
-        Sentry.captureException(ex);
-        throw new Error(ex);
-      }
+      return await executeMutation<any, Collection>(db, data, updateCollection);
     },
   },
   Query: {

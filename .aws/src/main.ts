@@ -102,6 +102,16 @@ class CollectionAPI extends TerraformStack {
               containerPort: 4004,
             },
           ],
+          healthCheck: {
+            command: [
+              'CMD-SHELL',
+              'curl -f http://localhost:4001/.well-known/apollo/server-health || exit 1',
+            ],
+            interval: 15,
+            retries: 3,
+            timeout: 5,
+            startPeriod: 0,
+          },
           envVars: [
             {
               name: 'NODE_ENV',
