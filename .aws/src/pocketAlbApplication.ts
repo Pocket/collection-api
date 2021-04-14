@@ -105,16 +105,8 @@ export function createPocketAlbApplication(
             valueFrom: `arn:aws:ssm:${region.name}:${caller.accountId}:parameter/${config.name}/${config.environment}/SENTRY_DSN`,
           },
           {
-            name: 'DB_HOST',
-            valueFrom: `${rds.secretARN}:host::`,
-          },
-          {
-            name: 'DB_USERNAME',
-            valueFrom: `${rds.secretARN}:username::`,
-          },
-          {
-            name: 'DB_PASSWORD',
-            valueFrom: `${rds.secretARN}:password::`,
+            name: 'DATABASE_URL',
+            valueFrom: `${rds.secretARN}:database_url::`,
           },
         ],
       },
