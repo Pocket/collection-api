@@ -105,7 +105,7 @@ class CollectionAPI extends TerraformStack {
           healthCheck: {
             command: [
               'CMD-SHELL',
-              'curl -f http://localhost:4001/.well-known/apollo/server-health || exit 1',
+              'curl -f http://localhost:4004/.well-known/apollo/server-health || exit 1',
             ],
             interval: 15,
             retries: 3,
@@ -145,18 +145,19 @@ class CollectionAPI extends TerraformStack {
             },
           ],
         },
-        // {
-        //   name: 'xray-daemon',
-        //   containerImage: 'amazon/aws-xray-daemon',
-        //   portMappings: [
-        //     {
-        //       hostPort: 2000,
-        //       containerPort: 2000,
-        //       protocol: 'udp',
-        //     },
-        //   ],
-        //   command: ['--region', 'us-east-1', '--local-mode'],
-        // },
+        {
+          name: 'xray-daemon',
+          containerImage: 'amazon/aws-xray-daemon',
+          repositoryCredentialsParam: `arn:aws:secretsmanager:${region.name}:${caller.accountId}:secret:Shared/DockerHub`,
+          portMappings: [
+            {
+              hostPort: 2000,
+              containerPort: 2000,
+              protocol: 'udp',
+            },
+          ],
+          command: ['--region', 'us-east-1', '--local-mode'],
+        },
       ],
       codeDeploy: {
         useCodeDeploy: true,
