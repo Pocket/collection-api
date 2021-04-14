@@ -135,18 +135,18 @@ class CollectionAPI extends TerraformStack {
             },
           ],
         },
-        {
-          name: 'xray-daemon',
-          containerImage: 'amazon/aws-xray-daemon',
-          portMappings: [
-            {
-              hostPort: 2000,
-              containerPort: 2000,
-              protocol: 'udp',
-            },
-          ],
-          command: ['--region', 'us-east-1', '--local-mode'],
-        },
+        // {
+        //   name: 'xray-daemon',
+        //   containerImage: 'amazon/aws-xray-daemon',
+        //   portMappings: [
+        //     {
+        //       hostPort: 2000,
+        //       containerPort: 2000,
+        //       protocol: 'udp',
+        //     },
+        //   ],
+        //   command: ['--region', 'us-east-1', '--local-mode'],
+        // },
       ],
       codeDeploy: {
         useCodeDeploy: true,
