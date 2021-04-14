@@ -123,3 +123,27 @@ export async function searchCollections(
 
   return db.collection.findMany(queryParams);
 }
+
+/**
+ * @param db
+ */
+export async function countAuthors(db: PrismaClient) {
+  return db.collectionAuthor.count();
+}
+
+/**
+ * @param db
+ * @param page
+ * @param perPage
+ */
+export async function getAuthors(
+  db: PrismaClient,
+  page: number,
+  perPage: number
+) {
+  return db.collectionAuthor.findMany({
+    take: perPage,
+    skip: page > 1 ? (page - 1) * perPage : 0,
+    orderBy: { name: 'asc' },
+  });
+}

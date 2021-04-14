@@ -8,7 +8,9 @@ import * as Sentry from '@sentry/node';
 import { CollectionsResult } from '../typeDefs';
 import { getPagination } from '../utils';
 import {
+  countAuthors,
   getAuthor,
+  getAuthors,
   getCollectionStory,
   searchCollections,
 } from '../database/queries';
@@ -91,7 +93,7 @@ export const resolvers = {
   Query: {
     searchCollections: async (
       _source,
-      { filters, page, perPage },
+      { filters, page = 1, perPage = 30 },
       { db }
     ): Promise<CollectionsResult> => {
       if (!filters || (!filters.author && !filters.title && !filters.status)) {
@@ -106,6 +108,19 @@ export const resolvers = {
       return {
         pagination: getPagination(totalResults, page, perPage),
         collections,
+      };
+    },
+    getCollectionAuthors: async (
+      _source,
+      { page = 1, perPage = 20 },
+      { db }
+    ) => {
+      const totalResults = await countAuthors(db);
+      const authors = await getAuthors(db, page, perPage);
+
+      return {
+        pagination: getPagination(totalResults, page, perPage),
+        authors,
       };
     },
     getCollectionAuthor: async (
