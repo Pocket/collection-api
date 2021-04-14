@@ -53,6 +53,7 @@ type CollectionStory {
   authors: [CollectionStoryAuthor]
   publisher: String
   sortOrder: Int
+  item: Item @external
 }
 
 type CollectionStoryAuthor {
