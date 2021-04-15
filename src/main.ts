@@ -35,7 +35,7 @@ app.use(xrayExpress.openSegment('collections-api'));
 AWSXRay.middleware.enableDynamicNaming('*');
 
 // Apply the admin graphql (This is not part of the federated graph i.e. Client API)
-adminServer.applyMiddleware({ app, path: '/admin-graphql' });
+adminServer.applyMiddleware({ app, path: '/admin' });
 
 // Apply the public graphql (This is part of the federated graph)
 publicServer.applyMiddleware({ app, path: '/' });

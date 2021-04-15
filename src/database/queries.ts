@@ -29,7 +29,7 @@ export async function getCollection(
     where: { slug },
     include: {
       authors: true,
-      stories: true,
+      stories: { orderBy: { sortOrder: 'asc' } },
     },
   });
 }
@@ -83,7 +83,7 @@ export async function getPublishedCollections(
     where: { status: 'published' },
     include: {
       authors: true,
-      stories: true,
+      stories: { orderBy: { sortOrder: 'asc' } },
     },
     orderBy: { publishedAt: 'desc' },
     take: perPage,
