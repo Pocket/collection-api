@@ -19,10 +19,15 @@ import {
   createCollection,
   CreateCollectionAuthorInput,
   CreateCollectionInput,
+  createCollectionStory,
+  CreateCollectionStoryInput,
+  deleteCollectionStory,
   updateAuthor,
   updateCollection,
   UpdateCollectionAuthorInput,
   UpdateCollectionInput,
+  updateCollectionStory,
+  UpdateCollectionStoryInput,
 } from '../database/mutations';
 
 /**
@@ -87,6 +92,39 @@ export const resolvers = {
         db,
         data,
         updateCollection
+      );
+    },
+    createCollectionStory: async (
+      _source,
+      { data },
+      { db }
+    ): Promise<CollectionStory> => {
+      return await executeMutation<CreateCollectionStoryInput, CollectionStory>(
+        db,
+        data,
+        createCollectionStory
+      );
+    },
+    updateCollectionStory: async (
+      _source,
+      { data },
+      { db }
+    ): Promise<CollectionStory> => {
+      return await executeMutation<UpdateCollectionStoryInput, CollectionStory>(
+        db,
+        data,
+        updateCollectionStory
+      );
+    },
+    deleteCollectionStory: async (
+      _source,
+      { externalId },
+      { db }
+    ): Promise<CollectionStory> => {
+      return await executeMutation<string, CollectionStory>(
+        db,
+        externalId,
+        deleteCollectionStory
       );
     },
   },
