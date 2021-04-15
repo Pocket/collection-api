@@ -212,16 +212,6 @@ export async function createCollectionStory(
     data.collectionExternalId
   );
 
-  const storyExists = await db.collectionStory.findUnique({
-    where: { collectionIdUrl: { collectionId: collection.id, url: data.url } },
-  });
-
-  if (storyExists) {
-    throw new Error(
-      `A collection story with with the external ID: ${data.collectionExternalId} and url: ${data.url} already exists.`
-    );
-  }
-
   // delete the collectionExternalId property
   // so data matches the expected prisma type
   delete data.collectionExternalId;
