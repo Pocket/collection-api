@@ -56,7 +56,6 @@ type CollectionStory {
 }
 
 
-
 type CollectionStoryAuthor {
   name: String!
 }

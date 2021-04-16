@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, CollectionStatus } from '@prisma/client';
 import { getCollection, getCollectionsBySlugs } from './queries';
 import {
   clear as clearDb,
@@ -9,7 +9,7 @@ import {
 const db = new PrismaClient();
 
 describe('queries', () => {
-  beforeAll(async () => {
+  beforeEach(async () => {
     await clearDb(db);
   });
 
@@ -30,8 +30,8 @@ describe('queries', () => {
 
   it('can get collections by slug', async () => {
     const author = await createAuthor(db, 1, 'brave');
-    await createCollection(db, 'test me', author);
-    await createCollection(db, 'test me 2', author);
+    await createCollection(db, 'test me', author, CollectionStatus.published);
+    await createCollection(db, 'test me 2', author, CollectionStatus.published);
 
     const collections = await getCollectionsBySlugs(db, [
       'test-me',
