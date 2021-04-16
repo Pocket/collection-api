@@ -14,7 +14,7 @@
     "migrate:dev": "prisma migrate dev",
     "migrate:deploy": "prisma migrate deploy",
     "migrate:reset": "prisma migrate reset",
-    "db:seed": "prisma seed --preview-feature"
+    "db:seed": "prisma db seed --preview-feature"
   },
   "dependencies": {
     "@apollo/federation": "^0.23.0",
