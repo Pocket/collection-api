@@ -96,17 +96,21 @@ jobs:
           key: node-v1-{{ checksum "package-lock.json" }}
           paths:
             - ./node_modules
-      # Copy built files to app_prod folder
+      - run:
+          name: generate prisma client
+          command: npm run db:generate-client
       - run:
           name:
           command: |
             export NODE_ENV=production
             npm run build
+      # Copy built files to app_prod folder
       - run:
           name: Setup workspace
           command: |
             mkdir -p /tmp/workspace/app_prod
-            cp -r ./node_modules package.json Dockerfile schema*.graphql ./dist /tmp/workspace/app_prod
+            rm -rf ./prisma/seed.ts
+            cp -r ./node_modules package.json Dockerfile schema*.graphql ./prisma ./dist /tmp/workspace/app_prod
       # Persist built files to workspace
       - persist_to_workspace:
           root: /tmp/workspace
@@ -265,7 +269,7 @@ workflows:
           codedeploy-application-name: 'CollectionAPI-Dev-ECS'
           codedeploy-deployment-group-name: 'CollectionAPI-Dev-ECS'
           codedeploy-load-balanced-container-name: app
-          codedeploy-load-balanced-container-port: 4002
+          codedeploy-load-balanced-container-port: 4004
           container-image-name-updates: 'container=app,image-and-tag=410318598490.dkr.ecr.us-east-1.amazonaws.com/collectionapi-dev-app:$CIRCLE_SHA1'
           aws-access-key-id: Dev_AWS_ACCESS_KEY
           aws-secret-access-key: Dev_AWS_SECRET_ACCESS_KEY
@@ -299,7 +303,7 @@ workflows:
           codedeploy-application-name: 'CollectionAPI-Prod-ECS'
           codedeploy-deployment-group-name: 'CollectionAPI-Prod-ECS'
           codedeploy-load-balanced-container-name: app
-          codedeploy-load-balanced-container-port: 4002
+          codedeploy-load-balanced-container-port: 4004
           container-image-name-updates: 'container=app,image-and-tag=996905175585.dkr.ecr.us-east-1.amazonaws.com/collectionapi-prod-app:$CIRCLE_SHA1'
           aws-access-key-id: Prod_AWS_ACCESS_KEY
           aws-secret-access-key: Prod_AWS_SECRET_ACCESS_KEY
