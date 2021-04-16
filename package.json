@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@apollo/federation": "^0.23.0",
-    "@pocket-tools/apollo-utils": "^1.0.3",
+    "@pocket-tools/apollo-utils": "^1.0.4",
     "@prisma/client": "^2.20.1",
     "@sentry/node": "^6.2.5",
     "@sentry/tracing": "^6.2.5",
