@@ -66,7 +66,20 @@ export async function getCollectionStory(
 export async function countPublishedCollections(
   db: PrismaClient
 ): Promise<number> {
-  return db.collection.count({ where: { status: 'published' } });
+  return db.collection.count({ where: { status: CollectionStatus.published } });
+}
+
+/**
+ * @param db PrismaClient
+ * @param slugs
+ */
+export async function getCollectionsBySlugs(
+  db: PrismaClient,
+  slugs: string[]
+): Promise<Collection[]> {
+  return await db.collection.findMany({
+    where: { slug: { in: slugs }, status: CollectionStatus.published },
+  });
 }
 
 /**

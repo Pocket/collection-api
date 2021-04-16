@@ -55,6 +55,7 @@ type CollectionStory {
   sortOrder: Int
 }
 
+
 type CollectionStoryAuthor {
   name: String!
 }
