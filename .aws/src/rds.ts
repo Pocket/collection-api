@@ -16,6 +16,7 @@ export function createRds(scope: Construct, pocketVpc: PocketVPC) {
         {
           minCapacity: config.rds.minCapacity,
           maxCapacity: config.rds.maxCapacity,
+          autoPause: false,
         },
       ],
     },
