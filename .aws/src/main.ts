@@ -4,7 +4,6 @@ import { AwsProvider } from '../.gen/providers/aws';
 import { config } from './config';
 import { PocketVPC } from '@pocket/terraform-modules';
 import { PagerdutyProvider } from '../.gen/providers/pagerduty';
-import { createElasticache } from './elasticache';
 import { createRds } from './rds';
 import { createPocketAlbApplication } from './pocketAlbApplication';
 
