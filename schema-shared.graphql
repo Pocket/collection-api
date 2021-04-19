@@ -17,6 +17,14 @@ directive @cacheControl(
   scope: CacheControlScope
 ) on FIELD_DEFINITION | OBJECT | INTERFACE
 
+extend type Item @key(fields: "givenUrl") {
+  "key field to identify the Item entity in the Parser service"
+  givenUrl: Url! @external
+
+  "If the item is a collection allow them to get the collection information"
+  collection: Collection
+}
+
 type Collection {
   externalId: ID!
   slug: String!
@@ -45,7 +53,7 @@ type CollectionAuthor {
   active: Boolean
 }
 
-type CollectionStory {
+type CollectionStory @key(fields: "item { givenUrl }") {
   externalId: ID!
   url: Url!
   title: String!
@@ -54,8 +62,8 @@ type CollectionStory {
   authors: [CollectionStoryAuthor]
   publisher: String
   sortOrder: Int
+  item: Item
 }
-
 
 type CollectionStoryAuthor {
   name: String!
