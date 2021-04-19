@@ -4,7 +4,6 @@ import { AwsProvider } from '../.gen/providers/aws';
 import { config } from './config';
 import { PocketVPC } from '@pocket/terraform-modules';
 import { PagerdutyProvider } from '../.gen/providers/pagerduty';
-import { createElasticache } from './elasticache';
 import { createRds } from './rds';
 import { createPocketAlbApplication } from './pocketAlbApplication';
 
@@ -24,11 +23,9 @@ class CollectionAPI extends TerraformStack {
 
     const pocketVpc = new PocketVPC(this, 'pocket-vpc');
 
-    const elasticache = createElasticache(this, pocketVpc);
-
     const rds = createRds(this, pocketVpc);
 
-    createPocketAlbApplication(this, { elasticache, rds });
+    createPocketAlbApplication(this, rds);
   }
 }
 

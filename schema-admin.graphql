@@ -9,13 +9,19 @@ input SearchCollectionsFilters {
   status: CollectionStatus
 }
 
+type CollectionAuthorsResult {
+  pagination: CollectionEntityPagination
+  authors: [CollectionAuthor]
+}
+
 type Query {
   searchCollections(
-    filters: SearchCollectionsFilters!
-    page: Int
+    filters: SearchCollectionsFilters!,
+    page: Int,
     perPage: Int
   ): CollectionsResult
-  getCollectionAuthor(id: Int!): CollectionAuthor
+  getCollectionAuthor(externalId: String!): CollectionAuthor
+  getCollectionAuthors(page: Int, perPage: Int): CollectionAuthorsResult
   getCollectionStory(collectionId: Int!, url: String): CollectionStory
 }
 
@@ -40,18 +46,44 @@ input CreateCollectionInput {
   intro: Markdown
   imageUrl: String
   status: CollectionStatus
-  authorExternalId: String
+  authorExternalId: String!
 }
 
 input UpdateCollectionInput {
   externalId: String
   slug: String!
   title: String!
-  excerpt: Markdown
+  excerpt: Markdown!
   intro: Markdown
   imageUrl: String
   status: CollectionStatus!
-  authorExternalId: String
+  authorExternalId: String!
+}
+
+input CollectionStoryAuthorInput {
+  name: String!
+}
+
+input CreateCollectionStoryInput {
+  collectionExternalId: String!
+  url: Url!
+  title: String!
+  excerpt: Markdown!
+  imageUrl: Url!
+  authors: [CollectionStoryAuthorInput]!
+  publisher: String!
+  sortOrder: Int
+}
+
+input UpdateCollectionStoryInput {
+  externalId: String!
+  url: Url!
+  title: String!
+  excerpt: Markdown!
+  imageUrl: Url!
+  authors: [CollectionStoryAuthorInput]!
+  publisher: String!
+  sortOrder: Int
 }
 
 type Mutation {
@@ -59,4 +91,7 @@ type Mutation {
   updateCollectionAuthor(data: UpdateCollectionAuthorInput): CollectionAuthor
   createCollection(data: CreateCollectionInput): Collection
   updateCollection(data: UpdateCollectionInput): Collection
+  createCollectionStory(data: CreateCollectionStoryInput): CollectionStory
+  updateCollectionStory(data: UpdateCollectionStoryInput): CollectionStory
+  deleteCollectionStory(externalId: String!): CollectionStory
 }

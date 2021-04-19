@@ -8,7 +8,9 @@ import * as Sentry from '@sentry/node';
 import { CollectionsResult } from '../typeDefs';
 import { getPagination } from '../utils';
 import {
+  countAuthors,
   getAuthor,
+  getAuthors,
   getCollectionStory,
   searchCollections,
 } from '../database/queries';
@@ -17,11 +19,17 @@ import {
   createCollection,
   CreateCollectionAuthorInput,
   CreateCollectionInput,
+  createCollectionStory,
+  CreateCollectionStoryInput,
+  deleteCollectionStory,
   updateAuthor,
   updateCollection,
   UpdateCollectionAuthorInput,
   UpdateCollectionInput,
+  updateCollectionStory,
+  UpdateCollectionStoryInput,
 } from '../database/mutations';
+import config from '../config';
 
 /**
  * Executes a mutation, catches exceptions and records to sentry and console
@@ -87,11 +95,44 @@ export const resolvers = {
         updateCollection
       );
     },
+    createCollectionStory: async (
+      _source,
+      { data },
+      { db }
+    ): Promise<CollectionStory> => {
+      return await executeMutation<CreateCollectionStoryInput, CollectionStory>(
+        db,
+        data,
+        createCollectionStory
+      );
+    },
+    updateCollectionStory: async (
+      _source,
+      { data },
+      { db }
+    ): Promise<CollectionStory> => {
+      return await executeMutation<UpdateCollectionStoryInput, CollectionStory>(
+        db,
+        data,
+        updateCollectionStory
+      );
+    },
+    deleteCollectionStory: async (
+      _source,
+      { externalId },
+      { db }
+    ): Promise<CollectionStory> => {
+      return await executeMutation<string, CollectionStory>(
+        db,
+        externalId,
+        deleteCollectionStory
+      );
+    },
   },
   Query: {
     searchCollections: async (
       _source,
-      { filters, page, perPage },
+      { filters, page = 1, perPage = config.app.pagination.collectionsPerPage },
       { db }
     ): Promise<CollectionsResult> => {
       if (!filters || (!filters.author && !filters.title && !filters.status)) {
@@ -108,12 +149,25 @@ export const resolvers = {
         collections,
       };
     },
+    getCollectionAuthors: async (
+      _source,
+      { page = 1, perPage = config.app.pagination.authorsPerPage },
+      { db }
+    ) => {
+      const totalResults = await countAuthors(db);
+      const authors = await getAuthors(db, page, perPage);
+
+      return {
+        pagination: getPagination(totalResults, page, perPage),
+        authors,
+      };
+    },
     getCollectionAuthor: async (
       _source,
-      { id },
+      { externalId },
       { db }
     ): Promise<CollectionAuthor> => {
-      return await getAuthor(db, id);
+      return await getAuthor(db, externalId);
     },
     getCollectionStory: async (
       _source,

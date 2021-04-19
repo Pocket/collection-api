@@ -42,6 +42,7 @@ type CollectionAuthor {
   slug: String
   bio: Markdown
   imageUrl: Url
+  active: Boolean
 }
 
 type CollectionStory {
@@ -61,11 +62,11 @@ type CollectionStoryAuthor {
 }
 
 type CollectionsResult {
-  pagination: CollectionPagination
+  pagination: CollectionEntityPagination
   collections: [Collection]
 }
 
-type CollectionPagination {
+type CollectionEntityPagination {
   currentPage: Int!
   totalPages: Int!
   totalResults: Int!

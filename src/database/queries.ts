@@ -29,20 +29,20 @@ export async function getCollection(
     where: { slug },
     include: {
       authors: true,
-      stories: true,
+      stories: { orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }] },
     },
   });
 }
 
 /**
  * @param db
- * @param id
+ * @param externalId
  */
 export async function getAuthor(
   db: PrismaClient,
-  id: number
+  externalId: string
 ): Promise<CollectionAuthor> {
-  return db.collectionAuthor.findUnique({ where: { id } });
+  return db.collectionAuthor.findUnique({ where: { externalId } });
 }
 
 /**
@@ -96,7 +96,7 @@ export async function getPublishedCollections(
     where: { status: 'published' },
     include: {
       authors: true,
-      stories: true,
+      stories: { orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }] },
     },
     orderBy: { publishedAt: 'desc' },
     take: perPage,
@@ -135,4 +135,28 @@ export async function searchCollections(
   }
 
   return db.collection.findMany(queryParams);
+}
+
+/**
+ * @param db
+ */
+export async function countAuthors(db: PrismaClient) {
+  return db.collectionAuthor.count();
+}
+
+/**
+ * @param db
+ * @param page
+ * @param perPage
+ */
+export async function getAuthors(
+  db: PrismaClient,
+  page: number,
+  perPage: number
+) {
+  return db.collectionAuthor.findMany({
+    take: perPage,
+    skip: page > 1 ? (page - 1) * perPage : 0,
+    orderBy: { name: 'asc' },
+  });
 }
