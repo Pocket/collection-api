@@ -20,7 +20,7 @@ type Query {
     page: Int,
     perPage: Int
   ): CollectionsResult
-  getCollectionAuthor(id: Int!): CollectionAuthor
+  getCollectionAuthor(externalId: String!): CollectionAuthor
   getCollectionAuthors(page: Int, perPage: Int): CollectionAuthorsResult
   getCollectionStory(collectionId: Int!, url: String): CollectionStory
 }

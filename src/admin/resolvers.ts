@@ -163,10 +163,10 @@ export const resolvers = {
     },
     getCollectionAuthor: async (
       _source,
-      { id },
+      { externalId },
       { db }
     ): Promise<CollectionAuthor> => {
-      return await getAuthor(db, id);
+      return await getAuthor(db, externalId);
     },
     getCollectionStory: async (
       _source,

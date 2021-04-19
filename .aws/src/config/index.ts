@@ -7,6 +7,10 @@ const graphqlVariant = isDev ? 'development' : 'current';
 //Arbitrary size and count for cache. No logic was used in deciding this.
 const cacheNodes = 2;
 const cacheSize = isDev ? 'cache.t2.micro' : 'cache.t3.medium';
+const rds = {
+  minCapacity: 1,
+  maxCapacity: isDev ? 1 : undefined
+}
 
 export const config = {
   name,
@@ -18,6 +22,7 @@ export const config = {
   graphqlVariant,
   cacheNodes,
   cacheSize,
+  rds,
   tags: {
     service: name,
     environment,
