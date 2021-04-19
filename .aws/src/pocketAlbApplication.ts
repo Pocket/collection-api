@@ -1,6 +1,5 @@
 import {
   ApplicationRDSCluster,
-  ApplicationRedis,
   PocketALBApplication,
   PocketPagerDuty,
 } from '@pocket/terraform-modules';
@@ -14,6 +13,9 @@ import {
   DataAwsSnsTopic,
 } from '../.gen/providers/aws';
 
+/**
+ * @param scope
+ */
 function createPagerDuty(scope: Construct) {
   const incidentManagement = new DataTerraformRemoteState(
     scope,
@@ -39,12 +41,14 @@ function createPagerDuty(scope: Construct) {
   });
 }
 
+/**
+ * @param scope
+ * @param rds
+ */
 export function createPocketAlbApplication(
   scope: Construct,
-  dependencies: { elasticache: ApplicationRedis; rds: ApplicationRDSCluster }
+  rds: ApplicationRDSCluster
 ): void {
-  const { elasticache, rds } = dependencies;
-
   const pagerDuty = createPagerDuty(scope);
 
   const region = new DataAwsRegion(scope, 'region');
@@ -87,16 +91,6 @@ export function createPocketAlbApplication(
           {
             name: 'NODE_ENV',
             value: process.env.NODE_ENV, // this gives us a nice lowercase production and development
-          },
-          {
-            name: 'REDIS_PRIMARY_ENDPOINT',
-            value:
-              elasticache.elasticacheReplicationGroup.primaryEndpointAddress,
-          },
-          {
-            name: 'REDIS_READER_ENDPOINT',
-            value:
-              elasticache.elasticacheReplicationGroup.readerEndpointAddress,
           },
         ],
         secretEnvVars: [

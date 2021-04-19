@@ -24,11 +24,9 @@ class CollectionAPI extends TerraformStack {
 
     const pocketVpc = new PocketVPC(this, 'pocket-vpc');
 
-    const elasticache = createElasticache(this, pocketVpc);
-
     const rds = createRds(this, pocketVpc);
 
-    createPocketAlbApplication(this, { elasticache, rds });
+    createPocketAlbApplication(this, rds);
   }
 }
 

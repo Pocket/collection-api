@@ -2,6 +2,10 @@ export default {
   app: {
     environment: process.env.NODE_ENV || 'development',
     defaultMaxAge: 0,
+    pagination: {
+      collectionsPerPage: 30,
+      authorsPerPage: 20,
+    },
   },
   slugify: { lower: true, remove: /[*+~.()'"!:@]/g },
   redis: {

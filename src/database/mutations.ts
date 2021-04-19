@@ -174,6 +174,10 @@ export async function updateCollection(
     where: { externalId: data.externalId },
     data: {
       ...data,
+      // reference: https://www.prisma.io/docs/concepts/components/prisma-client/relation-queries#disconnect-all-related-records
+      // set: [] disconnects all authors from the collection
+      // before connecting new authors, essentially a sync
+      // of authors for a collection
       authors: { set: [], connect: { externalId: authorExternalId } },
     },
   });

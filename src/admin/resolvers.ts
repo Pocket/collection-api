@@ -29,6 +29,7 @@ import {
   updateCollectionStory,
   UpdateCollectionStoryInput,
 } from '../database/mutations';
+import config from '../config';
 
 /**
  * Executes a mutation, catches exceptions and records to sentry and console
@@ -131,7 +132,7 @@ export const resolvers = {
   Query: {
     searchCollections: async (
       _source,
-      { filters, page = 1, perPage = 30 },
+      { filters, page = 1, perPage = config.app.pagination.collectionsPerPage },
       { db }
     ): Promise<CollectionsResult> => {
       if (!filters || (!filters.author && !filters.title && !filters.status)) {
@@ -150,7 +151,7 @@ export const resolvers = {
     },
     getCollectionAuthors: async (
       _source,
-      { page = 1, perPage = 20 },
+      { page = 1, perPage = config.app.pagination.authorsPerPage },
       { db }
     ) => {
       const totalResults = await countAuthors(db);

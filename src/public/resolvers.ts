@@ -7,6 +7,8 @@ import {
 import { getPagination } from '../utils';
 import { CollectionsResult } from '../typeDefs';
 import { Collection } from '@prisma/client';
+import config from '../config';
+
 /**
  * Resolvers
  */
@@ -21,7 +23,7 @@ export const resolvers = {
     },
     getCollections: async (
       _source,
-      { page = 1, perPage = 30 },
+      { page = 1, perPage = config.app.pagination.collectionsPerPage },
       { db }
     ): Promise<CollectionsResult> => {
       const totalResults = await countPublishedCollections(db);
