@@ -12,7 +12,14 @@ export function createRds(scope: Construct, pocketVpc: PocketVPC) {
       masterUsername: 'pkt_collections',
       engine: 'aurora-mysql',
       engineMode: 'serverless',
+      scalingConfiguration: [
+        {
+          minCapacity: config.rds.minCapacity,
+          maxCapacity: config.rds.maxCapacity,
+        },
+      ],
     },
+
     tags: config.tags,
   });
 }

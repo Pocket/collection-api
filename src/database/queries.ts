@@ -36,13 +36,13 @@ export async function getCollection(
 
 /**
  * @param db
- * @param id
+ * @param externalId
  */
 export async function getAuthor(
   db: PrismaClient,
-  id: number
+  externalId: string
 ): Promise<CollectionAuthor> {
-  return db.collectionAuthor.findUnique({ where: { id } });
+  return db.collectionAuthor.findUnique({ where: { externalId } });
 }
 
 /**

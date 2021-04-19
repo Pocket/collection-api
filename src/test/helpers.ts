@@ -74,7 +74,12 @@ export async function createCollection(
 }
 
 export async function clear(prisma: PrismaClient): Promise<void> {
-  ['CollectionStory', 'Collection', 'CollectionAuthor', 'Image'].map(
-    async (table) => await prisma.$executeRaw(`DELETE FROM ${table};`)
+  await Promise.all(
+    [
+      'CollectionStory',
+      'Collection',
+      'CollectionAuthor',
+      'Image',
+    ].map((table) => prisma.$executeRaw(`DELETE FROM ${table};`))
   );
 }
