@@ -180,21 +180,19 @@ describe('prisma middleware', () => {
         nextSingle
       );
 
-      // nextMany returns two collections in an array, so the inject function
-      // should have been called twice
+      // param action is update so the inject function should not be called
       expect(injectItemSpy).toBeCalledTimes(0);
     });
 
     it('should not apply middleware when a Collection is created', async () => {
-      params.action = 'update';
+      params.action = 'create';
 
       await PrismaMiddleware.collectionStoryInjectItemMiddleware(
         params,
         nextSingle
       );
 
-      // nextMany returns two collections in an array, so the inject function
-      // should have been called twice
+      // param action is update so the inject function should not be called
       expect(injectItemSpy).toBeCalledTimes(0);
     });
 
@@ -207,8 +205,7 @@ describe('prisma middleware', () => {
         nextSingle
       );
 
-      // nextMany returns two collections in an array, so the inject function
-      // should have been called twice
+      // param model is not a Collection so the inject function should not be called
       expect(injectItemSpy).toBeCalledTimes(0);
     });
   });
