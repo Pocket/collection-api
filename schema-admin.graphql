@@ -10,7 +10,7 @@ input SearchCollectionsFilters {
 }
 
 type CollectionAuthorsResult {
-  pagination: CollectionEntityPagination
+  pagination: Pagination
   authors: [CollectionAuthor]
 }
 
