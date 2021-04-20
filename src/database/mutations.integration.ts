@@ -40,6 +40,18 @@ describe('mutations', () => {
       expect(reFetch.title).toEqual('second iteration');
     });
 
+    it('should create a collection with a null publishedAt', async () => {
+      const author = await createAuthor(db, 'walter');
+      const initial = await createCollection(
+        db,
+        'first iteration',
+        author,
+        CollectionStatus.draft
+      );
+
+      expect(initial.publishedAt).toBeFalsy();
+    });
+
     it('should update publishedAt when going to published status', async () => {
       const author = await createAuthor(db, 'walter');
       const initial = await createCollection(
@@ -57,11 +69,12 @@ describe('mutations', () => {
         status: CollectionStatus.published,
       };
 
-      // should return the updated info
+      // publishedAt should have a value
       const updated = await updateCollection(db, data);
       expect(updated.publishedAt).not.toBeFalsy();
 
       // verify on a re-fetch that the update was persisted
+      // is this necessary?
       const reFetch = await getCollection(db, initial.externalId);
       expect(reFetch.publishedAt).not.toBeFalsy();
     });
@@ -72,12 +85,11 @@ describe('mutations', () => {
         db,
         'first iteration',
         author,
-        CollectionStatus.published
+        CollectionStatus.draft
       );
 
-      expect(initial.publishedAt).not.toBeFalsy();
-
-      const data: UpdateCollectionInput = {
+      // update the colletion to published
+      let data: UpdateCollectionInput = {
         externalId: initial.externalId,
         slug: initial.slug,
         title: 'second iteration',
@@ -85,9 +97,21 @@ describe('mutations', () => {
         status: CollectionStatus.published,
       };
 
-      // should return the updated info
+      const published = await updateCollection(db, data);
+
+      // update the colletion title (leaving all other fields the same)
+      data = {
+        externalId: initial.externalId,
+        slug: initial.slug,
+        title: 'third iteration',
+        authorExternalId: author.externalId,
+        status: CollectionStatus.published,
+      };
+
       const updated = await updateCollection(db, data);
-      expect(updated.publishedAt).toEqual(initial.publishedAt);
+
+      // make sure the publishedAt value hasn't changed
+      expect(published.publishedAt).toEqual(updated.publishedAt);
     });
   });
 });

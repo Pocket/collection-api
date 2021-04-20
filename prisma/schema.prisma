@@ -70,7 +70,7 @@ model Collection {
   excerpt            String?             @db.Text
   intro              String?             @db.Text
   imageUrl           String?             @db.VarChar(500)
-  publishedAt        DateTime?           @db.Timestamp(0)
+  publishedAt        DateTime?           @db.DateTime(0)
   status             CollectionStatus?   @default(draft)
   createdAt          DateTime            @default(now()) @db.Timestamp(0)
   updatedAt          DateTime            @default(now()) @db.Timestamp(0) @updatedAt

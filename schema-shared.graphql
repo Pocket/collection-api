@@ -1,3 +1,6 @@
+"""
+These are all just renamed strings right now
+"""
 scalar Url
 scalar Markdown
 scalar DateString
@@ -25,6 +28,10 @@ extend type Item @key(fields: "givenUrl") {
   collection: Collection
 }
 
+"""
+TODO: add comments to all the fields in here!
+there's a documentation ticket - do this in that ticket
+"""
 type Collection {
   externalId: ID!
   slug: String!

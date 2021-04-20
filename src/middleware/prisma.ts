@@ -66,7 +66,7 @@ export async function collectionStoryInjectItemMiddleware(
   // clients only retrieve CollectionStories within the context / as
   // children of Collections, so we start branching there.
 
-  // all retrieval queries in prisma begin with 'find' - findMany, findFirst,
+  // all retrieval queries in prisma begin with 'find' - findUnique, findFirst,
   // findMany. i do *not* like hard coding this 'find' string here. it's
   // setting us up for a bug when merging dependabot PRs.
   if (
