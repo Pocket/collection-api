@@ -16,10 +16,11 @@ type CollectionAuthorsResult {
 
 type Query {
   searchCollections(
-    filters: SearchCollectionsFilters!,
-    page: Int,
+    filters: SearchCollectionsFilters!
+    page: Int
     perPage: Int
   ): CollectionsResult
+  getCollection(externalId: String!): Collection
   getCollectionAuthor(externalId: String!): CollectionAuthor
   getCollectionAuthors(page: Int, perPage: Int): CollectionAuthorsResult
   getCollectionStory(collectionId: Int!, url: String): CollectionStory

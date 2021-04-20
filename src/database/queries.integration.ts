@@ -1,5 +1,9 @@
 import { PrismaClient, CollectionStatus } from '@prisma/client';
-import { getCollection, getCollectionsBySlugs } from './queries';
+import {
+  getCollection,
+  getCollectionBySlug,
+  getCollectionsBySlugs,
+} from './queries';
 import {
   clear as clearDb,
   createAuthor,
@@ -17,11 +21,22 @@ describe('queries', () => {
     await db.$disconnect();
   });
 
-  it('can get a collection', async () => {
+  it('can get a collection by external id', async () => {
+    const author = await createAuthor(db, 1, 'brave');
+    const created = await createCollection(db, 'test me', author);
+
+    const collection = await getCollection(db, created.externalId);
+
+    expect(collection.title).toEqual('test me');
+    expect(collection.authors).not.toBeNull();
+    expect(collection.stories).not.toBeNull();
+  });
+
+  it('can get a collection by slug', async () => {
     const author = await createAuthor(db, 1, 'brave');
     await createCollection(db, 'test me', author);
 
-    const collection = await getCollection(db, 'test-me');
+    const collection = await getCollectionBySlug(db, 'test-me');
 
     expect(collection.title).toEqual('test me');
     expect(collection.authors).not.toBeNull();

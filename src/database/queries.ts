@@ -19,9 +19,26 @@ export type CollectionWithAuthorsAndStories = Collection & {
 
 /**
  * @param db
- * @param slug
+ * @param externalId
  */
 export async function getCollection(
+  db: PrismaClient,
+  externalId: string
+): Promise<CollectionWithAuthorsAndStories> {
+  return db.collection.findUnique({
+    where: { externalId },
+    include: {
+      authors: true,
+      stories: { orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }] },
+    },
+  });
+}
+
+/**
+ * @param db
+ * @param slug
+ */
+export async function getCollectionBySlug(
   db: PrismaClient,
   slug: string
 ): Promise<CollectionWithAuthorsAndStories> {

@@ -1,6 +1,8 @@
 import path from 'path';
 import fs from 'fs';
 import { gql } from 'apollo-server';
+
+import { CollectionAuthor } from '@prisma/client';
 import { CollectionWithAuthorsAndStories } from './database/queries';
 
 const sharedSchema = fs
@@ -24,12 +26,19 @@ export const typeDefsAdmin = gql(
 /**
  * The shape of the response for searchCollections and getCollections queries
  */
+export type Pagination = {
+  totalResults: number;
+  totalPages: number;
+  currentPage: number;
+  perPage: number;
+};
+
 export type CollectionsResult = {
-  pagination: {
-    totalResults: number;
-    totalPages: number;
-    currentPage: number;
-    perPage: number;
-  };
+  pagination: Pagination;
   collections: CollectionWithAuthorsAndStories[];
+};
+
+export type CollectionAuthorsResult = {
+  pagination: Pagination;
+  authors: CollectionAuthor[];
 };

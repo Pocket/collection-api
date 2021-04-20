@@ -5,14 +5,16 @@ import {
   PrismaClient,
 } from '@prisma/client';
 import * as Sentry from '@sentry/node';
-import { CollectionsResult } from '../typeDefs';
+import { CollectionsResult, CollectionAuthorsResult } from '../typeDefs';
 import { getPagination } from '../utils';
 import {
   countAuthors,
   getAuthor,
   getAuthors,
   getCollectionStory,
+  getCollection,
   searchCollections,
+  CollectionWithAuthorsAndStories,
 } from '../database/queries';
 import {
   createAuthor,
@@ -130,6 +132,13 @@ export const resolvers = {
     },
   },
   Query: {
+    getCollection: async (
+      _source,
+      { externalId },
+      { db }
+    ): Promise<CollectionWithAuthorsAndStories> => {
+      return await getCollection(db, externalId);
+    },
     searchCollections: async (
       _source,
       { filters, page = 1, perPage = config.app.pagination.collectionsPerPage },
@@ -153,7 +162,7 @@ export const resolvers = {
       _source,
       { page = 1, perPage = config.app.pagination.authorsPerPage },
       { db }
-    ) => {
+    ): Promise<CollectionAuthorsResult> => {
       const totalResults = await countAuthors(db);
       const authors = await getAuthors(db, page, perPage);
 

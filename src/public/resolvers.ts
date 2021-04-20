@@ -1,7 +1,7 @@
 import {
   CollectionWithAuthorsAndStories,
   countPublishedCollections,
-  getCollection,
+  getCollectionBySlug,
   getPublishedCollections,
 } from '../database/queries';
 import { getPagination } from '../utils';
@@ -14,12 +14,12 @@ import config from '../config';
  */
 export const resolvers = {
   Query: {
-    getCollection: async (
+    getCollectionBySlug: async (
       _source,
       { slug },
       { db }
     ): Promise<CollectionWithAuthorsAndStories> => {
-      return await getCollection(db, slug);
+      return await getCollectionBySlug(db, slug);
     },
     getCollections: async (
       _source,
