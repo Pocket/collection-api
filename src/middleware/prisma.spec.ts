@@ -192,7 +192,7 @@ describe('prisma middleware', () => {
         nextSingle
       );
 
-      // param action is update so the inject function should not be called
+      // param action is create so the inject function should not be called
       expect(injectItemSpy).toBeCalledTimes(0);
     });
 
