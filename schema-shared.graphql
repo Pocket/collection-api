@@ -70,11 +70,11 @@ type CollectionStoryAuthor {
 }
 
 type CollectionsResult {
-  pagination: CollectionEntityPagination
+  pagination: Pagination
   collections: [Collection]
 }
 
-type CollectionEntityPagination {
+type Pagination {
   currentPage: Int!
   totalPages: Int!
   totalResults: Int!
