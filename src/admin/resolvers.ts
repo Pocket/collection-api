@@ -14,23 +14,25 @@ import {
   getCollectionStory,
   getCollection,
   searchCollections,
-  CollectionWithAuthorsAndStories,
 } from '../database/queries';
 import {
   createAuthor,
   createCollection,
-  CreateCollectionAuthorInput,
-  CreateCollectionInput,
   createCollectionStory,
-  CreateCollectionStoryInput,
   deleteCollectionStory,
   updateAuthor,
   updateCollection,
+  updateCollectionStory,
+} from '../database/mutations';
+import {
+  CollectionWithAuthorsAndStories,
+  CreateCollectionAuthorInput,
+  CreateCollectionInput,
+  CreateCollectionStoryInput,
   UpdateCollectionAuthorInput,
   UpdateCollectionInput,
-  updateCollectionStory,
   UpdateCollectionStoryInput,
-} from '../database/mutations';
+} from '../database/types';
 import config from '../config';
 
 /**

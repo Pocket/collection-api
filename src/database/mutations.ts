@@ -7,64 +7,16 @@ import {
 } from '@prisma/client';
 import slugify from 'slugify';
 import config from '../config';
+import { getCollection } from './queries';
 
-export type CreateCollectionAuthorInput = {
-  name: string;
-  bio?: string;
-  imageUrl?: string;
-};
-
-export type UpdateCollectionAuthorInput = {
-  externalId: string;
-  name: string;
-  bio?: string;
-  imageUrl?: string;
-  active?: boolean;
-};
-
-export type CreateCollectionInput = {
-  slug: string;
-  title: string;
-  excerpt?: string;
-  intro?: string;
-  imageUrl?: string;
-  status?: CollectionStatus;
-  authorExternalId?: string;
-};
-
-export type UpdateCollectionInput = {
-  externalId: string;
-  slug: string;
-  title: string;
-  excerpt?: string;
-  intro?: string;
-  imageUrl?: string;
-  status?: CollectionStatus;
-  authorExternalId: string;
-  publishedAt?: Date;
-};
-
-export type CollectionStoryAuthor = {
-  name: string;
-};
-
-export type CreateCollectionStoryInput = {
-  collectionExternalId: string;
-  url: string;
-  title: string;
-  excerpt: string;
-  imageUrl: string;
-  authors: CollectionStoryAuthor[];
-  publisher: string;
-  sortOrder?: number;
-};
-
-export type UpdateCollectionStoryInput = Omit<
+import {
+  CreateCollectionAuthorInput,
+  UpdateCollectionAuthorInput,
+  CreateCollectionInput,
+  UpdateCollectionInput,
   CreateCollectionStoryInput,
-  'collectionExternalId'
-> & {
-  externalId: string;
-};
+  UpdateCollectionStoryInput,
+} from './types';
 
 /**
  * @param db
@@ -154,9 +106,7 @@ export async function updateCollection(
   data: UpdateCollectionInput
 ): Promise<Collection> {
   // retrieve the current record, pre-update
-  const existingCollection = await db.collection.findUnique({
-    where: { externalId: data.externalId },
-  });
+  const existingCollection = await getCollection(db, data.externalId);
 
   if (!existingCollection) {
     throw new Error(`A collection by that ID could not be found`);
@@ -176,9 +126,7 @@ export async function updateCollection(
 
     // if we found more than one collection with this slug, we have a problem
     if (sameSlugs > 0) {
-      throw new Error(
-        `A different collection with the slug ${data.slug} already exists`
-      );
+      throw new Error(`A collection with the slug ${data.slug} already exists`);
     }
   }
 
@@ -214,25 +162,6 @@ export async function updateCollection(
 
 /**
  * @param db
- * @param externalId
- */
-export async function getCollectionByExternalId(
-  db: PrismaClient,
-  externalId: string
-): Promise<Collection> {
-  const collection = await db.collection.findUnique({ where: { externalId } });
-
-  if (!collection) {
-    throw new Error(
-      `Collection with external ID: ${externalId} does not exist.`
-    );
-  }
-
-  return collection;
-}
-
-/**
- * @param db
  * @param data
  */
 export async function createCollectionStory(
@@ -240,10 +169,7 @@ export async function createCollectionStory(
   data: CreateCollectionStoryInput
 ): Promise<CollectionStory> {
   // Use the giver collection external ID to fetch the collection ID
-  const collection = await getCollectionByExternalId(
-    db,
-    data.collectionExternalId
-  );
+  const collection = await getCollection(db, data.collectionExternalId);
 
   // delete the collectionExternalId property
   // so data matches the expected prisma type
