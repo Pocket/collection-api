@@ -20,7 +20,7 @@ model CollectionStory {
   publisher    String      @db.VarChar(255)
   sortOrder    Int         @default(0)
   createdAt    DateTime    @default(now()) @db.Timestamp(0)
-  updatedAt    DateTime    @default(now()) @db.Timestamp(0)
+  updatedAt    DateTime    @default(now()) @db.Timestamp(0) @updatedAt
   collection   Collection  @relation(fields: [collectionId], references: [id])
 
   @@unique([collectionId, url], name: "collectionIdUrl")
@@ -41,7 +41,7 @@ model Image {
   fileName      String?             @db.VarChar(255)
   path          String?             @db.VarChar(255)
   createdAt     DateTime            @default(now()) @db.Timestamp(0)
-  updatedAt     DateTime            @default(now()) @db.Timestamp(0)
+  updatedAt     DateTime            @default(now()) @db.Timestamp(0) @updatedAt
 
   @@index([entityId, entityType], name: "entityIdEntityType")
 }
@@ -54,7 +54,7 @@ model CollectionAuthor {
   bio               String?             @db.Text
   imageUrl          String?             @db.VarChar(500)
   createdAt         DateTime            @default(now()) @db.Timestamp(0)
-  updatedAt         DateTime            @default(now()) @db.Timestamp(0)
+  updatedAt         DateTime            @default(now()) @db.Timestamp(0) @updatedAt
   active            Boolean?            @default(true)
   collections       Collection[]
 
@@ -70,10 +70,10 @@ model Collection {
   excerpt            String?             @db.Text
   intro              String?             @db.Text
   imageUrl           String?             @db.VarChar(500)
-  publishedAt        DateTime            @default(now()) @db.Timestamp(0)
+  publishedAt        DateTime?           @db.Timestamp(0)
   status             CollectionStatus?   @default(draft)
   createdAt          DateTime            @default(now()) @db.Timestamp(0)
-  updatedAt          DateTime            @default(now()) @db.Timestamp(0)
+  updatedAt          DateTime            @default(now()) @db.Timestamp(0) @updatedAt
   authors            CollectionAuthor[]
   stories            CollectionStory[]
 

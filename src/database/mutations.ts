@@ -40,7 +40,8 @@ export type UpdateCollectionInput = {
   intro?: string;
   imageUrl?: string;
   status?: CollectionStatus;
-  authorExternalId?: string;
+  authorExternalId: string;
+  publishedAt?: string;
 };
 
 export type CollectionStoryAuthor = {
@@ -152,11 +153,11 @@ export async function updateCollection(
   db: PrismaClient,
   data: UpdateCollectionInput
 ): Promise<Collection> {
-  const slugExists = await db.collection.count({
-    where: { slug: data.slug, externalId: { not: data.externalId } },
+  const existingCollections = await db.collection.findMany({
+    where: { slug: data.slug },
   });
 
-  if (slugExists) {
+  if (existingCollections.length > 1) {
     throw new Error(
       `A different collection with the slug ${data.slug} already exists`
     );
@@ -169,6 +170,15 @@ export async function updateCollection(
   // an author to a collection.
   const authorExternalId = data.authorExternalId;
   delete data.authorExternalId;
+
+  // if the collection is going from unpublished to published, we update its
+  // `publishedAt` time
+  if (
+    existingCollections[0].status !== CollectionStatus.published &&
+    data.status === CollectionStatus.published
+  ) {
+    data.publishedAt = new Date().toISOString();
+  }
 
   return db.collection.update({
     where: { externalId: data.externalId },

@@ -22,7 +22,7 @@ describe('queries', () => {
   });
 
   it('can get a collection by external id', async () => {
-    const author = await createAuthor(db, 1, 'brave');
+    const author = await createAuthor(db, 'brave');
     const created = await createCollection(db, 'test me', author);
 
     const collection = await getCollection(db, created.externalId);
@@ -33,7 +33,7 @@ describe('queries', () => {
   });
 
   it('can get a collection by slug', async () => {
-    const author = await createAuthor(db, 1, 'brave');
+    const author = await createAuthor(db, 'brave');
     await createCollection(db, 'test me', author);
 
     const collection = await getCollectionBySlug(db, 'test-me');
@@ -44,7 +44,7 @@ describe('queries', () => {
   });
 
   it('can get collections by slug', async () => {
-    const author = await createAuthor(db, 1, 'brave');
+    const author = await createAuthor(db, 'brave');
     await createCollection(db, 'test me', author, CollectionStatus.published);
     await createCollection(db, 'test me 2', author, CollectionStatus.published);
 
