@@ -2,11 +2,3 @@ type Query {
   getCollections(page: Int, perPage: Int): CollectionsResult
   getCollection(slug: String!): Collection
 }
-
-extend type Item @key(fields: "givenUrl") {
-    "key field to identify the Item entity in the Parser service"
-    givenUrl: Url! @external
-
-    "If the item is a collection allow them to get the collection information"
-    collection: Collection
-}
