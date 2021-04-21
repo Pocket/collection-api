@@ -4,6 +4,7 @@ import {
   CollectionAuthor,
   CollectionStatus,
   PrismaClient,
+  Prisma,
 } from '@prisma/client';
 import faker from 'faker';
 import config from '../config';
@@ -12,7 +13,7 @@ const slugifyConfig = config.slugify;
 
 export async function createAuthorHelper(
   prisma: PrismaClient,
-  name
+  name: string
 ): Promise<CollectionAuthor> {
   const slug = slugify(name, slugifyConfig);
   return await prisma.collectionAuthor.create({
@@ -30,10 +31,7 @@ export async function createCollectionHelper(
   status: CollectionStatus = 'draft',
   publishedAt: Date = null
 ): Promise<Collection> {
-  // i would like to type the below with `CollectionCreateInput` but, even
-  // though this type is exported in `.prisma/client/index.d.ts`, i cannot
-  // import it here :/ (i can import other types in that file though so :shrug:)
-  const data: any = {
+  const data: Prisma.CollectionCreateInput = {
     title,
     slug: slugify(title, slugifyConfig),
     excerpt: title,

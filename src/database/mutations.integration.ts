@@ -48,17 +48,6 @@ describe('mutations', () => {
         expect(collection.publishedAt).toBeFalsy();
       });
 
-      it('should create a collection with a draft status by default', async () => {
-        const data: CreateCollectionInput = {
-          slug: 'walter-bowls',
-          title: 'walter bowls',
-          authorExternalId: author.externalId,
-        };
-        const collection = await createCollection(db, data);
-
-        expect(collection.publishedAt).toBeFalsy();
-      });
-
       it('should fail on a duplicate slug', async () => {
         // create our first collection
         const data1: CreateCollectionInput = {
@@ -76,15 +65,9 @@ describe('mutations', () => {
           authorExternalId: author.externalId,
         };
 
-        try {
-          await createCollection(db, data2);
-          // Fail test if above expression doesn't throw anything.
-          expect(true).toBe(false);
-        } catch (e) {
-          expect(e.message).toBe(
-            `A collection with the slug ${data2.slug} already exists`
-          );
-        }
+        await expect(createCollection(db, data2)).rejects.toThrow(
+          `A collection with the slug ${data2.slug} already exists`
+        );
       });
     });
 
@@ -201,15 +184,9 @@ describe('mutations', () => {
           authorExternalId: author.externalId,
         };
 
-        try {
-          await updateCollection(db, data);
-          // Fail test if above expression doesn't throw anything.
-          expect(true).toBe(false);
-        } catch (e) {
-          expect(e.message).toBe(
-            `A collection with the slug ${first.slug} already exists`
-          );
-        }
+        await expect(updateCollection(db, data)).rejects.toThrow(
+          `A collection with the slug ${first.slug} already exists`
+        );
       });
     });
   });
