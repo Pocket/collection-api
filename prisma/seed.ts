@@ -4,12 +4,12 @@ import { createAuthor, createCollection } from '../src/test/helpers';
 const prisma = new PrismaClient();
 
 async function main() {
-  const kelvin = await createAuthor(prisma, 1, 'Kelvin');
-  const jonathan = await createAuthor(prisma, 2, 'Jonathan');
-  const chelsea = await createAuthor(prisma, 3, 'Chelsea');
-  const mathijs = await createAuthor(prisma, 4, 'Mathijs');
-  const daniel = await createAuthor(prisma, 5, 'Daniel');
-  const nina = await createAuthor(prisma, 6, 'Nina');
+  const kelvin = await createAuthor(prisma, 'Kelvin');
+  const jonathan = await createAuthor(prisma, 'Jonathan');
+  const chelsea = await createAuthor(prisma, 'Chelsea');
+  const mathijs = await createAuthor(prisma, 'Mathijs');
+  const daniel = await createAuthor(prisma, 'Daniel');
+  const nina = await createAuthor(prisma, 'Nina');
 
   await createCollection(prisma, `Kelvin's first collection`, kelvin);
   await createCollection(

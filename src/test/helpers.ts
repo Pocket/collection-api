@@ -12,15 +12,11 @@ const slugifyConfig = config.slugify;
 
 export async function createAuthor(
   prisma: PrismaClient,
-  id,
   name
 ): Promise<CollectionAuthor> {
   const slug = slugify(name, slugifyConfig);
-  return await prisma.collectionAuthor.upsert({
-    where: { id },
-    update: {},
-    create: {
-      id,
+  return await prisma.collectionAuthor.create({
+    data: {
       name,
       slug,
     },
@@ -74,12 +70,9 @@ export async function createCollection(
 }
 
 export async function clear(prisma: PrismaClient): Promise<void> {
-  await Promise.all(
-    [
-      'CollectionStory',
-      'Collection',
-      'CollectionAuthor',
-      'Image',
-    ].map((table) => prisma.$executeRaw(`DELETE FROM ${table};`))
-  );
+  const tables = ['CollectionStory', 'Collection', 'CollectionAuthor', 'Image'];
+
+  for (let i = 0; i < tables.length; i++) {
+    await prisma.$executeRaw(`DELETE FROM ${tables[i]}`);
+  }
 }

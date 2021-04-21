@@ -8,7 +8,7 @@ import * as PrismaMiddleware from './prisma';
 
 // this type prepares a CollectionStory to have an extra 'item' property
 type CollectionStoryWithItem = CollectionStory & {
-  item: {
+  item?: {
     // the name of this property *must* be `givenUrl`. this is the name of the
     // field on the Parser Item model that is used to retrieve a Parser Item.
     // all we're doing is duplicating the CollectionStory `url` property here.
@@ -30,6 +30,11 @@ export type CollectionWithStoriesWithItem = Collection & {
 export function injectItemIntoCollectionStories(
   collection: CollectionWithStories
 ): CollectionWithStoriesWithItem {
+  // a collection may not include stories - if there are none, do nothing
+  if (!collection.stories) {
+    return collection;
+  }
+
   // map over each CollectionStory, injecting a new `item` property that
   // is a copy of the data in the `url` property.
   const stories = collection.stories.map((story) => {
@@ -61,7 +66,7 @@ export async function collectionStoryInjectItemMiddleware(
   // clients only retrieve CollectionStories within the context / as
   // children of Collections, so we start branching there.
 
-  // all retrieval queries in prisma begin with 'find' - findMany, findFirst,
+  // all retrieval queries in prisma begin with 'find' - findUnique, findFirst,
   // findMany. i do *not* like hard coding this 'find' string here. it's
   // setting us up for a bug when merging dependabot PRs.
   if (

@@ -102,6 +102,25 @@ describe('prisma middleware', () => {
         'https://thedude.com/walter/calm'
       );
     });
+
+    it('should return the collection unaltered if it does not contain stories', () => {
+      const c: any = {
+        id: 1,
+        externalId: 'abc-123',
+        slug: 'all-about-bowling',
+        title: 'All About Bowling',
+        excerpt: 'test',
+        intro: 'test',
+        imageUrl: 'test',
+        status: 'draft',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      const res: any = PrismaMiddleware.injectItemIntoCollectionStories(c);
+
+      expect(res).toEqual(c);
+    });
   });
 
   describe('collectionStoryInjectItemMiddleware', () => {

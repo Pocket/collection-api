@@ -40,7 +40,8 @@ export type UpdateCollectionInput = {
   intro?: string;
   imageUrl?: string;
   status?: CollectionStatus;
-  authorExternalId?: string;
+  authorExternalId: string;
+  publishedAt?: Date;
 };
 
 export type CollectionStoryAuthor = {
@@ -152,14 +153,33 @@ export async function updateCollection(
   db: PrismaClient,
   data: UpdateCollectionInput
 ): Promise<Collection> {
-  const slugExists = await db.collection.count({
-    where: { slug: data.slug, externalId: { not: data.externalId } },
+  // retrieve the current record, pre-update
+  const existingCollection = await db.collection.findUnique({
+    where: { externalId: data.externalId },
   });
 
-  if (slugExists) {
-    throw new Error(
-      `A different collection with the slug ${data.slug} already exists`
-    );
+  if (!existingCollection) {
+    throw new Error(`A collection by that ID could not be found`);
+  }
+
+  // if the slug is changing, we have to make sure it's unique
+  // we could let this fall back to a db unique constraint, but probably good
+  // to handle it here, too
+  if (existingCollection.slug !== data.slug) {
+    // make sure no other collections exist with the soon-to-be slug
+    const sameSlugs = await db.collection.count({
+      where: {
+        slug: data.slug,
+        externalId: { notIn: [existingCollection.externalId] },
+      },
+    });
+
+    // if we found more than one collection with this slug, we have a problem
+    if (sameSlugs > 0) {
+      throw new Error(
+        `A different collection with the slug ${data.slug} already exists`
+      );
+    }
   }
 
   // We have to pull the authorExternalId property out of data
@@ -169,6 +189,15 @@ export async function updateCollection(
   // an author to a collection.
   const authorExternalId = data.authorExternalId;
   delete data.authorExternalId;
+
+  // if the collection is going from unpublished to published, we update its
+  // `publishedAt` time
+  if (
+    existingCollection.status !== CollectionStatus.published &&
+    data.status === CollectionStatus.published
+  ) {
+    data.publishedAt = new Date();
+  }
 
   return db.collection.update({
     where: { externalId: data.externalId },
