@@ -40,8 +40,8 @@ model Image {
   fileSizeBytes Int?
   fileName      String?             @db.VarChar(255)
   path          String?             @db.VarChar(255)
-  createdAt     DateTime            @default(now()) @db.Timestamp(0)
-  updatedAt     DateTime            @default(now()) @db.Timestamp(0) @updatedAt
+  createdAt     DateTime            @default(now()) @db.DateTime(0)
+  updatedAt     DateTime            @default(now()) @db.DateTime(0) @updatedAt
 
   @@index([entityId, entityType], name: "entityIdEntityType")
 }
@@ -53,8 +53,8 @@ model CollectionAuthor {
   slug              String?             @db.VarChar(300)
   bio               String?             @db.Text
   imageUrl          String?             @db.VarChar(500)
-  createdAt         DateTime            @default(now()) @db.Timestamp(0)
-  updatedAt         DateTime            @default(now()) @db.Timestamp(0) @updatedAt
+  createdAt         DateTime            @default(now()) @db.DateTime(0)
+  updatedAt         DateTime            @default(now()) @db.DateTime(0) @updatedAt
   active            Boolean?            @default(true)
   collections       Collection[]
 
@@ -72,8 +72,8 @@ model Collection {
   imageUrl           String?             @db.VarChar(500)
   publishedAt        DateTime?           @db.DateTime(0)
   status             CollectionStatus?   @default(draft)
-  createdAt          DateTime            @default(now()) @db.Timestamp(0)
-  updatedAt          DateTime            @default(now()) @db.Timestamp(0) @updatedAt
+  createdAt          DateTime            @default(now()) @db.DateTime(0)
+  updatedAt          DateTime            @default(now()) @db.DateTime(0) @updatedAt
   authors            CollectionAuthor[]
   stories            CollectionStory[]
 

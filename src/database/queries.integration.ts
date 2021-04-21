@@ -21,6 +21,18 @@ describe('queries', () => {
     await db.$disconnect();
   });
 
+  it('should create a collection with a null publishedAt', async () => {
+    const author = await createAuthor(db, 'walter');
+    const initial = await createCollection(
+      db,
+      'first iteration',
+      author,
+      CollectionStatus.draft
+    );
+
+    expect(initial.publishedAt).toBeFalsy();
+  });
+
   it('can get a collection by external id', async () => {
     const author = await createAuthor(db, 'brave');
     const created = await createCollection(db, 'test me', author);

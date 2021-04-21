@@ -35,21 +35,15 @@ describe('mutations', () => {
       const updated = await updateCollection(db, data);
       expect(updated.title).toEqual('second iteration');
 
-      // verify on a re-fetch that the update was persisted
-      const reFetch = await getCollection(db, initial.externalId);
-      expect(reFetch.title).toEqual('second iteration');
-    });
-
-    it('should create a collection with a null publishedAt', async () => {
-      const author = await createAuthor(db, 'walter');
-      const initial = await createCollection(
-        db,
-        'first iteration',
-        author,
-        CollectionStatus.draft
+      // should have updated the updatedAt field
+      expect(updated.updatedAt.getTime()).toBeGreaterThan(
+        initial.updatedAt.getTime()
       );
 
-      expect(initial.publishedAt).toBeFalsy();
+      // verify on a re-fetch that the update was persisted
+      // is this necessary?
+      const reFetch = await getCollection(db, initial.externalId);
+      expect(reFetch.title).toEqual('second iteration');
     });
 
     it('should update publishedAt when going to published status', async () => {
