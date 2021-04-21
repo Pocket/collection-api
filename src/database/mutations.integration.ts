@@ -1,4 +1,4 @@
-import { PrismaClient, CollectionStatus } from '@prisma/client';
+import { PrismaClient, Collection, CollectionStatus } from '@prisma/client';
 import { getCollection } from './queries';
 import { UpdateCollectionInput } from './mutations';
 import {
@@ -112,6 +112,42 @@ describe('mutations', () => {
 
       // make sure the publishedAt value hasn't changed
       expect(published.publishedAt).toEqual(updated.publishedAt);
+    });
+
+    it('should fail on a duplicate slug', async () => {
+      const author = await createAuthor(db, 'walter');
+
+      // this should create a slug of 'let-us-go-bowling'
+      const first = await createCollection(
+        db,
+        'let us go bowling',
+        author,
+        CollectionStatus.draft
+      );
+
+      const second: Collection = await createCollection(
+        db,
+        'phone is ringing',
+        author,
+        CollectionStatus.draft
+      );
+
+      // try to update the second collection with the same slug as the first
+      const data: UpdateCollectionInput = {
+        ...second,
+        slug: first.slug,
+        authorExternalId: author.externalId,
+      };
+
+      try {
+        await updateCollection(db, data);
+        // Fail test if above expression doesn't throw anything.
+        expect(true).toBe(false);
+      } catch (e) {
+        expect(e.message).toBe(
+          `A different collection with the slug ${first.slug} already exists`
+        );
+      }
     });
   });
 });
