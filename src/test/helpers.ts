@@ -4,15 +4,16 @@ import {
   CollectionAuthor,
   CollectionStatus,
   PrismaClient,
+  Prisma,
 } from '@prisma/client';
 import faker from 'faker';
 import config from '../config';
 
 const slugifyConfig = config.slugify;
 
-export async function createAuthor(
+export async function createAuthorHelper(
   prisma: PrismaClient,
-  name
+  name: string
 ): Promise<CollectionAuthor> {
   const slug = slugify(name, slugifyConfig);
   return await prisma.collectionAuthor.create({
@@ -23,25 +24,30 @@ export async function createAuthor(
   });
 }
 
-export async function createCollection(
+export async function createCollectionHelper(
   prisma: PrismaClient,
-  title,
+  title: string,
   author: CollectionAuthor,
-  status: CollectionStatus = 'draft'
+  status: CollectionStatus = 'draft',
+  publishedAt: Date = null
 ): Promise<Collection> {
-  const collection = await prisma.collection.create({
-    data: {
-      title,
-      slug: slugify(title, slugifyConfig),
-      excerpt: title,
-      status,
-      authors: {
-        connect: {
-          id: author.id,
-        },
+  const data: Prisma.CollectionCreateInput = {
+    title,
+    slug: slugify(title, slugifyConfig),
+    excerpt: title,
+    status,
+    authors: {
+      connect: {
+        id: author.id,
       },
     },
-  });
+  };
+
+  if (status === CollectionStatus.published && publishedAt) {
+    data.publishedAt = publishedAt;
+  }
+
+  const collection = await prisma.collection.create({ data });
 
   function getRandomInt(min, max) {
     min = Math.ceil(min);

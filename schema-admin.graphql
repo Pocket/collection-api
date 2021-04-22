@@ -14,18 +14,6 @@ type CollectionAuthorsResult {
   authors: [CollectionAuthor]
 }
 
-type Query {
-  searchCollections(
-    filters: SearchCollectionsFilters!
-    page: Int
-    perPage: Int
-  ): CollectionsResult
-  getCollection(externalId: String!): Collection
-  getCollectionAuthor(externalId: String!): CollectionAuthor
-  getCollectionAuthors(page: Int, perPage: Int): CollectionAuthorsResult
-  getCollectionStory(collectionId: Int!, url: String): CollectionStory
-}
-
 input CreateCollectionAuthorInput {
   name: String!
   bio: Markdown
@@ -85,6 +73,30 @@ input UpdateCollectionStoryInput {
   authors: [CollectionStoryAuthorInput]!
   publisher: String!
   sortOrder: Int
+}
+
+type Query {
+  searchCollections(
+    filters: SearchCollectionsFilters!
+    page: Int
+    perPage: Int
+  ): CollectionsResult
+  """
+  Retrieves a Collection by externalId.
+  """
+  getCollection(externalId: String!): Collection
+  """
+  Retrieves a CollectionAuthor by externalId.
+  """
+  getCollectionAuthor(externalId: String!): CollectionAuthor
+  """
+  Retrieves a paged list of CollectionAuthors.
+  """
+  getCollectionAuthors(page: Int, perPage: Int): CollectionAuthorsResult
+  """
+  Retrieves a CollectionStory by a combination of collectionId and url.
+  """
+  getCollectionStory(collectionId: Int!, url: String): CollectionStory
 }
 
 type Mutation {

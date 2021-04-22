@@ -1,9 +1,9 @@
 import {
-  CollectionWithAuthorsAndStories,
   countPublishedCollections,
   getCollectionBySlug,
   getPublishedCollections,
 } from '../database/queries';
+import { CollectionWithAuthorsAndStories } from '../database/types';
 import { getPagination } from '../utils';
 import { CollectionsResult } from '../typeDefs';
 import { Collection } from '@prisma/client';

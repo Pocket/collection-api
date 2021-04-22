@@ -6,18 +6,19 @@ import {
   PrismaClient,
 } from '@prisma/client';
 
-export type SearchCollectionsFilters = {
-  author?: string;
-  title?: string;
-  status?: CollectionStatus;
-};
+import {
+  SearchCollectionsFilters,
+  CollectionWithAuthorsAndStories,
+} from './types';
 
-export type CollectionWithAuthorsAndStories = Collection & {
-  authors?: CollectionAuthor[];
-  stories?: CollectionStory[];
-};
+// -------------------------------
+// COLLECTION QUERIES
+// -------------------------------
 
 /**
+ * this is primarily an admin query, which is why we don't return any author
+ * or story information.
+ *
  * @param db
  * @param externalId
  */
@@ -25,16 +26,23 @@ export async function getCollection(
   db: PrismaClient,
   externalId: string
 ): Promise<CollectionWithAuthorsAndStories> {
-  return db.collection.findUnique({
+  const collection = db.collection.findUnique({
     where: { externalId },
-    include: {
-      authors: true,
-      stories: { orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }] },
-    },
   });
+
+  if (!collection) {
+    throw new Error(
+      `Collection with external ID: ${externalId} does not exist.`
+    );
+  }
+
+  return collection;
 }
 
 /**
+ * this is primarily a client query, which is why we include authors and
+ * stories by default.
+ *
  * @param db
  * @param slug
  */
@@ -42,48 +50,15 @@ export async function getCollectionBySlug(
   db: PrismaClient,
   slug: string
 ): Promise<CollectionWithAuthorsAndStories> {
-  return db.collection.findUnique({
-    where: { slug },
+  // slug is unique, but the generated type for `findUnique` here doesn't
+  // include `status`, so using `findFirst` instead
+  return db.collection.findFirst({
+    where: { slug, status: CollectionStatus.published },
     include: {
       authors: true,
       stories: { orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }] },
     },
   });
-}
-
-/**
- * @param db
- * @param externalId
- */
-export async function getAuthor(
-  db: PrismaClient,
-  externalId: string
-): Promise<CollectionAuthor> {
-  return db.collectionAuthor.findUnique({ where: { externalId } });
-}
-
-/**
- * @param db
- * @param collectionId
- * @param url
- */
-export async function getCollectionStory(
-  db: PrismaClient,
-  collectionId: number,
-  url: string
-): Promise<CollectionStory> {
-  return await db.collectionStory.findUnique({
-    where: { collectionIdUrl: { collectionId, url } },
-  });
-}
-
-/**
- * @param db
- */
-export async function countPublishedCollections(
-  db: PrismaClient
-): Promise<number> {
-  return db.collection.count({ where: { status: CollectionStatus.published } });
 }
 
 /**
@@ -123,6 +98,15 @@ export async function getPublishedCollections(
 
 /**
  * @param db
+ */
+export async function countPublishedCollections(
+  db: PrismaClient
+): Promise<number> {
+  return db.collection.count({ where: { status: CollectionStatus.published } });
+}
+
+/**
+ * @param db
  * @param filters
  * @param page
  * @param perPage
@@ -139,12 +123,12 @@ export async function searchCollections(
       title: { contains: filters.title },
       authors: { every: { name: { contains: filters.author } } },
     },
+    orderBy: { updatedAt: 'desc' },
     include: { authors: true },
   };
 
   if (page && perPage) {
     queryParams = {
-      orderBy: { updatedAt: 'desc' },
       take: perPage,
       skip: page > 1 ? (page - 1) * perPage : 0,
       ...queryParams,
@@ -154,11 +138,19 @@ export async function searchCollections(
   return db.collection.findMany(queryParams);
 }
 
+// -------------------------------
+// AUTHOR QUERIES
+// -------------------------------
+
 /**
  * @param db
+ * @param externalId
  */
-export async function countAuthors(db: PrismaClient) {
-  return db.collectionAuthor.count();
+export async function getAuthor(
+  db: PrismaClient,
+  externalId: string
+): Promise<CollectionAuthor> {
+  return db.collectionAuthor.findUnique({ where: { externalId } });
 }
 
 /**
@@ -170,10 +162,35 @@ export async function getAuthors(
   db: PrismaClient,
   page: number,
   perPage: number
-) {
+): Promise<CollectionAuthor[]> {
   return db.collectionAuthor.findMany({
     take: perPage,
     skip: page > 1 ? (page - 1) * perPage : 0,
     orderBy: { name: 'asc' },
+  });
+}
+
+/**
+ * @param db
+ */
+export async function countAuthors(db: PrismaClient): Promise<number> {
+  return db.collectionAuthor.count();
+}
+
+// -------------------------------
+// COLLECTION STORY QUERIES
+// -------------------------------
+/**
+ * @param db
+ * @param collectionId
+ * @param url
+ */
+export async function getCollectionStory(
+  db: PrismaClient,
+  collectionId: number,
+  url: string
+): Promise<CollectionStory> {
+  return await db.collectionStory.findUnique({
+    where: { collectionIdUrl: { collectionId, url } },
   });
 }

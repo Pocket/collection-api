@@ -3,7 +3,7 @@ import fs from 'fs';
 import { gql } from 'apollo-server';
 
 import { CollectionAuthor } from '@prisma/client';
-import { CollectionWithAuthorsAndStories } from './database/queries';
+import { CollectionWithAuthorsAndStories } from './database/types';
 
 const sharedSchema = fs
   .readFileSync(path.join(__dirname, '..', 'schema-shared.graphql'))
