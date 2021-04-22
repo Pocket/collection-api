@@ -46,9 +46,9 @@ type Collection {
 }
 
 enum CollectionStatus {
-  draft
-  published
-  archived
+  DRAFT
+  PUBLISHED
+  ARCHIVED
 }
 
 type CollectionAuthor {

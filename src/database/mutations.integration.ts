@@ -34,7 +34,7 @@ describe('mutations', () => {
         const collection = await createCollection(db, data);
 
         expect(collection).not.toBeNull();
-        expect(collection.status).toEqual(CollectionStatus.draft);
+        expect(collection.status).toEqual(CollectionStatus.DRAFT);
       });
 
       it('should create a collection with a null publishedAt', async () => {
@@ -106,7 +106,7 @@ describe('mutations', () => {
           db,
           'first iteration',
           author,
-          CollectionStatus.draft
+          CollectionStatus.DRAFT
         );
 
         const data: UpdateCollectionInput = {
@@ -114,7 +114,7 @@ describe('mutations', () => {
           slug: initial.slug,
           title: 'second iteration',
           authorExternalId: author.externalId,
-          status: CollectionStatus.published,
+          status: CollectionStatus.PUBLISHED,
         };
 
         // publishedAt should have a value
@@ -132,7 +132,7 @@ describe('mutations', () => {
           db,
           'first iteration',
           author,
-          CollectionStatus.draft
+          CollectionStatus.DRAFT
         );
 
         // update the colletion to published
@@ -141,7 +141,7 @@ describe('mutations', () => {
           slug: initial.slug,
           title: 'second iteration',
           authorExternalId: author.externalId,
-          status: CollectionStatus.published,
+          status: CollectionStatus.PUBLISHED,
         };
 
         const published = await updateCollection(db, data);
@@ -152,7 +152,7 @@ describe('mutations', () => {
           slug: initial.slug,
           title: 'third iteration',
           authorExternalId: author.externalId,
-          status: CollectionStatus.published,
+          status: CollectionStatus.PUBLISHED,
         };
 
         const updated = await updateCollection(db, data);
@@ -167,14 +167,14 @@ describe('mutations', () => {
           db,
           'let us go bowling',
           author,
-          CollectionStatus.draft
+          CollectionStatus.DRAFT
         );
 
         const second: Collection = await createCollectionHelper(
           db,
           'phone is ringing',
           author,
-          CollectionStatus.draft
+          CollectionStatus.DRAFT
         );
 
         // try to update the second collection with the same slug as the first

@@ -33,7 +33,7 @@ model Image {
   id            Int                 @id @default(autoincrement())
   entityId      String              @db.VarChar(255)
   entityType    ImageEntityType
-  sizeCategory  ImageSizeCategory   @default(large)
+  sizeCategory  ImageSizeCategory   @default(LARGE)
   width         Int?
   height        Int?
   mimeType      String?             @db.VarChar(255)
@@ -71,7 +71,7 @@ model Collection {
   intro              String?             @db.Text
   imageUrl           String?             @db.VarChar(500)
   publishedAt        DateTime?           @db.DateTime(0)
-  status             CollectionStatus?   @default(draft)
+  status             CollectionStatus?   @default(DRAFT)
   createdAt          DateTime            @default(now()) @db.DateTime(0)
   updatedAt          DateTime            @updatedAt
   authors            CollectionAuthor[]
@@ -83,18 +83,18 @@ model Collection {
 }
 
 enum ImageEntityType {
-  collection
-  collection_story
+  COLLECTION
+  COLLECTION_STORY
 }
 
 enum ImageSizeCategory {
-  small
-  medium
-  large
+  SMALL
+  MEDIUM
+  LARGE
 }
 
 enum CollectionStatus {
-  draft
-  published
-  archived
+  DRAFT
+  PUBLISHED
+  ARCHIVED
 }
