@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE `Image` MODIFY `entityId` VARCHAR(255) NULL,
+    MODIFY `entityType` ENUM('COLLECTION', 'COLLECTION_STORY') NULL;

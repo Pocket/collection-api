@@ -4,6 +4,7 @@ import { typeDefsAdmin } from '../typeDefs';
 import { resolvers as adminResolvers } from './resolvers';
 import { sentryPlugin } from '@pocket-tools/apollo-utils';
 import { client } from '../database/client';
+import s3 from '../aws/s3';
 
 export const server = new ApolloServer({
   // NOTE! this server is *not* part of the federated schema
@@ -17,5 +18,7 @@ export const server = new ApolloServer({
   plugins: [sentryPlugin],
   context: {
     db: client(),
+    s3,
   },
+  uploads: false,
 });

@@ -11,6 +11,7 @@ import {
   DataAwsKmsAlias,
   DataAwsRegion,
   DataAwsSnsTopic,
+  S3Bucket,
 } from '../.gen/providers/aws';
 
 /**
@@ -43,12 +44,14 @@ function createPagerDuty(scope: Construct) {
 
 /**
  * @param scope
- * @param rds
+ * @param dependencies
  */
 export function createPocketAlbApplication(
   scope: Construct,
-  rds: ApplicationRDSCluster
+  dependencies: { rds: ApplicationRDSCluster; s3: S3Bucket }
 ): void {
+  const { rds, s3 } = dependencies;
+
   const pagerDuty = createPagerDuty(scope);
 
   const region = new DataAwsRegion(scope, 'region');
@@ -91,6 +94,10 @@ export function createPocketAlbApplication(
           {
             name: 'NODE_ENV',
             value: process.env.NODE_ENV, // this gives us a nice lowercase production and development
+          },
+          {
+            name: 'AWS_S3_BUCKET',
+            value: process.env.AWS_S3_BUCKET,
           },
         ],
         secretEnvVars: [
@@ -164,6 +171,11 @@ export function createPocketAlbApplication(
             'xray:GetSamplingStatisticSummaries',
           ],
           resources: ['*'],
+          effect: 'Allow',
+        },
+        {
+          actions: ['s3:*'],
+          resources: [`arn:aws:s3:::${s3.id}`, `arn:aws:s3:::${s3.id}/*`],
           effect: 'Allow',
         },
       ],

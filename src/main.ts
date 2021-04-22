@@ -4,6 +4,7 @@ import AWSXRay from 'aws-xray-sdk-core';
 import xrayExpress from 'aws-xray-sdk-express';
 import express from 'express';
 import https from 'https';
+import { graphqlUploadExpress } from 'graphql-upload';
 import { server as adminServer } from './admin/server';
 import { server as publicServer } from './public/server';
 
@@ -33,6 +34,14 @@ app.use(xrayExpress.openSegment('collections-api'));
 
 //Set XRay to use the host header to open its segment name.
 AWSXRay.middleware.enableDynamicNaming('*');
+
+// Upload middleware
+app.use(
+  graphqlUploadExpress({
+    maxFileSize: config.app.upload.maxSize,
+    maxFiles: config.app.upload.maxFiles,
+  })
+);
 
 // Apply the admin graphql (This is not part of the federated graph i.e. Client API)
 adminServer.applyMiddleware({ app, path: '/admin' });

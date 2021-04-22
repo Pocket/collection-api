@@ -1,24 +1,27 @@
+import { S3 } from 'aws-sdk';
 import {
   Collection,
   CollectionAuthor,
   CollectionStory,
+  Image,
   PrismaClient,
 } from '@prisma/client';
 import * as Sentry from '@sentry/node';
-import { CollectionsResult, CollectionAuthorsResult } from '../typeDefs';
+import { CollectionAuthorsResult, CollectionsResult } from '../typeDefs';
 import { getPagination } from '../utils';
 import {
   countAuthors,
   getAuthor,
   getAuthors,
-  getCollectionStory,
   getCollection,
+  getCollectionStory,
   searchCollections,
 } from '../database/queries';
 import {
   createAuthor,
   createCollection,
   createCollectionStory,
+  createImage,
   deleteCollectionStory,
   updateAuthor,
   updateCollection,
@@ -29,11 +32,13 @@ import {
   CreateCollectionAuthorInput,
   CreateCollectionInput,
   CreateCollectionStoryInput,
+  CreateImageInput,
   UpdateCollectionAuthorInput,
   UpdateCollectionInput,
   UpdateCollectionStoryInput,
 } from '../database/types';
 import config from '../config';
+import { uploadImage } from '../aws/upload';
 
 /**
  * Executes a mutation, catches exceptions and records to sentry and console
@@ -131,6 +136,25 @@ export const resolvers = {
         externalId,
         deleteCollectionStory
       );
+    },
+    collectionImageUpload: async (
+      _source,
+      { data },
+      { s3, db }: { s3: S3; db: PrismaClient }
+    ) => {
+      const { image, width, height, fileSizeBytes } = data;
+
+      const uploadResponse = await uploadImage(s3, image);
+      const dbInput: CreateImageInput = {
+        width,
+        height,
+        fileSizeBytes,
+        ...uploadResponse,
+      };
+
+      await executeMutation<CreateImageInput, Image>(db, dbInput, createImage);
+
+      return { url: uploadResponse.url };
     },
   },
   Query: {

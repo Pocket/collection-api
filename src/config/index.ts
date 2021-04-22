@@ -1,10 +1,19 @@
 export default {
   app: {
     environment: process.env.NODE_ENV || 'development',
-    defaultMaxAge: 0,
     pagination: {
       collectionsPerPage: 30,
       authorsPerPage: 20,
+    },
+    upload: {
+      maxSize: 10000000, // in bytes => 10MB
+      maxFiles: 10,
+    },
+  },
+  aws: {
+    s3: {
+      endpoint: process.env.AWS_S3_ENDPOINT,
+      bucket: process.env.AWS_S3_BUCKET,
     },
   },
   slugify: { lower: true, remove: /[*+~.()'"!:@]/g },

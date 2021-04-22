@@ -1,10 +1,5 @@
 version: '3.1'
 services:
-  redis:
-    image: redis:latest
-    ports:
-      - "6376:6379"
-
   mysql:
     image: mysql:5.7
     env_file:
@@ -16,6 +11,32 @@ services:
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - TZ=UTC
+    networks:
+      - dev
+
+  localstack:
+    image: localstack/localstack:0.12.9
+    env_file:
+      - .docker/local.env
+    ports:
+      - '4566-4599:4566-4599'
+      - '8080:8080'
+    volumes:
+      - ./.docker/localstack:/docker-entrypoint-initaws.d
+    environment:
+      - LOCALSTACK_API_KEY=${LOCALSTACK_API_KEY}
+      - DEBUG=1
+      - SERVICES=s3
+      - DATA_DIR=/tmp/localstack/data
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - PORT_WEB_UI=8080
+      - EXTRA_CORS_ALLOWED_HEADERS=Content-Disposition, Content-Type, x-amz-acl
+      - EXTRA_CORS_EXPOSE_HEADERS=ETag
+      - HOSTNAME_EXTERNAL=localstack
+    networks:
+      dev:
+        aliases:
+          - collection-api-local-images.localstack
 
   app:
     image: node:15
@@ -24,6 +45,8 @@ services:
       - '4004:4004'
     volumes:
       - ./:/app
+    env_file:
+      - .docker/local.env
     environment:
       - NODE_ENV=development
       - AWS_XRAY_LOG_LEVEL=silent
@@ -31,4 +54,10 @@ services:
       - DATABASE_URL=mysql://root:@mysql:3306/collections
     command: "bash -c 'cd /app && npm i && npm run start:dev'"
     depends_on:
-      - redis
+      - mysql
+      - localstack
+    networks:
+      - dev
+
+networks:
+  dev:

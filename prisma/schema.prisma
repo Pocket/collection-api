@@ -31,19 +31,20 @@ model CollectionStory {
 
 model Image {
   id            Int                 @id @default(autoincrement())
-  entityId      String              @db.VarChar(255)
-  entityType    ImageEntityType
+  entityId      String?             @db.VarChar(255)
+  entityType    ImageEntityType?
   sizeCategory  ImageSizeCategory   @default(LARGE)
-  width         Int?
-  height        Int?
-  mimeType      String?             @db.VarChar(255)
-  fileSizeBytes Int?
-  fileName      String?             @db.VarChar(255)
-  path          String?             @db.VarChar(255)
+  width         Int
+  height        Int
+  mimeType      String              @db.VarChar(255)
+  fileSizeBytes Int
+  fileName      String              @db.VarChar(255)
+  path          String              @db.VarChar(255)
   createdAt     DateTime            @default(now()) @db.DateTime(0)
   updatedAt     DateTime            @updatedAt
 
   @@index([entityId, entityType], name: "entityIdEntityType")
+  @@unique([path], name: "path")
 }
 
 model CollectionAuthor {

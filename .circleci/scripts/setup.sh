@@ -11,6 +11,9 @@ while [[ "$1" ]]; do
       --db)
           "${dir}"/setup_db.sh
           ;;
+      --aws)
+          "${dir}"/setup_aws.sh
+          ;;
     esac
     shift
 done
