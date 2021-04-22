@@ -48,7 +48,7 @@ describe('queries', () => {
           db,
           'test me',
           author,
-          CollectionStatus.published
+          CollectionStatus.PUBLISHED
         );
 
         const collection = await getCollectionBySlug(db, 'test-me');
@@ -65,7 +65,7 @@ describe('queries', () => {
           db,
           'test me',
           author,
-          CollectionStatus.draft
+          CollectionStatus.DRAFT
         );
 
         const collection = await getCollectionBySlug(db, 'test-me');
@@ -80,13 +80,13 @@ describe('queries', () => {
           db,
           'test me',
           author,
-          CollectionStatus.published
+          CollectionStatus.PUBLISHED
         );
         await createCollectionHelper(
           db,
           'test me 2',
           author,
-          CollectionStatus.published
+          CollectionStatus.PUBLISHED
         );
 
         const collections = await getCollectionsBySlugs(db, [
@@ -103,25 +103,25 @@ describe('queries', () => {
           db,
           'published 1',
           author,
-          CollectionStatus.published
+          CollectionStatus.PUBLISHED
         );
         await createCollectionHelper(
           db,
           'published 2',
           author,
-          CollectionStatus.published
+          CollectionStatus.PUBLISHED
         );
         await createCollectionHelper(
           db,
           'i am le draft',
           author,
-          CollectionStatus.draft
+          CollectionStatus.DRAFT
         );
         await createCollectionHelper(
           db,
           'look at me i am archived',
           author,
-          CollectionStatus.archived
+          CollectionStatus.ARCHIVED
         );
 
         const collections = await getCollectionsBySlugs(db, [
@@ -140,25 +140,25 @@ describe('queries', () => {
           db,
           'first',
           author,
-          CollectionStatus.published
+          CollectionStatus.PUBLISHED
         );
         await createCollectionHelper(
           db,
           'second',
           author,
-          CollectionStatus.draft
+          CollectionStatus.DRAFT
         );
         await createCollectionHelper(
           db,
           'third',
           author,
-          CollectionStatus.archived
+          CollectionStatus.ARCHIVED
         );
         await createCollectionHelper(
           db,
           'fourth',
           author,
-          CollectionStatus.published
+          CollectionStatus.PUBLISHED
         );
 
         const collections = await getPublishedCollections(db, 1, 10);
@@ -175,35 +175,35 @@ describe('queries', () => {
           db,
           '1',
           author,
-          CollectionStatus.published,
+          CollectionStatus.PUBLISHED,
           new Date(2021, 0, 1)
         );
         await createCollectionHelper(
           db,
           '2',
           author,
-          CollectionStatus.published,
+          CollectionStatus.PUBLISHED,
           new Date(2021, 0, 2)
         );
         await createCollectionHelper(
           db,
           '3',
           author,
-          CollectionStatus.published,
+          CollectionStatus.PUBLISHED,
           new Date(2021, 0, 3)
         );
         await createCollectionHelper(
           db,
           '4',
           author,
-          CollectionStatus.published,
+          CollectionStatus.PUBLISHED,
           new Date(2021, 0, 4)
         );
         await createCollectionHelper(
           db,
           '5',
           author,
-          CollectionStatus.published,
+          CollectionStatus.PUBLISHED,
           new Date(2021, 0, 5)
         );
 
@@ -219,30 +219,30 @@ describe('queries', () => {
 
     describe('countPublishedCollections', () => {
       it('should retrieve the correct count of published collections', async () => {
-        await createCollectionHelper(db, '1', author, CollectionStatus.draft);
+        await createCollectionHelper(db, '1', author, CollectionStatus.DRAFT);
         await createCollectionHelper(
           db,
           '2',
           author,
-          CollectionStatus.archived
+          CollectionStatus.ARCHIVED
         );
         await createCollectionHelper(
           db,
           '3',
           author,
-          CollectionStatus.published
+          CollectionStatus.PUBLISHED
         );
         await createCollectionHelper(
           db,
           '4',
           author,
-          CollectionStatus.published
+          CollectionStatus.PUBLISHED
         );
         await createCollectionHelper(
           db,
           '5',
           author,
-          CollectionStatus.published
+          CollectionStatus.PUBLISHED
         );
 
         const count = await countPublishedCollections(db);
@@ -263,37 +263,37 @@ describe('queries', () => {
           db,
           'the dude abides',
           author2,
-          CollectionStatus.draft
+          CollectionStatus.DRAFT
         );
         await createCollectionHelper(
           db,
           'does the dude abide?',
           author,
-          CollectionStatus.archived
+          CollectionStatus.ARCHIVED
         );
         await createCollectionHelper(
           db,
           'your opinion man',
           author2,
-          CollectionStatus.published
+          CollectionStatus.PUBLISHED
         );
         await createCollectionHelper(
           db,
           'finishing my coffee',
           author,
-          CollectionStatus.published
+          CollectionStatus.PUBLISHED
         );
         await createCollectionHelper(
           db,
           'the dude abides man',
           author,
-          CollectionStatus.published
+          CollectionStatus.PUBLISHED
         );
       });
 
       it('should search by status', async () => {
         const results = await searchCollections(db, {
-          status: CollectionStatus.archived,
+          status: CollectionStatus.ARCHIVED,
         });
 
         expect(results.length).toEqual(1);
@@ -327,7 +327,7 @@ describe('queries', () => {
 
       it('should search by multiple filters', async () => {
         const results = await searchCollections(db, {
-          status: CollectionStatus.published,
+          status: CollectionStatus.PUBLISHED,
           author: author.name,
           title: 'coffee',
         });
@@ -342,7 +342,7 @@ describe('queries', () => {
         const results = await searchCollections(
           db,
           {
-            status: CollectionStatus.published,
+            status: CollectionStatus.PUBLISHED,
           },
           2,
           1

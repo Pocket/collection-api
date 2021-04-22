@@ -53,7 +53,7 @@ export async function getCollectionBySlug(
   // slug is unique, but the generated type for `findUnique` here doesn't
   // include `status`, so using `findFirst` instead
   return db.collection.findFirst({
-    where: { slug, status: CollectionStatus.published },
+    where: { slug, status: CollectionStatus.PUBLISHED },
     include: {
       authors: true,
       stories: { orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }] },
@@ -70,7 +70,7 @@ export async function getCollectionsBySlugs(
   slugs: string[]
 ): Promise<Collection[]> {
   return await db.collection.findMany({
-    where: { slug: { in: slugs }, status: CollectionStatus.published },
+    where: { slug: { in: slugs }, status: CollectionStatus.PUBLISHED },
   });
 }
 
@@ -85,7 +85,7 @@ export async function getPublishedCollections(
   perPage: number
 ): Promise<Collection[]> {
   return db.collection.findMany({
-    where: { status: 'published' },
+    where: { status: CollectionStatus.PUBLISHED },
     include: {
       authors: true,
       stories: { orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }] },
@@ -102,7 +102,7 @@ export async function getPublishedCollections(
 export async function countPublishedCollections(
   db: PrismaClient
 ): Promise<number> {
-  return db.collection.count({ where: { status: CollectionStatus.published } });
+  return db.collection.count({ where: { status: CollectionStatus.PUBLISHED } });
 }
 
 /**

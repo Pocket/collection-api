@@ -141,8 +141,8 @@ export async function updateCollection(
   // if the collection is going from unpublished to published, we update its
   // `publishedAt` time
   if (
-    existingCollection.status !== CollectionStatus.published &&
-    data.status === CollectionStatus.published
+    existingCollection.status !== CollectionStatus.PUBLISHED &&
+    data.status === CollectionStatus.PUBLISHED
   ) {
     data.publishedAt = new Date();
   }

@@ -28,7 +28,7 @@ export async function createCollectionHelper(
   prisma: PrismaClient,
   title: string,
   author: CollectionAuthor,
-  status: CollectionStatus = 'draft',
+  status: CollectionStatus = 'DRAFT',
   publishedAt: Date = null
 ): Promise<Collection> {
   const data: Prisma.CollectionCreateInput = {
@@ -43,7 +43,7 @@ export async function createCollectionHelper(
     },
   };
 
-  if (status === CollectionStatus.published && publishedAt) {
+  if (status === CollectionStatus.PUBLISHED && publishedAt) {
     data.publishedAt = publishedAt;
   }
 

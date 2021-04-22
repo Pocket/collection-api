@@ -1,4 +1,4 @@
-import { MiddlewareParams } from 'prisma';
+import { Prisma, CollectionStatus } from '@prisma/client';
 
 import * as PrismaMiddleware from './prisma';
 
@@ -11,7 +11,7 @@ describe('prisma middleware', () => {
     excerpt: 'test',
     intro: 'test',
     imageUrl: 'test',
-    status: 'draft',
+    status: CollectionStatus.DRAFT,
     publishedAt: new Date(),
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -55,7 +55,7 @@ describe('prisma middleware', () => {
     excerpt: 'test',
     intro: 'test',
     imageUrl: 'test',
-    status: 'draft',
+    status: CollectionStatus.DRAFT,
     publishedAt: new Date(),
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -112,7 +112,7 @@ describe('prisma middleware', () => {
         excerpt: 'test',
         intro: 'test',
         imageUrl: 'test',
-        status: 'draft',
+        status: CollectionStatus.DRAFT,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -124,20 +124,21 @@ describe('prisma middleware', () => {
   });
 
   describe('collectionStoryInjectItemMiddleware', () => {
-    let params: MiddlewareParams;
+    let params: Prisma.MiddlewareParams;
     let injectItemSpy;
 
-    const nextSingle = async function (params: MiddlewareParams) {
+    const nextSingle = async function (params: Prisma.MiddlewareParams) {
       return await collection1;
     };
 
-    const nextMany = async function (params: MiddlewareParams) {
+    const nextMany = async function (params: Prisma.MiddlewareParams) {
       return await [collection1, collection2];
     };
 
     beforeEach(() => {
       // reset the params object
       params = {
+        action: 'findMany',
         model: 'Collection',
         args: 'foo',
         dataPath: ['test'],
