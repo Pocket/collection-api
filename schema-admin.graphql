@@ -16,7 +16,7 @@ type CollectionAuthorsResult {
 
 input CreateCollectionAuthorInput {
   name: String!
-  slug: String!
+  slug: String
   bio: Markdown
   imageUrl: Url
 }
