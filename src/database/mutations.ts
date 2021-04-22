@@ -26,15 +26,17 @@ export async function createAuthor(
   db: PrismaClient,
   data: CreateCollectionAuthorInput
 ): Promise<CollectionAuthor> {
-  const slug = slugify(data.name, config.slugify);
+  data.slug = data.slug || slugify(data.name, config.slugify);
 
-  const slugExists = await db.collectionAuthor.count({ where: { slug } });
+  const slugExists = await db.collectionAuthor.count({
+    where: { slug: data.slug },
+  });
 
   if (slugExists) {
-    throw new Error(`Author with slug "${slug}" already exists`);
+    throw new Error(`Author with slug "${data.slug}" already exists`);
   }
 
-  return db.collectionAuthor.create({ data: { ...data, slug } });
+  return db.collectionAuthor.create({ data: { ...data } });
 }
 
 /**

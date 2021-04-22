@@ -1,28 +1,83 @@
 import { PrismaClient, Collection, CollectionStatus } from '@prisma/client';
 import { getCollection } from './queries';
-import { CreateCollectionInput, UpdateCollectionInput } from './types';
+import {
+  CreateCollectionAuthorInput,
+  CreateCollectionInput,
+  UpdateCollectionInput,
+} from './types';
 import {
   clear as clearDb,
   createAuthorHelper,
   createCollectionHelper,
 } from '../test/helpers';
-import { createCollection, updateCollection } from './mutations';
+import { createAuthor, createCollection, updateCollection } from './mutations';
 
 const db = new PrismaClient();
 
 describe('mutations', () => {
-  let author;
-
   beforeEach(async () => {
     await clearDb(db);
-    author = await createAuthorHelper(db, 'walter');
   });
 
   afterAll(async () => {
     await db.$disconnect();
   });
 
+  describe('collection author mutations', () => {
+    describe('createAuthor', () => {
+      it('should create a collection author with a default slug', async () => {
+        const data: CreateCollectionAuthorInput = {
+          name: 'the dude',
+        };
+
+        const author = await createAuthor(db, data);
+
+        expect(author.name).toEqual('the dude');
+        expect(author.slug).toEqual('the-dude');
+      });
+
+      it('should create a collection author with all fields specified', async () => {
+        const data: CreateCollectionAuthorInput = {
+          name: 'the dude',
+          slug: 'his-dudeness',
+          bio: 'the dude abides',
+          imageUrl: 'https://i.imgur.com/YeydXfW.gif',
+        };
+
+        const author = await createAuthor(db, data);
+
+        expect(author.name).toEqual('the dude');
+        expect(author.slug).toEqual('his-dudeness');
+        expect(author.bio).toEqual('the dude abides');
+        expect(author.imageUrl).toEqual('https://i.imgur.com/YeydXfW.gif');
+      });
+
+      it('should fail to create a collection author on duplicate slug', async () => {
+        const data: CreateCollectionAuthorInput = {
+          name: 'the dude',
+          slug: 'his-dudeness',
+        };
+
+        await createAuthor(db, data);
+
+        // change the name just because
+        data.name = 'walter man';
+
+        // should fail trying to create an author with the same slug
+        await expect(createAuthor(db, data)).rejects.toThrow(
+          `Author with slug "${data.slug}" already exists`
+        );
+      });
+    });
+  });
+
   describe('collection mutations', () => {
+    let author;
+
+    beforeEach(async () => {
+      author = await createAuthorHelper(db, 'walter');
+    });
+
     describe('createCollection', () => {
       it('should create a collection with a default status of `draft`', async () => {
         const data: CreateCollectionInput = {
