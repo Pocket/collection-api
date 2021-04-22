@@ -7,6 +7,7 @@ import {
 
 export type CreateCollectionAuthorInput = {
   name: string;
+  slug?: string;
   bio?: string;
   imageUrl?: string;
 };
