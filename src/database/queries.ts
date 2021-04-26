@@ -187,10 +187,9 @@ export async function countAuthors(db: PrismaClient): Promise<number> {
  */
 export async function getCollectionStory(
   db: PrismaClient,
-  collectionId: number,
-  url: string
+  externalId: string
 ): Promise<CollectionStory> {
   return await db.collectionStory.findUnique({
-    where: { collectionIdUrl: { collectionId, url } },
+    where: { externalId },
   });
 }
