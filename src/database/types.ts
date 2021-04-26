@@ -75,3 +75,12 @@ export type CollectionWithAuthorsAndStories = Collection & {
   authors?: CollectionAuthor[];
   stories?: CollectionStory[];
 };
+
+export type CreateImageInput = {
+  width: number;
+  height: number;
+  mimeType: string;
+  fileSizeBytes: number;
+  fileName: string;
+  path: string;
+};

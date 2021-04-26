@@ -3,6 +3,7 @@ import {
   CollectionAuthor,
   CollectionStatus,
   CollectionStory,
+  Image,
   PrismaClient,
 } from '@prisma/client';
 import slugify from 'slugify';
@@ -11,10 +12,11 @@ import { getCollection } from './queries';
 
 import {
   CreateCollectionAuthorInput,
-  UpdateCollectionAuthorInput,
   CreateCollectionInput,
-  UpdateCollectionInput,
   CreateCollectionStoryInput,
+  CreateImageInput,
+  UpdateCollectionAuthorInput,
+  UpdateCollectionInput,
   UpdateCollectionStoryInput,
 } from './types';
 
@@ -213,4 +215,11 @@ export async function deleteCollectionStory(
   externalId: string
 ): Promise<CollectionStory> {
   return await db.collectionStory.delete({ where: { externalId } });
+}
+
+export async function createImage(
+  db: PrismaClient,
+  data: CreateImageInput
+): Promise<Image> {
+  return db.image.create({ data });
 }
