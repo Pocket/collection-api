@@ -3,6 +3,7 @@ import { getCollection } from './queries';
 import {
   CreateCollectionAuthorInput,
   CreateCollectionInput,
+  UpdateCollectionAuthorInput,
   UpdateCollectionInput,
 } from './types';
 import {
@@ -10,7 +11,12 @@ import {
   createAuthorHelper,
   createCollectionHelper,
 } from '../test/helpers';
-import { createAuthor, createCollection, updateCollection } from './mutations';
+import {
+  createAuthor,
+  createCollection,
+  updateAuthor,
+  updateCollection,
+} from './mutations';
 
 const db = new PrismaClient();
 
@@ -65,7 +71,72 @@ describe('mutations', () => {
 
         // should fail trying to create an author with the same slug
         await expect(createAuthor(db, data)).rejects.toThrow(
-          `Author with slug "${data.slug}" already exists`
+          `An author with the slug "${data.slug}" already exists`
+        );
+      });
+    });
+
+    describe('updateAuthor', () => {
+      it('should update a collection author', async () => {
+        const author = await createAuthorHelper(db, 'the dude');
+
+        const data: UpdateCollectionAuthorInput = {
+          externalId: author.externalId,
+          name: 'el duderino',
+          bio: 'he abides, man',
+        };
+
+        const updated = await updateAuthor(db, data);
+
+        expect(updated.name).toEqual(data.name);
+        expect(updated.bio).toEqual(data.bio);
+      });
+
+      it('should not auto-regenerate a slug on update', async () => {
+        const author = await createAuthorHelper(db, 'the dude');
+
+        const data: UpdateCollectionAuthorInput = {
+          externalId: author.externalId,
+          name: 'el duderino',
+        };
+
+        const updated = await updateAuthor(db, data);
+
+        // even though the name changed, the slug should not
+        expect(updated.slug).toEqual(author.slug);
+      });
+
+      it('should update to a specified collection author slug', async () => {
+        const author = await createAuthorHelper(db, 'the dude');
+
+        const data: UpdateCollectionAuthorInput = {
+          externalId: author.externalId,
+          name: 'el duderino',
+          slug: 'his-dudeness',
+        };
+
+        const updated = await updateAuthor(db, data);
+
+        expect(updated.slug).toEqual(data.slug);
+      });
+
+      it('should fail to update a collection author slug if another author has that slug', async () => {
+        // will create a slug of 'the-dude'
+        await createAuthorHelper(db, 'the dude');
+        // will create a slug of 'walter'
+        const author2 = await createAuthorHelper(db, 'walter');
+
+        // try to make walter's slug 'the-dude'
+        const data: UpdateCollectionAuthorInput = {
+          externalId: author2.externalId,
+          name: author2.name,
+          slug: 'the-dude',
+        };
+
+        // should fail trying to make walter's slug 'the dude'
+        // there's only one the dude
+        await expect(updateAuthor(db, data)).rejects.toThrow(
+          `An author with the slug "${data.slug}" already exists`
         );
       });
     });

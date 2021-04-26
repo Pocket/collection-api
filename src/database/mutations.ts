@@ -33,7 +33,7 @@ export async function createAuthor(
   });
 
   if (slugExists) {
-    throw new Error(`Author with slug "${data.slug}" already exists`);
+    throw new Error(`An author with the slug "${data.slug}" already exists`);
   }
 
   return db.collectionAuthor.create({ data: { ...data } });
@@ -51,19 +51,20 @@ export async function updateAuthor(
     throw new Error('externalId must be provided.');
   }
 
-  const slug = slugify(data.name, config.slugify);
+  // only attempt to update the slug if specifically asked
+  if (data.slug) {
+    const slugExists = await db.collectionAuthor.count({
+      where: { slug: data.slug, externalId: { not: data.externalId } },
+    });
 
-  const slugExists = await db.collectionAuthor.count({
-    where: { slug, externalId: { not: data.externalId } },
-  });
-
-  if (slugExists) {
-    throw new Error(`An author with the slug "${slug}" already exists`);
+    if (slugExists) {
+      throw new Error(`An author with the slug "${data.slug}" already exists`);
+    }
   }
 
   return db.collectionAuthor.update({
     where: { externalId: data.externalId },
-    data: { ...data, slug },
+    data: { ...data },
   });
 }
 
