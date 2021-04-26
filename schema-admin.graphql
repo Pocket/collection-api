@@ -21,6 +21,7 @@ input CreateCollectionAuthorInput {
   slug: String
   bio: Markdown
   imageUrl: Url
+  active: Boolean
 }
 
 input UpdateCollectionAuthorInput {
