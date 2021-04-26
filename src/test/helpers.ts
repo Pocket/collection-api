@@ -3,6 +3,7 @@ import {
   Collection,
   CollectionAuthor,
   CollectionStatus,
+  CollectionStory,
   PrismaClient,
   Prisma,
 } from '@prisma/client';
@@ -56,23 +57,52 @@ export async function createCollectionHelper(
   }
 
   for (let i = 0; i < getRandomInt(2, 6); i++) {
-    await prisma.collectionStory.create({
-      data: {
-        collectionId: collection.id,
-        url: faker.internet.url(),
-        title: faker.lorem.sentence(),
-        excerpt: faker.lorem.paragraph(),
-        imageUrl: faker.image.imageUrl(),
-        authors: JSON.stringify([
-          { name: `${faker.name.firstName()} ${faker.name.lastName()}` },
-          { name: `${faker.name.firstName()} ${faker.name.lastName()}` },
-        ]),
-        publisher: faker.company.companyName(),
-      },
-    });
+    await createCollectionStoryHelper(
+      prisma,
+      collection.id,
+      faker.internet.url(),
+      faker.lorem.sentence(),
+      faker.lorem.paragraph(),
+      faker.image.imageUrl(),
+      [
+        { name: `${faker.name.firstName()} ${faker.name.lastName()}` },
+        { name: `${faker.name.firstName()} ${faker.name.lastName()}` },
+      ],
+      faker.company.companyName()
+    );
   }
 
   return collection;
+}
+
+export async function createCollectionStoryHelper(
+  prisma: PrismaClient,
+  collectionId: number,
+  url: string,
+  title: string,
+  excerpt: string,
+  imageUrl: string,
+  authors: { name: string }[],
+  publisher: string,
+  sortOrder?: number
+): Promise<CollectionStory> {
+  const data: any = {
+    collectionId,
+    url,
+    title,
+    excerpt,
+    imageUrl,
+    authors: JSON.stringify(authors),
+    publisher,
+  };
+
+  if (sortOrder) {
+    data.sortOrder = sortOrder;
+  }
+
+  return await prisma.collectionStory.create({
+    data,
+  });
 }
 
 export async function clear(prisma: PrismaClient): Promise<void> {
