@@ -206,10 +206,10 @@ export const resolvers = {
     },
     getCollectionStory: async (
       _source,
-      { collectionId, url },
+      { externalId },
       { db }
     ): Promise<CollectionStory> => {
-      const collectionStory = await getCollectionStory(db, collectionId, url);
+      const collectionStory = await getCollectionStory(db, externalId);
 
       return {
         ...collectionStory,

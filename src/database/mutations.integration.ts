@@ -1,10 +1,12 @@
 import { PrismaClient, Collection, CollectionStatus } from '@prisma/client';
-import { getCollection } from './queries';
+import { getCollection, getCollectionStory } from './queries';
 import {
   CreateCollectionAuthorInput,
   CreateCollectionInput,
+  CreateCollectionStoryInput,
   UpdateCollectionAuthorInput,
   UpdateCollectionInput,
+  UpdateCollectionStoryInput,
 } from './types';
 import {
   clear as clearDb,
@@ -14,8 +16,11 @@ import {
 import {
   createAuthor,
   createCollection,
+  createCollectionStory,
+  deleteCollectionStory,
   updateAuthor,
   updateCollection,
+  updateCollectionStory,
 } from './mutations';
 
 const db = new PrismaClient();
@@ -313,6 +318,159 @@ describe('mutations', () => {
         await expect(updateCollection(db, data)).rejects.toThrow(
           `A collection with the slug ${first.slug} already exists`
         );
+      });
+    });
+  });
+
+  describe('collection story mutations', () => {
+    let collection;
+
+    beforeEach(async () => {
+      const author = await createAuthorHelper(db, 'maude');
+      collection = await createCollectionHelper(
+        db,
+        'a collection: by maude',
+        author
+      );
+    });
+
+    describe('createCollectionStory', () => {
+      it('should create a collection story', async () => {
+        const data: CreateCollectionStoryInput = {
+          collectionExternalId: collection.externalId,
+          url: 'https://www.lebowskifest.com/',
+          title: 'lebowski fest',
+          excerpt: 'when will the next fest be?',
+          imageUrl: 'idk',
+          authors: [{ name: 'donny' }, { name: 'walter' }],
+          publisher: 'little lebowskis',
+        };
+
+        const story = await createCollectionStory(db, data);
+
+        // it should be properly mapped to the collection
+        expect(story.collectionId).toEqual(collection.id);
+        // authors should be properly json stringified and parsed
+        expect(story.authors).toEqual([{ name: 'donny' }, { name: 'walter' }]);
+        // default sort order of 0 should be there
+        expect(story.sortOrder).toEqual(0);
+      });
+
+      it('should create a collection story with a sort order', async () => {
+        const data: CreateCollectionStoryInput = {
+          collectionExternalId: collection.externalId,
+          url: 'https://www.lebowskifest.com/',
+          title: 'lebowski fest',
+          excerpt: 'when will the next fest be?',
+          imageUrl: 'idk',
+          authors: [{ name: 'donny' }, { name: 'walter' }],
+          publisher: 'little lebowskis',
+          sortOrder: 4,
+        };
+
+        const story = await createCollectionStory(db, data);
+
+        expect(story.sortOrder).toEqual(4);
+      });
+
+      it('should fail adding the same url to the same collection', async () => {
+        const data: CreateCollectionStoryInput = {
+          collectionExternalId: collection.externalId,
+          url: 'https://www.lebowskifest.com/',
+          title: 'lebowski fest',
+          excerpt: 'when will the next fest be?',
+          imageUrl: 'idk',
+          authors: [{ name: 'donny' }, { name: 'walter' }],
+          publisher: 'little lebowskis',
+          sortOrder: 4,
+        };
+
+        await createCollectionStory(db, data);
+
+        await expect(createCollectionStory(db, data)).rejects.toThrow();
+      });
+    });
+
+    describe('updateCollectionStory', () => {
+      it('should upate a collection story', async () => {
+        const data: CreateCollectionStoryInput = {
+          collectionExternalId: collection.externalId,
+          url: 'https://www.lebowskifest.com/',
+          title: 'lebowski fest',
+          excerpt: 'when will the next fest be?',
+          imageUrl: 'idk',
+          authors: [{ name: 'donny' }, { name: 'walter' }],
+          publisher: 'little lebowskis',
+          sortOrder: 4,
+        };
+
+        const story = await createCollectionStory(db, data);
+
+        const updateData: UpdateCollectionStoryInput = {
+          externalId: story.externalId,
+          url: 'https://www.lebowskifest.com/bowling',
+          title: 'a fest of lebowskis',
+          excerpt: 'new excerpt',
+          imageUrl: 'new image url',
+          authors: [{ name: 'brandt' }, { name: 'karl' }],
+          publisher: 'the cast',
+          sortOrder: 3,
+        };
+
+        const updated = await updateCollectionStory(db, updateData);
+
+        expect(updated.url).toEqual(updateData.url);
+        expect(updated.title).toEqual(updateData.title);
+        expect(updated.excerpt).toEqual(updateData.excerpt);
+        expect(updated.imageUrl).toEqual(updateData.imageUrl);
+        expect(updated.authors).toEqual(updateData.authors);
+        expect(updated.publisher).toEqual(updateData.publisher);
+        expect(updated.sortOrder).toEqual(updateData.sortOrder);
+      });
+    });
+
+    describe('deleteCollectionStory', () => {
+      it('should delete a collection story', async () => {
+        const data: CreateCollectionStoryInput = {
+          collectionExternalId: collection.externalId,
+          url: 'https://www.lebowskifest.com/',
+          title: 'lebowski fest',
+          excerpt: 'when will the next fest be?',
+          imageUrl: 'idk',
+          authors: [{ name: 'donny' }, { name: 'walter' }],
+          publisher: 'little lebowskis',
+          sortOrder: 4,
+        };
+
+        const story = await createCollectionStory(db, data);
+
+        const result = await deleteCollectionStory(db, story.externalId);
+
+        expect(result).toBeTruthy();
+
+        // make sure the story is really gone
+        const found = await getCollectionStory(db, story.externalId);
+
+        expect(found).toBeFalsy();
+      });
+
+      it('should fail to delete a collection story if the externalId cannot be found', async () => {
+        const data: CreateCollectionStoryInput = {
+          collectionExternalId: collection.externalId,
+          url: 'https://www.lebowskifest.com/',
+          title: 'lebowski fest',
+          excerpt: 'when will the next fest be?',
+          imageUrl: 'idk',
+          authors: [{ name: 'donny' }, { name: 'walter' }],
+          publisher: 'little lebowskis',
+          sortOrder: 4,
+        };
+
+        const story = await createCollectionStory(db, data);
+
+        await expect(
+          deleteCollectionStory(db, story.externalId + 'typo')
+        ).rejects.toThrow();
       });
     });
   });
