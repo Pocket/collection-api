@@ -24,6 +24,7 @@ input CreateCollectionAuthorInput {
 input UpdateCollectionAuthorInput {
   externalId: String!
   name: String!
+  slug: String
   bio: Markdown
   imageUrl: Url
   active: Boolean
