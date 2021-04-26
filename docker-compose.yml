@@ -6,20 +6,16 @@ services:
       - ./.docker/local.env
     ports:
       - '3308:3306'
-#    volumes:
-#      - .docker/mysql/schema:/docker-entrypoint-initdb.d:delegated
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - TZ=UTC
-    networks:
-      - dev
 
   localstack:
-    image: localstack/localstack:0.12.9
+    image: localstack/localstack
     env_file:
       - .docker/local.env
     ports:
-      - '4566-4599:4566-4599'
+      - '4566:4566'
       - '8080:8080'
     volumes:
       - ./.docker/localstack:/docker-entrypoint-initaws.d
@@ -33,10 +29,6 @@ services:
       - EXTRA_CORS_ALLOWED_HEADERS=Content-Disposition, Content-Type, x-amz-acl
       - EXTRA_CORS_EXPOSE_HEADERS=ETag
       - HOSTNAME_EXTERNAL=localstack
-    networks:
-      dev:
-        aliases:
-          - collection-api-local-images.localstack
 
   app:
     image: node:15
@@ -56,8 +48,3 @@ services:
     depends_on:
       - mysql
       - localstack
-    networks:
-      - dev
-
-networks:
-  dev:
