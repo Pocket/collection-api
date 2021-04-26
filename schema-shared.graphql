@@ -36,7 +36,7 @@ type Collection {
   externalId: ID!
   slug: String!
   title: String!
-  excerpt: Markdown!
+  excerpt: Markdown
   status: CollectionStatus!
   intro: Markdown
   imageUrl: Url
