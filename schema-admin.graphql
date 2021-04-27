@@ -13,7 +13,7 @@ input SearchCollectionsFilters {
 
 type CollectionAuthorsResult {
   pagination: Pagination
-  authors: [CollectionAuthor]
+  authors: [CollectionAuthor!]!
 }
 
 input CreateCollectionAuthorInput {
@@ -26,7 +26,7 @@ input CreateCollectionAuthorInput {
 input UpdateCollectionAuthorInput {
   externalId: String!
   name: String!
-  slug: String
+  slug: String!
   bio: Markdown
   imageUrl: Url
   active: Boolean
