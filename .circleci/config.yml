@@ -135,6 +135,18 @@ jobs:
         environment:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           TZ: 'UTC'
+      - image: localstack/localstack
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_PASSWORD
+        environment:
+          DEBUG: 1
+          SERVICES: 's3'
+          DATA_DIR: /tmp/localstack/data
+          EXTRA_CORS_ALLOWED_HEADERS: Content-Disposition, Content-Type, x-amz-acl
+          EXTRA_CORS_EXPOSE_HEADERS: ETag
+          HOSTNAME_EXTERNAL: localstack
+          PORT_WEB_UI: 8080
     steps:
       - checkout
       - restore_cache:
@@ -155,7 +167,7 @@ jobs:
       - run:
           name: run setup.sh
           command: |
-            export $(egrep -v '^#' .docker/local.env | xargs -0) && ./.circleci/scripts/setup.sh --hosts --db
+            export $(egrep -v '^#' .docker/local.env | xargs -0) && ./.circleci/scripts/setup.sh --hosts --db --aws
       - run:
           name: run tests
           command: |
