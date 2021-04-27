@@ -18,7 +18,7 @@ This application has two GraphQL schemas - one public for clients (Web, Android,
 
 `schema-shared.graphql` is stitched onto the other schemas in `src/typeDefs.ts`.
 
-Having two schmemas means we need two GraphQL endpoints, meaning two Apollo Servers. These servers are located in `src/admin/server.ts` and `src/public/server.ts`. In `src/main.ts`, we add both Apollo Servers to Express.
+Having two schemas means we need two GraphQL endpoints, meaning two Apollo Servers. These servers are located in `src/admin/server.ts` and `src/public/server.ts`. In `src/main.ts`, we add both Apollo Servers to Express.
 
 ## Local development
 
@@ -52,7 +52,7 @@ TODO: Add images to our seeder?
 
 #### Adding a Migration
 
-If you need to change the Prisma schema (in `prisma/schmea.prisma`), you'll need to create a migration to ensure the database is in sync. After you have made your changes to `schema.prisma`, run `docker compose exec app npx prisma migrate dev --name some_meaningful_migration_name`. This will create a migration script in `prisma/migrations` and will automatically run the new migration. This will also re-create your Prisma Typescript types.
+If you need to change the Prisma schema (in `prisma/schema.prisma`), you'll need to create a migration to ensure the database is in sync. After you have made your changes to `schema.prisma`, run `docker compose exec app npx prisma migrate dev --name some_meaningful_migration_name`. This will create a migration script in `prisma/migrations` and will automatically run the new migration. This will also re-create your Prisma Typescript types.
 
 #### Re-creating Prisma Typescript Types
 
@@ -97,3 +97,22 @@ query {
   }
 }
 ```
+
+## Digging into the Database
+
+Sometimes it's nice to look in the database to see what's actually going on with data. Here are a few hand commands for that.
+
+First, get into MySQL:
+
+- `docker compose exec mysql bash`
+- `mysql -u root`
+
+Once you're there, you can inspect the available databases with `show databases;`. Select the `collections` database with `use collections;`.
+
+From there, you can inspect the structure and data of tables contained within:
+
+- `show tables;` shows all available tables
+- `describe {tablename};` will show you the schema for a table
+- `select * from {tablename};` will show you all the data for a table
+
+From here you can issue any SQL statements you want to view/change data. Don't mess with the table schemas though. If you need to change table schemas, do that through Prisma migrations (see above).
