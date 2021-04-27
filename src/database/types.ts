@@ -15,7 +15,7 @@ export type CreateCollectionAuthorInput = {
 export type UpdateCollectionAuthorInput = {
   externalId: string;
   name: string;
-  slug?: string;
+  slug: string;
   bio?: string;
   imageUrl?: string;
   active?: boolean;
