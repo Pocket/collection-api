@@ -116,3 +116,7 @@ From there, you can inspect the structure and data of tables contained within:
 - `select * from {tablename};` will show you all the data for a table
 
 From here you can issue any SQL statements you want to view/change data. Don't mess with the table schemas though. If you need to change table schemas, do that through Prisma migrations (see above).
+
+### What About a GUI?
+
+Command line not your thing? That's fine. You can connect to MySQL through any GUI you like. It's available at `localhost:3308`. You're responsible for setting up your own GUI though. 😉
