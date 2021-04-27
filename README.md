@@ -100,7 +100,7 @@ query {
 
 ## Digging into the Database
 
-Sometimes it's nice to look in the database to see what's actually going on with data. Here are a few hand commands for that.
+Sometimes it's nice to look in the database to see what's actually going on with data. Here are a few handy commands for that.
 
 First, get into MySQL:
 
