@@ -12,8 +12,8 @@ export default {
   },
   aws: {
     s3: {
-      endpoint: process.env.AWS_S3_ENDPOINT,
-      bucket: process.env.AWS_S3_BUCKET,
+      endpoint: process.env.AWS_S3_ENDPOINT || 'http://localhost:4566',
+      bucket: process.env.AWS_S3_BUCKET || 'collection-api-local-images',
     },
   },
   slugify: { lower: true, remove: /[*+~.()'"!:@]/g },
