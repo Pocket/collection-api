@@ -23,7 +23,7 @@ export async function uploadImage(
   const stream = createReadStream();
   const key = `${uuidv4()}.${mime.extension(mimetype)}`;
 
-  const params = {
+  const params: S3.Types.PutObjectRequest = {
     Bucket: config.aws.s3.bucket,
     Key: key,
     Body: stream,

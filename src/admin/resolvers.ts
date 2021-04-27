@@ -144,17 +144,23 @@ export const resolvers = {
     ) => {
       const { image, width, height, fileSizeBytes } = data;
 
-      const uploadResponse = await uploadImage(s3, image);
+      const { fileName, path, mimeType, url } = await uploadImage(
+        s3,
+        image.file
+      );
+
       const dbInput: CreateImageInput = {
         width,
         height,
         fileSizeBytes,
-        ...uploadResponse,
+        fileName,
+        path,
+        mimeType,
       };
 
       await executeMutation<CreateImageInput, Image>(db, dbInput, createImage);
 
-      return { url: uploadResponse.url };
+      return { url };
     },
   },
   Query: {
@@ -206,10 +212,10 @@ export const resolvers = {
     },
     getCollectionStory: async (
       _source,
-      { collectionId, url },
+      { externalId },
       { db }
     ): Promise<CollectionStory> => {
-      const collectionStory = await getCollectionStory(db, collectionId, url);
+      const collectionStory = await getCollectionStory(db, externalId);
 
       return {
         ...collectionStory,

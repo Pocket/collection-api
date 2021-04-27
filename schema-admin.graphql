@@ -100,7 +100,7 @@ type Query {
   """
   Retrieves a CollectionStory by a combination of collectionId and url.
   """
-  getCollectionStory(collectionId: Int!, url: String): CollectionStory
+  getCollectionStory(externalId: String): CollectionStory
 }
 
 type CollectionImageUrl {

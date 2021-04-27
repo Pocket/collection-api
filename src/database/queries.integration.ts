@@ -1,9 +1,13 @@
 import { PrismaClient, CollectionStatus } from '@prisma/client';
 import {
+  countAuthors,
   countPublishedCollections,
+  getAuthor,
+  getAuthors,
   getCollection,
   getCollectionBySlug,
   getCollectionsBySlugs,
+  getCollectionStory,
   getPublishedCollections,
   searchCollections,
 } from './queries';
@@ -11,23 +15,81 @@ import {
   clear as clearDb,
   createAuthorHelper,
   createCollectionHelper,
+  createCollectionStoryHelper,
 } from '../test/helpers';
 
 const db = new PrismaClient();
 
 describe('queries', () => {
-  let author;
-
   beforeEach(async () => {
     await clearDb(db);
-    author = await createAuthorHelper(db, 'walter');
   });
 
   afterAll(async () => {
     await db.$disconnect();
   });
 
+  describe('collection author queries', () => {
+    describe('getAuthor', () => {
+      it('should get an author by their externalId', async () => {
+        const author = await createAuthorHelper(db, 'the dude');
+
+        const found = await getAuthor(db, author.externalId);
+
+        expect(found).not.toBeNull();
+      });
+
+      it('should fail on an invalid externalId', async () => {
+        const author = await createAuthorHelper(db, 'the dude');
+
+        const found = await getAuthor(db, author.externalId + 'typo');
+
+        expect(found).toBeNull();
+      });
+    });
+
+    describe('getAuthors', () => {
+      it('should get authors and respect paging', async () => {
+        // create some authors to retrieve
+        await createAuthorHelper(db, 'the dude');
+        await createAuthorHelper(db, 'walter');
+        await createAuthorHelper(db, 'donny');
+        await createAuthorHelper(db, 'maude');
+        await createAuthorHelper(db, 'brandt');
+
+        // get page 2, with 2 per page
+        const results = await getAuthors(db, 2, 2);
+
+        // as we order by name ascending, this should give us maude & the dude
+        expect(results.length).toEqual(2);
+        expect(results[0].name).toEqual('maude');
+        expect(results[1].name).toEqual('the dude');
+      });
+    });
+
+    describe('countAuthors', () => {
+      it('should accurately count collection authors in the system', async () => {
+        // create some authors
+        await createAuthorHelper(db, 'the dude');
+        await createAuthorHelper(db, 'walter');
+        await createAuthorHelper(db, 'donny');
+        await createAuthorHelper(db, 'maude');
+        await createAuthorHelper(db, 'brandt');
+
+        const result = await countAuthors(db);
+
+        expect(result).toEqual(5);
+      });
+    });
+  });
+
   describe('collection queries', () => {
+    let author;
+
+    beforeEach(async () => {
+      author = await createAuthorHelper(db, 'walter');
+    });
+
     describe('getCollection', () => {
       it('can get a collection by external id', async () => {
         const created = await createCollectionHelper(db, 'test me', author);
@@ -353,6 +415,42 @@ describe('queries', () => {
 
         // ensure we are getting the second result (page 2)
         expect(results[0].title).toEqual('finishing my coffee');
+      });
+    });
+  });
+
+  describe('collection story queries', () => {
+    describe('getCollectionStory', () => {
+      let story;
+
+      beforeEach(async () => {
+        const author = await createAuthorHelper(db, 'donny');
+        const collection = await createCollectionHelper(db, 'test me', author);
+        story = await createCollectionStoryHelper(
+          db,
+          collection.id,
+          'https://getpocket.com',
+          'a story',
+          'this is a story, all about how...',
+          'https://some.image',
+          [{ name: 'donny' }],
+          'the verge'
+        );
+      });
+
+      it('should retrieve a collection story', async () => {
+        const retrieved = await getCollectionStory(db, story.externalId);
+
+        expect(retrieved.title).toEqual('a story');
+      });
+
+      it('should fail to retrieve a collection story for an unknown externalID', async () => {
+        const retrieved = await getCollectionStory(
+          db,
+          story.externalId + 'typo'
+        );
+
+        expect(retrieved).toBeFalsy();
       });
     });
   });
