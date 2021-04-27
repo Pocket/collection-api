@@ -86,6 +86,7 @@ model Collection {
 enum ImageEntityType {
   COLLECTION
   COLLECTION_STORY
+  COLLECTION_AUTHOR
 }
 
 enum ImageSizeCategory {
