@@ -97,7 +97,7 @@ export function createPocketAlbApplication(
           },
           {
             name: 'AWS_S3_BUCKET',
-            value: process.env.AWS_S3_BUCKET,
+            value: s3.id,
           },
         ],
         secretEnvVars: [

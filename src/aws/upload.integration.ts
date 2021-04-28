@@ -32,7 +32,7 @@ describe('Upload', () => {
 
     // Check that the returned url matches the expected pattern
     // http://localstack:4566/collection-api-local-images/cde476c9-b047-4f3b-be06-ce1c2fce9988.jpeg
-    const urlPrefix = config.aws.s3.endpoint.replace(/\//g, '/');
+    const urlPrefix = config.aws.s3.localEndpoint;
     const urlPattern = new RegExp(
       `^${urlPrefix}/${config.aws.s3.bucket}/.+.jpeg$`
     );

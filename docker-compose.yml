@@ -40,10 +40,7 @@ services:
     env_file:
       - .docker/local.env
     environment:
-      - NODE_ENV=development
-      - AWS_XRAY_LOG_LEVEL=silent
-      - AWS_XRAY_CONTEXT_MISSING=LOG_ERROR
-      - DATABASE_URL=mysql://root:@mysql:3306/collections
+      - NODE_ENV=local
     command: "bash -c 'cd /app && npm i && npm run start:dev'"
     depends_on:
       - mysql

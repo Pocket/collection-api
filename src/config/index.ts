@@ -1,3 +1,9 @@
+const awsEnvironments = ['production', 'development'];
+let localEndpoint;
+if (!awsEnvironments.includes(process.env.NODE_ENV)) {
+  localEndpoint = process.env.AWS_S3_ENDPOINT || 'http://localhost:4566';
+}
+
 export default {
   app: {
     environment: process.env.NODE_ENV || 'development',
@@ -12,8 +18,8 @@ export default {
   },
   aws: {
     s3: {
-      endpoint: process.env.AWS_S3_ENDPOINT,
-      bucket: process.env.AWS_S3_BUCKET,
+      localEndpoint,
+      bucket: process.env.AWS_S3_BUCKET || 'collection-api-local-images',
     },
   },
   slugify: { lower: true, remove: /[*+~.()'"!:@]/g },

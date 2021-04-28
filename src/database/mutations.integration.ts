@@ -88,6 +88,7 @@ describe('mutations', () => {
         const data: UpdateCollectionAuthorInput = {
           externalId: author.externalId,
           name: 'el duderino',
+          slug: 'el-duderino',
           bio: 'he abides, man',
         };
 
@@ -95,20 +96,6 @@ describe('mutations', () => {
 
         expect(updated.name).toEqual(data.name);
         expect(updated.bio).toEqual(data.bio);
-      });
-
-      it('should not auto-regenerate a slug on update', async () => {
-        const author = await createAuthorHelper(db, 'the dude');
-
-        const data: UpdateCollectionAuthorInput = {
-          externalId: author.externalId,
-          name: 'el duderino',
-        };
-
-        const updated = await updateAuthor(db, data);
-
-        // even though the name changed, the slug should not
-        expect(updated.slug).toEqual(author.slug);
       });
 
       it('should update to a specified collection author slug', async () => {
