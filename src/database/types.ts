@@ -10,6 +10,7 @@ export type CreateCollectionAuthorInput = {
   slug?: string;
   bio?: string;
   imageUrl?: string;
+  active?: boolean;
 };
 
 export type UpdateCollectionAuthorInput = {
