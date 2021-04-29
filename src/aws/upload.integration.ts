@@ -25,10 +25,9 @@ describe('Upload', () => {
 
     const upload = await uploadImage(s3, image);
 
-    // Check the fileName and mimeType matches expected
-    expect(upload).toEqual(
-      expect.objectContaining({ fileName: 'test.jpeg', mimeType: 'image/jpeg' })
-    );
+    expect(upload.mimeType).toEqual('image/jpeg');
+    // filename should be equal the key (string after last "/" in path) in the path
+    expect(upload.fileName).toEqual(/[^/]*$/.exec(upload.path)[0]);
 
     // Check that the returned url matches the expected pattern
     // http://localstack:4566/collection-api-local-images/cde476c9-b047-4f3b-be06-ce1c2fce9988.jpeg
@@ -36,6 +35,6 @@ describe('Upload', () => {
     const urlPattern = new RegExp(
       `^${urlPrefix}/${config.aws.s3.bucket}/.+.jpeg$`
     );
-    expect(upload.url).toMatch(urlPattern);
+    expect(upload.path).toMatch(urlPattern);
   });
 });

@@ -1,5 +1,4 @@
-import { Collection, CollectionStory } from '@prisma/client';
-import { MiddlewareParams } from 'prisma';
+import { Collection, CollectionStory, Prisma } from '@prisma/client';
 
 // THIS IS WEIRD!
 // we are importing every export *in this file* into itself so we can spy
@@ -56,8 +55,8 @@ export function injectItemIntoCollectionStories(
 // conforms to the prisma middleware API
 // https://www.prisma.io/docs/reference/api-reference/prisma-client-reference/#use
 export async function collectionStoryInjectItemMiddleware(
-  params: MiddlewareParams,
-  next
+  params: Prisma.MiddlewareParams,
+  next: (params: Prisma.MiddlewareParams) => any
 ): Promise<any> {
   // let all other middlewares finish first
   let results = await next(params);
