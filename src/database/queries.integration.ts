@@ -342,13 +342,19 @@ describe('queries', () => {
           db,
           'the dude abides',
           author2,
-          CollectionStatus.DRAFT
+          CollectionStatus.DRAFT,
+          null,
+          null,
+          false
         );
         await createCollectionHelper(
           db,
           'does the dude abide?',
           author,
-          CollectionStatus.ARCHIVED
+          CollectionStatus.ARCHIVED,
+          null,
+          null,
+          false
         );
         await createCollectionHelper(
           db,
@@ -377,6 +383,7 @@ describe('queries', () => {
 
         expect(results.length).toEqual(1);
         expect(results[0].title).toEqual('does the dude abide?');
+        expect(results[0].stories.length).toEqual(0);
       });
 
       it('should search by author', async () => {
