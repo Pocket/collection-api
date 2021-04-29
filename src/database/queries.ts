@@ -1,5 +1,4 @@
 import {
-  Collection,
   CollectionAuthor,
   CollectionStatus,
   CollectionStory,
