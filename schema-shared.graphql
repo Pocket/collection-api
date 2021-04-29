@@ -77,7 +77,7 @@ type CollectionStoryAuthor {
 }
 
 type CollectionsResult {
-  pagination: Pagination
+  pagination: Pagination!
   collections: [Collection!]!
 }
 
