@@ -85,7 +85,7 @@ type Query {
     filters: SearchCollectionsFilters!
     page: Int
     perPage: Int
-  ): CollectionsResult
+  ): CollectionsResult!
   """
   Retrieves a Collection by externalId.
   """
