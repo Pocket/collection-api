@@ -64,7 +64,7 @@ input CreateCollectionStoryInput {
   title: String!
   excerpt: Markdown!
   imageUrl: Url!
-  authors: [CollectionStoryAuthorInput]!
+  authors: [CollectionStoryAuthorInput!]!
   publisher: String!
   sortOrder: Int
 }
@@ -75,7 +75,7 @@ input UpdateCollectionStoryInput {
   title: String!
   excerpt: Markdown!
   imageUrl: Url!
-  authors: [CollectionStoryAuthorInput]!
+  authors: [CollectionStoryAuthorInput!]!
   publisher: String!
   sortOrder: Int
 }
