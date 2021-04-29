@@ -8,7 +8,6 @@ export type ImageUploadResponse = {
   fileName: string;
   path: string;
   mimeType: string;
-  url: string;
 };
 
 /**
@@ -19,7 +18,7 @@ export async function uploadImage(
   s3: S3,
   image: FileUpload
 ): Promise<ImageUploadResponse> {
-  const { filename, mimetype, createReadStream } = image;
+  const { mimetype, createReadStream } = image;
   const stream = createReadStream();
   const key = `${uuidv4()}.${mime.extension(mimetype)}`;
 
@@ -34,9 +33,8 @@ export async function uploadImage(
   const response = await s3.upload(params).promise();
 
   return {
-    fileName: filename,
-    path: key,
+    fileName: key,
+    path: response.Location,
     mimeType: mimetype,
-    url: response.Location,
   };
 }

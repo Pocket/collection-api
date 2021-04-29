@@ -1,4 +1,10 @@
-import { PrismaClient, Collection, CollectionStatus } from '@prisma/client';
+import {
+  Collection,
+  CollectionStatus,
+  Image,
+  ImageEntityType,
+  PrismaClient,
+} from '@prisma/client';
 import { getCollection, getCollectionStory } from './queries';
 import {
   CreateCollectionAuthorInput,
@@ -12,8 +18,10 @@ import {
   clear as clearDb,
   createAuthorHelper,
   createCollectionHelper,
+  createImageHelper,
 } from '../test/helpers';
 import {
+  associateImageWithEntity,
   createAuthor,
   createCollection,
   createCollectionStory,
@@ -459,6 +467,70 @@ describe('mutations', () => {
           deleteCollectionStory(db, story.externalId + 'typo')
         ).rejects.toThrow();
       });
+    });
+  });
+
+  describe('image mutations', () => {
+    const imageUrl = 'https://image.test/test.jpeg';
+    let collection;
+    let author;
+
+    beforeEach(async () => {
+      author = await createAuthorHelper(db, 'maude', imageUrl);
+      collection = await createCollectionHelper(
+        db,
+        'a collection: by maude',
+        author,
+        CollectionStatus.DRAFT,
+        null,
+        imageUrl
+      );
+
+      await createImageHelper(
+        db,
+        'test.jpeg',
+        'image/jpeg',
+        1000,
+        200,
+        200,
+        imageUrl
+      );
+    });
+
+    it('associates an image with a collection entity', async () => {
+      const image = (await associateImageWithEntity(
+        db,
+        collection,
+        ImageEntityType.COLLECTION
+      )) as Image;
+      expect(image.entityId).toEqual(collection.id);
+      expect(image.entityType).toEqual(ImageEntityType.COLLECTION);
+    });
+
+    it('associates an image with a collection story entity', async () => {
+      const collectionStory = await db.collectionStory.findFirst({
+        where: { collectionId: collection.id },
+      });
+
+      const image = (await associateImageWithEntity(
+        db,
+        collectionStory,
+        ImageEntityType.COLLECTION_STORY
+      )) as Image;
+
+      expect(image.entityId).toEqual(collectionStory.id);
+      expect(image.entityType).toEqual(ImageEntityType.COLLECTION_STORY);
+    });
+
+    it('associates an image with a collection author entity', async () => {
+      const image = (await associateImageWithEntity(
+        db,
+        author,
+        ImageEntityType.COLLECTION_AUTHOR
+      )) as Image;
+
+      expect(image.entityId).toEqual(author.id);
+      expect(image.entityType).toEqual(ImageEntityType.COLLECTION_AUTHOR);
     });
   });
 });
