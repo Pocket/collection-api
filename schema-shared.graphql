@@ -41,8 +41,8 @@ type Collection {
   intro: Markdown
   imageUrl: Url
   publishedAt: DateString
-  authors: [CollectionAuthor]
-  stories: [CollectionStory]
+  authors: [CollectionAuthor!]!
+  stories: [CollectionStory]!
 }
 
 enum CollectionStatus {

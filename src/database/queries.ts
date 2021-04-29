@@ -28,6 +28,10 @@ export async function getCollection(
 ): Promise<CollectionWithAuthorsAndStories> {
   const collection = db.collection.findUnique({
     where: { externalId },
+    include: {
+      authors: true,
+      stories: { orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }] },
+    },
   });
 
   if (!collection) {
@@ -68,9 +72,13 @@ export async function getCollectionBySlug(
 export async function getCollectionsBySlugs(
   db: PrismaClient,
   slugs: string[]
-): Promise<Collection[]> {
+): Promise<CollectionWithAuthorsAndStories[]> {
   return await db.collection.findMany({
     where: { slug: { in: slugs }, status: CollectionStatus.PUBLISHED },
+    include: {
+      authors: true,
+      stories: { orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }] },
+    },
   });
 }
 
@@ -83,7 +91,7 @@ export async function getPublishedCollections(
   db: PrismaClient,
   page: number,
   perPage: number
-): Promise<Collection[]> {
+): Promise<CollectionWithAuthorsAndStories[]> {
   return db.collection.findMany({
     where: { status: CollectionStatus.PUBLISHED },
     include: {

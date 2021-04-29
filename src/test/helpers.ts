@@ -33,7 +33,8 @@ export async function createCollectionHelper(
   author: CollectionAuthor,
   status: CollectionStatus = 'DRAFT',
   publishedAt: Date = null,
-  imageUrl: string = null
+  imageUrl: string = null,
+  addStories = true
 ): Promise<Collection> {
   const data: Prisma.CollectionCreateInput = {
     title,
@@ -63,20 +64,22 @@ export async function createCollectionHelper(
     return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
   }
 
-  for (let i = 0; i < getRandomInt(2, 6); i++) {
-    await createCollectionStoryHelper(
-      prisma,
-      collection.id,
-      faker.internet.url(),
-      faker.lorem.sentence(),
-      faker.lorem.paragraph(),
-      imageUrl || faker.image.imageUrl(),
-      [
-        { name: `${faker.name.firstName()} ${faker.name.lastName()}` },
-        { name: `${faker.name.firstName()} ${faker.name.lastName()}` },
-      ],
-      faker.company.companyName()
-    );
+  if (addStories) {
+    for (let i = 0; i < getRandomInt(2, 6); i++) {
+      await createCollectionStoryHelper(
+        prisma,
+        collection.id,
+        faker.internet.url(),
+        faker.lorem.sentence(),
+        faker.lorem.paragraph(),
+        imageUrl || faker.image.imageUrl(),
+        [
+          { name: `${faker.name.firstName()} ${faker.name.lastName()}` },
+          { name: `${faker.name.firstName()} ${faker.name.lastName()}` },
+        ],
+        faker.company.companyName()
+      );
+    }
   }
 
   return collection;
