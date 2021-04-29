@@ -131,7 +131,10 @@ export async function searchCollections(
       authors: { every: { name: { contains: filters.author } } },
     },
     orderBy: { updatedAt: 'desc' },
-    include: { authors: true },
+    include: {
+      authors: true,
+      stories: { orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }] },
+    },
   };
 
   if (page && perPage) {
