@@ -4,8 +4,9 @@ import {
   CollectionAuthor,
   CollectionStatus,
   CollectionStory,
-  PrismaClient,
+  Image,
   Prisma,
+  PrismaClient,
 } from '@prisma/client';
 import faker from 'faker';
 import config from '../config';
@@ -14,15 +15,16 @@ const slugifyConfig = config.slugify;
 
 export async function createAuthorHelper(
   prisma: PrismaClient,
-  name: string
+  name: string,
+  imageUrl: string = null
 ): Promise<CollectionAuthor> {
   const slug = slugify(name, slugifyConfig);
-  return await prisma.collectionAuthor.create({
-    data: {
-      name,
-      slug,
-    },
-  });
+
+  const data: Prisma.CollectionAuthorCreateInput = { name, slug };
+
+  if (imageUrl) data.imageUrl = imageUrl;
+
+  return await prisma.collectionAuthor.create({ data });
 }
 
 export async function createCollectionHelper(
@@ -30,7 +32,9 @@ export async function createCollectionHelper(
   title: string,
   author: CollectionAuthor,
   status: CollectionStatus = 'DRAFT',
-  publishedAt: Date = null
+  publishedAt: Date = null,
+  imageUrl: string = null,
+  addStories = true
 ): Promise<Collection> {
   const data: Prisma.CollectionCreateInput = {
     title,
@@ -48,6 +52,10 @@ export async function createCollectionHelper(
     data.publishedAt = publishedAt;
   }
 
+  if (imageUrl) {
+    data.imageUrl = imageUrl;
+  }
+
   const collection = await prisma.collection.create({ data });
 
   function getRandomInt(min, max) {
@@ -56,20 +64,22 @@ export async function createCollectionHelper(
     return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
   }
 
-  for (let i = 0; i < getRandomInt(2, 6); i++) {
-    await createCollectionStoryHelper(
-      prisma,
-      collection.id,
-      faker.internet.url(),
-      faker.lorem.sentence(),
-      faker.lorem.paragraph(),
-      faker.image.imageUrl(),
-      [
-        { name: `${faker.name.firstName()} ${faker.name.lastName()}` },
-        { name: `${faker.name.firstName()} ${faker.name.lastName()}` },
-      ],
-      faker.company.companyName()
-    );
+  if (addStories) {
+    for (let i = 0; i < getRandomInt(2, 6); i++) {
+      await createCollectionStoryHelper(
+        prisma,
+        collection.id,
+        faker.internet.url(),
+        faker.lorem.sentence(),
+        faker.lorem.paragraph(),
+        imageUrl || faker.image.imageUrl(),
+        [
+          { name: `${faker.name.firstName()} ${faker.name.lastName()}` },
+          { name: `${faker.name.firstName()} ${faker.name.lastName()}` },
+        ],
+        faker.company.companyName()
+      );
+    }
   }
 
   return collection;
@@ -102,6 +112,27 @@ export async function createCollectionStoryHelper(
 
   return await prisma.collectionStory.create({
     data,
+  });
+}
+
+export async function createImageHelper(
+  prisma: PrismaClient,
+  fileName: string,
+  mimeType: string,
+  fileSizeBytes: number,
+  width: number,
+  height: number,
+  path: string
+): Promise<Image> {
+  return prisma.image.create({
+    data: {
+      fileName,
+      width,
+      height,
+      path,
+      mimeType,
+      fileSizeBytes,
+    },
   });
 }
 

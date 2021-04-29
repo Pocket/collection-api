@@ -38,7 +38,7 @@ input CreateCollectionInput {
   title: String!
   excerpt: Markdown
   intro: Markdown
-  imageUrl: String
+  imageUrl: Url
   status: CollectionStatus
   authorExternalId: String!
 }
@@ -49,7 +49,7 @@ input UpdateCollectionInput {
   title: String!
   excerpt: Markdown!
   intro: Markdown
-  imageUrl: String
+  imageUrl: Url
   status: CollectionStatus!
   authorExternalId: String!
 }
@@ -64,7 +64,7 @@ input CreateCollectionStoryInput {
   title: String!
   excerpt: Markdown!
   imageUrl: Url!
-  authors: [CollectionStoryAuthorInput]!
+  authors: [CollectionStoryAuthorInput!]!
   publisher: String!
   sortOrder: Int
 }
@@ -75,7 +75,7 @@ input UpdateCollectionStoryInput {
   title: String!
   excerpt: Markdown!
   imageUrl: Url!
-  authors: [CollectionStoryAuthorInput]!
+  authors: [CollectionStoryAuthorInput!]!
   publisher: String!
   sortOrder: Int
 }

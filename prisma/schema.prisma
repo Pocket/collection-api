@@ -31,7 +31,7 @@ model CollectionStory {
 
 model Image {
   id            Int                 @id @default(autoincrement())
-  entityId      String?             @db.VarChar(255)
+  entityId      Int?
   entityType    ImageEntityType?
   sizeCategory  ImageSizeCategory   @default(LARGE)
   width         Int

@@ -92,15 +92,28 @@ describe('queries', () => {
 
     describe('getCollection', () => {
       it('can get a collection by external id', async () => {
-        const created = await createCollectionHelper(db, 'test me', author);
+        const created = await createCollectionHelper(
+          db,
+          'test me',
+          author,
+          CollectionStatus.DRAFT,
+          null,
+          null,
+          false // don't create any stories
+        );
 
         const collection = await getCollection(db, created.externalId);
 
         expect(collection.title).toEqual('test me');
 
-        // ensure we aren't getting extra client data
-        expect(collection.authors).toBeFalsy();
-        expect(collection.stories).toBeFalsy();
+        // we should return an author
+        expect(collection.authors).toBeTruthy();
+
+        // we should return an array (truthy)
+        expect(collection.stories).toBeTruthy();
+
+        // the array should be empty (bc we skipped creating stories above)
+        expect(collection.stories.length).toEqual(0);
       });
     });
 
@@ -158,6 +171,10 @@ describe('queries', () => {
 
         expect(collections[0].title).toEqual('test me');
         expect(collections[1].title).toEqual('test me 2');
+        expect(collections[0].authors).toBeTruthy();
+        expect(collections[1].authors).toBeTruthy();
+        expect(collections[0].stories).toBeTruthy();
+        expect(collections[1].stories).toBeTruthy();
       });
 
       it('gets only published collections', async () => {
