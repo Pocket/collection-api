@@ -1,4 +1,3 @@
-import * as Sentry from '@sentry/node';
 import { CollectionWithAuthorsAndStories } from '../../database/types';
 import {
   countPublishedCollections,

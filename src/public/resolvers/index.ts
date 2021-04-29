@@ -1,5 +1,5 @@
-import {getCollectionBySlug, getCollections} from './queries';
-import {collection} from './item';
+import { getCollectionBySlug, getCollections } from './queries';
+import { collection } from './item';
 
 /**
  * Resolvers
@@ -11,5 +11,5 @@ export const resolvers = {
   },
   Item: {
     collection,
-  }
+  },
 };
