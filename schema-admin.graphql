@@ -97,11 +97,11 @@ type Query {
   """
   Retrieves a paged list of CollectionAuthors.
   """
-  getCollectionAuthors(page: Int, perPage: Int): CollectionAuthorsResult
+  getCollectionAuthors(page: Int, perPage: Int): CollectionAuthorsResult!
   """
   Retrieves a CollectionStory by a combination of collectionId and url.
   """
-  getCollectionStory(externalId: String): CollectionStory
+  getCollectionStory(externalId: String!): CollectionStory
 }
 
 type CollectionImageUrl {
@@ -116,12 +116,12 @@ input CollectionImageUploadInput {
 }
 
 type Mutation {
-  createCollectionAuthor(data: CreateCollectionAuthorInput): CollectionAuthor
-  updateCollectionAuthor(data: UpdateCollectionAuthorInput): CollectionAuthor
-  createCollection(data: CreateCollectionInput): Collection
-  updateCollection(data: UpdateCollectionInput): Collection
-  createCollectionStory(data: CreateCollectionStoryInput): CollectionStory
-  updateCollectionStory(data: UpdateCollectionStoryInput): CollectionStory
-  deleteCollectionStory(externalId: String!): CollectionStory
+  createCollectionAuthor(data: CreateCollectionAuthorInput!): CollectionAuthor!
+  updateCollectionAuthor(data: UpdateCollectionAuthorInput!): CollectionAuthor!
+  createCollection(data: CreateCollectionInput!): Collection!
+  updateCollection(data: UpdateCollectionInput!): Collection!
+  createCollectionStory(data: CreateCollectionStoryInput!): CollectionStory!
+  updateCollectionStory(data: UpdateCollectionStoryInput!): CollectionStory!
+  deleteCollectionStory(externalId: String!): CollectionStory!
   collectionImageUpload(data: CollectionImageUploadInput!): CollectionImageUrl!
 }

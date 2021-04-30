@@ -57,7 +57,7 @@ type CollectionAuthor {
   slug: String
   bio: Markdown
   imageUrl: Url
-  active: Boolean
+  active: Boolean!
 }
 
 type CollectionStory @key(fields: "item { givenUrl }") {
