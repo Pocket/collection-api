@@ -328,7 +328,11 @@ describe('mutations', () => {
       });
 
       it('should return authors and stories when a collection is updated', async () => {
-        const initial = await createCollectionHelper(db, 'first iteration', author);
+        const initial = await createCollectionHelper(
+          db,
+          'first iteration',
+          author
+        );
 
         const data: UpdateCollectionInput = {
           externalId: initial.externalId,
