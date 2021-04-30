@@ -6,5 +6,5 @@ type Query {
   """
   Retrieves a Collection by the given slug. The Collection must be published.
   """
-  getCollectionBySlug(slug: String!): Collection!
+  getCollectionBySlug(slug: String!): Collection
 }

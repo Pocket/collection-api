@@ -89,11 +89,11 @@ type Query {
   """
   Retrieves a Collection by externalId.
   """
-  getCollection(externalId: String!): Collection!
+  getCollection(externalId: String!): Collection
   """
   Retrieves a CollectionAuthor by externalId.
   """
-  getCollectionAuthor(externalId: String!): CollectionAuthor!
+  getCollectionAuthor(externalId: String!): CollectionAuthor
   """
   Retrieves a paged list of CollectionAuthors.
   """
@@ -101,7 +101,7 @@ type Query {
   """
   Retrieves a CollectionStory by a combination of collectionId and url.
   """
-  getCollectionStory(externalId: String!): CollectionStory!
+  getCollectionStory(externalId: String!): CollectionStory
 }
 
 type CollectionImageUrl {
