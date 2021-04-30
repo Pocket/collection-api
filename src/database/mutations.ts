@@ -12,6 +12,7 @@ import config from '../config';
 import { getCollection } from './queries';
 
 import {
+  CollectionWithAuthorsAndStories,
   CreateCollectionAuthorInput,
   CreateCollectionInput,
   CreateCollectionStoryInput,
@@ -75,7 +76,7 @@ export async function updateAuthor(
 export async function createCollection(
   db: PrismaClient,
   data: CreateCollectionInput
-): Promise<Collection> {
+): Promise<CollectionWithAuthorsAndStories> {
   const slugExists = await db.collection.count({
     where: { slug: data.slug },
   });
@@ -97,6 +98,10 @@ export async function createCollection(
       ...data,
       authors: { connect: { externalId: authorExternalId } },
     },
+    include: {
+      authors: true,
+      stories: { orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }] },
+    },
   });
 }
 
@@ -107,7 +112,7 @@ export async function createCollection(
 export async function updateCollection(
   db: PrismaClient,
   data: UpdateCollectionInput
-): Promise<Collection> {
+): Promise<CollectionWithAuthorsAndStories> {
   // retrieve the current record, pre-update
   const existingCollection = await getCollection(db, data.externalId);
 
@@ -159,6 +164,10 @@ export async function updateCollection(
       // before connecting new authors, essentially a sync
       // of authors for a collection
       authors: { set: [], connect: { externalId: authorExternalId } },
+    },
+    include: {
+      authors: true,
+      stories: { orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }] },
     },
   });
 }

@@ -195,6 +195,18 @@ describe('mutations', () => {
           `A collection with the slug ${data2.slug} already exists`
         );
       });
+
+      it('should return authors and stories when a collection is created', async () => {
+        const data: CreateCollectionInput = {
+          slug: 'walter-bowls',
+          title: 'walter bowls',
+          authorExternalId: author.externalId,
+        };
+        const collection = await createCollection(db, data);
+
+        expect(collection.authors).toBeTruthy();
+        expect(collection.stories).toBeTruthy();
+      });
     });
 
     describe('updateCollection', () => {
@@ -272,7 +284,7 @@ describe('mutations', () => {
 
         const published = await updateCollection(db, data);
 
-        // update the colletion title (leaving all other fields the same)
+        // update the collection title (leaving all other fields the same)
         data = {
           externalId: initial.externalId,
           slug: initial.slug,
@@ -313,6 +325,23 @@ describe('mutations', () => {
         await expect(updateCollection(db, data)).rejects.toThrow(
           `A collection with the slug ${first.slug} already exists`
         );
+      });
+
+      it('should return authors and stories when a collection is updated', async () => {
+        const initial = await createCollectionHelper(db, 'first iteration', author);
+
+        const data: UpdateCollectionInput = {
+          externalId: initial.externalId,
+          slug: initial.slug,
+          title: 'second iteration',
+          authorExternalId: author.externalId,
+        };
+
+        // should return the updated info
+        const updated = await updateCollection(db, data);
+
+        expect(updated.authors).toBeTruthy();
+        expect(updated.stories).toBeTruthy();
       });
     });
   });
