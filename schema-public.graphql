@@ -2,9 +2,9 @@ type Query {
   """
   Retrievs a paged set of published Collections.
   """
-  getCollections(page: Int, perPage: Int): CollectionsResult
+  getCollections(page: Int, perPage: Int): CollectionsResult!
   """
   Retrieves a Collection by the given slug. The Collection must be published.
   """
-  getCollectionBySlug(slug: String!): Collection
+  getCollectionBySlug(slug: String!): Collection!
 }
