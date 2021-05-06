@@ -116,7 +116,7 @@ describe('queries', () => {
         expect(collection.stories.length).toEqual(0);
       });
 
-      it('can get a collection with stories by external id', async () => {
+      it('can get a collection with stories with authors by external id', async () => {
         const created = await createCollectionHelper(
           db,
           'test me',

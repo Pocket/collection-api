@@ -200,7 +200,7 @@ export async function createCollectionStory(
   // delete the collectionExternalId property
   // so data matches the expected prisma type
   delete data.collectionExternalId;
-  const story = await db.collectionStory.create({
+  return await db.collectionStory.create({
     data: {
       ...data,
       collectionId: collection.id,
@@ -214,8 +214,6 @@ export async function createCollectionStory(
       },
     },
   });
-
-  return story;
 }
 
 /**
@@ -236,7 +234,7 @@ export async function updateCollectionStory(
     },
   });
 
-  const story = await db.collectionStory.update({
+  return await db.collectionStory.update({
     where: { externalId: data.externalId },
     data: {
       ...data,
@@ -250,8 +248,6 @@ export async function updateCollectionStory(
       },
     },
   });
-
-  return story;
 }
 
 /**
