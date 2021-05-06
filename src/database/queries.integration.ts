@@ -91,7 +91,7 @@ describe('queries', () => {
     });
 
     describe('getCollection', () => {
-      it('can get a collection by external id', async () => {
+      it('can get a collection with no stories by external id', async () => {
         const created = await createCollectionHelper(
           db,
           'test me',
@@ -115,6 +115,23 @@ describe('queries', () => {
         // the array should be empty (bc we skipped creating stories above)
         expect(collection.stories.length).toEqual(0);
       });
+
+      it('can get a collection with stories by external id', async () => {
+        const created = await createCollectionHelper(
+          db,
+          'test me',
+          author,
+          CollectionStatus.DRAFT,
+          null,
+          null
+        );
+
+        const collection = await getCollection(db, created.externalId);
+
+        // stories should have authors
+        expect(collection.stories[0].authors.length).toBeGreaterThan(0);
+        expect(collection.stories[0].authors[0]).toBeTruthy();
+      });
     });
 
     describe('getCollectionBySlug', () => {
@@ -131,8 +148,9 @@ describe('queries', () => {
         expect(collection.title).toEqual('test me');
 
         // ensure we are getting extra client data
-        expect(collection.authors).not.toBeNull();
-        expect(collection.stories).not.toBeNull();
+        expect(collection.authors).toBeTruthy();
+        expect(collection.stories).toBeTruthy();
+        expect(collection.stories[0].authors).toBeTruthy();
       });
 
       it("should not get a collection that isn't published", async () => {
@@ -174,7 +192,10 @@ describe('queries', () => {
         expect(collections[0].authors).toBeTruthy();
         expect(collections[1].authors).toBeTruthy();
         expect(collections[0].stories).toBeTruthy();
+        expect(collections[0].stories[0].authors.length).toBeGreaterThan(0);
+        expect(collections[0].stories[0].authors[0]).toBeTruthy();
         expect(collections[1].stories).toBeTruthy();
+        expect(collections[0].stories[1].authors.length).toBeGreaterThan(0);
       });
 
       it('gets only published collections', async () => {
@@ -245,6 +266,9 @@ describe('queries', () => {
         expect(collections.length).toEqual(2);
         expect(collections[0].title).toEqual('first');
         expect(collections[1].title).toEqual('fourth');
+        expect(collections[0].stories).toBeTruthy();
+        expect(collections[0].authors).toBeTruthy();
+        expect(collections[0].stories[0].authors).toBeTruthy();
       });
 
       it('respects pagination', async () => {
@@ -422,6 +446,21 @@ describe('queries', () => {
         expect(results[0].title).toEqual('finishing my coffee');
       });
 
+      it('should return all associated data - authors, stories, and story authors', async () => {
+        const results = await searchCollections(db, {
+          status: CollectionStatus.PUBLISHED,
+        });
+
+        for (let i = 0; i < results.length; i++) {
+          expect(results[i].authors.length).toBeGreaterThan(0);
+          expect(results[i].stories.length).toBeGreaterThan(0);
+
+          for (let j = 0; j < results[i].stories.length; j++) {
+            expect(results[i].stories[j].authors.length).toBeGreaterThan(0);
+          }
+        }
+      });
+
       it('should respect pagination', async () => {
         // get 1 per page, get page 2 of the results
         // this should result in 3 matches
@@ -462,10 +501,11 @@ describe('queries', () => {
         );
       });
 
-      it('should retrieve a collection story', async () => {
+      it('should retrieve a collection story with authors', async () => {
         const retrieved = await getCollectionStory(db, story.externalId);
 
         expect(retrieved.title).toEqual('a story');
+        expect(retrieved.authors.length).toBeGreaterThan(0);
       });
 
       it('should fail to retrieve a collection story for an unknown externalID', async () => {

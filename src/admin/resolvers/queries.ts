@@ -97,8 +97,5 @@ export async function getCollectionStory(
 ): Promise<CollectionStory> {
   const collectionStory = await dbGetCollectionStory(db, externalId);
 
-  return {
-    ...collectionStory,
-    authors: JSON.parse(collectionStory.authors),
-  };
+  return collectionStory;
 }

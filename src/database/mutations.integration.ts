@@ -206,6 +206,8 @@ describe('mutations', () => {
 
         expect(collection.authors).toBeTruthy();
         expect(collection.stories).toBeTruthy();
+        // there will never be stories on a freshly created collection
+        expect(collection.stories.length).toEqual(0);
       });
     });
 
@@ -237,6 +239,32 @@ describe('mutations', () => {
         // is this necessary?
         const reFetch = await getCollection(db, initial.externalId);
         expect(reFetch.title).toEqual('second iteration');
+      });
+
+      it('should return all associated data after updating - authors, stories, and story authors', async () => {
+        const initial = await createCollectionHelper(
+          db,
+          'first iteration',
+          author
+        );
+
+        const data: UpdateCollectionInput = {
+          externalId: initial.externalId,
+          slug: initial.slug,
+          title: 'second iteration',
+          authorExternalId: author.externalId,
+        };
+
+        // should return the updated info
+        const updated = await updateCollection(db, data);
+
+        expect(updated.authors.length).toBeGreaterThan(0);
+        expect(updated.stories.length).toBeGreaterThan(0);
+
+        for (let i = 0; i < updated.stories.length; i++) {
+          expect(updated.stories[i].authors).toBeTruthy();
+          expect(updated.stories[i].authors.length).toBeGreaterThan(0);
+        }
       });
 
       it('should update publishedAt when going to published status', async () => {
@@ -378,8 +406,13 @@ describe('mutations', () => {
 
         // it should be properly mapped to the collection
         expect(story.collectionId).toEqual(collection.id);
-        // authors should be properly json stringified and parsed
-        expect(story.authors).toEqual([{ name: 'donny' }, { name: 'walter' }]);
+
+        // it should have the specified authors
+        expect(story.authors.length).toBeGreaterThan(0);
+        // (authors are returned sorted by name asc)
+        expect(story.authors[0].name).toEqual('donny');
+        expect(story.authors[1].name).toEqual('walter');
+
         // default sort order of 0 should be there
         expect(story.sortOrder).toEqual(0);
       });
@@ -451,14 +484,19 @@ describe('mutations', () => {
         expect(updated.title).toEqual(updateData.title);
         expect(updated.excerpt).toEqual(updateData.excerpt);
         expect(updated.imageUrl).toEqual(updateData.imageUrl);
-        expect(updated.authors).toEqual(updateData.authors);
+        expect(updated.authors.length).toEqual(2);
+        // (authors are returned sorted by name asc)
+        expect(updated.authors[0].name).toEqual('brandt');
+        expect(updated.authors[1].name).toEqual('karl');
         expect(updated.publisher).toEqual(updateData.publisher);
         expect(updated.sortOrder).toEqual(updateData.sortOrder);
       });
     });
 
     describe('deleteCollectionStory', () => {
-      it('should delete a collection story', async () => {
+      let story;
+
+      beforeEach(async () => {
         const data: CreateCollectionStoryInput = {
           collectionExternalId: collection.externalId,
           url: 'https://www.lebowskifest.com/',
@@ -470,8 +508,10 @@ describe('mutations', () => {
           sortOrder: 4,
         };
 
-        const story = await createCollectionStory(db, data);
+        story = await createCollectionStory(db, data);
+      });
 
+      it('should delete a collection story', async () => {
         const result = await deleteCollectionStory(db, story.externalId);
 
         expect(result).toBeTruthy();
@@ -482,20 +522,19 @@ describe('mutations', () => {
         expect(found).toBeFalsy();
       });
 
+      it('should delete all related collection story authors', async () => {
+        await deleteCollectionStory(db, story.externalId);
+
+        const relatedAuthors = db.collectionStoryAuthor.findMany({
+          where: {
+            collectionStoryId: story.id,
+          },
+        });
+
+        expect((await relatedAuthors).length).toEqual(0);
+      });
+
       it('should fail to delete a collection story if the externalId cannot be found', async () => {
-        const data: CreateCollectionStoryInput = {
-          collectionExternalId: collection.externalId,
-          url: 'https://www.lebowskifest.com/',
-          title: 'lebowski fest',
-          excerpt: 'when will the next fest be?',
-          imageUrl: 'idk',
-          authors: [{ name: 'donny' }, { name: 'walter' }],
-          publisher: 'little lebowskis',
-          sortOrder: 4,
-        };
-
-        const story = await createCollectionStory(db, data);
-
         await expect(
           deleteCollectionStory(db, story.externalId + 'typo')
         ).rejects.toThrow();

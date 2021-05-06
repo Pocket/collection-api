@@ -102,8 +102,10 @@ export async function createCollectionStoryHelper(
     title,
     excerpt,
     imageUrl,
-    authors: JSON.stringify(authors),
     publisher,
+    authors: {
+      create: authors,
+    },
   };
 
   if (sortOrder) {
