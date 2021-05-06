@@ -8,9 +8,10 @@ import {
 } from '@prisma/client';
 import slugify from 'slugify';
 import config from '../config';
-import { getCollection } from './queries';
+import { getCollection, getCollectionStory } from './queries';
 
 import {
+  CollectionStoryWithAuthors,
   CollectionWithAuthorsAndStories,
   CreateCollectionAuthorInput,
   CreateCollectionInput,
@@ -99,7 +100,14 @@ export async function createCollection(
     },
     include: {
       authors: true,
-      stories: { orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }] },
+      stories: {
+        include: {
+          authors: {
+            orderBy: [{ name: 'asc' }],
+          },
+        },
+        orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+      },
     },
   });
 }
@@ -166,7 +174,14 @@ export async function updateCollection(
     },
     include: {
       authors: true,
-      stories: { orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }] },
+      stories: {
+        include: {
+          authors: {
+            orderBy: [{ name: 'asc' }],
+          },
+        },
+        orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+      },
     },
   });
 }
@@ -178,22 +193,27 @@ export async function updateCollection(
 export async function createCollectionStory(
   db: PrismaClient,
   data: CreateCollectionStoryInput
-): Promise<CollectionStory> {
+): Promise<CollectionStoryWithAuthors> {
   // Use the giver collection external ID to fetch the collection ID
   const collection = await getCollection(db, data.collectionExternalId);
 
   // delete the collectionExternalId property
   // so data matches the expected prisma type
   delete data.collectionExternalId;
-  const story = await db.collectionStory.create({
+  return await db.collectionStory.create({
     data: {
       ...data,
       collectionId: collection.id,
-      authors: JSON.stringify(data.authors),
+      authors: {
+        create: data.authors,
+      },
+    },
+    include: {
+      authors: {
+        orderBy: [{ name: 'asc' }],
+      },
     },
   });
-
-  return { ...story, authors: JSON.parse(story.authors) };
 }
 
 /**
@@ -203,13 +223,31 @@ export async function createCollectionStory(
 export async function updateCollectionStory(
   db: PrismaClient,
   data: UpdateCollectionStoryInput
-): Promise<CollectionStory> {
-  const story = await db.collectionStory.update({
-    where: { externalId: data.externalId },
-    data: { ...data, authors: JSON.stringify(data.authors) },
+): Promise<CollectionStoryWithAuthors> {
+  // get collectionStory internal id for deleting authors
+  const existingStory = await getCollectionStory(db, data.externalId);
+
+  // delete related authors
+  await db.collectionStoryAuthor.deleteMany({
+    where: {
+      collectionStoryId: existingStory.id,
+    },
   });
 
-  return { ...story, authors: JSON.parse(story.authors) };
+  return await db.collectionStory.update({
+    where: { externalId: data.externalId },
+    data: {
+      ...data,
+      authors: {
+        create: data.authors,
+      },
+    },
+    include: {
+      authors: {
+        orderBy: [{ name: 'asc' }],
+      },
+    },
+  });
 }
 
 /**
@@ -220,6 +258,17 @@ export async function deleteCollectionStory(
   db: PrismaClient,
   externalId: string
 ): Promise<CollectionStory> {
+  // get the existing story for the internal id
+  const existingStory = await getCollectionStory(db, externalId);
+
+  // delete all associated collection story authors
+  await db.collectionStoryAuthor.deleteMany({
+    where: {
+      collectionStoryId: existingStory.id,
+    },
+  });
+
+  // delete the story
   return await db.collectionStory.delete({ where: { externalId } });
 }
 
