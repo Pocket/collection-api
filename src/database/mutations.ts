@@ -1,7 +1,6 @@
 import {
   CollectionAuthor,
   CollectionStatus,
-  CollectionStory,
   Image,
   ImageEntityType,
   PrismaClient,
@@ -257,7 +256,7 @@ export async function updateCollectionStory(
 export async function deleteCollectionStory(
   db: PrismaClient,
   externalId: string
-): Promise<CollectionStory> {
+): Promise<CollectionStoryWithAuthors> {
   // get the existing story for the internal id
   const existingStory = await getCollectionStory(db, externalId);
 
@@ -269,7 +268,14 @@ export async function deleteCollectionStory(
   });
 
   // delete the story
-  return await db.collectionStory.delete({ where: { externalId } });
+  await db.collectionStory.delete({
+    where: { externalId },
+  });
+
+  // to conform with the scheam, we need to return a CollectionStory with
+  // authors, which can't be done in the `.delete` call above because we
+  // already deleted the authors.
+  return existingStory;
 }
 
 /**
