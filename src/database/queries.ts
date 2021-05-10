@@ -32,7 +32,7 @@ export async function getCollection(
       stories: {
         include: {
           authors: {
-            orderBy: [{ name: 'asc' }],
+            orderBy: [{ sortOrder: 'asc' }],
           },
         },
         orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
@@ -69,7 +69,7 @@ export async function getCollectionBySlug(
       stories: {
         include: {
           authors: {
-            orderBy: [{ name: 'asc' }],
+            orderBy: [{ sortOrder: 'asc' }],
           },
         },
         orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
@@ -93,7 +93,7 @@ export async function getCollectionsBySlugs(
       stories: {
         include: {
           authors: {
-            orderBy: [{ name: 'asc' }],
+            orderBy: [{ sortOrder: 'asc' }],
           },
         },
         orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
@@ -119,7 +119,7 @@ export async function getPublishedCollections(
       stories: {
         include: {
           authors: {
-            orderBy: [{ name: 'asc' }],
+            orderBy: [{ sortOrder: 'asc' }],
           },
         },
         orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
@@ -164,7 +164,7 @@ export async function searchCollections(
       stories: {
         include: {
           authors: {
-            orderBy: [{ name: 'asc' }],
+            orderBy: [{ sortOrder: 'asc' }],
           },
         },
         orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
@@ -238,7 +238,7 @@ export async function getCollectionStory(
     where: { externalId },
     include: {
       authors: {
-        orderBy: [{ name: 'asc' }],
+        orderBy: [{ sortOrder: 'asc' }],
       },
     },
   });

@@ -16,6 +16,7 @@ import {
   createAuthorHelper,
   createCollectionHelper,
   createCollectionStoryHelper,
+  sortCollectionStoryAuthors,
 } from '../test/helpers';
 
 const db = new PrismaClient();
@@ -132,6 +133,25 @@ describe('queries', () => {
         expect(collection.stories[0].authors.length).toBeGreaterThan(0);
         expect(collection.stories[0].authors[0]).toBeTruthy();
       });
+
+      it('can get a collection with story authors sorted correctly', async () => {
+        const created = await createCollectionHelper(
+          db,
+          'test me',
+          author,
+          CollectionStatus.DRAFT,
+          null,
+          null
+        );
+
+        const collection = await getCollection(db, created.externalId);
+
+        // the default sort returned from prisma should match our expected
+        // manual sort
+        expect(collection.stories[0].authors).toEqual(
+          sortCollectionStoryAuthors(collection.stories[0].authors)
+        );
+      });
     });
 
     describe('getCollectionBySlug', () => {
@@ -164,6 +184,23 @@ describe('queries', () => {
         const collection = await getCollectionBySlug(db, 'test-me');
 
         expect(collection).toBeNull();
+      });
+
+      it('can get a collection by slug with story authors sorted correctly', async () => {
+        await createCollectionHelper(
+          db,
+          'test me',
+          author,
+          CollectionStatus.PUBLISHED
+        );
+
+        const collection = await getCollectionBySlug(db, 'test-me');
+
+        // the default sort returned from prisma should match our expected
+        // manual sort
+        expect(collection.stories[0].authors).toEqual(
+          sortCollectionStoryAuthors(collection.stories[0].authors)
+        );
       });
     });
 
@@ -231,6 +268,32 @@ describe('queries', () => {
 
         expect(collections.length).toEqual(1);
         expect(collections[0].title).toEqual('published 1');
+      });
+
+      it('can get collections by slugs with story authors sorted correctly', async () => {
+        await createCollectionHelper(
+          db,
+          'test me',
+          author,
+          CollectionStatus.PUBLISHED
+        );
+        await createCollectionHelper(
+          db,
+          'test me 2',
+          author,
+          CollectionStatus.PUBLISHED
+        );
+
+        const collections = await getCollectionsBySlugs(db, [
+          'test-me',
+          'test-me-2',
+        ]);
+
+        // the default sort returned from prisma should match our expected
+        // manual sort
+        expect(collections[0].stories[0].authors).toEqual(
+          sortCollectionStoryAuthors(collections[0].stories[0].authors)
+        );
       });
     });
 
@@ -317,6 +380,29 @@ describe('queries', () => {
         expect(collections.length).toEqual(2);
         expect(collections[0].title).toEqual('3');
         expect(collections[1].title).toEqual('2');
+      });
+
+      it('can get published collections with story authors sorted correctly', async () => {
+        await createCollectionHelper(
+          db,
+          'first',
+          author,
+          CollectionStatus.PUBLISHED
+        );
+        await createCollectionHelper(
+          db,
+          'fourth',
+          author,
+          CollectionStatus.PUBLISHED
+        );
+
+        const collections = await getPublishedCollections(db, 1, 10);
+
+        // the default sort returned from prisma should match our expected
+        // manual sort
+        expect(collections[0].stories[0].authors).toEqual(
+          sortCollectionStoryAuthors(collections[0].stories[0].authors)
+        );
       });
     });
 
@@ -479,6 +565,18 @@ describe('queries', () => {
         // ensure we are getting the second result (page 2)
         expect(results[0].title).toEqual('finishing my coffee');
       });
+
+      it('can get published collections with story authors sorted correctly', async () => {
+        const collections = await searchCollections(db, {
+          status: CollectionStatus.PUBLISHED,
+        });
+
+        // the default sort returned from prisma should match our expected
+        // manual sort
+        expect(collections[0].stories[0].authors).toEqual(
+          sortCollectionStoryAuthors(collections[0].stories[0].authors)
+        );
+      });
     });
   });
 
@@ -496,7 +594,7 @@ describe('queries', () => {
           'a story',
           'this is a story, all about how...',
           'https://some.image',
-          [{ name: 'donny' }],
+          [{ name: 'donny', sortOrder: 0 }],
           'the verge'
         );
       });
@@ -506,6 +604,16 @@ describe('queries', () => {
 
         expect(retrieved.title).toEqual('a story');
         expect(retrieved.authors.length).toBeGreaterThan(0);
+      });
+
+      it('should retrieve a collection story with authors sorted correctly', async () => {
+        const result = await getCollectionStory(db, story.externalId);
+
+        // the default sort returned from prisma should match our expected
+        // manual sort
+        expect(result.authors).toEqual(
+          sortCollectionStoryAuthors(result.authors)
+        );
       });
 
       it('should fail to retrieve a collection story for an unknown externalID', async () => {
