@@ -1,5 +1,5 @@
-# Basic dependabot.yml file with
-# minimum configuration for two package managers
+# Check the npm registry for updates every weekday at 9 am pst = 11 am cdt = 12 pm est.
+# We use pacific standard time instead of UTC because we'd like to have a consistent time in the U.S.
 
 version: 2
 updates:
@@ -7,9 +7,10 @@ updates:
   - package-ecosystem: 'npm'
     # Look for `package.json` and `lock` files in the `root` directory
     directory: '/'
-    # Check the npm registry for updates every day (weekdays)
     schedule:
       interval: 'daily'
+      time: '9:00'
+      timezone: 'America/Los_Angeles'
     commit-message:
       prefix: '[DEPBOT-0101]'
 
@@ -17,9 +18,10 @@ updates:
   - package-ecosystem: 'docker'
     # Look for a `Dockerfile` in the `root` directory
     directory: '/'
-    # Check for updates once a week
     schedule:
       interval: 'daily'
+      time: '9:00'
+      timezone: 'America/Los_Angeles'
     commit-message:
       prefix: '[DEPBOT-0102]'
 
@@ -28,6 +30,8 @@ updates:
     directory: '/'
     schedule:
       interval: 'daily'
+      time: '9:00'
+      timezone: 'America/Los_Angeles'
     commit-message:
       prefix: '[DEPBOT-0103]'
 
@@ -36,5 +40,7 @@ updates:
     directory: '.aws'
     schedule:
       interval: 'daily'
+      time: '9:00'
+      timezone: 'America/Los_Angeles'
     commit-message:
       prefix: '[DEPBOT-0104]'
