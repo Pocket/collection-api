@@ -1,4 +1,4 @@
-# Check the npm registry for updates every weekday at 9 am pst = 11 am cdt = 12 pm est.
+# Check for updates every weekday at 9 am pst = 11 am cdt = 12 pm est.
 # We use pacific standard time instead of UTC because we'd like to have a consistent time in the U.S.
 
 version: 2
