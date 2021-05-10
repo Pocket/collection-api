@@ -9,7 +9,7 @@ updates:
     directory: '/'
     schedule:
       interval: 'daily'
-      time: '9:00'
+      time: '09:00'
       timezone: 'America/Los_Angeles'
     commit-message:
       prefix: '[DEPBOT-0101]'
@@ -20,7 +20,7 @@ updates:
     directory: '/'
     schedule:
       interval: 'daily'
-      time: '9:00'
+      time: '09:00'
       timezone: 'America/Los_Angeles'
     commit-message:
       prefix: '[DEPBOT-0102]'
@@ -30,7 +30,7 @@ updates:
     directory: '/'
     schedule:
       interval: 'daily'
-      time: '9:00'
+      time: '09:00'
       timezone: 'America/Los_Angeles'
     commit-message:
       prefix: '[DEPBOT-0103]'
@@ -40,7 +40,7 @@ updates:
     directory: '.aws'
     schedule:
       interval: 'daily'
-      time: '9:00'
+      time: '09:00'
       timezone: 'America/Los_Angeles'
     commit-message:
       prefix: '[DEPBOT-0104]'
