@@ -511,10 +511,14 @@ describe('mutations', () => {
         story = await createCollectionStory(db, data);
       });
 
-      it('should delete a collection story', async () => {
+      it('should delete a collection story and return the deleted data', async () => {
         const result = await deleteCollectionStory(db, story.externalId);
 
-        expect(result).toBeTruthy();
+        // should have direct model data
+        expect(result.title).toEqual(story.title);
+
+        // should have related author data
+        expect(result.authors.length).toBeGreaterThan(0);
 
         // make sure the story is really gone
         const found = await getCollectionStory(db, story.externalId);
