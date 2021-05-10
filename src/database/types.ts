@@ -46,6 +46,7 @@ export type UpdateCollectionInput = {
 
 export type CollectionStoryAuthor = {
   name: string;
+  sortOrder: number;
 };
 
 export type CreateCollectionStoryInput = {

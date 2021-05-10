@@ -19,6 +19,7 @@ import {
   createAuthorHelper,
   createCollectionHelper,
   createImageHelper,
+  sortCollectionStoryAuthors,
 } from '../test/helpers';
 import {
   associateImageWithEntity,
@@ -267,6 +268,28 @@ describe('mutations', () => {
         }
       });
 
+      it('should return story author sorted correctly', async () => {
+        const initial = await createCollectionHelper(
+          db,
+          'first iteration',
+          author
+        );
+
+        const data: UpdateCollectionInput = {
+          externalId: initial.externalId,
+          slug: initial.slug,
+          title: 'second iteration',
+          authorExternalId: author.externalId,
+        };
+
+        // should return the updated info
+        const updated = await updateCollection(db, data);
+
+        expect(updated.stories[0].authors).toEqual(
+          sortCollectionStoryAuthors(updated.stories[0].authors)
+        );
+      });
+
       it('should update publishedAt when going to published status', async () => {
         const initial = await createCollectionHelper(
           db,
@@ -354,27 +377,6 @@ describe('mutations', () => {
           `A collection with the slug ${first.slug} already exists`
         );
       });
-
-      it('should return authors and stories when a collection is updated', async () => {
-        const initial = await createCollectionHelper(
-          db,
-          'first iteration',
-          author
-        );
-
-        const data: UpdateCollectionInput = {
-          externalId: initial.externalId,
-          slug: initial.slug,
-          title: 'second iteration',
-          authorExternalId: author.externalId,
-        };
-
-        // should return the updated info
-        const updated = await updateCollection(db, data);
-
-        expect(updated.authors).toBeTruthy();
-        expect(updated.stories).toBeTruthy();
-      });
     });
   });
 
@@ -391,25 +393,47 @@ describe('mutations', () => {
     });
 
     describe('createCollectionStory', () => {
-      it('should create a collection story', async () => {
-        const data: CreateCollectionStoryInput = {
+      let data: CreateCollectionStoryInput;
+
+      beforeEach(async () => {
+        data = {
           collectionExternalId: collection.externalId,
           url: 'https://www.lebowskifest.com/',
           title: 'lebowski fest',
           excerpt: 'when will the next fest be?',
           imageUrl: 'idk',
-          authors: [{ name: 'donny' }, { name: 'walter' }],
+          authors: [
+            { name: 'donny', sortOrder: 1 },
+            { name: 'walter', sortOrder: 2 },
+          ],
           publisher: 'little lebowskis',
         };
+      });
 
+      it('should create a collection story', async () => {
         const story = await createCollectionStory(db, data);
 
         // it should be properly mapped to the collection
         expect(story.collectionId).toEqual(collection.id);
 
+        // default sort order of 0 should be there
+        expect(story.sortOrder).toEqual(0);
+      });
+
+      it('should create a collection story with a default sort order', async () => {
+        const story = await createCollectionStory(db, data);
+
+        // default sort order of 0 should be there
+        expect(story.sortOrder).toEqual(0);
+      });
+
+      it('should return story authors sorted correctly', async () => {
+        const story = await createCollectionStory(db, data);
+
         // it should have the specified authors
         expect(story.authors.length).toBeGreaterThan(0);
-        // (authors are returned sorted by name asc)
+
+        // (authors are returned sorted by sortOrder asc)
         expect(story.authors[0].name).toEqual('donny');
         expect(story.authors[1].name).toEqual('walter');
 
@@ -418,16 +442,7 @@ describe('mutations', () => {
       });
 
       it('should create a collection story with a sort order', async () => {
-        const data: CreateCollectionStoryInput = {
-          collectionExternalId: collection.externalId,
-          url: 'https://www.lebowskifest.com/',
-          title: 'lebowski fest',
-          excerpt: 'when will the next fest be?',
-          imageUrl: 'idk',
-          authors: [{ name: 'donny' }, { name: 'walter' }],
-          publisher: 'little lebowskis',
-          sortOrder: 4,
-        };
+        data.sortOrder = 4;
 
         const story = await createCollectionStory(db, data);
 
@@ -435,17 +450,6 @@ describe('mutations', () => {
       });
 
       it('should fail adding the same url to the same collection', async () => {
-        const data: CreateCollectionStoryInput = {
-          collectionExternalId: collection.externalId,
-          url: 'https://www.lebowskifest.com/',
-          title: 'lebowski fest',
-          excerpt: 'when will the next fest be?',
-          imageUrl: 'idk',
-          authors: [{ name: 'donny' }, { name: 'walter' }],
-          publisher: 'little lebowskis',
-          sortOrder: 4,
-        };
-
         await createCollectionStory(db, data);
 
         await expect(createCollectionStory(db, data)).rejects.toThrow();
@@ -453,27 +457,37 @@ describe('mutations', () => {
     });
 
     describe('updateCollectionStory', () => {
-      it('should upate a collection story', async () => {
+      let story;
+
+      beforeEach(async () => {
         const data: CreateCollectionStoryInput = {
           collectionExternalId: collection.externalId,
           url: 'https://www.lebowskifest.com/',
           title: 'lebowski fest',
           excerpt: 'when will the next fest be?',
           imageUrl: 'idk',
-          authors: [{ name: 'donny' }, { name: 'walter' }],
+          authors: [
+            { name: 'donny', sortOrder: 1 },
+            { name: 'walter', sortOrder: 2 },
+          ],
           publisher: 'little lebowskis',
           sortOrder: 4,
         };
 
-        const story = await createCollectionStory(db, data);
+        story = await createCollectionStory(db, data);
+      });
 
+      it('should upate a collection story', async () => {
         const updateData: UpdateCollectionStoryInput = {
           externalId: story.externalId,
           url: 'https://www.lebowskifest.com/bowling',
           title: 'a fest of lebowskis',
           excerpt: 'new excerpt',
           imageUrl: 'new image url',
-          authors: [{ name: 'brandt' }, { name: 'karl' }],
+          authors: [
+            { name: 'brandt', sortOrder: 1 },
+            { name: 'karl', sortOrder: 2 },
+          ],
           publisher: 'the cast',
           sortOrder: 3,
         };
@@ -484,12 +498,33 @@ describe('mutations', () => {
         expect(updated.title).toEqual(updateData.title);
         expect(updated.excerpt).toEqual(updateData.excerpt);
         expect(updated.imageUrl).toEqual(updateData.imageUrl);
-        expect(updated.authors.length).toEqual(2);
-        // (authors are returned sorted by name asc)
-        expect(updated.authors[0].name).toEqual('brandt');
-        expect(updated.authors[1].name).toEqual('karl');
         expect(updated.publisher).toEqual(updateData.publisher);
         expect(updated.sortOrder).toEqual(updateData.sortOrder);
+      });
+
+      it('should update the collection story authors and return them property sorted', async () => {
+        const updateData: UpdateCollectionStoryInput = {
+          externalId: story.externalId,
+          url: 'https://www.lebowskifest.com/bowling',
+          title: 'a fest of lebowskis',
+          excerpt: 'new excerpt',
+          imageUrl: 'new image url',
+          authors: [
+            { name: 'brandt', sortOrder: 1 },
+            { name: 'karl', sortOrder: 2 },
+            { name: 'maude', sortOrder: 6 },
+          ],
+          publisher: 'the cast',
+          sortOrder: 3,
+        };
+
+        const updated = await updateCollectionStory(db, updateData);
+
+        expect(updated.authors.length).toEqual(3);
+        // (authors are returned sorted by sortOrder asc)
+        expect(updated.authors[0].name).toEqual('brandt');
+        expect(updated.authors[1].name).toEqual('karl');
+        expect(updated.authors[2].name).toEqual('maude');
       });
     });
 
@@ -503,7 +538,10 @@ describe('mutations', () => {
           title: 'lebowski fest',
           excerpt: 'when will the next fest be?',
           imageUrl: 'idk',
-          authors: [{ name: 'donny' }, { name: 'walter' }],
+          authors: [
+            { name: 'donny', sortOrder: 1 },
+            { name: 'walter', sortOrder: 2 },
+          ],
           publisher: 'little lebowskis',
           sortOrder: 4,
         };
@@ -524,6 +562,14 @@ describe('mutations', () => {
         const found = await getCollectionStory(db, story.externalId);
 
         expect(found).toBeFalsy();
+      });
+
+      it('should delete a collection story and return the story authors sorted correctly', async () => {
+        const result = await deleteCollectionStory(db, story.externalId);
+
+        // (authors are returned sorted by sortOrder asc)
+        expect(result.authors[0].name).toEqual('donny');
+        expect(result.authors[1].name).toEqual('walter');
       });
 
       it('should delete all related collection story authors', async () => {

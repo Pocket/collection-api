@@ -100,9 +100,12 @@ export async function createCollection(
     include: {
       authors: true,
       stories: {
+        // note that this include is only present to satisfy the return type
+        // there will never be any stories (or story authors) at the time a
+        // collection is created
         include: {
           authors: {
-            orderBy: [{ name: 'asc' }],
+            orderBy: [{ sortOrder: 'asc' }],
           },
         },
         orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
@@ -176,7 +179,7 @@ export async function updateCollection(
       stories: {
         include: {
           authors: {
-            orderBy: [{ name: 'asc' }],
+            orderBy: [{ sortOrder: 'asc' }],
           },
         },
         orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
@@ -209,7 +212,7 @@ export async function createCollectionStory(
     },
     include: {
       authors: {
-        orderBy: [{ name: 'asc' }],
+        orderBy: [{ sortOrder: 'asc' }],
       },
     },
   });
@@ -243,7 +246,7 @@ export async function updateCollectionStory(
     },
     include: {
       authors: {
-        orderBy: [{ name: 'asc' }],
+        orderBy: [{ sortOrder: 'asc' }],
       },
     },
   });
