@@ -30,4 +30,5 @@ export const server = new ApolloServer({
       collectionLoader,
     },
   },
+  playground: true,
 });
