@@ -21,4 +21,5 @@ export const server = new ApolloServer({
     s3,
   },
   uploads: false,
+  playground: true,
 });
