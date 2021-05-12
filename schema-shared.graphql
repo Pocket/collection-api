@@ -74,6 +74,7 @@ type CollectionStory @key(fields: "item { givenUrl }") {
 
 type CollectionStoryAuthor {
   name: String!
+  sortOrder: Int!
 }
 
 type CollectionsResult {
