@@ -1,2 +1,5 @@
-#All Files/PRS
+# Make @pocket-ci codeowner such that it can approve Dependabot PRs automatically.
+*                         @pocket-ci
+
+# This latter rule takes precedence, such that only we are assigned code reviews.
 *                         @pocket/backend
