@@ -29,6 +29,8 @@ import {
 } from '../../database/mutations';
 import { S3 } from 'aws-sdk';
 import { uploadImage } from '../../aws/upload';
+import { FileUpload } from 'graphql-upload';
+import { createReadStream, ReadStream } from 'fs';
 
 /**
  * Executes a mutation, catches exceptions and records to sentry and console
@@ -201,7 +203,18 @@ export async function collectionImageUpload(
   { s3, db }: { s3: S3; db: PrismaClient }
 ) {
   const { image, ...imageData } = data;
-  const upload = await uploadImage(s3, image.file);
+  console.log(imageData);
+
+  const fileUpload: FileUpload = {
+    filename: imageData.name,
+    mimetype: imageData.mimeType,
+    encoding: '',
+    createReadStream: (): ReadStream => {
+      return image;
+    },
+  };
+
+  const upload = await uploadImage(s3, fileUpload);
 
   await executeMutation<CreateImageInput, Image>(
     db,

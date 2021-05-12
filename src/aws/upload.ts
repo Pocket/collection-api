@@ -20,7 +20,10 @@ export async function uploadImage(
 ): Promise<ImageUploadResponse> {
   const { mimetype, createReadStream } = image;
   const stream = createReadStream();
+  console.log(mimetype);
+  //console.log(stream);
   const key = `${uuidv4()}.${mime.extension(mimetype)}`;
+  console.log(key);
 
   const params: S3.Types.PutObjectRequest = {
     Bucket: config.aws.s3.bucket,

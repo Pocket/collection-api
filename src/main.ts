@@ -44,7 +44,12 @@ app.use(
 );
 
 // Apply the admin graphql (This is not part of the federated graph i.e. Client API)
-adminServer.applyMiddleware({ app, path: '/admin' });
+adminServer.applyMiddleware({
+  app,
+  path: '/admin',
+  // we also have to set the file size limit in the middleware
+  bodyParserConfig: { limit: config.app.upload.maxSizeString },
+});
 
 // Apply the public graphql (This is part of the federated graph)
 publicServer.applyMiddleware({ app, path: '/' });

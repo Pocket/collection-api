@@ -12,7 +12,8 @@ export default {
       authorsPerPage: 20,
     },
     upload: {
-      maxSize: 10000000, // in bytes => 10MB
+      maxSize: 10000000, // in bytes => 10MB, this is for the graphql-upload package
+      maxSizeString: '10mb', // of course express needs this as a string
       maxFiles: 10,
     },
   },
