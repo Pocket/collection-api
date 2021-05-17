@@ -17,7 +17,7 @@
     "db:seed": "prisma db seed --preview-feature"
   },
   "dependencies": {
-    "@apollo/federation": "^0.23.2",
+    "@apollo/federation": "^0.25.0",
     "@pocket-tools/apollo-utils": "^1.0.4",
     "@prisma/client": "^2.20.1",
     "@sentry/node": "^6.3.1",
