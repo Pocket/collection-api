@@ -32,16 +32,16 @@
     "graphql": "^15.5.0",
     "graphql-upload": "^11.0.0",
     "mime-types": "^2.1.30",
-    "slugify": "^1.5.1",
+    "slugify": "^1.5.3",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@types/chai": "^4.2.18",
-    "@types/faker": "^5.5.1",
+    "@types/faker": "^5.5.5",
     "@types/graphql-upload": "^8.0.4",
     "@types/jest": "^26.0.23",
     "@types/node": "^15.0.2",
-    "@typescript-eslint/eslint-plugin": "^4.21.0",
+    "@typescript-eslint/eslint-plugin": "^4.23.0",
     "@typescript-eslint/parser": "^4.21.0",
     "chai": "^4.3.4",
     "eslint": "^7.26.0",
@@ -52,7 +52,7 @@
     "nock": "^13.0.11",
     "nodemon": "^2.0.7",
     "prettier": "^2.2.1",
-    "prisma": "^2.22.0",
+    "prisma": "^2.22.1",
     "ts-jest": "^26.5.4",
     "ts-node": "^9.1.1",
     "typescript": "^4.2.3"
