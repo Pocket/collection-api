@@ -8,6 +8,7 @@ import {
   Prisma,
   PrismaClient,
 } from '@prisma/client';
+import { CollectionStoryAuthor } from '../database/types';
 import faker from 'faker';
 import config from '../config';
 
@@ -74,8 +75,14 @@ export async function createCollectionHelper(
         faker.lorem.paragraph(),
         imageUrl || faker.image.imageUrl(),
         [
-          { name: `${faker.name.firstName()} ${faker.name.lastName()}` },
-          { name: `${faker.name.firstName()} ${faker.name.lastName()}` },
+          {
+            name: `${faker.name.firstName()} ${faker.name.lastName()}`,
+            sortOrder: faker.datatype.number(),
+          },
+          {
+            name: `${faker.name.firstName()} ${faker.name.lastName()}`,
+            sortOrder: faker.datatype.number(),
+          },
         ],
         faker.company.companyName()
       );
@@ -92,7 +99,7 @@ export async function createCollectionStoryHelper(
   title: string,
   excerpt: string,
   imageUrl: string,
-  authors: { name: string }[],
+  authors: { name: string; sortOrder: number }[],
   publisher: string,
   sortOrder?: number
 ): Promise<CollectionStory> {
@@ -102,8 +109,10 @@ export async function createCollectionStoryHelper(
     title,
     excerpt,
     imageUrl,
-    authors: JSON.stringify(authors),
     publisher,
+    authors: {
+      create: authors,
+    },
   };
 
   if (sortOrder) {
@@ -142,4 +151,16 @@ export async function clear(prisma: PrismaClient): Promise<void> {
   for (let i = 0; i < tables.length; i++) {
     await prisma.$executeRaw(`DELETE FROM ${tables[i]}`);
   }
+}
+
+export function sortCollectionStoryAuthors(
+  authors: CollectionStoryAuthor[]
+): CollectionStoryAuthor[] {
+  // manually sort the authors of the first story by their `sortOrder`
+  // property
+  return authors.sort((a, b) => {
+    // this coerces the sort function to treat sortOrder as a number and not
+    // a string. oh javascript.
+    return a.sortOrder - b.sortOrder;
+  });
 }

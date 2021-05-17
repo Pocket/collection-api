@@ -57,7 +57,7 @@ type CollectionAuthor {
   slug: String
   bio: Markdown
   imageUrl: Url
-  active: Boolean
+  active: Boolean!
 }
 
 type CollectionStory @key(fields: "item { givenUrl }") {
@@ -74,10 +74,11 @@ type CollectionStory @key(fields: "item { givenUrl }") {
 
 type CollectionStoryAuthor {
   name: String!
+  sortOrder: Int!
 }
 
 type CollectionsResult {
-  pagination: Pagination
+  pagination: Pagination!
   collections: [Collection!]!
 }
 

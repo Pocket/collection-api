@@ -46,6 +46,7 @@ export type UpdateCollectionInput = {
 
 export type CollectionStoryAuthor = {
   name: string;
+  sortOrder: number;
 };
 
 export type CreateCollectionStoryInput = {
@@ -72,9 +73,13 @@ export type SearchCollectionsFilters = {
   status?: CollectionStatus;
 };
 
+export type CollectionStoryWithAuthors = CollectionStory & {
+  authors: CollectionStoryAuthor[];
+};
+
 export type CollectionWithAuthorsAndStories = Collection & {
   authors?: CollectionAuthor[];
-  stories?: CollectionStory[];
+  stories?: CollectionStoryWithAuthors[];
 };
 
 export type CreateImageInput = {

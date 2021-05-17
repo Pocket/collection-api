@@ -1,17 +1,17 @@
 import {
-  Collection,
   CollectionAuthor,
   CollectionStatus,
-  CollectionStory,
   Image,
   ImageEntityType,
   PrismaClient,
 } from '@prisma/client';
 import slugify from 'slugify';
 import config from '../config';
-import { getCollection } from './queries';
+import { getCollection, getCollectionStory } from './queries';
 
 import {
+  CollectionStoryWithAuthors,
+  CollectionWithAuthorsAndStories,
   CreateCollectionAuthorInput,
   CreateCollectionInput,
   CreateCollectionStoryInput,
@@ -75,7 +75,7 @@ export async function updateAuthor(
 export async function createCollection(
   db: PrismaClient,
   data: CreateCollectionInput
-): Promise<Collection> {
+): Promise<CollectionWithAuthorsAndStories> {
   const slugExists = await db.collection.count({
     where: { slug: data.slug },
   });
@@ -97,6 +97,20 @@ export async function createCollection(
       ...data,
       authors: { connect: { externalId: authorExternalId } },
     },
+    include: {
+      authors: true,
+      stories: {
+        // note that this include is only present to satisfy the return type
+        // there will never be any stories (or story authors) at the time a
+        // collection is created
+        include: {
+          authors: {
+            orderBy: [{ sortOrder: 'asc' }],
+          },
+        },
+        orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+      },
+    },
   });
 }
 
@@ -107,7 +121,7 @@ export async function createCollection(
 export async function updateCollection(
   db: PrismaClient,
   data: UpdateCollectionInput
-): Promise<Collection> {
+): Promise<CollectionWithAuthorsAndStories> {
   // retrieve the current record, pre-update
   const existingCollection = await getCollection(db, data.externalId);
 
@@ -160,6 +174,17 @@ export async function updateCollection(
       // of authors for a collection
       authors: { set: [], connect: { externalId: authorExternalId } },
     },
+    include: {
+      authors: true,
+      stories: {
+        include: {
+          authors: {
+            orderBy: [{ sortOrder: 'asc' }],
+          },
+        },
+        orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+      },
+    },
   });
 }
 
@@ -170,22 +195,27 @@ export async function updateCollection(
 export async function createCollectionStory(
   db: PrismaClient,
   data: CreateCollectionStoryInput
-): Promise<CollectionStory> {
+): Promise<CollectionStoryWithAuthors> {
   // Use the giver collection external ID to fetch the collection ID
   const collection = await getCollection(db, data.collectionExternalId);
 
   // delete the collectionExternalId property
   // so data matches the expected prisma type
   delete data.collectionExternalId;
-  const story = await db.collectionStory.create({
+  return await db.collectionStory.create({
     data: {
       ...data,
       collectionId: collection.id,
-      authors: JSON.stringify(data.authors),
+      authors: {
+        create: data.authors,
+      },
+    },
+    include: {
+      authors: {
+        orderBy: [{ sortOrder: 'asc' }],
+      },
     },
   });
-
-  return { ...story, authors: JSON.parse(story.authors) };
 }
 
 /**
@@ -195,13 +225,31 @@ export async function createCollectionStory(
 export async function updateCollectionStory(
   db: PrismaClient,
   data: UpdateCollectionStoryInput
-): Promise<CollectionStory> {
-  const story = await db.collectionStory.update({
-    where: { externalId: data.externalId },
-    data: { ...data, authors: JSON.stringify(data.authors) },
+): Promise<CollectionStoryWithAuthors> {
+  // get collectionStory internal id for deleting authors
+  const existingStory = await getCollectionStory(db, data.externalId);
+
+  // delete related authors
+  await db.collectionStoryAuthor.deleteMany({
+    where: {
+      collectionStoryId: existingStory.id,
+    },
   });
 
-  return { ...story, authors: JSON.parse(story.authors) };
+  return await db.collectionStory.update({
+    where: { externalId: data.externalId },
+    data: {
+      ...data,
+      authors: {
+        create: data.authors,
+      },
+    },
+    include: {
+      authors: {
+        orderBy: [{ sortOrder: 'asc' }],
+      },
+    },
+  });
 }
 
 /**
@@ -211,8 +259,26 @@ export async function updateCollectionStory(
 export async function deleteCollectionStory(
   db: PrismaClient,
   externalId: string
-): Promise<CollectionStory> {
-  return await db.collectionStory.delete({ where: { externalId } });
+): Promise<CollectionStoryWithAuthors> {
+  // get the existing story for the internal id
+  const existingStory = await getCollectionStory(db, externalId);
+
+  // delete all associated collection story authors
+  await db.collectionStoryAuthor.deleteMany({
+    where: {
+      collectionStoryId: existingStory.id,
+    },
+  });
+
+  // delete the story
+  await db.collectionStory.delete({
+    where: { externalId },
+  });
+
+  // to conform with the scheam, we need to return a CollectionStory with
+  // authors, which can't be done in the `.delete` call above because we
+  // already deleted the authors.
+  return existingStory;
 }
 
 /**
