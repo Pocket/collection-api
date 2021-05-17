@@ -27,7 +27,7 @@
     "apollo-server-express": "^2.24.0",
     "apollo-server-plugin-response-cache": "^0.8.0",
     "aws-sdk": "^2.901.0",
-    "aws-xray-sdk-core": "^3.2.0",
+    "aws-xray-sdk-core": "^3.3.3",
     "aws-xray-sdk-express": "^3.2.0",
     "graphql": "^15.5.0",
     "graphql-upload": "^11.0.0",
