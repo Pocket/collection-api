@@ -2,9 +2,12 @@ import { PrismaClient } from '@prisma/client';
 import {
   CreateCollectionAuthorInput,
   UpdateCollectionAuthorInput,
-} from './types';
-import { clear as clearDb, createAuthorHelper } from '../test/helpers';
-import { createAuthor, updateAuthor } from './mutations';
+} from '../types';
+import { clear as clearDb, createAuthorHelper } from '../../test/helpers';
+import {
+  createCollectionAuthor,
+  updateCollectionAuthor,
+} from './CollectionAuthor';
 
 const db = new PrismaClient();
 
@@ -23,7 +26,7 @@ describe('mutations: CollectionAuthor', () => {
         name: 'the dude',
       };
 
-      const author = await createAuthor(db, data);
+      const author = await createCollectionAuthor(db, data);
 
       expect(author.name).toEqual('the dude');
       expect(author.slug).toEqual('the-dude');
@@ -37,7 +40,7 @@ describe('mutations: CollectionAuthor', () => {
         imageUrl: 'https://i.imgur.com/YeydXfW.gif',
       };
 
-      const author = await createAuthor(db, data);
+      const author = await createCollectionAuthor(db, data);
 
       expect(author.name).toEqual('the dude');
       expect(author.slug).toEqual('his-dudeness');
@@ -51,13 +54,13 @@ describe('mutations: CollectionAuthor', () => {
         slug: 'his-dudeness',
       };
 
-      await createAuthor(db, data);
+      await createCollectionAuthor(db, data);
 
       // change the name just because
       data.name = 'walter man';
 
       // should fail trying to create an author with the same slug
-      await expect(createAuthor(db, data)).rejects.toThrow(
+      await expect(createCollectionAuthor(db, data)).rejects.toThrow(
         `An author with the slug "${data.slug}" already exists`
       );
     });
@@ -73,7 +76,7 @@ describe('mutations: CollectionAuthor', () => {
           bio: 'he abides, man',
         };
 
-        const updated = await updateAuthor(db, data);
+        const updated = await updateCollectionAuthor(db, data);
 
         expect(updated.name).toEqual(data.name);
         expect(updated.bio).toEqual(data.bio);
@@ -88,7 +91,7 @@ describe('mutations: CollectionAuthor', () => {
           slug: 'his-dudeness',
         };
 
-        const updated = await updateAuthor(db, data);
+        const updated = await updateCollectionAuthor(db, data);
 
         expect(updated.slug).toEqual(data.slug);
       });
@@ -108,7 +111,7 @@ describe('mutations: CollectionAuthor', () => {
 
         // should fail trying to make walter's slug 'the dude'
         // there's only one the dude
-        await expect(updateAuthor(db, data)).rejects.toThrow(
+        await expect(updateCollectionAuthor(db, data)).rejects.toThrow(
           `An author with the slug "${data.slug}" already exists`
         );
       });

@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
-import { countAuthors, getAuthor, getAuthors } from './queries';
-import { clear as clearDb, createAuthorHelper } from '../test/helpers';
+import { countAuthors, getAuthor, getAuthors } from './CollectionAuthor';
+import { clear as clearDb, createAuthorHelper } from '../../test/helpers';
 
 const db = new PrismaClient();
 
