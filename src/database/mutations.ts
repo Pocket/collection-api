@@ -19,6 +19,7 @@ import {
   UpdateCollectionAuthorInput,
   UpdateCollectionInput,
   UpdateCollectionStoryInput,
+  UpdateCollectionStorySortOrderInput,
 } from './types';
 
 /**
@@ -243,6 +244,30 @@ export async function updateCollectionStory(
       authors: {
         create: data.authors,
       },
+    },
+    include: {
+      authors: {
+        orderBy: [{ sortOrder: 'asc' }],
+      },
+    },
+  });
+}
+
+/**
+ * mutation dedicated to re-ordering stories within a collection
+ * @param db
+ * @param externalId
+ * @param sortOrder
+ * @returns
+ */
+export async function updateCollectionStorySortOrder(
+  db: PrismaClient,
+  data: UpdateCollectionStorySortOrderInput
+): Promise<CollectionStoryWithAuthors> {
+  return db.collectionStory.update({
+    where: { externalId: data.externalId },
+    data: {
+      sortOrder: data.sortOrder,
     },
     include: {
       authors: {

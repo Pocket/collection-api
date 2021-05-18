@@ -15,6 +15,7 @@ import {
   UpdateCollectionAuthorInput,
   UpdateCollectionInput,
   UpdateCollectionStoryInput,
+  UpdateCollectionStorySortOrderInput,
 } from '../../database/types';
 import {
   associateImageWithEntity,
@@ -26,6 +27,7 @@ import {
   updateAuthor,
   updateCollection as dbUpdateCollection,
   updateCollectionStory as dbUpdateCollectionStory,
+  updateCollectionStorySortOrder as dbUpdateCollectionStorySortOrder,
 } from '../../database/mutations';
 import { S3 } from 'aws-sdk';
 import { uploadImage } from '../../aws/upload';
@@ -168,6 +170,27 @@ export async function updateCollectionStory(
     db,
     data,
     dbUpdateCollectionStory,
+    ImageEntityType.COLLECTION_STORY
+  );
+}
+
+/**
+ * @param parent
+ * @param data
+ * @param db
+ */
+export async function updateCollectionStorySortOrder(
+  parent,
+  { data },
+  { db }
+): Promise<CollectionStory> {
+  return await executeMutation<
+    UpdateCollectionStorySortOrderInput,
+    CollectionStory
+  >(
+    db,
+    data,
+    dbUpdateCollectionStorySortOrder,
     ImageEntityType.COLLECTION_STORY
   );
 }
