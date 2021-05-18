@@ -89,9 +89,8 @@ describe('prisma middleware', () => {
 
   describe('injectItemIntoCollectionStories', () => {
     it('should inject an item property for each story', () => {
-      const res: PrismaMiddleware.CollectionWithStoriesWithItem = PrismaMiddleware.injectItemIntoCollectionStories(
-        collection1
-      );
+      const res: PrismaMiddleware.CollectionWithStoriesWithItem =
+        PrismaMiddleware.injectItemIntoCollectionStories(collection1);
 
       expect(res.stories[0].item.givenUrl).toEqual('test.com/bowling');
       expect(res.stories[1].item.givenUrl).toEqual(
