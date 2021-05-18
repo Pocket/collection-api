@@ -81,6 +81,22 @@ input UpdateCollectionStoryInput {
   sortOrder: Int
 }
 
+input UpdateCollectionStorySortOrderInput {
+  externalId: String!
+  sortOrder: Int!
+}
+
+type CollectionImageUrl {
+  url: String!
+}
+
+input CollectionImageUploadInput {
+  image: Upload!
+  width: Int!
+  height: Int!
+  fileSizeBytes: Int!
+}
+
 type Query {
   searchCollections(
     filters: SearchCollectionsFilters!
@@ -105,24 +121,43 @@ type Query {
   getCollectionStory(externalId: String!): CollectionStory
 }
 
-type CollectionImageUrl {
-  url: String!
-}
-
-input CollectionImageUploadInput {
-  image: Upload!
-  width: Int!
-  height: Int!
-  fileSizeBytes: Int!
-}
-
 type Mutation {
+  """
+  Creates a CollectionAuthor.
+  """
   createCollectionAuthor(data: CreateCollectionAuthorInput!): CollectionAuthor!
+  """
+  Updates a CollectionAuthor.
+  """
   updateCollectionAuthor(data: UpdateCollectionAuthorInput!): CollectionAuthor!
+  """
+  Creates a Collection.
+  """
   createCollection(data: CreateCollectionInput!): Collection!
+  """
+  Updates a Collection.
+  """
   updateCollection(data: UpdateCollectionInput!): Collection!
+  """
+  Creates a CollectionStory.
+  """
   createCollectionStory(data: CreateCollectionStoryInput!): CollectionStory!
+  """
+  Updates a CollectionStory.
+  """
   updateCollectionStory(data: UpdateCollectionStoryInput!): CollectionStory!
+  """
+  Updates only the `sortOrder` property of a CollectionStory. Dedicated to ordering stories within the UI.
+  """
+  updateCollectionStorySortOrder(
+    data: UpdateCollectionStorySortOrderInput!
+  ): CollectionStory!
+  """
+  Deletes a CollectionStory. Also deletes all the related CollectionStoryAuthor records.
+  """
   deleteCollectionStory(externalId: String!): CollectionStory!
+  """
+  Uploads an image to S3. Does *not* save the image to any entity (CollectionAuthor/Collection/CollectionStory).
+  """
   collectionImageUpload(data: CollectionImageUploadInput!): CollectionImageUrl!
 }

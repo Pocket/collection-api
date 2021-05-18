@@ -14,6 +14,7 @@ import {
   updateCollection,
   updateCollectionAuthor,
   updateCollectionStory,
+  updateCollectionStorySortOrder,
 } from './mutations';
 
 export const resolvers = {
@@ -26,6 +27,7 @@ export const resolvers = {
     updateCollectionStory,
     deleteCollectionStory,
     collectionImageUpload,
+    updateCollectionStorySortOrder,
   },
   Query: {
     getCollection,

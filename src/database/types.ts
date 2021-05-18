@@ -67,6 +67,11 @@ export type UpdateCollectionStoryInput = Omit<
   externalId: string;
 };
 
+export type UpdateCollectionStorySortOrderInput = {
+  externalId: string;
+  sortOrder: number;
+};
+
 export type SearchCollectionsFilters = {
   author?: string;
   title?: string;
