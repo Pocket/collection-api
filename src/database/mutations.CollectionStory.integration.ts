@@ -13,6 +13,7 @@ import {
   createCollectionStory,
   deleteCollectionStory,
   updateCollectionStory,
+  updateCollectionStorySortOrder,
 } from './mutations';
 
 const db = new PrismaClient();
@@ -145,7 +146,7 @@ describe('mutations: CollectionStory', () => {
       expect(updated.sortOrder).toEqual(updateData.sortOrder);
     });
 
-    it('should update the collection story authors and return them property sorted', async () => {
+    it('should update the collection story authors and return them properly sorted', async () => {
       const updateData: UpdateCollectionStoryInput = {
         externalId: story.externalId,
         url: 'https://www.lebowskifest.com/bowling',
@@ -168,6 +169,51 @@ describe('mutations: CollectionStory', () => {
       expect(updated.authors[0].name).toEqual('brandt');
       expect(updated.authors[1].name).toEqual('karl');
       expect(updated.authors[2].name).toEqual('maude');
+    });
+  });
+
+  describe('updateCollectionStorySortOrder', () => {
+    let story;
+
+    beforeEach(async () => {
+      const data: CreateCollectionStoryInput = {
+        collectionExternalId: collection.externalId,
+        url: 'https://www.lebowskifest.com/',
+        title: 'lebowski fest',
+        excerpt: 'when will the next fest be?',
+        imageUrl: 'idk',
+        authors: [
+          { name: 'donny', sortOrder: 1 },
+          { name: 'walter', sortOrder: 2 },
+        ],
+        publisher: 'little lebowskis',
+        sortOrder: 4,
+      };
+
+      story = await createCollectionStory(db, data);
+    });
+
+    it('should update the sortOrder of a collection story', async () => {
+      const updated = await updateCollectionStorySortOrder(db, {
+        externalId: story.externalId,
+        sortOrder: story.sortOrder + 1,
+      });
+
+      expect(updated.sortOrder).toEqual(story.sortOrder + 1);
+    });
+
+    it('should not update any other properties when updating sortOrder', async () => {
+      const updated = await updateCollectionStorySortOrder(db, {
+        externalId: story.externalId,
+        sortOrder: 3,
+      });
+
+      expect(updated.title).toEqual(story.title);
+      expect(updated.url).toEqual(story.url);
+      expect(updated.excerpt).toEqual(story.excerpt);
+      expect(updated.imageUrl).toEqual(story.imageUrl);
+      expect(updated.authors).toEqual(story.authors);
+      expect(updated.publisher).toEqual(story.publisher);
     });
   });
 
