@@ -1,13 +1,13 @@
 import { Collection, CollectionStatus, PrismaClient } from '@prisma/client';
-import { getCollection } from './queries';
-import { CreateCollectionInput, UpdateCollectionInput } from './types';
+import { getCollection } from '../queries';
+import { CreateCollectionInput, UpdateCollectionInput } from '../types';
 import {
   clear as clearDb,
   createAuthorHelper,
   createCollectionHelper,
   sortCollectionStoryAuthors,
-} from '../test/helpers';
-import { createCollection, updateCollection } from './mutations';
+} from '../../test/helpers';
+import { createCollection, updateCollection } from './Collection';
 
 const db = new PrismaClient();
 

@@ -6,13 +6,13 @@ import {
   getCollectionsBySlugs,
   getPublishedCollections,
   searchCollections,
-} from './queries';
+} from './Collection';
 import {
   clear as clearDb,
   createAuthorHelper,
   createCollectionHelper,
   sortCollectionStoryAuthors,
-} from '../test/helpers';
+} from '../../test/helpers';
 
 const db = new PrismaClient();
 

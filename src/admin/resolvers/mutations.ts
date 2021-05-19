@@ -19,12 +19,12 @@ import {
 } from '../../database/types';
 import {
   associateImageWithEntity,
-  createAuthor,
+  createCollectionAuthor as dbCreateCollectionAuthor,
   createCollection as dbCreateCollection,
   createCollectionStory as dbCreateCollectionStory,
   createImage,
   deleteCollectionStory as dbDeleteCollectionStory,
-  updateAuthor,
+  updateCollectionAuthor as dbUpdateCollectionAuthor,
   updateCollection as dbUpdateCollection,
   updateCollectionStory as dbUpdateCollectionStory,
   updateCollectionStorySortOrder as dbUpdateCollectionStorySortOrder,
@@ -79,7 +79,7 @@ export async function createCollectionAuthor(
   return executeMutation<CreateCollectionAuthorInput, CollectionAuthor>(
     db,
     data,
-    createAuthor,
+    dbCreateCollectionAuthor,
     ImageEntityType.COLLECTION_AUTHOR
   );
 }
@@ -97,7 +97,7 @@ export async function updateCollectionAuthor(
   return executeMutation<UpdateCollectionAuthorInput, CollectionAuthor>(
     db,
     data,
-    updateAuthor,
+    dbUpdateCollectionAuthor,
     ImageEntityType.COLLECTION_AUTHOR
   );
 }
