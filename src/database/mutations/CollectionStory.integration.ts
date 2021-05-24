@@ -15,6 +15,7 @@ import {
   updateCollectionStory,
   updateCollectionStorySortOrder,
 } from './CollectionStory';
+import { createCollection } from './Collection';
 
 const db = new PrismaClient();
 
@@ -96,7 +97,9 @@ describe('mutations: CollectionStory', () => {
     it('should fail adding the same url to the same collection', async () => {
       await createCollectionStory(db, data);
 
-      await expect(createCollectionStory(db, data)).rejects.toThrow();
+      await expect(createCollectionStory(db, data)).rejects.toThrow(
+        `A story with the url "${data.url}" already exists in this collection`
+      );
     });
   });
 
@@ -121,7 +124,7 @@ describe('mutations: CollectionStory', () => {
       story = await createCollectionStory(db, data);
     });
 
-    it('should upate a collection story', async () => {
+    it('should update a collection story', async () => {
       const updateData: UpdateCollectionStoryInput = {
         externalId: story.externalId,
         url: 'https://www.lebowskifest.com/bowling',
@@ -169,6 +172,45 @@ describe('mutations: CollectionStory', () => {
       expect(updated.authors[0].name).toEqual('brandt');
       expect(updated.authors[1].name).toEqual('karl');
       expect(updated.authors[2].name).toEqual('maude');
+    });
+
+    it('should fail adding the same url to the same collection', async () => {
+      // Create another story first
+      const createData: CreateCollectionStoryInput = {
+        collectionExternalId: collection.externalId,
+        url: 'https://www.anything-goes.com/',
+        title: 'anything goes',
+        excerpt: 'why would this even be a thing?',
+        imageUrl: 'idk',
+        authors: [
+          { name: 'donny', sortOrder: 1 },
+          { name: 'walter', sortOrder: 2 },
+        ],
+        publisher: 'random penguin',
+        sortOrder: 5,
+      };
+
+      await createCollectionStory(db, createData);
+
+      // Update the test story with the newly added story's URL
+      const updateData: UpdateCollectionStoryInput = {
+        externalId: story.externalId,
+        url: 'https://www.anything-goes.com/',
+        title: 'a fest of lebowskis',
+        excerpt: 'new excerpt',
+        imageUrl: '',
+        authors: [
+          { name: 'brandt', sortOrder: 1 },
+          { name: 'karl', sortOrder: 2 },
+        ],
+        publisher: 'random penguin',
+        sortOrder: 1,
+      };
+
+      // Return a custom error message instead of "Unique constraint failed..."
+      await expect(updateCollectionStory(db, updateData)).rejects.toThrow(
+        `A story with the url "${updateData.url}" already exists in this collection`
+      );
     });
   });
 

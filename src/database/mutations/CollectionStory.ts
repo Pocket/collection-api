@@ -16,6 +16,16 @@ export async function createCollectionStory(
   db: PrismaClient,
   data: CreateCollectionStoryInput
 ): Promise<CollectionStoryWithAuthors> {
+  const storyExists = await db.collectionStory.count({
+    where: { url: data.url },
+  });
+
+  if (storyExists) {
+    throw new Error(
+      `A story with the url "${data.url}" already exists in this collection`
+    );
+  }
+
   // Use the giver collection external ID to fetch the collection ID
   const collection = await getCollection(db, data.collectionExternalId);
 
@@ -46,6 +56,16 @@ export async function updateCollectionStory(
   db: PrismaClient,
   data: UpdateCollectionStoryInput
 ): Promise<CollectionStoryWithAuthors> {
+  const storyExists = await db.collectionStory.count({
+    where: { url: data.url },
+  });
+
+  if (storyExists) {
+    throw new Error(
+      `A story with the url "${data.url}" already exists in this collection`
+    );
+  }
+
   // get collectionStory internal id for deleting authors
   const existingStory = await getCollectionStory(db, data.externalId);
 

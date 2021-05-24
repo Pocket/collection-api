@@ -20,7 +20,7 @@ export async function createCollection(
   });
 
   if (slugExists) {
-    throw new Error(`A collection with the slug ${data.slug} already exists`);
+    throw new Error(`A collection with the slug "${data.slug}" already exists`);
   }
 
   // We have to pull the authorExternalId property out of data
@@ -82,7 +82,9 @@ export async function updateCollection(
 
     // if we found more than one collection with this slug, we have a problem
     if (sameSlugs > 0) {
-      throw new Error(`A collection with the slug ${data.slug} already exists`);
+      throw new Error(
+        `A collection with the slug "${data.slug}" already exists`
+      );
     }
   }
 

@@ -67,7 +67,7 @@ Unit/functional tests are self-contained, meaning they do not rely on any extern
 Test are run via `npm` commands:
 
 - Unit/functional: `npm test`
-- Integration: `npm run test-integrations`
+- Integration: `docker compose exec app npm run test-integrations`
 
 ### Testing Federated Resolvers
 
