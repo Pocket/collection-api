@@ -57,7 +57,7 @@ export async function updateCollectionStory(
   data: UpdateCollectionStoryInput
 ): Promise<CollectionStoryWithAuthors> {
   const storyExists = await db.collectionStory.count({
-    where: { url: data.url },
+    where: { url: data.url, externalId: { not: data.externalId } },
   });
 
   if (storyExists) {

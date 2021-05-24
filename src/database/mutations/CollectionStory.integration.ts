@@ -126,7 +126,7 @@ describe('mutations: CollectionStory', () => {
     it('should update a collection story', async () => {
       const updateData: UpdateCollectionStoryInput = {
         externalId: story.externalId,
-        url: 'https://www.lebowskifest.com/bowling',
+        url: story.url, // not updating the URL here
         title: 'a fest of lebowskis',
         excerpt: 'new excerpt',
         imageUrl: 'new image url',
@@ -140,7 +140,7 @@ describe('mutations: CollectionStory', () => {
 
       const updated = await updateCollectionStory(db, updateData);
 
-      expect(updated.url).toEqual(updateData.url);
+      expect(updated.url).toEqual(story.url);
       expect(updated.title).toEqual(updateData.title);
       expect(updated.excerpt).toEqual(updateData.excerpt);
       expect(updated.imageUrl).toEqual(updateData.imageUrl);
@@ -171,6 +171,26 @@ describe('mutations: CollectionStory', () => {
       expect(updated.authors[0].name).toEqual('brandt');
       expect(updated.authors[1].name).toEqual('karl');
       expect(updated.authors[2].name).toEqual('maude');
+    });
+
+    it("should update a collection story URL as long as it doesn't already exist", async () => {
+      const updateData: UpdateCollectionStoryInput = {
+        externalId: story.externalId,
+        url: 'https://openpuppies.com/',
+        title: 'a fest of lebowskis',
+        excerpt: 'new excerpt',
+        imageUrl: 'new image url',
+        authors: [
+          { name: 'brandt', sortOrder: 1 },
+          { name: 'karl', sortOrder: 2 },
+        ],
+        publisher: 'the cast',
+        sortOrder: 3,
+      };
+
+      const updated = await updateCollectionStory(db, updateData);
+
+      expect(updated.url).toEqual(updateData.url);
     });
 
     it('should fail adding the same url to the same collection', async () => {
