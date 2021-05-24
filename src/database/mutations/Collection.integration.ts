@@ -66,7 +66,7 @@ describe('mutations: Collection', () => {
       };
 
       await expect(createCollection(db, data2)).rejects.toThrow(
-        `A collection with the slug ${data2.slug} already exists`
+        `A collection with the slug "${data2.slug}" already exists`
       );
     });
 
@@ -247,7 +247,7 @@ describe('mutations: Collection', () => {
       };
 
       await expect(updateCollection(db, data)).rejects.toThrow(
-        `A collection with the slug ${first.slug} already exists`
+        `A collection with the slug "${first.slug}" already exists`
       );
     });
   });
