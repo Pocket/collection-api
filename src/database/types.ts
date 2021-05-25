@@ -72,6 +72,11 @@ export type UpdateCollectionStorySortOrderInput = {
   sortOrder: number;
 };
 
+export type UpdateCollectionStoryImageUrlInput = {
+  externalId: string;
+  imageUrl: string;
+};
+
 export type SearchCollectionsFilters = {
   author?: string;
   title?: string;

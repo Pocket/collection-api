@@ -10,5 +10,6 @@ export {
   deleteCollectionStory,
   updateCollectionStory,
   updateCollectionStorySortOrder,
+  updateCollectionStoryImageUrl,
 } from './mutations/CollectionStory';
 export { createImage, associateImageWithEntity } from './mutations/Image';

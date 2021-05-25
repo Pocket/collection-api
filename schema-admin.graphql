@@ -86,6 +86,11 @@ input UpdateCollectionStorySortOrderInput {
   sortOrder: Int!
 }
 
+input UpdateCollectionStoryImageUrlInput {
+  externalId: String!
+  imageUrl: Url!
+}
+
 type CollectionImageUrl {
   url: String!
 }
@@ -151,6 +156,12 @@ type Mutation {
   """
   updateCollectionStorySortOrder(
     data: UpdateCollectionStorySortOrderInput!
+  ): CollectionStory!
+  """
+  Updates only the `imageUrl` property of a CollectionStory. Dedicated to uploading images within the UI.
+  """
+  updateCollectionStoryImageUrl(
+    data: UpdateCollectionStoryImageUrlInput!
   ): CollectionStory!
   """
   Deletes a CollectionStory. Also deletes all the related CollectionStoryAuthor records.
