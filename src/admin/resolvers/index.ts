@@ -4,6 +4,7 @@ import {
   getCollectionAuthors,
   getCollectionStory,
   getCurationCategories,
+  getIABCategories,
   searchCollections,
 } from './queries';
 import {
@@ -43,5 +44,6 @@ export const resolvers = {
     getCollectionAuthor,
     getCollectionStory,
     getCurationCategories,
+    getIABCategories,
   },
 };

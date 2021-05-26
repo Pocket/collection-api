@@ -4,6 +4,7 @@ import {
   CollectionStatus,
   CollectionStory,
   CurationCategory,
+  IABCategory,
 } from '@prisma/client';
 
 export type CreateCollectionAuthorInput = {
@@ -37,19 +38,23 @@ export type CreateCollectionInput = {
   status?: CollectionStatus;
   authorExternalId: string;
   curationCategoryExternalId?: string;
+  IABTopCategoryId?: string;
+  IABSubCategoryId?: string;
 };
 
 export type UpdateCollectionInput = {
-  externalId: string;
-  slug: string;
-  title: string;
-  excerpt?: string;
-  intro?: string;
-  imageUrl?: string;
-  status?: CollectionStatus;
   authorExternalId: string;
   curationCategoryExternalId?: string;
+  excerpt?: string;
+  externalId: string;
+  IABSubCategoryId?: string;
+  IABTopCategoryId?: string;
+  imageUrl?: string;
+  intro?: string;
   publishedAt?: Date;
+  slug: string;
+  status?: CollectionStatus;
+  title: string;
 };
 
 export type UpdateCollectionImageUrlInput = {
@@ -103,6 +108,8 @@ export type CollectionStoryWithAuthors = CollectionStory & {
 export type CollectionWithAuthorsAndStories = Collection & {
   authors?: CollectionAuthor[];
   curationCategory?: CurationCategory;
+  IABTopCategory?: IABCategory;
+  IABSubCategory?: IABCategory;
   stories?: CollectionStoryWithAuthors[];
 };
 
@@ -113,4 +120,8 @@ export type CreateImageInput = {
   fileSizeBytes: number;
   fileName: string;
   path: string;
+};
+
+export type IABParentCategory = IABCategory & {
+  children: IABCategory[];
 };

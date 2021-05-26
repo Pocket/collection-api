@@ -32,6 +32,19 @@ extend type Item @key(fields: "givenUrl") {
 TODO: add comments to all the fields in here!
 there's a documentation ticket - do this in that ticket
 """
+type IABCategory {
+  externalId: String!
+  name: String!
+  slug: String!
+}
+
+type IABParentCategory {
+  externalId: String!
+  name: String!
+  slug: String!
+  children: [IABCategory!]!
+}
+
 type Collection {
   externalId: ID!
   slug: String!
@@ -44,6 +57,12 @@ type Collection {
   publishedAt: DateString
   authors: [CollectionAuthor!]!
   stories: [CollectionStory!]!
+  """
+  We will never return child categories in this type, so there's no need to
+  specify `IABParentCategory` here. The basic `IABCategory` is sufficient.
+  """
+  IABTopCategory: IABCategory
+  IABSubCategory: IABCategory
 }
 
 enum CollectionStatus {

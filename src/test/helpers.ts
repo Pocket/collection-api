@@ -5,6 +5,7 @@ import {
   CollectionStatus,
   CollectionStory,
   CurationCategory,
+  IABCategory,
   Image,
   Prisma,
   PrismaClient,
@@ -29,20 +30,67 @@ export async function createAuthorHelper(
   return await prisma.collectionAuthor.create({ data });
 }
 
+// the minimum information required to create a collection
+export interface createCollectionHelperRequiredInput {
+  title: string;
+  author: CollectionAuthor;
+}
+
+// optional information you can provide when creating a collection
+export interface createCollectionHelperOptionalInput {
+  status?: CollectionStatus;
+  curationCategory?: CurationCategory;
+  publishedAt?: Date;
+  imageUrl?: string;
+  addStories?: boolean;
+  IABTopCategory?: IABCategory;
+  IABSubCategory?: IABCategory;
+}
+
+// the input for the `createCollectionHelper` function is a combo of the
+// required and optional properties
+export type createCollectionHelperInput = createCollectionHelperRequiredInput &
+  createCollectionHelperOptionalInput;
+
+// the assumed defaults for the optional properties if not specified
+const createCollectionHelperDefaults: createCollectionHelperOptionalInput = {
+  status: 'DRAFT',
+  addStories: true,
+  curationCategory: null,
+  publishedAt: null,
+  imageUrl: null,
+  IABTopCategory: null,
+  IABSubCategory: null,
+};
+
 export async function createCollectionHelper(
   prisma: PrismaClient,
-  title: string,
-  author: CollectionAuthor,
-  status: CollectionStatus = 'DRAFT',
-  curationCategory: CurationCategory = null,
-  publishedAt: Date = null,
-  imageUrl: string = null,
-  addStories = true
+  params: createCollectionHelperInput
 ): Promise<Collection> {
+  // start with defaults and override with any user-provided values
+  const mergedParams: createCollectionHelperInput = Object.assign(
+    {}, // start with an empty object
+    createCollectionHelperDefaults, // add in all defaults
+    params // add all specified params, which can/may override defaults
+  );
+
+  const {
+    title,
+    author,
+    status,
+    curationCategory,
+    publishedAt,
+    imageUrl,
+    addStories,
+    IABTopCategory,
+    IABSubCategory,
+  } = mergedParams;
+
   const data: Prisma.CollectionCreateInput = {
     title,
     slug: slugify(title, slugifyConfig),
-    excerpt: title,
+    excerpt: faker.lorem.sentences(2),
+    intro: faker.lorem.paragraphs(2),
     status,
     authors: {
       connect: {
@@ -51,16 +99,25 @@ export async function createCollectionHelper(
     },
   };
 
-  if (curationCategory) {
-    data.curationCategory = { connect: { id: curationCategory.id } };
-  }
-
   if (status === CollectionStatus.PUBLISHED && publishedAt) {
     data.publishedAt = publishedAt;
   }
 
   if (imageUrl) {
     data.imageUrl = imageUrl;
+  }
+
+  if (curationCategory) {
+    data.curationCategory = { connect: { id: curationCategory.id } };
+  }
+
+  if (IABTopCategory) {
+    data.IABTopCategory = { connect: { id: IABTopCategory.id } };
+
+    // only set a sub category if the parent was also set
+    if (IABSubCategory) {
+      data.IABSubCategory = { connect: { id: IABSubCategory.id } };
+    }
   }
 
   const collection = await prisma.collection.create({ data });
@@ -141,6 +198,22 @@ export async function createCurationCategoryHelper(
   return await prisma.curationCategory.create({ data });
 }
 
+export async function createIABCategoryHelper(
+  prisma: PrismaClient,
+  name: string,
+  parent?: IABCategory
+): Promise<IABCategory> {
+  const slug = slugify(name, slugifyConfig);
+
+  const data: Prisma.IABCategoryCreateInput = { name, slug };
+
+  if (parent) {
+    data.parent = { connect: { id: parent.id } };
+  }
+
+  return await prisma.iABCategory.create({ data });
+}
+
 export async function createImageHelper(
   prisma: PrismaClient,
   fileName: string,
@@ -168,6 +241,7 @@ export async function clear(prisma: PrismaClient): Promise<void> {
     'CurationCategory',
     'Collection',
     'CollectionAuthor',
+    'IABCategory',
     'Image',
   ];
 

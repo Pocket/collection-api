@@ -1,5 +1,4 @@
 import { Collection, CollectionStatus, PrismaClient } from '@prisma/client';
-import { getCollection } from '../queries';
 import {
   CreateCollectionInput,
   UpdateCollectionImageUrlInput,
@@ -10,6 +9,7 @@ import {
   createAuthorHelper,
   createCollectionHelper,
   createCurationCategoryHelper,
+  createIABCategoryHelper,
   sortCollectionStoryAuthors,
 } from '../../test/helpers';
 import {
@@ -23,6 +23,8 @@ const db = new PrismaClient();
 describe('mutations: Collection', () => {
   let author;
   let curationCategory;
+  let IABTopCategory;
+  let IABSubCategory;
 
   beforeEach(async () => {
     await clearDb(db);
@@ -30,6 +32,12 @@ describe('mutations: Collection', () => {
     curationCategory = await createCurationCategoryHelper(
       db,
       'Personal Finance'
+    );
+    IABTopCategory = await createIABCategoryHelper(db, 'Entertainment');
+    IABSubCategory = await createIABCategoryHelper(
+      db,
+      'Bowling',
+      IABTopCategory
     );
   });
 
@@ -116,16 +124,55 @@ describe('mutations: Collection', () => {
       // there will never be stories on a freshly created collection
       expect(collection.stories.length).toEqual(0);
     });
+
+    it('should create a collection with an IAB top category', async () => {
+      const data: CreateCollectionInput = {
+        slug: 'walter-bowls',
+        title: 'walter bowls',
+        authorExternalId: author.externalId,
+        IABTopCategoryId: IABTopCategory.externalId,
+      };
+
+      const c = await createCollection(db, data);
+
+      expect(c.IABTopCategory.externalId).toEqual(IABTopCategory.externalId);
+    });
+
+    it('should create a collection with IAB top and sub categories', async () => {
+      const data: CreateCollectionInput = {
+        slug: 'walter-bowls',
+        title: 'walter bowls',
+        authorExternalId: author.externalId,
+        IABTopCategoryId: IABTopCategory.externalId,
+        IABSubCategoryId: IABSubCategory.externalId,
+      };
+
+      const c = await createCollection(db, data);
+
+      expect(c.IABTopCategory.externalId).toEqual(IABTopCategory.externalId);
+      expect(c.IABSubCategory.externalId).toEqual(IABSubCategory.externalId);
+    });
+
+    it('should not connect an IAB sub category if an IAB top category is not set', async () => {
+      const data: CreateCollectionInput = {
+        slug: 'walter-bowls',
+        title: 'walter bowls',
+        authorExternalId: author.externalId,
+        IABSubCategoryId: IABSubCategory.externalId,
+      };
+
+      const c = await createCollection(db, data);
+
+      expect(c.IABSubCategory).toBeNull();
+    });
   });
 
   describe('updateCollection', () => {
     it('should update a collection', async () => {
-      const initial = await createCollectionHelper(
-        db,
-        'first iteration',
+      const initial = await createCollectionHelper(db, {
+        title: 'first iteration',
         author,
-        CollectionStatus.DRAFT
-      );
+      });
 
       const newAuthor = await createAuthorHelper(db, 'Leo Tolstoy');
 
@@ -150,12 +197,10 @@ describe('mutations: Collection', () => {
     });
 
     it('should update a collection with a curation category', async () => {
-      const initial = await createCollectionHelper(
-        db,
-        'first iteration',
+      const initial = await createCollectionHelper(db, {
+        title: 'first iteration',
         author,
-        CollectionStatus.DRAFT
-      );
+      });
 
       const newCurationCategory = await createCurationCategoryHelper(
         db,
@@ -180,13 +225,11 @@ describe('mutations: Collection', () => {
     });
 
     it('should update a collection and remove a curation category', async () => {
-      const initial = await createCollectionHelper(
-        db,
-        'first iteration',
+      const initial = await createCollectionHelper(db, {
+        title: 'first iteration',
         author,
-        CollectionStatus.DRAFT,
-        curationCategory
-      );
+        curationCategory,
+      });
 
       const data: UpdateCollectionInput = {
         externalId: initial.externalId,
@@ -201,14 +244,72 @@ describe('mutations: Collection', () => {
       expect(updated.curationCategory).toBeNull();
     });
 
-    it('should return all associated data after updating - authors, curation category, stories, and story authors', async () => {
-      const initial = await createCollectionHelper(
-        db,
-        'first iteration',
+    it('should update a collection with an IAB top category', async () => {
+      const initial = await createCollectionHelper(db, {
+        title: 'first iteration',
         author,
-        CollectionStatus.DRAFT,
-        curationCategory
-      );
+      });
+
+      const data: UpdateCollectionInput = {
+        externalId: initial.externalId,
+        slug: initial.slug,
+        title: 'second iteration',
+        authorExternalId: author.externalId,
+        IABTopCategoryId: IABTopCategory.externalId,
+      };
+
+      const updated = await updateCollection(db, data);
+
+      expect(updated.IABTopCategory.name).toEqual(IABTopCategory.name);
+    });
+
+    it('should update a collection with IAB top and sub categories', async () => {
+      const initial = await createCollectionHelper(db, {
+        title: 'first iteration',
+        author,
+      });
+
+      const data: UpdateCollectionInput = {
+        externalId: initial.externalId,
+        slug: initial.slug,
+        title: 'second iteration',
+        authorExternalId: author.externalId,
+        IABTopCategoryId: IABTopCategory.externalId,
+        IABSubCategoryId: IABSubCategory.externalId,
+      };
+
+      const updated = await updateCollection(db, data);
+
+      expect(updated.IABTopCategory.name).toEqual(IABTopCategory.name);
+      expect(updated.IABSubCategory.name).toEqual(IABSubCategory.name);
+    });
+
+    it('should update a collection and remove IAB categories', async () => {
+      const initial = await createCollectionHelper(db, {
+        title: 'first iteration',
+        author,
+        IABTopCategory,
+        IABSubCategory,
+      });
+
+      const data: UpdateCollectionInput = {
+        externalId: initial.externalId,
+        slug: initial.slug,
+        title: 'second iteration',
+        authorExternalId: author.externalId,
+      };
+
+      const updated = await updateCollection(db, data);
+
+      expect(updated.IABTopCategory).toBeNull();
+      expect(updated.IABSubCategory).toBeNull();
+    });
+
+    it('should return all associated data after updating - authors, curation category, IAB categories, stories, and story authors', async () => {
+      const initial = await createCollectionHelper(db, {
+        title: 'first iteration',
+        author,
+      });
 
       const data: UpdateCollectionInput = {
         externalId: initial.externalId,
@@ -216,6 +317,8 @@ describe('mutations: Collection', () => {
         title: 'second iteration',
         authorExternalId: author.externalId,
         curationCategoryExternalId: curationCategory.externalId,
+        IABTopCategoryId: IABTopCategory.externalId,
+        IABSubCategoryId: IABSubCategory.externalId,
       };
 
       // should return the updated info
@@ -229,23 +332,21 @@ describe('mutations: Collection', () => {
         expect(updated.stories[i].authors.length).toBeGreaterThan(0);
       }
       expect(updated.curationCategory).toBeTruthy();
+      expect(updated.IABTopCategory).toBeTruthy();
+      expect(updated.IABSubCategory).toBeTruthy();
     });
 
     it('should return story author sorted correctly', async () => {
-      const initial = await createCollectionHelper(
-        db,
-        'first iteration',
+      const initial = await createCollectionHelper(db, {
+        title: 'first iteration',
         author,
-        CollectionStatus.DRAFT,
-        curationCategory
-      );
+      });
 
       const data: UpdateCollectionInput = {
         externalId: initial.externalId,
         slug: initial.slug,
         title: 'second iteration',
         authorExternalId: author.externalId,
-        curationCategoryExternalId: curationCategory.externalId,
       };
 
       // should return the updated info
@@ -257,41 +358,29 @@ describe('mutations: Collection', () => {
     });
 
     it('should update publishedAt when going to published status', async () => {
-      const initial = await createCollectionHelper(
-        db,
-        'first iteration',
+      const initial = await createCollectionHelper(db, {
+        title: 'first iteration',
         author,
-        CollectionStatus.DRAFT,
-        curationCategory
-      );
+      });
 
       const data: UpdateCollectionInput = {
         externalId: initial.externalId,
         slug: initial.slug,
         title: 'second iteration',
         authorExternalId: author.externalId,
-        curationCategoryExternalId: curationCategory.externalId,
         status: CollectionStatus.PUBLISHED,
       };
 
       // publishedAt should have a value
       const updated = await updateCollection(db, data);
       expect(updated.publishedAt).not.toBeFalsy();
-
-      // verify on a re-fetch that the update was persisted
-      // is this necessary?
-      const reFetch = await getCollection(db, initial.externalId);
-      expect(reFetch.publishedAt).not.toBeFalsy();
     });
 
     it('should not update publishedAt when already published', async () => {
-      const initial = await createCollectionHelper(
-        db,
-        'first iteration',
+      const initial = await createCollectionHelper(db, {
+        title: 'first iteration',
         author,
-        CollectionStatus.DRAFT,
-        curationCategory
-      );
+      });
 
       // update the collection to published
       let data: UpdateCollectionInput = {
@@ -299,7 +388,6 @@ describe('mutations: Collection', () => {
         slug: initial.slug,
         title: 'second iteration',
         authorExternalId: author.externalId,
-        curationCategoryExternalId: curationCategory.externalId,
         status: CollectionStatus.PUBLISHED,
       };
 
@@ -311,7 +399,6 @@ describe('mutations: Collection', () => {
         slug: initial.slug,
         title: 'third iteration',
         authorExternalId: author.externalId,
-        curationCategoryExternalId: curationCategory.externalId,
         status: CollectionStatus.PUBLISHED,
       };
 
@@ -323,28 +410,22 @@ describe('mutations: Collection', () => {
 
     it('should fail on a duplicate slug', async () => {
       // this should create a slug of 'let-us-go-bowling'
-      const first = await createCollectionHelper(
-        db,
-        'let us go bowling',
+      const first = await createCollectionHelper(db, {
+        title: 'let us go bowling',
         author,
-        CollectionStatus.DRAFT,
-        curationCategory
-      );
+      });
 
-      const second: Collection = await createCollectionHelper(
-        db,
-        'phone is ringing',
+      const second: Collection = await createCollectionHelper(db, {
+        title: 'phone is ringing',
         author,
-        CollectionStatus.DRAFT,
-        curationCategory
-      );
+      });
 
       // try to update the second collection with the same slug as the first
       const data: UpdateCollectionInput = {
-        ...second,
+        title: second.title,
+        externalId: second.externalId,
         slug: first.slug,
         authorExternalId: author.externalId,
-        curationCategoryExternalId: curationCategory.externalId,
       };
 
       await expect(updateCollection(db, data)).rejects.toThrow(
@@ -355,13 +436,10 @@ describe('mutations: Collection', () => {
 
   describe('updateCollectionImageUrl', () => {
     it('should update a collection image url', async () => {
-      const initial = await createCollectionHelper(
-        db,
-        'first iteration',
+      const initial = await createCollectionHelper(db, {
+        title: 'first iteration',
         author,
-        CollectionStatus.DRAFT,
-        curationCategory
-      );
+      });
       const randomKitten = 'https://placekitten.com/g/200/300';
 
       const data: UpdateCollectionImageUrlInput = {
@@ -381,13 +459,11 @@ describe('mutations: Collection', () => {
     });
 
     it('should not update any other collection fields', async () => {
-      const initial = await createCollectionHelper(
-        db,
-        'first iteration',
+      const initial = await createCollectionHelper(db, {
+        title: 'first iteration',
         author,
-        CollectionStatus.DRAFT,
-        curationCategory
-      );
+      });
+
       const randomKitten = 'https://placekitten.com/g/200/300';
 
       const data: UpdateCollectionImageUrlInput = {

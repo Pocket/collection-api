@@ -1,4 +1,7 @@
-import { CollectionWithAuthorsAndStories } from '../../database/types';
+import {
+  CollectionWithAuthorsAndStories,
+  IABParentCategory,
+} from '../../database/types';
 import {
   countAuthors,
   getAuthor,
@@ -7,6 +10,7 @@ import {
   getCollectionStory as dbGetCollectionStory,
   getCurationCategories as dbGetCurationCategories,
   searchCollections as dbSearchCollections,
+  getIABCategories as dbGetIABCategories,
 } from '../../database/queries';
 import config from '../../config';
 import { CollectionAuthorsResult, CollectionsResult } from '../../typeDefs';
@@ -117,4 +121,14 @@ export async function getCurationCategories(
   const curationCategories = await dbGetCurationCategories(db);
 
   return curationCategories;
+}
+
+export async function getIABCategories(
+  parent,
+  _,
+  { db }
+): Promise<IABParentCategory[]> {
+  const IABCategories = dbGetIABCategories(db);
+
+  return IABCategories;
 }

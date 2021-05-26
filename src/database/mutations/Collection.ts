@@ -37,6 +37,12 @@ export async function createCollection(
   const curationCategoryExternalId = data.curationCategoryExternalId;
   delete data.curationCategoryExternalId;
 
+  // And again with IAB categories
+  const IABTopCategoryId = data.IABTopCategoryId;
+  const IABSubCategoryId = data.IABSubCategoryId;
+  delete data.IABTopCategoryId;
+  delete data.IABSubCategoryId;
+
   // we need to build dbData conditionally, as some entity connections may or
   // may not need to be created
   const dbData: any = {
@@ -51,11 +57,26 @@ export async function createCollection(
     };
   }
 
+  // if IAB categories were specified, set up those connections as well
+  if (IABTopCategoryId) {
+    dbData.IABTopCategory = {
+      connect: { externalId: IABTopCategoryId },
+    };
+
+    if (IABSubCategoryId) {
+      dbData.IABSubCategory = {
+        connect: { externalId: IABSubCategoryId },
+      };
+    }
+  }
+
   return db.collection.create({
     data: dbData,
     include: {
       authors: true,
       curationCategory: true,
+      IABTopCategory: true,
+      IABSubCategory: true,
       stories: {
         // note that this include is only present to satisfy the return type
         // there will never be any stories (or story authors) at the time a
@@ -120,6 +141,12 @@ export async function updateCollection(
   const curationCategoryExternalId = data.curationCategoryExternalId;
   delete data.curationCategoryExternalId;
 
+  // And the same thing for IAB categories
+  const IABTopCategoryId = data.IABTopCategoryId;
+  const IABSubCategoryId = data.IABSubCategoryId;
+  delete data.IABTopCategoryId;
+  delete data.IABSubCategoryId;
+
   // if the collection is going from unpublished to published, we update its
   // `publishedAt` time
   if (
@@ -141,6 +168,7 @@ export async function updateCollection(
   };
 
   // if a curation category was specified, set up the connection
+  // otherwise, make sure no connection exists
   if (curationCategoryExternalId) {
     dbData.curationCategory = {
       connect: { externalId: curationCategoryExternalId },
@@ -151,12 +179,36 @@ export async function updateCollection(
     };
   }
 
+  // same as above for IAB categories
+  if (IABTopCategoryId) {
+    dbData.IABTopCategory = {
+      connect: { externalId: IABTopCategoryId },
+    };
+
+    // we'd only ever set the sub category if a top category is set
+    if (IABSubCategoryId) {
+      dbData.IABSubCategory = {
+        connect: { externalId: IABSubCategoryId },
+      };
+    }
+  } else {
+    dbData.IABTopCategory = {
+      disconnect: true,
+    };
+
+    dbData.IABSubCategory = {
+      disconnect: true,
+    };
+  }
+
   return db.collection.update({
     where: { externalId: data.externalId },
     data: dbData,
     include: {
       authors: true,
       curationCategory: true,
+      IABSubCategory: true,
+      IABTopCategory: true,
       stories: {
         orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
         include: {
@@ -189,6 +241,9 @@ export async function updateCollectionImageUrl(
     data: { ...data },
     include: {
       authors: true,
+      curationCategory: true,
+      IABSubCategory: true,
+      IABTopCategory: true,
       stories: {
         orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
         include: {
