@@ -100,6 +100,16 @@ describe('mutations: CollectionStory', () => {
         `A story with the url "${data.url}" already exists in this collection`
       );
     });
+
+    it('should work if authors are not supplied for a story', async () => {
+      // for the occasional story that doesn't have an author, i.e.
+      // supplied by a press agency
+      data.authors = [];
+
+      const story = await createCollectionStory(db, data);
+
+      expect(story.authors.length).toEqual(0);
+    });
   });
 
   describe('updateCollectionStory', () => {
@@ -230,6 +240,27 @@ describe('mutations: CollectionStory', () => {
       await expect(updateCollectionStory(db, updateData)).rejects.toThrow(
         `A story with the url "${updateData.url}" already exists in this collection`
       );
+    });
+
+    it('should work if authors are not supplied for a story', async () => {
+      // for the occasional story that doesn't have an author, i.e.
+      // supplied by a press agency
+      story.authors = [];
+
+      const updateData: UpdateCollectionStoryInput = {
+        externalId: story.externalId,
+        url: 'https://openpuppies.com/',
+        title: 'a fest of lebowskis',
+        excerpt: 'new excerpt',
+        imageUrl: 'new image url',
+        authors: [],
+        publisher: 'the cast',
+        sortOrder: 3,
+      };
+
+      const updated = await updateCollectionStory(db, updateData);
+
+      expect(updated.authors.length).toEqual(0);
     });
   });
 
