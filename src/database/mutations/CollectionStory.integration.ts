@@ -19,12 +19,13 @@ import {
 const db = new PrismaClient();
 
 describe('mutations: CollectionStory', () => {
+  let author;
   let collection;
 
   beforeEach(async () => {
     await clearDb(db);
 
-    const author = await createAuthorHelper(db, 'maude');
+    author = await createAuthorHelper(db, 'maude');
     collection = await createCollectionHelper(
       db,
       'a collection: by maude',
@@ -93,12 +94,45 @@ describe('mutations: CollectionStory', () => {
       expect(story.sortOrder).toEqual(4);
     });
 
+    it('should create a collection story with no authors', async () => {
+      data.authors = [];
+
+      const story = await createCollectionStory(db, data);
+
+      expect(story).not.toBeNull();
+      expect(story.authors.length).toEqual(0);
+    });
+
     it('should fail adding the same url to the same collection', async () => {
       await createCollectionStory(db, data);
+
+      // put the externalId back (it's deleted in `createCollectionStory`)
+      data.collectionExternalId = collection.externalId;
 
       await expect(createCollectionStory(db, data)).rejects.toThrow(
         `A story with the url "${data.url}" already exists in this collection`
       );
+    });
+
+    it('should add a url that already exists in a different collection', async () => {
+      // add the default story to the default collection
+      const story = await createCollectionStory(db, data);
+
+      // create a second collection
+      const collection2 = await createCollectionHelper(
+        db,
+        'a collection: by walter',
+        author
+      );
+
+      // update the collection in the create data to reference the second collection
+      data.collectionExternalId = collection2.externalId;
+
+      // add the same default story to the second collection
+      const story2 = await createCollectionStory(db, data);
+
+      // the urls should be the same
+      expect(story2.url).toEqual(story.url);
     });
   });
 
@@ -173,6 +207,23 @@ describe('mutations: CollectionStory', () => {
       expect(updated.authors[2].name).toEqual('maude');
     });
 
+    it('should update a collection story with no authors', async () => {
+      const updateData: UpdateCollectionStoryInput = {
+        externalId: story.externalId,
+        url: 'https://www.lebowskifest.com/bowling',
+        title: 'a fest of lebowskis',
+        excerpt: 'new excerpt',
+        imageUrl: 'new image url',
+        authors: [],
+        publisher: 'the cast',
+        sortOrder: 3,
+      };
+
+      const updated = await updateCollectionStory(db, updateData);
+
+      expect(updated.authors.length).toEqual(0);
+    });
+
     it("should update a collection story URL as long as it doesn't already exist", async () => {
       const updateData: UpdateCollectionStoryInput = {
         externalId: story.externalId,
@@ -193,7 +244,7 @@ describe('mutations: CollectionStory', () => {
       expect(updated.url).toEqual(updateData.url);
     });
 
-    it('should fail adding the same url to the same collection', async () => {
+    it('should fail updating to a url that already exists in the same collection', async () => {
       // Create another story first
       const createData: CreateCollectionStoryInput = {
         collectionExternalId: collection.externalId,
@@ -230,6 +281,51 @@ describe('mutations: CollectionStory', () => {
       await expect(updateCollectionStory(db, updateData)).rejects.toThrow(
         `A story with the url "${updateData.url}" already exists in this collection`
       );
+    });
+
+    it('should update to a url that already exists in a different collection', async () => {
+      // create a new collection
+      const collection2 = await createCollectionHelper(
+        db,
+        'a collection: by walter',
+        author
+      );
+
+      // create a story in the new collection
+      const createData: CreateCollectionStoryInput = {
+        collectionExternalId: collection2.externalId,
+        url: 'https://www.anything-goes.com/',
+        title: 'anything goes',
+        excerpt: 'why would this even be a thing?',
+        imageUrl: 'idk',
+        authors: [
+          { name: 'donny', sortOrder: 1 },
+          { name: 'walter', sortOrder: 2 },
+        ],
+        publisher: 'random penguin',
+        sortOrder: 5,
+      };
+
+      await createCollectionStory(db, createData);
+
+      // Update the test story with the newly added story's URL
+      const updateData: UpdateCollectionStoryInput = {
+        externalId: story.externalId,
+        url: 'https://www.anything-goes.com/',
+        title: 'a fest of lebowskis',
+        excerpt: 'new excerpt',
+        imageUrl: '',
+        authors: [
+          { name: 'brandt', sortOrder: 1 },
+          { name: 'karl', sortOrder: 2 },
+        ],
+        publisher: 'random penguin',
+        sortOrder: 1,
+      };
+
+      const updated = await updateCollectionStory(db, updateData);
+
+      expect(updated.url).toEqual(updateData.url);
     });
   });
 
