@@ -16,8 +16,12 @@ export async function createCollectionStory(
   db: PrismaClient,
   data: CreateCollectionStoryInput
 ): Promise<CollectionStoryWithAuthors> {
+  // Use the given collection external ID to fetch the collection ID
+  const collection = await getCollection(db, data.collectionExternalId);
+
+  // make sure this same story doesn't exist in the same collection
   const storyExists = await db.collectionStory.count({
-    where: { url: data.url },
+    where: { url: data.url, collectionId: collection.id },
   });
 
   if (storyExists) {
@@ -25,9 +29,6 @@ export async function createCollectionStory(
       `A story with the url "${data.url}" already exists in this collection`
     );
   }
-
-  // Use the giver collection external ID to fetch the collection ID
-  const collection = await getCollection(db, data.collectionExternalId);
 
   // delete the collectionExternalId property
   // so data matches the expected prisma type
@@ -56,18 +57,25 @@ export async function updateCollectionStory(
   db: PrismaClient,
   data: UpdateCollectionStoryInput
 ): Promise<CollectionStoryWithAuthors> {
-  const storyExists = await db.collectionStory.count({
-    where: { url: data.url, externalId: { not: data.externalId } },
-  });
-
-  if (storyExists) {
-    throw new Error(
-      `A story with the url "${data.url}" already exists in this collection`
-    );
-  }
-
-  // get collectionStory internal id for deleting authors
+  // get collectionStory internal id for deleting authors & checking for existing story
   const existingStory = await getCollectionStory(db, data.externalId);
+
+  // if the url has changed, make sure no other stories with the same url exist on this collection
+  // (if the url hasn't changed, we don't need to check - this already happens on create)
+  if (data.url !== existingStory.url) {
+    const storyExists = await db.collectionStory.count({
+      where: {
+        url: data.url,
+        collectionId: existingStory.collectionId,
+      },
+    });
+
+    if (storyExists) {
+      throw new Error(
+        `A story with the url "${data.url}" already exists in this collection`
+      );
+    }
+  }
 
   // delete related authors
   await db.collectionStoryAuthor.deleteMany({
