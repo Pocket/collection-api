@@ -13,6 +13,7 @@ import {
   deleteCollectionStory,
   updateCollection,
   updateCollectionAuthor,
+  updateCollectionAuthorImageUrl,
   updateCollectionStory,
   updateCollectionStorySortOrder,
   updateCollectionStoryImageUrl,
@@ -22,6 +23,7 @@ export const resolvers = {
   Mutation: {
     createCollectionAuthor,
     updateCollectionAuthor,
+    updateCollectionAuthorImageUrl,
     createCollection,
     updateCollection,
     createCollectionStory,

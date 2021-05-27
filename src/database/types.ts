@@ -22,6 +22,11 @@ export type UpdateCollectionAuthorInput = {
   active?: boolean;
 };
 
+export type UpdateCollectionAuthorImageUrlInput = {
+  externalId: string;
+  imageUrl: string;
+};
+
 export type CreateCollectionInput = {
   slug: string;
   title: string;

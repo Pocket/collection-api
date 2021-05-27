@@ -12,6 +12,7 @@ import {
   CreateCollectionInput,
   CreateCollectionStoryInput,
   CreateImageInput,
+  UpdateCollectionAuthorImageUrlInput,
   UpdateCollectionAuthorInput,
   UpdateCollectionInput,
   UpdateCollectionStoryImageUrlInput,
@@ -26,6 +27,7 @@ import {
   createImage,
   deleteCollectionStory as dbDeleteCollectionStory,
   updateCollectionAuthor as dbUpdateCollectionAuthor,
+  updateCollectionAuthorImageUrl as dbUpdateCollectionAuthorImageUrl,
   updateCollection as dbUpdateCollection,
   updateCollectionStory as dbUpdateCollectionStory,
   updateCollectionStorySortOrder as dbUpdateCollectionStorySortOrder,
@@ -100,6 +102,24 @@ export async function updateCollectionAuthor(
     db,
     data,
     dbUpdateCollectionAuthor,
+    ImageEntityType.COLLECTION_AUTHOR
+  );
+}
+
+/**
+ * @param parent
+ * @param data
+ * @param db
+ */
+export async function updateCollectionAuthorImageUrl(
+  parent,
+  { data },
+  { db }
+): Promise<CollectionAuthor> {
+  return executeMutation<UpdateCollectionAuthorImageUrlInput, CollectionAuthor>(
+    db,
+    data,
+    dbUpdateCollectionAuthorImageUrl,
     ImageEntityType.COLLECTION_AUTHOR
   );
 }

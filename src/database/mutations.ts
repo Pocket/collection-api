@@ -3,6 +3,7 @@
 export {
   createCollectionAuthor,
   updateCollectionAuthor,
+  updateCollectionAuthorImageUrl,
 } from './mutations/CollectionAuthor';
 export { createCollection, updateCollection } from './mutations/Collection';
 export {

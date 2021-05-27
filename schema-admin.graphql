@@ -33,6 +33,11 @@ input UpdateCollectionAuthorInput {
   active: Boolean
 }
 
+input UpdateCollectionAuthorImageUrlInput {
+  externalId: String!
+  imageUrl: Url!
+}
+
 input CreateCollectionInput {
   slug: String!
   title: String!
@@ -135,6 +140,12 @@ type Mutation {
   Updates a CollectionAuthor.
   """
   updateCollectionAuthor(data: UpdateCollectionAuthorInput!): CollectionAuthor!
+  """
+  Updates only the `imageUrl` property of a CollectionAuthor. Dedicated to uploading images within the UI.
+  """
+  updateCollectionAuthorImageUrl(
+    data: UpdateCollectionAuthorImageUrlInput!
+  ): CollectionAuthor!
   """
   Creates a Collection.
   """
