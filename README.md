@@ -54,6 +54,10 @@ TODO: Add images to our seeder?
 
 If you need to change the Prisma schema (in `prisma/schema.prisma`), you'll need to create a migration to ensure the database is in sync. After you have made your changes to `schema.prisma`, run `docker compose exec app npx prisma migrate dev --name some_meaningful_migration_name`. This will create a migration script in `prisma/migrations` and will automatically run the new migration. This will also re-create your Prisma Typescript types.
 
+##### Resetting Your Local Database
+
+If you want to wipe your local database (e.g. to re-run all migrations or the seeder script), run `docker compose exec app npx prisma migrate reset`.
+
 #### Re-creating Prisma Typescript Types
 
 If your local environment gets messed up (it happens), you can re-create your Prisma Typescript types by running `npx prisma generate`. (Note that you don't have to do this within the Docker container, but you can if you want.)
