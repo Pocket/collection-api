@@ -14,3 +14,7 @@ export {
   searchCollections,
 } from './queries/Collection';
 export { getCollectionStory } from './queries/CollectionStory';
+export {
+  countCurationCategories,
+  getCurationCategories,
+} from './queries/CurationCategory';

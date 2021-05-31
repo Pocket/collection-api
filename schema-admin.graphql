@@ -97,6 +97,11 @@ input CollectionImageUploadInput {
   fileSizeBytes: Int!
 }
 
+type CurationCategoriesResult {
+  pagination: Pagination
+  curationCategories: [CurationCategory!]!
+}
+
 type Query {
   searchCollections(
     filters: SearchCollectionsFilters!
@@ -119,6 +124,10 @@ type Query {
   Retrieves a CollectionStory by a combination of collectionId and url.
   """
   getCollectionStory(externalId: String!): CollectionStory
+  """
+  Retrieves a list of CurationCategories, sorted alphabetically
+  """
+  getCurationCategories(page: Int, perPage: Int): CurationCategoriesResult!
 }
 
 type Mutation {

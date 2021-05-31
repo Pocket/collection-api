@@ -5,10 +5,16 @@ import {
   getAuthors,
   getCollection as dbGetCollection,
   getCollectionStory as dbGetCollectionStory,
+  countCurationCategories,
+  getCurationCategories as dbGetCurationCategories,
   searchCollections as dbSearchCollections,
 } from '../../database/queries';
 import config from '../../config';
-import { CollectionAuthorsResult, CollectionsResult } from '../../typeDefs';
+import {
+  CollectionAuthorsResult,
+  CollectionsResult,
+  CurationCategoriesResult,
+} from '../../typeDefs';
 import { getPagination } from '../../utils';
 import { CollectionAuthor, CollectionStory } from '@prisma/client';
 
@@ -98,4 +104,22 @@ export async function getCollectionStory(
   const collectionStory = await dbGetCollectionStory(db, externalId);
 
   return collectionStory;
+}
+
+/**
+ * @param parent
+ * @param db
+ */
+export async function getCurationCategories(
+  parent,
+  { page = 1, perPage = config.app.pagination.curationCategoriesPerPage },
+  { db }
+): Promise<CurationCategoriesResult> {
+  const totalResults = await countCurationCategories(db);
+  const curationCategories = await dbGetCurationCategories(db);
+
+  return {
+    pagination: getPagination(totalResults, page, perPage),
+    curationCategories,
+  };
 }

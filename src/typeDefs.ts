@@ -2,7 +2,7 @@ import path from 'path';
 import fs from 'fs';
 import { gql } from 'apollo-server';
 
-import { CollectionAuthor } from '@prisma/client';
+import { CollectionAuthor, CurationCategory } from '@prisma/client';
 import { CollectionWithAuthorsAndStories } from './database/types';
 
 const sharedSchema = fs
@@ -41,4 +41,9 @@ export type CollectionsResult = {
 export type CollectionAuthorsResult = {
   pagination: Pagination;
   authors: CollectionAuthor[];
+};
+
+export type CurationCategoriesResult = {
+  pagination: Pagination;
+  curationCategories: CurationCategory[];
 };
