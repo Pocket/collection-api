@@ -49,6 +49,11 @@ export type UpdateCollectionInput = {
   publishedAt?: Date;
 };
 
+export type UpdateCollectionImageUrlInput = {
+  externalId: string;
+  imageUrl: string;
+};
+
 export type CollectionStoryAuthor = {
   name: string;
   sortOrder: number;

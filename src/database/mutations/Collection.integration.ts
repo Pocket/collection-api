@@ -1,13 +1,21 @@
 import { Collection, CollectionStatus, PrismaClient } from '@prisma/client';
 import { getCollection } from '../queries';
-import { CreateCollectionInput, UpdateCollectionInput } from '../types';
+import {
+  CreateCollectionInput,
+  UpdateCollectionImageUrlInput,
+  UpdateCollectionInput,
+} from '../types';
 import {
   clear as clearDb,
   createAuthorHelper,
   createCollectionHelper,
   sortCollectionStoryAuthors,
 } from '../../test/helpers';
-import { createCollection, updateCollection } from './Collection';
+import {
+  createCollection,
+  updateCollection,
+  updateCollectionImageUrl,
+} from './Collection';
 
 const db = new PrismaClient();
 
@@ -197,7 +205,7 @@ describe('mutations: Collection', () => {
         CollectionStatus.DRAFT
       );
 
-      // update the colletion to published
+      // update the collection to published
       let data: UpdateCollectionInput = {
         externalId: initial.externalId,
         slug: initial.slug,
@@ -249,6 +257,55 @@ describe('mutations: Collection', () => {
       await expect(updateCollection(db, data)).rejects.toThrow(
         `A collection with the slug "${first.slug}" already exists`
       );
+    });
+  });
+
+  describe('updateCollectionImageUrl', () => {
+    it('should update a collection image url', async () => {
+      const initial = await createCollectionHelper(
+        db,
+        'first iteration',
+        author
+      );
+      const randomKitten = 'https://placekitten.com/g/200/300';
+
+      const data: UpdateCollectionImageUrlInput = {
+        externalId: initial.externalId,
+        imageUrl: randomKitten,
+      };
+
+      // should return the updated info
+      const updated = await updateCollectionImageUrl(db, data);
+
+      expect(updated.imageUrl).toEqual(data.imageUrl);
+
+      // should have updated the updatedAt field
+      expect(updated.updatedAt.getTime()).toBeGreaterThan(
+        initial.updatedAt.getTime()
+      );
+    });
+
+    it('should not update any other collection fields', async () => {
+      const initial = await createCollectionHelper(
+        db,
+        'first iteration',
+        author
+      );
+      const randomKitten = 'https://placekitten.com/g/200/300';
+
+      const data: UpdateCollectionImageUrlInput = {
+        externalId: initial.externalId,
+        imageUrl: randomKitten,
+      };
+
+      // should return the updated info
+      const updated = await updateCollectionImageUrl(db, data);
+
+      expect(updated.title).toEqual(initial.title);
+      expect(updated.slug).toEqual(initial.slug);
+      expect(updated.excerpt).toEqual(initial.excerpt);
+      expect(updated.intro).toEqual(initial.intro);
+      expect(updated.status).toEqual(initial.status);
     });
   });
 });

@@ -59,6 +59,11 @@ input UpdateCollectionInput {
   authorExternalId: String!
 }
 
+input UpdateCollectionImageUrlInput {
+  externalId: String!
+  imageUrl: Url!
+}
+
 input CollectionStoryAuthorInput {
   name: String!
   sortOrder: Int!
@@ -154,6 +159,10 @@ type Mutation {
   Updates a Collection.
   """
   updateCollection(data: UpdateCollectionInput!): Collection!
+  """
+  Updates only the `imageUrl` property of a Collection. Dedicated to uploading images within the UI.
+  """
+  updateCollectionImageUrl(data: UpdateCollectionImageUrlInput!): Collection!
   """
   Creates a CollectionStory.
   """

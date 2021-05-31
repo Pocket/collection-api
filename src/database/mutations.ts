@@ -5,7 +5,11 @@ export {
   updateCollectionAuthor,
   updateCollectionAuthorImageUrl,
 } from './mutations/CollectionAuthor';
-export { createCollection, updateCollection } from './mutations/Collection';
+export {
+  createCollection,
+  updateCollection,
+  updateCollectionImageUrl,
+} from './mutations/Collection';
 export {
   createCollectionStory,
   deleteCollectionStory,
