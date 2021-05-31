@@ -38,6 +38,7 @@ type Collection {
   title: String!
   excerpt: Markdown
   status: CollectionStatus!
+  curationCategory: CurationCategory
   intro: Markdown
   imageUrl: Url
   publishedAt: DateString
@@ -58,6 +59,12 @@ type CollectionAuthor {
   bio: Markdown
   imageUrl: Url
   active: Boolean!
+}
+
+type CurationCategory {
+  externalId: ID!
+  name: String!
+  slug: String!
 }
 
 type CollectionStory @key(fields: "item { givenUrl }") {
