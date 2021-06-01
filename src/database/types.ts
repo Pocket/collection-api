@@ -30,6 +30,7 @@ export type CreateCollectionInput = {
   imageUrl?: string;
   status?: CollectionStatus;
   authorExternalId: string;
+  curationCategoryExternalId: string;
 };
 
 export type UpdateCollectionInput = {
@@ -41,6 +42,7 @@ export type UpdateCollectionInput = {
   imageUrl?: string;
   status?: CollectionStatus;
   authorExternalId: string;
+  curationCategoryExternalId: string;
   publishedAt?: Date;
 };
 

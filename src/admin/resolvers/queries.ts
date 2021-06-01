@@ -116,7 +116,7 @@ export async function getCurationCategories(
   { db }
 ): Promise<CurationCategoriesResult> {
   const totalResults = await countCurationCategories(db);
-  const curationCategories = await dbGetCurationCategories(db);
+  const curationCategories = await dbGetCurationCategories(db, page, perPage);
 
   return {
     pagination: getPagination(totalResults, page, perPage),

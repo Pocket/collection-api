@@ -31,13 +31,20 @@ export async function createCollection(
   const authorExternalId = data.authorExternalId;
   delete data.authorExternalId;
 
+  // And we do the same thing for the curationCategoryExternalId
+  // property
+  const curationCategoryExternalId = data.curationCategoryExternalId;
+  delete data.curationCategoryExternalId;
+
   return db.collection.create({
     data: {
       ...data,
       authors: { connect: { externalId: authorExternalId } },
+      curationCategory: { connect: { externalId: curationCategoryExternalId } },
     },
     include: {
       authors: true,
+      curationCategory: true,
       stories: {
         // note that this include is only present to satisfy the return type
         // there will never be any stories (or story authors) at the time a
@@ -96,6 +103,11 @@ export async function updateCollection(
   const authorExternalId = data.authorExternalId;
   delete data.authorExternalId;
 
+  // And we do the same thing for the curationCategoryExternalId
+  // property
+  const curationCategoryExternalId = data.curationCategoryExternalId;
+  delete data.curationCategoryExternalId;
+
   // if the collection is going from unpublished to published, we update its
   // `publishedAt` time
   if (
@@ -114,9 +126,11 @@ export async function updateCollection(
       // before connecting new authors, essentially a sync
       // of authors for a collection
       authors: { set: [], connect: { externalId: authorExternalId } },
+      curationCategory: { connect: { externalId: curationCategoryExternalId } },
     },
     include: {
       authors: true,
+      curationCategory: true,
       stories: {
         orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
         include: {

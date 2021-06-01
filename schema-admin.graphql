@@ -41,6 +41,7 @@ input CreateCollectionInput {
   imageUrl: Url
   status: CollectionStatus
   authorExternalId: String!
+  curationCategoryExternalId: String!
 }
 
 input UpdateCollectionInput {
@@ -52,6 +53,7 @@ input UpdateCollectionInput {
   imageUrl: Url
   status: CollectionStatus!
   authorExternalId: String!
+  curationCategoryExternalId: String!
 }
 
 input CollectionStoryAuthorInput {

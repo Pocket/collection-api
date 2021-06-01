@@ -35,6 +35,7 @@ describe('mutations: Collection', () => {
         slug: 'walter-bowls',
         title: 'walter bowls',
         authorExternalId: author.externalId,
+        curationCategoryExternalId: curationCategory.externalId,
       };
 
       const collection = await createCollection(db, data);
@@ -48,6 +49,7 @@ describe('mutations: Collection', () => {
         slug: 'walter-bowls',
         title: 'walter bowls',
         authorExternalId: author.externalId,
+        curationCategoryExternalId: curationCategory.externalId,
       };
       const collection = await createCollection(db, data);
 
@@ -60,6 +62,7 @@ describe('mutations: Collection', () => {
         slug: 'walter-bowls',
         title: 'walter bowls',
         authorExternalId: author.externalId,
+        curationCategoryExternalId: curationCategory.externalId,
       };
 
       await createCollection(db, data1);
@@ -69,6 +72,7 @@ describe('mutations: Collection', () => {
         slug: 'walter-bowls',
         title: 'walter bowls, again',
         authorExternalId: author.externalId,
+        curationCategoryExternalId: curationCategory.externalId,
       };
 
       await expect(createCollection(db, data2)).rejects.toThrow(
@@ -81,6 +85,7 @@ describe('mutations: Collection', () => {
         slug: 'walter-bowls',
         title: 'walter bowls',
         authorExternalId: author.externalId,
+        curationCategoryExternalId: curationCategory.externalId,
       };
       const collection = await createCollection(db, data);
 
@@ -106,6 +111,7 @@ describe('mutations: Collection', () => {
         slug: initial.slug,
         title: 'second iteration',
         authorExternalId: author.externalId,
+        curationCategoryExternalId: curationCategory.externalId,
       };
 
       // should return the updated info
@@ -137,6 +143,7 @@ describe('mutations: Collection', () => {
         slug: initial.slug,
         title: 'second iteration',
         authorExternalId: author.externalId,
+        curationCategoryExternalId: curationCategory.externalId,
       };
 
       // should return the updated info
@@ -165,6 +172,7 @@ describe('mutations: Collection', () => {
         slug: initial.slug,
         title: 'second iteration',
         authorExternalId: author.externalId,
+        curationCategoryExternalId: curationCategory.externalId,
       };
 
       // should return the updated info
@@ -189,6 +197,7 @@ describe('mutations: Collection', () => {
         slug: initial.slug,
         title: 'second iteration',
         authorExternalId: author.externalId,
+        curationCategoryExternalId: curationCategory.externalId,
         status: CollectionStatus.PUBLISHED,
       };
 
@@ -217,6 +226,7 @@ describe('mutations: Collection', () => {
         slug: initial.slug,
         title: 'second iteration',
         authorExternalId: author.externalId,
+        curationCategoryExternalId: curationCategory.externalId,
         status: CollectionStatus.PUBLISHED,
       };
 
@@ -228,6 +238,7 @@ describe('mutations: Collection', () => {
         slug: initial.slug,
         title: 'third iteration',
         authorExternalId: author.externalId,
+        curationCategoryExternalId: curationCategory.externalId,
         status: CollectionStatus.PUBLISHED,
       };
 
@@ -260,6 +271,7 @@ describe('mutations: Collection', () => {
         ...second,
         slug: first.slug,
         authorExternalId: author.externalId,
+        curationCategoryExternalId: curationCategory.externalId,
       };
 
       await expect(updateCollection(db, data)).rejects.toThrow(
