@@ -12,22 +12,28 @@ import {
   createCollectionStory,
   deleteCollectionStory,
   updateCollection,
+  updateCollectionImageUrl,
   updateCollectionAuthor,
+  updateCollectionAuthorImageUrl,
   updateCollectionStory,
   updateCollectionStorySortOrder,
+  updateCollectionStoryImageUrl,
 } from './mutations';
 
 export const resolvers = {
   Mutation: {
     createCollectionAuthor,
     updateCollectionAuthor,
+    updateCollectionAuthorImageUrl,
     createCollection,
     updateCollection,
+    updateCollectionImageUrl,
     createCollectionStory,
     updateCollectionStory,
     deleteCollectionStory,
     collectionImageUpload,
     updateCollectionStorySortOrder,
+    updateCollectionStoryImageUrl,
   },
   Query: {
     getCollection,

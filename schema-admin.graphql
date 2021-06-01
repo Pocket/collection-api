@@ -33,6 +33,11 @@ input UpdateCollectionAuthorInput {
   active: Boolean
 }
 
+input UpdateCollectionAuthorImageUrlInput {
+  externalId: String!
+  imageUrl: Url!
+}
+
 input CreateCollectionInput {
   slug: String!
   title: String!
@@ -52,6 +57,11 @@ input UpdateCollectionInput {
   imageUrl: Url
   status: CollectionStatus!
   authorExternalId: String!
+}
+
+input UpdateCollectionImageUrlInput {
+  externalId: String!
+  imageUrl: Url!
 }
 
 input CollectionStoryAuthorInput {
@@ -84,6 +94,11 @@ input UpdateCollectionStoryInput {
 input UpdateCollectionStorySortOrderInput {
   externalId: String!
   sortOrder: Int!
+}
+
+input UpdateCollectionStoryImageUrlInput {
+  externalId: String!
+  imageUrl: Url!
 }
 
 type CollectionImageUrl {
@@ -131,6 +146,12 @@ type Mutation {
   """
   updateCollectionAuthor(data: UpdateCollectionAuthorInput!): CollectionAuthor!
   """
+  Updates only the `imageUrl` property of a CollectionAuthor. Dedicated to uploading images within the UI.
+  """
+  updateCollectionAuthorImageUrl(
+    data: UpdateCollectionAuthorImageUrlInput!
+  ): CollectionAuthor!
+  """
   Creates a Collection.
   """
   createCollection(data: CreateCollectionInput!): Collection!
@@ -138,6 +159,10 @@ type Mutation {
   Updates a Collection.
   """
   updateCollection(data: UpdateCollectionInput!): Collection!
+  """
+  Updates only the `imageUrl` property of a Collection. Dedicated to uploading images within the UI.
+  """
+  updateCollectionImageUrl(data: UpdateCollectionImageUrlInput!): Collection!
   """
   Creates a CollectionStory.
   """
@@ -151,6 +176,12 @@ type Mutation {
   """
   updateCollectionStorySortOrder(
     data: UpdateCollectionStorySortOrderInput!
+  ): CollectionStory!
+  """
+  Updates only the `imageUrl` property of a CollectionStory. Dedicated to uploading images within the UI.
+  """
+  updateCollectionStoryImageUrl(
+    data: UpdateCollectionStoryImageUrlInput!
   ): CollectionStory!
   """
   Deletes a CollectionStory. Also deletes all the related CollectionStoryAuthor records.
