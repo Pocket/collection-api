@@ -3,6 +3,7 @@ import {
   CollectionAuthor,
   CollectionStatus,
   CollectionStory,
+  CurationCategory,
 } from '@prisma/client';
 
 export type CreateCollectionAuthorInput = {
@@ -86,6 +87,7 @@ export type CollectionStoryWithAuthors = CollectionStory & {
 
 export type CollectionWithAuthorsAndStories = Collection & {
   authors?: CollectionAuthor[];
+  curationCategory?: CurationCategory;
   stories?: CollectionStoryWithAuthors[];
 };
 

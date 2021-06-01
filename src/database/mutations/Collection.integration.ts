@@ -80,7 +80,7 @@ describe('mutations: Collection', () => {
       );
     });
 
-    it('should return authors and stories when a collection is created', async () => {
+    it('should return authors, stories and curation category when a collection is created', async () => {
       const data: CreateCollectionInput = {
         slug: 'walter-bowls',
         title: 'walter bowls',
@@ -90,6 +90,7 @@ describe('mutations: Collection', () => {
       const collection = await createCollection(db, data);
 
       expect(collection.authors).toBeTruthy();
+      expect(collection.curationCategory).toBeTruthy();
       expect(collection.stories).toBeTruthy();
       // there will never be stories on a freshly created collection
       expect(collection.stories.length).toEqual(0);
@@ -129,7 +130,7 @@ describe('mutations: Collection', () => {
       expect(reFetch.title).toEqual('second iteration');
     });
 
-    it('should return all associated data after updating - authors, stories, and story authors', async () => {
+    it('should return all associated data after updating - authors, curation category, stories, and story authors', async () => {
       const initial = await createCollectionHelper(
         db,
         'first iteration',
@@ -156,6 +157,7 @@ describe('mutations: Collection', () => {
         expect(updated.stories[i].authors).toBeTruthy();
         expect(updated.stories[i].authors.length).toBeGreaterThan(0);
       }
+      expect(updated.curationCategory).toBeTruthy();
     });
 
     it('should return story author sorted correctly', async () => {

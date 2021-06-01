@@ -20,6 +20,7 @@ export async function getCollection(
     where: { externalId },
     include: {
       authors: true,
+      curationCategory: true,
       stories: {
         include: {
           authors: {
@@ -57,6 +58,7 @@ export async function getCollectionBySlug(
     where: { slug, status: CollectionStatus.PUBLISHED },
     include: {
       authors: true,
+      curationCategory: true,
       stories: {
         include: {
           authors: {
@@ -81,6 +83,7 @@ export async function getCollectionsBySlugs(
     where: { slug: { in: slugs }, status: CollectionStatus.PUBLISHED },
     include: {
       authors: true,
+      curationCategory: true,
       stories: {
         include: {
           authors: {
@@ -107,6 +110,7 @@ export async function getPublishedCollections(
     where: { status: CollectionStatus.PUBLISHED },
     include: {
       authors: true,
+      curationCategory: true,
       stories: {
         include: {
           authors: {
@@ -152,6 +156,7 @@ export async function searchCollections(
     orderBy: { updatedAt: 'desc' },
     include: {
       authors: true,
+      curationCategory: true,
       stories: {
         include: {
           authors: {

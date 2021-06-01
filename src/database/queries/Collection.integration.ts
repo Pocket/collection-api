@@ -51,6 +51,11 @@ describe('queries: Collection', () => {
       // we should return an author
       expect(collection.authors).toBeTruthy();
 
+      // we should return a curation category
+      expect(collection.curationCategory).toBeTruthy();
+      expect(collection.curationCategory.name).toEqual('Business');
+      expect(collection.curationCategory.slug).toEqual('business');
+
       // we should return an array (truthy)
       expect(collection.stories).toBeTruthy();
 
@@ -114,6 +119,7 @@ describe('queries: Collection', () => {
       // ensure we are getting extra client data
       expect(collection.authors).toBeTruthy();
       expect(collection.stories).toBeTruthy();
+      expect(collection.curationCategory).toBeTruthy();
       expect(collection.stories[0].authors).toBeTruthy();
     });
 
@@ -290,6 +296,7 @@ describe('queries: Collection', () => {
       expect(collections[0].stories).toBeTruthy();
       expect(collections[0].authors).toBeTruthy();
       expect(collections[0].stories[0].authors).toBeTruthy();
+      expect(collections[0].curationCategory).toBeTruthy();
     });
 
     it('respects pagination', async () => {
