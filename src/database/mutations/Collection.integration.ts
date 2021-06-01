@@ -5,6 +5,7 @@ import {
   clear as clearDb,
   createAuthorHelper,
   createCollectionHelper,
+  createCurationCategoryHelper,
   sortCollectionStoryAuthors,
 } from '../../test/helpers';
 import { createCollection, updateCollection } from './Collection';
@@ -13,10 +14,15 @@ const db = new PrismaClient();
 
 describe('mutations: Collection', () => {
   let author;
+  let curationCategory;
 
   beforeEach(async () => {
     await clearDb(db);
     author = await createAuthorHelper(db, 'walter');
+    curationCategory = await createCurationCategoryHelper(
+      db,
+      'Personal Finance'
+    );
   });
 
   afterAll(async () => {
@@ -90,7 +96,9 @@ describe('mutations: Collection', () => {
       const initial = await createCollectionHelper(
         db,
         'first iteration',
-        author
+        author,
+        CollectionStatus.DRAFT,
+        curationCategory
       );
 
       const data: UpdateCollectionInput = {
@@ -119,7 +127,9 @@ describe('mutations: Collection', () => {
       const initial = await createCollectionHelper(
         db,
         'first iteration',
-        author
+        author,
+        CollectionStatus.DRAFT,
+        curationCategory
       );
 
       const data: UpdateCollectionInput = {
@@ -145,7 +155,9 @@ describe('mutations: Collection', () => {
       const initial = await createCollectionHelper(
         db,
         'first iteration',
-        author
+        author,
+        CollectionStatus.DRAFT,
+        curationCategory
       );
 
       const data: UpdateCollectionInput = {
@@ -168,7 +180,8 @@ describe('mutations: Collection', () => {
         db,
         'first iteration',
         author,
-        CollectionStatus.DRAFT
+        CollectionStatus.DRAFT,
+        curationCategory
       );
 
       const data: UpdateCollectionInput = {
@@ -194,7 +207,8 @@ describe('mutations: Collection', () => {
         db,
         'first iteration',
         author,
-        CollectionStatus.DRAFT
+        CollectionStatus.DRAFT,
+        curationCategory
       );
 
       // update the colletion to published
@@ -229,14 +243,16 @@ describe('mutations: Collection', () => {
         db,
         'let us go bowling',
         author,
-        CollectionStatus.DRAFT
+        CollectionStatus.DRAFT,
+        curationCategory
       );
 
       const second: Collection = await createCollectionHelper(
         db,
         'phone is ringing',
         author,
-        CollectionStatus.DRAFT
+        CollectionStatus.DRAFT,
+        curationCategory
       );
 
       // try to update the second collection with the same slug as the first

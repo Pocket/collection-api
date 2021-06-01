@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { CollectionStatus, PrismaClient } from '@prisma/client';
 import { getCollectionStory } from '../queries';
 import {
   CreateCollectionStoryInput,
@@ -8,6 +8,7 @@ import {
   clear as clearDb,
   createAuthorHelper,
   createCollectionHelper,
+  createCurationCategoryHelper,
 } from '../../test/helpers';
 import {
   createCollectionStory,
@@ -20,16 +21,20 @@ const db = new PrismaClient();
 
 describe('mutations: CollectionStory', () => {
   let author;
+  let curationCategory;
   let collection;
 
   beforeEach(async () => {
     await clearDb(db);
 
     author = await createAuthorHelper(db, 'maude');
+    curationCategory = await createCurationCategoryHelper(db, 'Food');
     collection = await createCollectionHelper(
       db,
       'a collection: by maude',
-      author
+      author,
+      CollectionStatus.DRAFT,
+      curationCategory
     );
   });
 
@@ -122,7 +127,9 @@ describe('mutations: CollectionStory', () => {
       const collection2 = await createCollectionHelper(
         db,
         'a collection: by walter',
-        author
+        author,
+        CollectionStatus.DRAFT,
+        curationCategory
       );
 
       // update the collection in the create data to reference the second collection
@@ -288,7 +295,9 @@ describe('mutations: CollectionStory', () => {
       const collection2 = await createCollectionHelper(
         db,
         'a collection: by walter',
-        author
+        author,
+        CollectionStatus.DRAFT,
+        curationCategory
       );
 
       // create a story in the new collection

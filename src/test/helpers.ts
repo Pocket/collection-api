@@ -34,6 +34,7 @@ export async function createCollectionHelper(
   title: string,
   author: CollectionAuthor,
   status: CollectionStatus = 'DRAFT',
+  curationCategory: CurationCategory,
   publishedAt: Date = null,
   imageUrl: string = null,
   addStories = true
@@ -43,6 +44,11 @@ export async function createCollectionHelper(
     slug: slugify(title, slugifyConfig),
     excerpt: title,
     status,
+    curationCategory: {
+      connect: {
+        id: curationCategory.id,
+      },
+    },
     authors: {
       connect: {
         id: author.id,
