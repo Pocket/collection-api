@@ -5,7 +5,6 @@ import {
   getAuthors,
   getCollection as dbGetCollection,
   getCollectionStory as dbGetCollectionStory,
-  countCurationCategories,
   getCurationCategories as dbGetCurationCategories,
   searchCollections as dbSearchCollections,
 } from '../../database/queries';
@@ -112,10 +111,9 @@ export async function getCollectionStory(
  */
 export async function getCurationCategories(
   parent,
-  {},
+  _,
   { db }
 ): Promise<CurationCategory[]> {
-  const totalResults = await countCurationCategories(db);
   const curationCategories = await dbGetCurationCategories(db);
 
   return curationCategories;
