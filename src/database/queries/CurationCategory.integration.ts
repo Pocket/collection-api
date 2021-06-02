@@ -20,7 +20,7 @@ describe('queries: CurationCategory', () => {
   });
 
   describe('getCurationCategories', () => {
-    it('should get curation categories and respect paging', async () => {
+    it('should get all curation categories and respect ordering', async () => {
       // create some curation categories to retrieve
       await createCurationCategoryHelper(db, 'Endless Articles');
       await createCurationCategoryHelper(db, 'To Read About');
@@ -28,13 +28,11 @@ describe('queries: CurationCategory', () => {
       await createCurationCategoryHelper(db, 'Is Standing Still');
       await createCurationCategoryHelper(db, 'Thanks To A Virus');
 
-      // get page 2, with 2 per page
-      const results = await getCurationCategories(db, 2, 2);
+      const results = await getCurationCategories(db);
 
-      // as we order by name ascending, this should give us "Thanks.." and "To..."
-      expect(results.length).toEqual(2);
-      expect(results[0].name).toEqual('Thanks To A Virus');
-      expect(results[1].name).toEqual('To Read About');
+      expect(results.length).toEqual(5);
+      expect(results[0].name).toEqual('Endless Articles');
+      expect(results[1].name).toEqual('Is Standing Still');
     });
   });
 

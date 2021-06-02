@@ -2,17 +2,11 @@ import { CurationCategory, PrismaClient } from '@prisma/client';
 
 /**
  * @param db
- * @param page
- * @param perPage
  */
 export async function getCurationCategories(
-  db: PrismaClient,
-  page: number,
-  perPage: number
+  db: PrismaClient
 ): Promise<CurationCategory[]> {
   return db.curationCategory.findMany({
-    take: perPage,
-    skip: page > 1 ? (page - 1) * perPage : 0,
     orderBy: { name: 'asc' },
   });
 }

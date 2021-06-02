@@ -102,7 +102,7 @@ model CurationCategory {
   name       String @db.VarChar(255)
 
   @@unique([externalId], name: "externalId")
-  Collection Collection[]
+  collections Collection[]
 }
 
 enum ImageEntityType {

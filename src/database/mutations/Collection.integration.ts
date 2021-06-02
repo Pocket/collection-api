@@ -107,17 +107,30 @@ describe('mutations: Collection', () => {
         curationCategory
       );
 
+      const newCurationCategory = await createCurationCategoryHelper(
+        db,
+        'Travel'
+      );
+
+      const newAuthor = await createAuthorHelper(db, 'Leo Tolstoy');
+
       const data: UpdateCollectionInput = {
         externalId: initial.externalId,
         slug: initial.slug,
         title: 'second iteration',
-        authorExternalId: author.externalId,
-        curationCategoryExternalId: curationCategory.externalId,
+        authorExternalId: newAuthor.externalId,
+        curationCategoryExternalId: newCurationCategory.externalId,
       };
 
       // should return the updated info
       const updated = await updateCollection(db, data);
       expect(updated.title).toEqual('second iteration');
+
+      // should return the updated curation category
+      expect(updated.curationCategory.name).toEqual(newCurationCategory.name);
+
+      // should return the updated author
+      expect(updated.authors[0].name).toEqual(newAuthor.name);
 
       // should have updated the updatedAt field
       expect(updated.updatedAt.getTime()).toBeGreaterThan(
