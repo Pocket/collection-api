@@ -12,8 +12,11 @@ import {
   CreateCollectionInput,
   CreateCollectionStoryInput,
   CreateImageInput,
+  UpdateCollectionAuthorImageUrlInput,
   UpdateCollectionAuthorInput,
+  UpdateCollectionImageUrlInput,
   UpdateCollectionInput,
+  UpdateCollectionStoryImageUrlInput,
   UpdateCollectionStoryInput,
   UpdateCollectionStorySortOrderInput,
 } from '../../database/types';
@@ -25,9 +28,12 @@ import {
   createImage,
   deleteCollectionStory as dbDeleteCollectionStory,
   updateCollectionAuthor as dbUpdateCollectionAuthor,
+  updateCollectionAuthorImageUrl as dbUpdateCollectionAuthorImageUrl,
   updateCollection as dbUpdateCollection,
+  updateCollectionImageUrl as dbUpdateCollectionImageUrl,
   updateCollectionStory as dbUpdateCollectionStory,
   updateCollectionStorySortOrder as dbUpdateCollectionStorySortOrder,
+  updateCollectionStoryImageUrl as dbUpdateCollectionStoryImageUrl,
 } from '../../database/mutations';
 import { S3 } from 'aws-sdk';
 import { uploadImage } from '../../aws/upload';
@@ -107,6 +113,24 @@ export async function updateCollectionAuthor(
  * @param data
  * @param db
  */
+export async function updateCollectionAuthorImageUrl(
+  parent,
+  { data },
+  { db }
+): Promise<CollectionAuthor> {
+  return executeMutation<UpdateCollectionAuthorImageUrlInput, CollectionAuthor>(
+    db,
+    data,
+    dbUpdateCollectionAuthorImageUrl,
+    ImageEntityType.COLLECTION_AUTHOR
+  );
+}
+
+/**
+ * @param parent
+ * @param data
+ * @param db
+ */
 export async function createCollection(
   parent,
   { data },
@@ -134,6 +158,24 @@ export async function updateCollection(
     db,
     data,
     dbUpdateCollection,
+    ImageEntityType.COLLECTION
+  );
+}
+
+/**
+ * @param parent
+ * @param data
+ * @param db
+ */
+export async function updateCollectionImageUrl(
+  parent,
+  { data },
+  { db }
+): Promise<Collection> {
+  return await executeMutation<UpdateCollectionImageUrlInput, Collection>(
+    db,
+    data,
+    dbUpdateCollectionImageUrl,
     ImageEntityType.COLLECTION
   );
 }
@@ -191,6 +233,27 @@ export async function updateCollectionStorySortOrder(
     db,
     data,
     dbUpdateCollectionStorySortOrder,
+    ImageEntityType.COLLECTION_STORY
+  );
+}
+
+/**
+ * @param parent
+ * @param data
+ * @param db
+ */
+export async function updateCollectionStoryImageUrl(
+  parent,
+  { data },
+  { db }
+): Promise<CollectionStory> {
+  return await executeMutation<
+    UpdateCollectionStoryImageUrlInput,
+    CollectionStory
+  >(
+    db,
+    data,
+    dbUpdateCollectionStoryImageUrl,
     ImageEntityType.COLLECTION_STORY
   );
 }

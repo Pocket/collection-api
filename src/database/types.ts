@@ -23,6 +23,11 @@ export type UpdateCollectionAuthorInput = {
   active?: boolean;
 };
 
+export type UpdateCollectionAuthorImageUrlInput = {
+  externalId: string;
+  imageUrl: string;
+};
+
 export type CreateCollectionInput = {
   slug: string;
   title: string;
@@ -45,6 +50,11 @@ export type UpdateCollectionInput = {
   authorExternalId: string;
   curationCategoryExternalId: string;
   publishedAt?: Date;
+};
+
+export type UpdateCollectionImageUrlInput = {
+  externalId: string;
+  imageUrl: string;
 };
 
 export type CollectionStoryAuthor = {
@@ -73,6 +83,11 @@ export type UpdateCollectionStoryInput = Omit<
 export type UpdateCollectionStorySortOrderInput = {
   externalId: string;
   sortOrder: number;
+};
+
+export type UpdateCollectionStoryImageUrlInput = {
+  externalId: string;
+  imageUrl: string;
 };
 
 export type SearchCollectionsFilters = {

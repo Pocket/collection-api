@@ -1,12 +1,14 @@
 import { PrismaClient } from '@prisma/client';
 import {
   CreateCollectionAuthorInput,
+  UpdateCollectionAuthorImageUrlInput,
   UpdateCollectionAuthorInput,
 } from '../types';
 import { clear as clearDb, createAuthorHelper } from '../../test/helpers';
 import {
   createCollectionAuthor,
   updateCollectionAuthor,
+  updateCollectionAuthorImageUrl,
 } from './CollectionAuthor';
 
 const db = new PrismaClient();
@@ -114,6 +116,38 @@ describe('mutations: CollectionAuthor', () => {
         await expect(updateCollectionAuthor(db, data)).rejects.toThrow(
           `An author with the slug "${data.slug}" already exists`
         );
+      });
+    });
+    describe('updateAuthorImageUrl', () => {
+      it('should update a collection author image url', async () => {
+        const author = await createAuthorHelper(db, 'the dude');
+        const randomKitten = 'https://placekitten.com/g/200/300';
+
+        const data: UpdateCollectionAuthorImageUrlInput = {
+          externalId: author.externalId,
+          imageUrl: randomKitten,
+        };
+
+        const updated = await updateCollectionAuthorImageUrl(db, data);
+
+        expect(updated.imageUrl).toEqual(data.imageUrl);
+      });
+
+      it('should not update any other author fields', async () => {
+        const author = await createAuthorHelper(db, 'the dude');
+        const randomKitten = 'https://placekitten.com/g/200/300';
+
+        const data: UpdateCollectionAuthorImageUrlInput = {
+          externalId: author.externalId,
+          imageUrl: randomKitten,
+        };
+
+        const updated = await updateCollectionAuthorImageUrl(db, data);
+
+        expect(updated.name).toEqual(author.name);
+        expect(updated.slug).toEqual(author.slug);
+        expect(updated.bio).toEqual(author.bio);
+        expect(updated.active).toEqual(author.active);
       });
     });
   });

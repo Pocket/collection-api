@@ -14,6 +14,7 @@ import {
   createCollectionStory,
   deleteCollectionStory,
   updateCollectionStory,
+  updateCollectionStoryImageUrl,
   updateCollectionStorySortOrder,
 } from './CollectionStory';
 
@@ -378,6 +379,52 @@ describe('mutations: CollectionStory', () => {
       expect(updated.url).toEqual(story.url);
       expect(updated.excerpt).toEqual(story.excerpt);
       expect(updated.imageUrl).toEqual(story.imageUrl);
+      expect(updated.authors).toEqual(story.authors);
+      expect(updated.publisher).toEqual(story.publisher);
+    });
+  });
+
+  describe('updateCollectionStoryImageUrl', () => {
+    let story;
+
+    beforeEach(async () => {
+      const data: CreateCollectionStoryInput = {
+        collectionExternalId: collection.externalId,
+        url: 'https://www.lebowskifest.com/',
+        title: 'lebowski fest',
+        excerpt: 'when will the next fest be?',
+        imageUrl: 'idk',
+        authors: [
+          { name: 'donny', sortOrder: 1 },
+          { name: 'walter', sortOrder: 2 },
+        ],
+        publisher: 'little lebowskis',
+        sortOrder: 4,
+      };
+
+      story = await createCollectionStory(db, data);
+    });
+
+    it('should update the imageUrl of a collection story', async () => {
+      const randomKitten = 'https://placekitten.com/g/200/300';
+      const updated = await updateCollectionStoryImageUrl(db, {
+        externalId: story.externalId,
+        imageUrl: randomKitten,
+      });
+
+      expect(updated.imageUrl).toEqual(randomKitten);
+    });
+
+    it('should not update any other properties when updating sortOrder', async () => {
+      const updated = await updateCollectionStoryImageUrl(db, {
+        externalId: story.externalId,
+        imageUrl: 'https://placekitten.com/g/200/300',
+      });
+
+      expect(updated.title).toEqual(story.title);
+      expect(updated.url).toEqual(story.url);
+      expect(updated.excerpt).toEqual(story.excerpt);
+      expect(updated.sortOrder).toEqual(story.sortOrder);
       expect(updated.authors).toEqual(story.authors);
       expect(updated.publisher).toEqual(story.publisher);
     });

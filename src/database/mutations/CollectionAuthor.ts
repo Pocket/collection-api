@@ -4,6 +4,7 @@ import config from '../../config';
 
 import {
   CreateCollectionAuthorInput,
+  UpdateCollectionAuthorImageUrlInput,
   UpdateCollectionAuthorInput,
 } from '../types';
 
@@ -46,6 +47,20 @@ export async function updateCollectionAuthor(
 
   if (slugExists) {
     throw new Error(`An author with the slug "${data.slug}" already exists`);
+  }
+
+  return db.collectionAuthor.update({
+    where: { externalId: data.externalId },
+    data: { ...data },
+  });
+}
+
+export async function updateCollectionAuthorImageUrl(
+  db: PrismaClient,
+  data: UpdateCollectionAuthorImageUrlInput
+): Promise<CollectionAuthor> {
+  if (!data.externalId) {
+    throw new Error('externalId must be provided.');
   }
 
   return db.collectionAuthor.update({

@@ -4,6 +4,7 @@ import { getCollection } from '../queries';
 import {
   CollectionWithAuthorsAndStories,
   CreateCollectionInput,
+  UpdateCollectionImageUrlInput,
   UpdateCollectionInput,
 } from '../types';
 
@@ -131,6 +132,38 @@ export async function updateCollection(
     include: {
       authors: true,
       curationCategory: true,
+      stories: {
+        orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+        include: {
+          authors: {
+            orderBy: [{ sortOrder: 'asc' }],
+          },
+        },
+      },
+    },
+  });
+}
+
+export async function updateCollectionImageUrl(
+  db: PrismaClient,
+  data: UpdateCollectionImageUrlInput
+): Promise<CollectionWithAuthorsAndStories> {
+  if (!data.externalId) {
+    throw new Error('externalId must be provided.');
+  }
+
+  // retrieve the current record, pre-update
+  const existingCollection = await getCollection(db, data.externalId);
+
+  if (!existingCollection) {
+    throw new Error(`A collection by that ID could not be found`);
+  }
+
+  return db.collection.update({
+    where: { externalId: data.externalId },
+    data: { ...data },
+    include: {
+      authors: true,
       stories: {
         orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
         include: {

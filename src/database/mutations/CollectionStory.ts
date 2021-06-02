@@ -6,6 +6,7 @@ import {
   CollectionStoryWithAuthors,
   UpdateCollectionStoryInput,
   UpdateCollectionStorySortOrderInput,
+  UpdateCollectionStoryImageUrlInput,
 } from '../types';
 
 /**
@@ -103,8 +104,7 @@ export async function updateCollectionStory(
 /**
  * mutation dedicated to re-ordering stories within a collection
  * @param db
- * @param externalId
- * @param sortOrder
+ * @param data
  * @returns
  */
 export async function updateCollectionStorySortOrder(
@@ -115,6 +115,29 @@ export async function updateCollectionStorySortOrder(
     where: { externalId: data.externalId },
     data: {
       sortOrder: data.sortOrder,
+    },
+    include: {
+      authors: {
+        orderBy: [{ sortOrder: 'asc' }],
+      },
+    },
+  });
+}
+
+/**
+ * Mutation dedicated to updating a story with a url of an image uploaded to S3
+ * @param db
+ * @param data
+ * @returns
+ */
+export async function updateCollectionStoryImageUrl(
+  db: PrismaClient,
+  data: UpdateCollectionStoryImageUrlInput
+): Promise<CollectionStoryWithAuthors> {
+  return db.collectionStory.update({
+    where: { externalId: data.externalId },
+    data: {
+      imageUrl: data.imageUrl,
     },
     include: {
       authors: {
