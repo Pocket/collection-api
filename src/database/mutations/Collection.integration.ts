@@ -308,7 +308,9 @@ describe('mutations: Collection', () => {
       const initial = await createCollectionHelper(
         db,
         'first iteration',
-        author
+        author,
+        CollectionStatus.DRAFT,
+        curationCategory
       );
       const randomKitten = 'https://placekitten.com/g/200/300';
 
@@ -332,7 +334,9 @@ describe('mutations: Collection', () => {
       const initial = await createCollectionHelper(
         db,
         'first iteration',
-        author
+        author,
+        CollectionStatus.DRAFT,
+        curationCategory
       );
       const randomKitten = 'https://placekitten.com/g/200/300';
 
