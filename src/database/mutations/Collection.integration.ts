@@ -127,11 +127,6 @@ describe('mutations: Collection', () => {
         CollectionStatus.DRAFT
       );
 
-      const newCurationCategory = await createCurationCategoryHelper(
-        db,
-        'Travel'
-      );
-
       const newAuthor = await createAuthorHelper(db, 'Leo Tolstoy');
 
       const data: UpdateCollectionInput = {
