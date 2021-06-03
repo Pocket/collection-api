@@ -33,16 +33,26 @@ export async function createCollection(
   delete data.authorExternalId;
 
   // And we do the same thing for the curationCategoryExternalId
-  // property
+  // property (which may or may not exist)
   const curationCategoryExternalId = data.curationCategoryExternalId;
   delete data.curationCategoryExternalId;
 
+  // we need to build dbData conditionally, as some entity connections may or
+  // may not need to be created
+  const dbData: any = {
+    ...data,
+    authors: { connect: { externalId: authorExternalId } },
+  };
+
+  // if a curation category was specified, set up the connection
+  if (curationCategoryExternalId) {
+    dbData.curationCategory = {
+      connect: { externalId: curationCategoryExternalId },
+    };
+  }
+
   return db.collection.create({
-    data: {
-      ...data,
-      authors: { connect: { externalId: authorExternalId } },
-      curationCategory: { connect: { externalId: curationCategoryExternalId } },
-    },
+    data: dbData,
     include: {
       authors: true,
       curationCategory: true,
@@ -105,7 +115,8 @@ export async function updateCollection(
   delete data.authorExternalId;
 
   // And we do the same thing for the curationCategoryExternalId
-  // property
+  // property (this property may or  may not exist - the code below 'fails'
+  // gracefully if it does not)
   const curationCategoryExternalId = data.curationCategoryExternalId;
   delete data.curationCategoryExternalId;
 
@@ -118,17 +129,27 @@ export async function updateCollection(
     data.publishedAt = new Date();
   }
 
+  // we need to build dbData conditionally, as some entity connections may or
+  // may not need to be created
+  const dbData: any = {
+    ...data,
+    // reference: https://www.prisma.io/docs/concepts/components/prisma-client/relation-queries#disconnect-all-related-records
+    // set: [] disconnects all authors from the collection
+    // before connecting new authors, essentially a sync
+    // of authors for a collection
+    authors: { set: [], connect: { externalId: authorExternalId } },
+  };
+
+  // if a curation category was specified, set up the connection
+  if (curationCategoryExternalId) {
+    dbData.curationCategory = {
+      connect: { externalId: curationCategoryExternalId },
+    };
+  }
+
   return db.collection.update({
     where: { externalId: data.externalId },
-    data: {
-      ...data,
-      // reference: https://www.prisma.io/docs/concepts/components/prisma-client/relation-queries#disconnect-all-related-records
-      // set: [] disconnects all authors from the collection
-      // before connecting new authors, essentially a sync
-      // of authors for a collection
-      authors: { set: [], connect: { externalId: authorExternalId } },
-      curationCategory: { connect: { externalId: curationCategoryExternalId } },
-    },
+    data: dbData,
     include: {
       authors: true,
       curationCategory: true,
