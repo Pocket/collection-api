@@ -20,7 +20,7 @@
     "@apollo/federation": "^0.25.1",
     "@pocket-tools/apollo-utils": "^1.0.4",
     "@prisma/client": "^2.24.0",
-    "@sentry/node": "^6.5.0",
+    "@sentry/node": "^6.5.1",
     "@sentry/tracing": "^6.5.0",
     "apollo-server": "^2.25.0",
     "apollo-server-cache-redis": "^1.5.0",
