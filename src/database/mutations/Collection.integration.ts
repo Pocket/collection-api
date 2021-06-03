@@ -43,7 +43,6 @@ describe('mutations: Collection', () => {
         slug: 'walter-bowls',
         title: 'walter bowls',
         authorExternalId: author.externalId,
-        curationCategoryExternalId: curationCategory.externalId,
       };
 
       const collection = await createCollection(db, data);
@@ -57,11 +56,24 @@ describe('mutations: Collection', () => {
         slug: 'walter-bowls',
         title: 'walter bowls',
         authorExternalId: author.externalId,
-        curationCategoryExternalId: curationCategory.externalId,
       };
+
       const collection = await createCollection(db, data);
 
       expect(collection.publishedAt).toBeFalsy();
+    });
+
+    it('should store the curation category when provided', async () => {
+      const data: CreateCollectionInput = {
+        slug: 'walter-bowls',
+        title: 'walter bowls',
+        authorExternalId: author.externalId,
+        curationCategoryExternalId: curationCategory.externalId,
+      };
+
+      const collection = await createCollection(db, data);
+
+      expect(collection.curationCategory).not.toBeNull();
     });
 
     it('should fail on a duplicate slug', async () => {
@@ -95,6 +107,7 @@ describe('mutations: Collection', () => {
         authorExternalId: author.externalId,
         curationCategoryExternalId: curationCategory.externalId,
       };
+
       const collection = await createCollection(db, data);
 
       expect(collection.authors).toBeTruthy();
@@ -111,8 +124,47 @@ describe('mutations: Collection', () => {
         db,
         'first iteration',
         author,
-        CollectionStatus.DRAFT,
-        curationCategory
+        CollectionStatus.DRAFT
+      );
+
+      const newCurationCategory = await createCurationCategoryHelper(
+        db,
+        'Travel'
+      );
+
+      const newAuthor = await createAuthorHelper(db, 'Leo Tolstoy');
+
+      const data: UpdateCollectionInput = {
+        externalId: initial.externalId,
+        slug: initial.slug,
+        title: 'second iteration',
+        authorExternalId: newAuthor.externalId,
+      };
+
+      // should return the updated info
+      const updated = await updateCollection(db, data);
+      expect(updated.title).toEqual('second iteration');
+
+      // should return the updated author
+      expect(updated.authors[0].name).toEqual(newAuthor.name);
+
+      // should have updated the updatedAt field
+      expect(updated.updatedAt.getTime()).toBeGreaterThan(
+        initial.updatedAt.getTime()
+      );
+
+      // verify on a re-fetch that the update was persisted
+      // is this necessary?
+      const reFetch = await getCollection(db, initial.externalId);
+      expect(reFetch.title).toEqual('second iteration');
+    });
+
+    it('should update a collection with a curation category', async () => {
+      const initial = await createCollectionHelper(
+        db,
+        'first iteration',
+        author,
+        CollectionStatus.DRAFT
       );
 
       const newCurationCategory = await createCurationCategoryHelper(
@@ -130,25 +182,11 @@ describe('mutations: Collection', () => {
         curationCategoryExternalId: newCurationCategory.externalId,
       };
 
-      // should return the updated info
       const updated = await updateCollection(db, data);
-      expect(updated.title).toEqual('second iteration');
 
+      // make sure a curation category was connected
       // should return the updated curation category
       expect(updated.curationCategory.name).toEqual(newCurationCategory.name);
-
-      // should return the updated author
-      expect(updated.authors[0].name).toEqual(newAuthor.name);
-
-      // should have updated the updatedAt field
-      expect(updated.updatedAt.getTime()).toBeGreaterThan(
-        initial.updatedAt.getTime()
-      );
-
-      // verify on a re-fetch that the update was persisted
-      // is this necessary?
-      const reFetch = await getCollection(db, initial.externalId);
-      expect(reFetch.title).toEqual('second iteration');
     });
 
     it('should return all associated data after updating - authors, curation category, stories, and story authors', async () => {
