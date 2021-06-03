@@ -46,6 +46,7 @@ input CreateCollectionInput {
   imageUrl: Url
   status: CollectionStatus
   authorExternalId: String!
+  curationCategoryExternalId: String!
 }
 
 input UpdateCollectionInput {
@@ -57,6 +58,7 @@ input UpdateCollectionInput {
   imageUrl: Url
   status: CollectionStatus!
   authorExternalId: String!
+  curationCategoryExternalId: String!
 }
 
 input UpdateCollectionImageUrlInput {
@@ -134,6 +136,10 @@ type Query {
   Retrieves a CollectionStory by a combination of collectionId and url.
   """
   getCollectionStory(externalId: String!): CollectionStory
+  """
+  Retrieves a list of CurationCategories, sorted alphabetically
+  """
+  getCurationCategories: [CurationCategory!]!
 }
 
 type Mutation {

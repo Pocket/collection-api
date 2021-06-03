@@ -11,6 +11,7 @@ import {
   clear as clearDb,
   createAuthorHelper,
   createCollectionHelper,
+  createCurationCategoryHelper,
   sortCollectionStoryAuthors,
 } from '../../test/helpers';
 
@@ -18,10 +19,12 @@ const db = new PrismaClient();
 
 describe('queries: Collection', () => {
   let author;
+  let curationCategory;
 
   beforeEach(async () => {
     await clearDb(db);
     author = await createAuthorHelper(db, 'walter');
+    curationCategory = await createCurationCategoryHelper(db, 'Business');
   });
 
   afterAll(async () => {
@@ -35,6 +38,7 @@ describe('queries: Collection', () => {
         'test me',
         author,
         CollectionStatus.DRAFT,
+        curationCategory,
         null,
         null,
         false // don't create any stories
@@ -46,6 +50,11 @@ describe('queries: Collection', () => {
 
       // we should return an author
       expect(collection.authors).toBeTruthy();
+
+      // we should return a curation category
+      expect(collection.curationCategory).toBeTruthy();
+      expect(collection.curationCategory.name).toEqual('Business');
+      expect(collection.curationCategory.slug).toEqual('business');
 
       // we should return an array (truthy)
       expect(collection.stories).toBeTruthy();
@@ -60,6 +69,7 @@ describe('queries: Collection', () => {
         'test me',
         author,
         CollectionStatus.DRAFT,
+        curationCategory,
         null,
         null
       );
@@ -77,6 +87,7 @@ describe('queries: Collection', () => {
         'test me',
         author,
         CollectionStatus.DRAFT,
+        curationCategory,
         null,
         null
       );
@@ -97,7 +108,8 @@ describe('queries: Collection', () => {
         db,
         'test me',
         author,
-        CollectionStatus.PUBLISHED
+        CollectionStatus.PUBLISHED,
+        curationCategory
       );
 
       const collection = await getCollectionBySlug(db, 'test-me');
@@ -107,6 +119,7 @@ describe('queries: Collection', () => {
       // ensure we are getting extra client data
       expect(collection.authors).toBeTruthy();
       expect(collection.stories).toBeTruthy();
+      expect(collection.curationCategory).toBeTruthy();
       expect(collection.stories[0].authors).toBeTruthy();
     });
 
@@ -115,7 +128,8 @@ describe('queries: Collection', () => {
         db,
         'test me',
         author,
-        CollectionStatus.DRAFT
+        CollectionStatus.DRAFT,
+        curationCategory
       );
 
       const collection = await getCollectionBySlug(db, 'test-me');
@@ -128,7 +142,8 @@ describe('queries: Collection', () => {
         db,
         'test me',
         author,
-        CollectionStatus.PUBLISHED
+        CollectionStatus.PUBLISHED,
+        curationCategory
       );
 
       const collection = await getCollectionBySlug(db, 'test-me');
@@ -147,13 +162,15 @@ describe('queries: Collection', () => {
         db,
         'test me',
         author,
-        CollectionStatus.PUBLISHED
+        CollectionStatus.PUBLISHED,
+        curationCategory
       );
       await createCollectionHelper(
         db,
         'test me 2',
         author,
-        CollectionStatus.PUBLISHED
+        CollectionStatus.PUBLISHED,
+        curationCategory
       );
 
       const collections = await getCollectionsBySlugs(db, [
@@ -177,25 +194,29 @@ describe('queries: Collection', () => {
         db,
         'published 1',
         author,
-        CollectionStatus.PUBLISHED
+        CollectionStatus.PUBLISHED,
+        curationCategory
       );
       await createCollectionHelper(
         db,
         'published 2',
         author,
-        CollectionStatus.PUBLISHED
+        CollectionStatus.PUBLISHED,
+        curationCategory
       );
       await createCollectionHelper(
         db,
         'i am le draft',
         author,
-        CollectionStatus.DRAFT
+        CollectionStatus.DRAFT,
+        curationCategory
       );
       await createCollectionHelper(
         db,
         'look at me i am archived',
         author,
-        CollectionStatus.ARCHIVED
+        CollectionStatus.ARCHIVED,
+        curationCategory
       );
 
       const collections = await getCollectionsBySlugs(db, [
@@ -212,13 +233,15 @@ describe('queries: Collection', () => {
         db,
         'test me',
         author,
-        CollectionStatus.PUBLISHED
+        CollectionStatus.PUBLISHED,
+        curationCategory
       );
       await createCollectionHelper(
         db,
         'test me 2',
         author,
-        CollectionStatus.PUBLISHED
+        CollectionStatus.PUBLISHED,
+        curationCategory
       );
 
       const collections = await getCollectionsBySlugs(db, [
@@ -240,25 +263,29 @@ describe('queries: Collection', () => {
         db,
         'first',
         author,
-        CollectionStatus.PUBLISHED
+        CollectionStatus.PUBLISHED,
+        curationCategory
       );
       await createCollectionHelper(
         db,
         'second',
         author,
-        CollectionStatus.DRAFT
+        CollectionStatus.DRAFT,
+        curationCategory
       );
       await createCollectionHelper(
         db,
         'third',
         author,
-        CollectionStatus.ARCHIVED
+        CollectionStatus.ARCHIVED,
+        curationCategory
       );
       await createCollectionHelper(
         db,
         'fourth',
         author,
-        CollectionStatus.PUBLISHED
+        CollectionStatus.PUBLISHED,
+        curationCategory
       );
 
       const collections = await getPublishedCollections(db, 1, 10);
@@ -269,6 +296,7 @@ describe('queries: Collection', () => {
       expect(collections[0].stories).toBeTruthy();
       expect(collections[0].authors).toBeTruthy();
       expect(collections[0].stories[0].authors).toBeTruthy();
+      expect(collections[0].curationCategory).toBeTruthy();
     });
 
     it('respects pagination', async () => {
@@ -279,6 +307,7 @@ describe('queries: Collection', () => {
         '1',
         author,
         CollectionStatus.PUBLISHED,
+        curationCategory,
         new Date(2021, 0, 1)
       );
       await createCollectionHelper(
@@ -286,6 +315,7 @@ describe('queries: Collection', () => {
         '2',
         author,
         CollectionStatus.PUBLISHED,
+        curationCategory,
         new Date(2021, 0, 2)
       );
       await createCollectionHelper(
@@ -293,6 +323,7 @@ describe('queries: Collection', () => {
         '3',
         author,
         CollectionStatus.PUBLISHED,
+        curationCategory,
         new Date(2021, 0, 3)
       );
       await createCollectionHelper(
@@ -300,6 +331,7 @@ describe('queries: Collection', () => {
         '4',
         author,
         CollectionStatus.PUBLISHED,
+        curationCategory,
         new Date(2021, 0, 4)
       );
       await createCollectionHelper(
@@ -307,6 +339,7 @@ describe('queries: Collection', () => {
         '5',
         author,
         CollectionStatus.PUBLISHED,
+        curationCategory,
         new Date(2021, 0, 5)
       );
 
@@ -324,13 +357,15 @@ describe('queries: Collection', () => {
         db,
         'first',
         author,
-        CollectionStatus.PUBLISHED
+        CollectionStatus.PUBLISHED,
+        curationCategory
       );
       await createCollectionHelper(
         db,
         'fourth',
         author,
-        CollectionStatus.PUBLISHED
+        CollectionStatus.PUBLISHED,
+        curationCategory
       );
 
       const collections = await getPublishedCollections(db, 1, 10);
@@ -345,11 +380,41 @@ describe('queries: Collection', () => {
 
   describe('countPublishedCollections', () => {
     it('should retrieve the correct count of published collections', async () => {
-      await createCollectionHelper(db, '1', author, CollectionStatus.DRAFT);
-      await createCollectionHelper(db, '2', author, CollectionStatus.ARCHIVED);
-      await createCollectionHelper(db, '3', author, CollectionStatus.PUBLISHED);
-      await createCollectionHelper(db, '4', author, CollectionStatus.PUBLISHED);
-      await createCollectionHelper(db, '5', author, CollectionStatus.PUBLISHED);
+      await createCollectionHelper(
+        db,
+        '1',
+        author,
+        CollectionStatus.DRAFT,
+        curationCategory
+      );
+      await createCollectionHelper(
+        db,
+        '2',
+        author,
+        CollectionStatus.ARCHIVED,
+        curationCategory
+      );
+      await createCollectionHelper(
+        db,
+        '3',
+        author,
+        CollectionStatus.PUBLISHED,
+        curationCategory
+      );
+      await createCollectionHelper(
+        db,
+        '4',
+        author,
+        CollectionStatus.PUBLISHED,
+        curationCategory
+      );
+      await createCollectionHelper(
+        db,
+        '5',
+        author,
+        CollectionStatus.PUBLISHED,
+        curationCategory
+      );
 
       const count = await countPublishedCollections(db);
 
@@ -370,6 +435,7 @@ describe('queries: Collection', () => {
         'the dude abides',
         author2,
         CollectionStatus.DRAFT,
+        curationCategory,
         null,
         null,
         false
@@ -379,6 +445,7 @@ describe('queries: Collection', () => {
         'does the dude abide?',
         author,
         CollectionStatus.ARCHIVED,
+        curationCategory,
         null,
         null,
         false
@@ -387,19 +454,22 @@ describe('queries: Collection', () => {
         db,
         'your opinion man',
         author2,
-        CollectionStatus.PUBLISHED
+        CollectionStatus.PUBLISHED,
+        curationCategory
       );
       await createCollectionHelper(
         db,
         'finishing my coffee',
         author,
-        CollectionStatus.PUBLISHED
+        CollectionStatus.PUBLISHED,
+        curationCategory
       );
       await createCollectionHelper(
         db,
         'the dude abides man',
         author,
-        CollectionStatus.PUBLISHED
+        CollectionStatus.PUBLISHED,
+        curationCategory
       );
     });
 

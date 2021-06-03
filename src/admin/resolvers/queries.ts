@@ -5,12 +5,17 @@ import {
   getAuthors,
   getCollection as dbGetCollection,
   getCollectionStory as dbGetCollectionStory,
+  getCurationCategories as dbGetCurationCategories,
   searchCollections as dbSearchCollections,
 } from '../../database/queries';
 import config from '../../config';
 import { CollectionAuthorsResult, CollectionsResult } from '../../typeDefs';
 import { getPagination } from '../../utils';
-import { CollectionAuthor, CollectionStory } from '@prisma/client';
+import {
+  CollectionAuthor,
+  CollectionStory,
+  CurationCategory,
+} from '@prisma/client';
 
 /**
  * @param parent
@@ -98,4 +103,18 @@ export async function getCollectionStory(
   const collectionStory = await dbGetCollectionStory(db, externalId);
 
   return collectionStory;
+}
+
+/**
+ * @param parent
+ * @param db
+ */
+export async function getCurationCategories(
+  parent,
+  _,
+  { db }
+): Promise<CurationCategory[]> {
+  const curationCategories = await dbGetCurationCategories(db);
+
+  return curationCategories;
 }

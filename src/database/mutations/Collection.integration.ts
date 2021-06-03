@@ -9,6 +9,7 @@ import {
   clear as clearDb,
   createAuthorHelper,
   createCollectionHelper,
+  createCurationCategoryHelper,
   sortCollectionStoryAuthors,
 } from '../../test/helpers';
 import {
@@ -21,10 +22,15 @@ const db = new PrismaClient();
 
 describe('mutations: Collection', () => {
   let author;
+  let curationCategory;
 
   beforeEach(async () => {
     await clearDb(db);
     author = await createAuthorHelper(db, 'walter');
+    curationCategory = await createCurationCategoryHelper(
+      db,
+      'Personal Finance'
+    );
   });
 
   afterAll(async () => {
@@ -37,6 +43,7 @@ describe('mutations: Collection', () => {
         slug: 'walter-bowls',
         title: 'walter bowls',
         authorExternalId: author.externalId,
+        curationCategoryExternalId: curationCategory.externalId,
       };
 
       const collection = await createCollection(db, data);
@@ -50,6 +57,7 @@ describe('mutations: Collection', () => {
         slug: 'walter-bowls',
         title: 'walter bowls',
         authorExternalId: author.externalId,
+        curationCategoryExternalId: curationCategory.externalId,
       };
       const collection = await createCollection(db, data);
 
@@ -62,6 +70,7 @@ describe('mutations: Collection', () => {
         slug: 'walter-bowls',
         title: 'walter bowls',
         authorExternalId: author.externalId,
+        curationCategoryExternalId: curationCategory.externalId,
       };
 
       await createCollection(db, data1);
@@ -71,6 +80,7 @@ describe('mutations: Collection', () => {
         slug: 'walter-bowls',
         title: 'walter bowls, again',
         authorExternalId: author.externalId,
+        curationCategoryExternalId: curationCategory.externalId,
       };
 
       await expect(createCollection(db, data2)).rejects.toThrow(
@@ -78,15 +88,17 @@ describe('mutations: Collection', () => {
       );
     });
 
-    it('should return authors and stories when a collection is created', async () => {
+    it('should return authors, stories and curation category when a collection is created', async () => {
       const data: CreateCollectionInput = {
         slug: 'walter-bowls',
         title: 'walter bowls',
         authorExternalId: author.externalId,
+        curationCategoryExternalId: curationCategory.externalId,
       };
       const collection = await createCollection(db, data);
 
       expect(collection.authors).toBeTruthy();
+      expect(collection.curationCategory).toBeTruthy();
       expect(collection.stories).toBeTruthy();
       // there will never be stories on a freshly created collection
       expect(collection.stories.length).toEqual(0);
@@ -98,19 +110,35 @@ describe('mutations: Collection', () => {
       const initial = await createCollectionHelper(
         db,
         'first iteration',
-        author
+        author,
+        CollectionStatus.DRAFT,
+        curationCategory
       );
+
+      const newCurationCategory = await createCurationCategoryHelper(
+        db,
+        'Travel'
+      );
+
+      const newAuthor = await createAuthorHelper(db, 'Leo Tolstoy');
 
       const data: UpdateCollectionInput = {
         externalId: initial.externalId,
         slug: initial.slug,
         title: 'second iteration',
-        authorExternalId: author.externalId,
+        authorExternalId: newAuthor.externalId,
+        curationCategoryExternalId: newCurationCategory.externalId,
       };
 
       // should return the updated info
       const updated = await updateCollection(db, data);
       expect(updated.title).toEqual('second iteration');
+
+      // should return the updated curation category
+      expect(updated.curationCategory.name).toEqual(newCurationCategory.name);
+
+      // should return the updated author
+      expect(updated.authors[0].name).toEqual(newAuthor.name);
 
       // should have updated the updatedAt field
       expect(updated.updatedAt.getTime()).toBeGreaterThan(
@@ -123,11 +151,13 @@ describe('mutations: Collection', () => {
       expect(reFetch.title).toEqual('second iteration');
     });
 
-    it('should return all associated data after updating - authors, stories, and story authors', async () => {
+    it('should return all associated data after updating - authors, curation category, stories, and story authors', async () => {
       const initial = await createCollectionHelper(
         db,
         'first iteration',
-        author
+        author,
+        CollectionStatus.DRAFT,
+        curationCategory
       );
 
       const data: UpdateCollectionInput = {
@@ -135,6 +165,7 @@ describe('mutations: Collection', () => {
         slug: initial.slug,
         title: 'second iteration',
         authorExternalId: author.externalId,
+        curationCategoryExternalId: curationCategory.externalId,
       };
 
       // should return the updated info
@@ -147,13 +178,16 @@ describe('mutations: Collection', () => {
         expect(updated.stories[i].authors).toBeTruthy();
         expect(updated.stories[i].authors.length).toBeGreaterThan(0);
       }
+      expect(updated.curationCategory).toBeTruthy();
     });
 
     it('should return story author sorted correctly', async () => {
       const initial = await createCollectionHelper(
         db,
         'first iteration',
-        author
+        author,
+        CollectionStatus.DRAFT,
+        curationCategory
       );
 
       const data: UpdateCollectionInput = {
@@ -161,6 +195,7 @@ describe('mutations: Collection', () => {
         slug: initial.slug,
         title: 'second iteration',
         authorExternalId: author.externalId,
+        curationCategoryExternalId: curationCategory.externalId,
       };
 
       // should return the updated info
@@ -176,7 +211,8 @@ describe('mutations: Collection', () => {
         db,
         'first iteration',
         author,
-        CollectionStatus.DRAFT
+        CollectionStatus.DRAFT,
+        curationCategory
       );
 
       const data: UpdateCollectionInput = {
@@ -184,6 +220,7 @@ describe('mutations: Collection', () => {
         slug: initial.slug,
         title: 'second iteration',
         authorExternalId: author.externalId,
+        curationCategoryExternalId: curationCategory.externalId,
         status: CollectionStatus.PUBLISHED,
       };
 
@@ -202,7 +239,8 @@ describe('mutations: Collection', () => {
         db,
         'first iteration',
         author,
-        CollectionStatus.DRAFT
+        CollectionStatus.DRAFT,
+        curationCategory
       );
 
       // update the collection to published
@@ -211,6 +249,7 @@ describe('mutations: Collection', () => {
         slug: initial.slug,
         title: 'second iteration',
         authorExternalId: author.externalId,
+        curationCategoryExternalId: curationCategory.externalId,
         status: CollectionStatus.PUBLISHED,
       };
 
@@ -222,6 +261,7 @@ describe('mutations: Collection', () => {
         slug: initial.slug,
         title: 'third iteration',
         authorExternalId: author.externalId,
+        curationCategoryExternalId: curationCategory.externalId,
         status: CollectionStatus.PUBLISHED,
       };
 
@@ -237,14 +277,16 @@ describe('mutations: Collection', () => {
         db,
         'let us go bowling',
         author,
-        CollectionStatus.DRAFT
+        CollectionStatus.DRAFT,
+        curationCategory
       );
 
       const second: Collection = await createCollectionHelper(
         db,
         'phone is ringing',
         author,
-        CollectionStatus.DRAFT
+        CollectionStatus.DRAFT,
+        curationCategory
       );
 
       // try to update the second collection with the same slug as the first
@@ -252,6 +294,7 @@ describe('mutations: Collection', () => {
         ...second,
         slug: first.slug,
         authorExternalId: author.externalId,
+        curationCategoryExternalId: curationCategory.externalId,
       };
 
       await expect(updateCollection(db, data)).rejects.toThrow(
@@ -265,7 +308,9 @@ describe('mutations: Collection', () => {
       const initial = await createCollectionHelper(
         db,
         'first iteration',
-        author
+        author,
+        CollectionStatus.DRAFT,
+        curationCategory
       );
       const randomKitten = 'https://placekitten.com/g/200/300';
 
@@ -289,7 +334,9 @@ describe('mutations: Collection', () => {
       const initial = await createCollectionHelper(
         db,
         'first iteration',
-        author
+        author,
+        CollectionStatus.DRAFT,
+        curationCategory
       );
       const randomKitten = 'https://placekitten.com/g/200/300';
 

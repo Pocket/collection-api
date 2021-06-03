@@ -4,6 +4,7 @@ import {
   CollectionAuthor,
   CollectionStatus,
   CollectionStory,
+  CurationCategory,
   Image,
   Prisma,
   PrismaClient,
@@ -33,6 +34,7 @@ export async function createCollectionHelper(
   title: string,
   author: CollectionAuthor,
   status: CollectionStatus = 'DRAFT',
+  curationCategory: CurationCategory,
   publishedAt: Date = null,
   imageUrl: string = null,
   addStories = true
@@ -42,6 +44,11 @@ export async function createCollectionHelper(
     slug: slugify(title, slugifyConfig),
     excerpt: title,
     status,
+    curationCategory: {
+      connect: {
+        id: curationCategory.id,
+      },
+    },
     authors: {
       connect: {
         id: author.id,
@@ -124,6 +131,17 @@ export async function createCollectionStoryHelper(
   });
 }
 
+export async function createCurationCategoryHelper(
+  prisma: PrismaClient,
+  name: string
+): Promise<CurationCategory> {
+  const slug = slugify(name, slugifyConfig);
+
+  const data: Prisma.CurationCategoryCreateInput = { name, slug };
+
+  return await prisma.curationCategory.create({ data });
+}
+
 export async function createImageHelper(
   prisma: PrismaClient,
   fileName: string,
@@ -146,7 +164,13 @@ export async function createImageHelper(
 }
 
 export async function clear(prisma: PrismaClient): Promise<void> {
-  const tables = ['CollectionStory', 'Collection', 'CollectionAuthor', 'Image'];
+  const tables = [
+    'CollectionStory',
+    'CurationCategory',
+    'Collection',
+    'CollectionAuthor',
+    'Image',
+  ];
 
   for (let i = 0; i < tables.length; i++) {
     await prisma.$executeRaw(`DELETE FROM ${tables[i]}`);

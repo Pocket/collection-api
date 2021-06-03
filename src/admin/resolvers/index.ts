@@ -3,6 +3,7 @@ import {
   getCollectionAuthor,
   getCollectionAuthors,
   getCollectionStory,
+  getCurationCategories,
   searchCollections,
 } from './queries';
 import {
@@ -41,5 +42,6 @@ export const resolvers = {
     getCollectionAuthors,
     getCollectionAuthor,
     getCollectionStory,
+    getCurationCategories,
   },
 };
