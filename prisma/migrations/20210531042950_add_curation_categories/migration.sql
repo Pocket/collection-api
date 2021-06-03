@@ -1,5 +1,5 @@
 -- AlterTable
-ALTER TABLE `Collection` ADD COLUMN `curationCategoryId` INTEGER NOT NULL DEFAULT 1;
+ALTER TABLE `Collection` ADD COLUMN `curationCategoryId` INTEGER NULL;
 
 -- CreateTable
 CREATE TABLE `CurationCategory` (

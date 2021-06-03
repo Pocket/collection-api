@@ -83,12 +83,12 @@ model Collection {
   imageUrl           String?            @db.VarChar(500)
   publishedAt        DateTime?          @db.DateTime(0)
   status             CollectionStatus?  @default(DRAFT)
-  curationCategoryId Int                @default(1)
+  curationCategoryId Int?
   createdAt          DateTime           @default(now()) @db.DateTime(0)
   updatedAt          DateTime           @updatedAt
   authors            CollectionAuthor[]
   stories            CollectionStory[]
-  curationCategory   CurationCategory   @relation(fields: [curationCategoryId], references: [id])
+  curationCategory   CurationCategory?   @relation(fields: [curationCategoryId], references: [id])
 
   @@unique([externalId], name: "externalId")
   @@index([slug], name: "slug")
