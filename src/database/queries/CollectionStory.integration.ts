@@ -24,7 +24,7 @@ describe('queries: CollectionStory', () => {
     let story;
 
     beforeEach(async () => {
-      const author = await createAuthorHelper(db, 'donny');
+      const author = await createAuthorHelper(db, { name: 'donny' });
       const curationCategory = await createCurationCategoryHelper(
         db,
         'Entertainment'

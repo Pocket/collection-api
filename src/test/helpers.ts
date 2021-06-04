@@ -9,7 +9,10 @@ import {
   Prisma,
   PrismaClient,
 } from '@prisma/client';
-import { CollectionStoryAuthor } from '../database/types';
+import {
+  CollectionStoryAuthor,
+  CreateCollectionAuthorInput,
+} from '../database/types';
 import faker from 'faker';
 import config from '../config';
 
@@ -17,16 +20,13 @@ const slugifyConfig = config.slugify;
 
 export async function createAuthorHelper(
   prisma: PrismaClient,
-  name: string,
-  imageUrl: string = null
+  author: CreateCollectionAuthorInput
 ): Promise<CollectionAuthor> {
-  const slug = slugify(name, slugifyConfig);
+  if (!author.slug) {
+    author.slug = slugify(author.name, slugifyConfig);
+  }
 
-  const data: Prisma.CollectionAuthorCreateInput = { name, slug };
-
-  if (imageUrl) data.imageUrl = imageUrl;
-
-  return await prisma.collectionAuthor.create({ data });
+  return await prisma.collectionAuthor.create({ data: author });
 }
 
 export async function createCollectionHelper(

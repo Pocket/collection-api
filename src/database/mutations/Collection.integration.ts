@@ -26,7 +26,7 @@ describe('mutations: Collection', () => {
 
   beforeEach(async () => {
     await clearDb(db);
-    author = await createAuthorHelper(db, 'walter');
+    author = await createAuthorHelper(db, { name: 'walter' });
     curationCategory = await createCurationCategoryHelper(
       db,
       'Personal Finance'
@@ -127,7 +127,7 @@ describe('mutations: Collection', () => {
         CollectionStatus.DRAFT
       );
 
-      const newAuthor = await createAuthorHelper(db, 'Leo Tolstoy');
+      const newAuthor = await createAuthorHelper(db, { name: 'Leo Tolstoy' });
 
       const data: UpdateCollectionInput = {
         externalId: initial.externalId,
@@ -167,7 +167,7 @@ describe('mutations: Collection', () => {
         'Travel'
       );
 
-      const newAuthor = await createAuthorHelper(db, 'Leo Tolstoy');
+      const newAuthor = await createAuthorHelper(db, { name: 'Leo Tolstoy' });
 
       const data: UpdateCollectionInput = {
         externalId: initial.externalId,

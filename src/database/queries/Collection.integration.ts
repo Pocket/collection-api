@@ -23,7 +23,7 @@ describe('queries: Collection', () => {
 
   beforeEach(async () => {
     await clearDb(db);
-    author = await createAuthorHelper(db, 'walter');
+    author = await createAuthorHelper(db, { name: 'walter' });
     curationCategory = await createCurationCategoryHelper(db, 'Business');
   });
 
@@ -300,7 +300,7 @@ describe('queries: Collection', () => {
     });
 
     it('respects pagination', async () => {
-      // `getPublishedCollections` sorts by `publishedAt` decsending, so
+      // `getPublishedCollections` sorts by `publishedAt` descending, so
       // these should be returned bottom to top
       await createCollectionHelper(
         db,
@@ -427,7 +427,7 @@ describe('queries: Collection', () => {
 
     beforeEach(async () => {
       // create a second author for variety
-      author2 = await createAuthorHelper(db, 'the dude');
+      author2 = await createAuthorHelper(db, { name: 'the dude' });
 
       // create a batch of collections to search
       await createCollectionHelper(
