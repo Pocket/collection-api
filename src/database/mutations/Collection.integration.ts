@@ -147,11 +147,6 @@ describe('mutations: Collection', () => {
       expect(updated.updatedAt.getTime()).toBeGreaterThan(
         initial.updatedAt.getTime()
       );
-
-      // verify on a re-fetch that the update was persisted
-      // is this necessary?
-      const reFetch = await getCollection(db, initial.externalId);
-      expect(reFetch.title).toEqual('second iteration');
     });
 
     it('should update a collection with a curation category', async () => {
@@ -182,6 +177,28 @@ describe('mutations: Collection', () => {
       // make sure a curation category was connected
       // should return the updated curation category
       expect(updated.curationCategory.name).toEqual(newCurationCategory.name);
+    });
+
+    it('should update a collection and remove a curation category', async () => {
+      const initial = await createCollectionHelper(
+        db,
+        'first iteration',
+        author,
+        CollectionStatus.DRAFT,
+        curationCategory
+      );
+
+      const data: UpdateCollectionInput = {
+        externalId: initial.externalId,
+        slug: initial.slug,
+        title: 'second iteration',
+        authorExternalId: author.externalId,
+      };
+
+      const updated = await updateCollection(db, data);
+
+      // make sure a curation category was disconnected
+      expect(updated.curationCategory).toBeNull();
     });
 
     it('should return all associated data after updating - authors, curation category, stories, and story authors', async () => {

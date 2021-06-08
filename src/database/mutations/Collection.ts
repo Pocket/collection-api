@@ -145,6 +145,10 @@ export async function updateCollection(
     dbData.curationCategory = {
       connect: { externalId: curationCategoryExternalId },
     };
+  } else {
+    dbData.curationCategory = {
+      disconnect: true,
+    };
   }
 
   return db.collection.update({
