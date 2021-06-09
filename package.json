@@ -38,7 +38,7 @@
   "devDependencies": {
     "@types/chai": "^4.2.18",
     "@types/faker": "^5.5.6",
-    "@types/graphql-upload": "^8.0.4",
+    "@types/graphql-upload": "^8.0.5",
     "@types/jest": "^26.0.23",
     "@types/node": "^15.6.2",
     "@typescript-eslint/eslint-plugin": "^4.26.1",
