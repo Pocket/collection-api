@@ -114,3 +114,12 @@ export type CreateImageInput = {
   fileName: string;
   path: string;
 };
+
+/**
+ * This input is not currently used in any mutations - its sole purpose is to
+ * provide consistency for helper functions in src/test/helpers.ts
+ */
+export type CreateCurationCategoryInput = {
+  name: string;
+  slug: string;
+};

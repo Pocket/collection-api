@@ -24,7 +24,10 @@ describe('queries: Collection', () => {
   beforeEach(async () => {
     await clearDb(db);
     author = await createAuthorHelper(db, { name: 'walter' });
-    curationCategory = await createCurationCategoryHelper(db, 'Business');
+    curationCategory = await createCurationCategoryHelper(db, {
+      name: 'Business',
+      slug: 'business',
+    });
   });
 
   afterAll(async () => {

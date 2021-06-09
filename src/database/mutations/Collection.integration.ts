@@ -27,10 +27,10 @@ describe('mutations: Collection', () => {
   beforeEach(async () => {
     await clearDb(db);
     author = await createAuthorHelper(db, { name: 'walter' });
-    curationCategory = await createCurationCategoryHelper(
-      db,
-      'Personal Finance'
-    );
+    curationCategory = await createCurationCategoryHelper(db, {
+      name: 'Personal Finance',
+      slug: 'personal-finance',
+    });
   });
 
   afterAll(async () => {
@@ -157,10 +157,10 @@ describe('mutations: Collection', () => {
         CollectionStatus.DRAFT
       );
 
-      const newCurationCategory = await createCurationCategoryHelper(
-        db,
-        'Travel'
-      );
+      const newCurationCategory = await createCurationCategoryHelper(db, {
+        name: 'Travel',
+        slug: 'travel',
+      });
 
       const newAuthor = await createAuthorHelper(db, { name: 'Leo Tolstoy' });
 

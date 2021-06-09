@@ -12,6 +12,8 @@ import {
 import {
   CollectionStoryAuthor,
   CreateCollectionAuthorInput,
+  CreateCollectionStoryInput,
+  CreateCurationCategoryInput,
 } from '../database/types';
 import faker from 'faker';
 import config from '../config';
@@ -73,14 +75,13 @@ export async function createCollectionHelper(
 
   if (addStories) {
     for (let i = 0; i < getRandomInt(2, 6); i++) {
-      await createCollectionStoryHelper(
-        prisma,
-        collection.id,
-        faker.internet.url(),
-        faker.lorem.sentence(),
-        faker.lorem.paragraph(),
-        imageUrl || faker.image.imageUrl(),
-        [
+      await createCollectionStoryHelper(prisma, {
+        collectionId: collection.id,
+        url: faker.internet.url(),
+        title: faker.lorem.sentence(),
+        excerpt: faker.lorem.paragraph(),
+        imageUrl: imageUrl || faker.image.imageUrl(),
+        authors: [
           {
             name: `${faker.name.firstName()} ${faker.name.lastName()}`,
             sortOrder: faker.datatype.number(),
@@ -90,8 +91,8 @@ export async function createCollectionHelper(
             sortOrder: faker.datatype.number(),
           },
         ],
-        faker.company.companyName()
-      );
+        publisher: faker.company.companyName(),
+      });
     }
   }
 
@@ -100,30 +101,14 @@ export async function createCollectionHelper(
 
 export async function createCollectionStoryHelper(
   prisma: PrismaClient,
-  collectionId: number,
-  url: string,
-  title: string,
-  excerpt: string,
-  imageUrl: string,
-  authors: { name: string; sortOrder: number }[],
-  publisher: string,
-  sortOrder?: number
+  collectionStory: {
+    collectionId: number;
+  } & Omit<CreateCollectionStoryInput, 'collectionExternalId'>
 ): Promise<CollectionStory> {
-  const data: any = {
-    collectionId,
-    url,
-    title,
-    excerpt,
-    imageUrl,
-    publisher,
-    authors: {
-      create: authors,
-    },
+  const data: any = collectionStory;
+  data.authors = {
+    create: collectionStory.authors,
   };
-
-  if (sortOrder) {
-    data.sortOrder = sortOrder;
-  }
 
   return await prisma.collectionStory.create({
     data,
@@ -132,13 +117,9 @@ export async function createCollectionStoryHelper(
 
 export async function createCurationCategoryHelper(
   prisma: PrismaClient,
-  name: string
+  curationCategory: CreateCurationCategoryInput
 ): Promise<CurationCategory> {
-  const slug = slugify(name, slugifyConfig);
-
-  const data: Prisma.CurationCategoryCreateInput = { name, slug };
-
-  return await prisma.curationCategory.create({ data });
+  return await prisma.curationCategory.create({ data: curationCategory });
 }
 
 export async function createImageHelper(

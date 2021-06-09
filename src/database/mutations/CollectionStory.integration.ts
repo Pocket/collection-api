@@ -29,7 +29,10 @@ describe('mutations: CollectionStory', () => {
     await clearDb(db);
 
     author = await createAuthorHelper(db, { name: 'maude' });
-    curationCategory = await createCurationCategoryHelper(db, 'Food');
+    curationCategory = await createCurationCategoryHelper(db, {
+      name: 'Food',
+      slug: 'food',
+    });
     collection = await createCollectionHelper(
       db,
       'a collection: by maude',

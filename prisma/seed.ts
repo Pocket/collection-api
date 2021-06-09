@@ -15,10 +15,10 @@ async function main() {
   const daniel = await createAuthorHelper(prisma, { name: 'Daniel' });
   const nina = await createAuthorHelper(prisma, { name: 'Nina' });
 
-  const curationCategory = await createCurationCategoryHelper(
-    prisma,
-    'Lorem Ipsum'
-  );
+  const curationCategory = await createCurationCategoryHelper(prisma, {
+    name: 'Lorem Ipsum',
+    slug: 'lorem-ipsum',
+  });
 
   await createCollectionHelper(
     prisma,

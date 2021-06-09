@@ -25,10 +25,10 @@ describe('queries: CollectionStory', () => {
 
     beforeEach(async () => {
       const author = await createAuthorHelper(db, { name: 'donny' });
-      const curationCategory = await createCurationCategoryHelper(
-        db,
-        'Entertainment'
-      );
+      const curationCategory = await createCurationCategoryHelper(db, {
+        name: 'Entertainment',
+        slug: 'entertainment',
+      });
       const collection = await createCollectionHelper(
         db,
         'test me',
@@ -36,16 +36,15 @@ describe('queries: CollectionStory', () => {
         CollectionStatus.DRAFT,
         curationCategory
       );
-      story = await createCollectionStoryHelper(
-        db,
-        collection.id,
-        'https://getpocket.com',
-        'a story',
-        'this is a story, all about how...',
-        'https://some.image',
-        [{ name: 'donny', sortOrder: 0 }],
-        'the verge'
-      );
+      story = await createCollectionStoryHelper(db, {
+        collectionId: collection.id,
+        url: 'https://getpocket.com',
+        title: 'a story',
+        excerpt: 'this is a story, all about how...',
+        imageUrl: 'https://some.image',
+        authors: [{ name: 'donny', sortOrder: 0 }],
+        publisher: 'the verge',
+      });
     });
 
     it('should retrieve a collection story with authors', async () => {
