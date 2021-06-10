@@ -21,18 +21,18 @@ const db = new PrismaClient();
 describe('queries: Collection', () => {
   let author;
   let curationCategory;
-  let IABTopCategory;
-  let IABSubCategory;
+  let IABParentCategory;
+  let IABChildCategory;
 
   beforeEach(async () => {
     await clearDb(db);
     author = await createAuthorHelper(db, 'walter');
     curationCategory = await createCurationCategoryHelper(db, 'Business');
-    IABTopCategory = await createIABCategoryHelper(db, 'Entertainment');
-    IABSubCategory = await createIABCategoryHelper(
+    IABParentCategory = await createIABCategoryHelper(db, 'Entertainment');
+    IABChildCategory = await createIABCategoryHelper(
       db,
       'Bowling',
-      IABTopCategory
+      IABParentCategory
     );
   });
 
@@ -47,8 +47,8 @@ describe('queries: Collection', () => {
         author,
         addStories: false,
         curationCategory,
-        IABTopCategory,
-        IABSubCategory,
+        IABParentCategory,
+        IABChildCategory,
       });
 
       const collection = await getCollection(db, created.externalId);
@@ -62,8 +62,8 @@ describe('queries: Collection', () => {
       expect(collection.curationCategory).toBeTruthy();
       expect(collection.curationCategory.name).toEqual(curationCategory.name);
       expect(collection.curationCategory.slug).toEqual(curationCategory.slug);
-      expect(collection.IABTopCategory.name).toEqual(IABTopCategory.name);
-      expect(collection.IABSubCategory.name).toEqual(IABSubCategory.name);
+      expect(collection.IABParentCategory.name).toEqual(IABParentCategory.name);
+      expect(collection.IABChildCategory.name).toEqual(IABChildCategory.name);
 
       // we should return an array (truthy)
       expect(collection.stories).toBeTruthy();
@@ -108,8 +108,8 @@ describe('queries: Collection', () => {
         author,
         status: CollectionStatus.PUBLISHED,
         curationCategory,
-        IABTopCategory,
-        IABSubCategory,
+        IABParentCategory,
+        IABChildCategory,
       });
 
       const collection = await getCollectionBySlug(db, 'test-me');
@@ -121,8 +121,8 @@ describe('queries: Collection', () => {
       expect(collection.stories).toBeTruthy();
       expect(collection.curationCategory).toBeTruthy();
       expect(collection.stories[0].authors).toBeTruthy();
-      expect(collection.IABTopCategory).toBeTruthy();
-      expect(collection.IABSubCategory).toBeTruthy();
+      expect(collection.IABParentCategory).toBeTruthy();
+      expect(collection.IABChildCategory).toBeTruthy();
     });
 
     it("should not get a collection that isn't published", async () => {
@@ -165,8 +165,8 @@ describe('queries: Collection', () => {
         title: 'test me 2',
         author,
         status: CollectionStatus.PUBLISHED,
-        IABTopCategory,
-        IABSubCategory,
+        IABParentCategory,
+        IABChildCategory,
       });
 
       const collections = await getCollectionsBySlugs(db, [
@@ -183,8 +183,12 @@ describe('queries: Collection', () => {
       expect(collections[0].stories[0].authors[0]).toBeTruthy();
       expect(collections[1].stories).toBeTruthy();
       expect(collections[0].stories[1].authors.length).toBeGreaterThan(0);
-      expect(collections[1].IABTopCategory.name).toEqual(IABTopCategory.name);
-      expect(collections[1].IABSubCategory.name).toEqual(IABSubCategory.name);
+      expect(collections[1].IABParentCategory.name).toEqual(
+        IABParentCategory.name
+      );
+      expect(collections[1].IABChildCategory.name).toEqual(
+        IABChildCategory.name
+      );
     });
 
     it('gets only published collections', async () => {
@@ -248,8 +252,8 @@ describe('queries: Collection', () => {
         title: 'first',
         author,
         status: CollectionStatus.PUBLISHED,
-        IABTopCategory,
-        IABSubCategory,
+        IABParentCategory,
+        IABChildCategory,
       });
       await createCollectionHelper(db, {
         title: 'second',
@@ -274,8 +278,12 @@ describe('queries: Collection', () => {
       expect(collections[0].stories).toBeTruthy();
       expect(collections[0].authors).toBeTruthy();
       expect(collections[0].stories[0].authors).toBeTruthy();
-      expect(collections[0].IABTopCategory.name).toEqual(IABTopCategory.name);
-      expect(collections[0].IABSubCategory.name).toEqual(IABSubCategory.name);
+      expect(collections[0].IABParentCategory.name).toEqual(
+        IABParentCategory.name
+      );
+      expect(collections[0].IABChildCategory.name).toEqual(
+        IABChildCategory.name
+      );
     });
 
     it('respects pagination', async () => {

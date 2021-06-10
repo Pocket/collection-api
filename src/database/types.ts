@@ -38,8 +38,8 @@ export type CreateCollectionInput = {
   status?: CollectionStatus;
   authorExternalId: string;
   curationCategoryExternalId?: string;
-  IABTopCategoryId?: string;
-  IABSubCategoryId?: string;
+  IABParentCategoryId?: string;
+  IABChildCategoryId?: string;
 };
 
 export type UpdateCollectionInput = {
@@ -47,8 +47,8 @@ export type UpdateCollectionInput = {
   curationCategoryExternalId?: string;
   excerpt?: string;
   externalId: string;
-  IABSubCategoryId?: string;
-  IABTopCategoryId?: string;
+  IABChildCategoryId?: string;
+  IABParentCategoryId?: string;
   imageUrl?: string;
   intro?: string;
   publishedAt?: Date;
@@ -108,8 +108,8 @@ export type CollectionStoryWithAuthors = CollectionStory & {
 export type CollectionWithAuthorsAndStories = Collection & {
   authors?: CollectionAuthor[];
   curationCategory?: CurationCategory;
-  IABTopCategory?: IABCategory;
-  IABSubCategory?: IABCategory;
+  IABParentCategory?: IABCategory;
+  IABChildCategory?: IABCategory;
   stories?: CollectionStoryWithAuthors[];
 };
 

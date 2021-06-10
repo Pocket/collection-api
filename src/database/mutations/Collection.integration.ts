@@ -23,8 +23,8 @@ const db = new PrismaClient();
 describe('mutations: Collection', () => {
   let author;
   let curationCategory;
-  let IABTopCategory;
-  let IABSubCategory;
+  let IABParentCategory;
+  let IABChildCategory;
 
   beforeEach(async () => {
     await clearDb(db);
@@ -33,11 +33,11 @@ describe('mutations: Collection', () => {
       db,
       'Personal Finance'
     );
-    IABTopCategory = await createIABCategoryHelper(db, 'Entertainment');
-    IABSubCategory = await createIABCategoryHelper(
+    IABParentCategory = await createIABCategoryHelper(db, 'Entertainment');
+    IABChildCategory = await createIABCategoryHelper(
       db,
       'Bowling',
-      IABTopCategory
+      IABParentCategory
     );
   });
 
@@ -130,12 +130,14 @@ describe('mutations: Collection', () => {
         slug: 'walter-bowls',
         title: 'walter bowls',
         authorExternalId: author.externalId,
-        IABTopCategoryId: IABTopCategory.externalId,
+        IABParentCategoryId: IABParentCategory.externalId,
       };
 
       const c = await createCollection(db, data);
 
-      expect(c.IABTopCategory.externalId).toEqual(IABTopCategory.externalId);
+      expect(c.IABParentCategory.externalId).toEqual(
+        IABParentCategory.externalId
+      );
     });
 
     it('should create a collection with IAB top and sub categories', async () => {
@@ -143,14 +145,18 @@ describe('mutations: Collection', () => {
         slug: 'walter-bowls',
         title: 'walter bowls',
         authorExternalId: author.externalId,
-        IABTopCategoryId: IABTopCategory.externalId,
-        IABSubCategoryId: IABSubCategory.externalId,
+        IABParentCategoryId: IABParentCategory.externalId,
+        IABChildCategoryId: IABChildCategory.externalId,
       };
 
       const c = await createCollection(db, data);
 
-      expect(c.IABTopCategory.externalId).toEqual(IABTopCategory.externalId);
-      expect(c.IABSubCategory.externalId).toEqual(IABSubCategory.externalId);
+      expect(c.IABParentCategory.externalId).toEqual(
+        IABParentCategory.externalId
+      );
+      expect(c.IABChildCategory.externalId).toEqual(
+        IABChildCategory.externalId
+      );
     });
 
     it('should not connect an IAB sub category if an IAB top category is not set', async () => {
@@ -158,12 +164,12 @@ describe('mutations: Collection', () => {
         slug: 'walter-bowls',
         title: 'walter bowls',
         authorExternalId: author.externalId,
-        IABSubCategoryId: IABSubCategory.externalId,
+        IABChildCategoryId: IABChildCategory.externalId,
       };
 
       const c = await createCollection(db, data);
 
-      expect(c.IABSubCategory).toBeNull();
+      expect(c.IABChildCategory).toBeNull();
     });
   });
 
@@ -255,12 +261,12 @@ describe('mutations: Collection', () => {
         slug: initial.slug,
         title: 'second iteration',
         authorExternalId: author.externalId,
-        IABTopCategoryId: IABTopCategory.externalId,
+        IABParentCategoryId: IABParentCategory.externalId,
       };
 
       const updated = await updateCollection(db, data);
 
-      expect(updated.IABTopCategory.name).toEqual(IABTopCategory.name);
+      expect(updated.IABParentCategory.name).toEqual(IABParentCategory.name);
     });
 
     it('should update a collection with IAB top and sub categories', async () => {
@@ -274,22 +280,22 @@ describe('mutations: Collection', () => {
         slug: initial.slug,
         title: 'second iteration',
         authorExternalId: author.externalId,
-        IABTopCategoryId: IABTopCategory.externalId,
-        IABSubCategoryId: IABSubCategory.externalId,
+        IABParentCategoryId: IABParentCategory.externalId,
+        IABChildCategoryId: IABChildCategory.externalId,
       };
 
       const updated = await updateCollection(db, data);
 
-      expect(updated.IABTopCategory.name).toEqual(IABTopCategory.name);
-      expect(updated.IABSubCategory.name).toEqual(IABSubCategory.name);
+      expect(updated.IABParentCategory.name).toEqual(IABParentCategory.name);
+      expect(updated.IABChildCategory.name).toEqual(IABChildCategory.name);
     });
 
     it('should update a collection and remove IAB categories', async () => {
       const initial = await createCollectionHelper(db, {
         title: 'first iteration',
         author,
-        IABTopCategory,
-        IABSubCategory,
+        IABParentCategory,
+        IABChildCategory,
       });
 
       const data: UpdateCollectionInput = {
@@ -301,8 +307,8 @@ describe('mutations: Collection', () => {
 
       const updated = await updateCollection(db, data);
 
-      expect(updated.IABTopCategory).toBeNull();
-      expect(updated.IABSubCategory).toBeNull();
+      expect(updated.IABParentCategory).toBeNull();
+      expect(updated.IABChildCategory).toBeNull();
     });
 
     it('should return all associated data after updating - authors, curation category, IAB categories, stories, and story authors', async () => {
@@ -317,8 +323,8 @@ describe('mutations: Collection', () => {
         title: 'second iteration',
         authorExternalId: author.externalId,
         curationCategoryExternalId: curationCategory.externalId,
-        IABTopCategoryId: IABTopCategory.externalId,
-        IABSubCategoryId: IABSubCategory.externalId,
+        IABParentCategoryId: IABParentCategory.externalId,
+        IABChildCategoryId: IABChildCategory.externalId,
       };
 
       // should return the updated info
@@ -332,8 +338,8 @@ describe('mutations: Collection', () => {
         expect(updated.stories[i].authors.length).toBeGreaterThan(0);
       }
       expect(updated.curationCategory).toBeTruthy();
-      expect(updated.IABTopCategory).toBeTruthy();
-      expect(updated.IABSubCategory).toBeTruthy();
+      expect(updated.IABParentCategory).toBeTruthy();
+      expect(updated.IABChildCategory).toBeTruthy();
     });
 
     it('should return story author sorted correctly', async () => {

@@ -17,11 +17,11 @@ model IABCategory {
   updatedAt         DateTime      @updatedAt
   IABCategoryId     Int?
   // parent and children define the one-to-many relationship with this table
-  parent            IABCategory?  @relation("CategoryChildren", fields: [IABCategoryId], references: [id])
-  children          IABCategory[] @relation("CategoryChildren")
+  parent            IABCategory?  @relation("IABCategoryChildren", fields: [IABCategoryId], references: [id])
+  children          IABCategory[] @relation("IABCategoryChildren")
   // these declarations are required to map to the top/sub categories defined in the Collection model below
-  topCollections    Collection[]  @relation("IABTopCategory")
-  subCollections    Collection[]  @relation("IABSubCategory")
+  parentCollections Collection[]  @relation("CollectionIABParentCategory")
+  childCollections  Collection[]  @relation("CollectionIABChildCategory")
 
   @@index([IABCategoryId], name: "IABCategoryId")
   @@unique([externalId], name: "externalId")
@@ -93,25 +93,25 @@ model CollectionAuthor {
 }
 
 model Collection {
-  id                 Int                @id @default(autoincrement())
-  externalId         String             @default(uuid()) @db.VarChar(255)
-  slug               String             @unique @db.VarChar(300)
-  title              String             @db.VarChar(255)
-  excerpt            String?            @db.Text
-  intro              String?            @db.Text
-  imageUrl           String?            @db.VarChar(500)
-  publishedAt        DateTime?          @db.DateTime(0)
-  createdAt          DateTime           @default(now()) @db.DateTime(0)
-  updatedAt          DateTime           @updatedAt
-  curationCategoryId Int?
-  IABTopCategoryId   Int?
-  IABSubCategoryId   Int?
-  status             CollectionStatus?  @default(DRAFT)
-  authors            CollectionAuthor[]
-  stories            CollectionStory[]
-  curationCategory   CurationCategory?  @relation(fields: [curationCategoryId], references: [id])
-  IABTopCategory     IABCategory?       @relation("IABTopCategory", fields: [IABTopCategoryId], references: [id])
-  IABSubCategory     IABCategory?       @relation("IABSubCategory", fields: [IABSubCategoryId], references: [id])
+  id                  Int                @id @default(autoincrement())
+  externalId          String             @default(uuid()) @db.VarChar(255)
+  slug                String             @unique @db.VarChar(300)
+  title               String             @db.VarChar(255)
+  excerpt             String?            @db.Text
+  intro               String?            @db.Text
+  imageUrl            String?            @db.VarChar(500)
+  publishedAt         DateTime?          @db.DateTime(0)
+  createdAt           DateTime           @default(now()) @db.DateTime(0)
+  updatedAt           DateTime           @updatedAt
+  curationCategoryId  Int?
+  IABParentCategoryId Int?
+  IABChildCategoryId  Int?
+  status              CollectionStatus?  @default(DRAFT)
+  authors             CollectionAuthor[]
+  stories             CollectionStory[]
+  curationCategory    CurationCategory?  @relation(fields: [curationCategoryId], references: [id])
+  IABParentCategory   IABCategory?       @relation("CollectionIABParentCategory", fields: [IABParentCategoryId], references: [id])
+  IABChildCategory    IABCategory?       @relation("CollectionIABChildCategory", fields: [IABChildCategoryId], references: [id])
 
   @@unique([externalId], name: "externalId")
   @@index([slug], name: "slug")

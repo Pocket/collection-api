@@ -47,8 +47,8 @@ input CreateCollectionInput {
   status: CollectionStatus
   authorExternalId: String!
   curationCategoryExternalId: String
-  IABTopCategoryExternalId: String
-  IABSubCategoryExternalId: String
+  IABParentCategoryExternalId: String
+  IABChildCategoryExternalId: String
 }
 
 input UpdateCollectionInput {
@@ -61,8 +61,8 @@ input UpdateCollectionInput {
   status: CollectionStatus!
   authorExternalId: String!
   curationCategoryExternalId: String
-  IABTopCategoryExternalId: String
-  IABSubCategoryExternalId: String
+  IABParentCategoryExternalId: String
+  IABChildCategoryExternalId: String
 }
 
 input UpdateCollectionImageUrlInput {

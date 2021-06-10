@@ -26,11 +26,14 @@ async function main() {
     'Bowling'
   );
 
-  const IABTopCategory = await createIABCategoryHelper(prisma, 'Entertainment');
-  const IABSubCategory = await createIABCategoryHelper(
+  const IABParentCategory = await createIABCategoryHelper(
+    prisma,
+    'Entertainment'
+  );
+  const IABChildCategory = await createIABCategoryHelper(
     prisma,
     'Bowling',
-    IABTopCategory
+    IABParentCategory
   );
 
   await createCollectionHelper(prisma, {
@@ -43,8 +46,8 @@ async function main() {
     author: daniel,
     status: CollectionStatus.PUBLISHED,
     publishedAt: new Date(),
-    IABTopCategory,
-    IABSubCategory,
+    IABParentCategory,
+    IABChildCategory,
   });
   await createCollectionHelper(prisma, {
     title: `Nina's first collection`,
@@ -66,8 +69,8 @@ async function main() {
     title: `Jonathan's' first collection`,
     author: jonathan,
     curationCategory: curationCategory2,
-    IABTopCategory,
-    IABSubCategory,
+    IABParentCategory,
+    IABChildCategory,
   });
   await createCollectionHelper(prisma, {
     title: `Chelsea's second collection`,
@@ -77,8 +80,8 @@ async function main() {
     title: `Daniel's second collection`,
     author: daniel,
     curationCategory: curationCategory2,
-    IABTopCategory,
-    IABSubCategory,
+    IABParentCategory,
+    IABChildCategory,
   });
   await createCollectionHelper(prisma, {
     title: `Jonathan's second collection`,
@@ -89,8 +92,8 @@ async function main() {
     title: `Chelsea's' third collection`,
     author: chelsea,
     status: CollectionStatus.ARCHIVED,
-    IABTopCategory,
-    IABSubCategory,
+    IABParentCategory,
+    IABChildCategory,
   });
 }
 

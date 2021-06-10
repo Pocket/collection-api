@@ -38,10 +38,10 @@ export async function createCollection(
   delete data.curationCategoryExternalId;
 
   // And again with IAB categories
-  const IABTopCategoryId = data.IABTopCategoryId;
-  const IABSubCategoryId = data.IABSubCategoryId;
-  delete data.IABTopCategoryId;
-  delete data.IABSubCategoryId;
+  const IABParentCategoryId = data.IABParentCategoryId;
+  const IABChildCategoryId = data.IABChildCategoryId;
+  delete data.IABParentCategoryId;
+  delete data.IABChildCategoryId;
 
   // we need to build dbData conditionally, as some entity connections may or
   // may not need to be created
@@ -58,14 +58,14 @@ export async function createCollection(
   }
 
   // if IAB categories were specified, set up those connections as well
-  if (IABTopCategoryId) {
-    dbData.IABTopCategory = {
-      connect: { externalId: IABTopCategoryId },
+  if (IABParentCategoryId) {
+    dbData.IABParentCategory = {
+      connect: { externalId: IABParentCategoryId },
     };
 
-    if (IABSubCategoryId) {
-      dbData.IABSubCategory = {
-        connect: { externalId: IABSubCategoryId },
+    if (IABChildCategoryId) {
+      dbData.IABChildCategory = {
+        connect: { externalId: IABChildCategoryId },
       };
     }
   }
@@ -75,8 +75,8 @@ export async function createCollection(
     include: {
       authors: true,
       curationCategory: true,
-      IABTopCategory: true,
-      IABSubCategory: true,
+      IABParentCategory: true,
+      IABChildCategory: true,
       stories: {
         // note that this include is only present to satisfy the return type
         // there will never be any stories (or story authors) at the time a
@@ -142,10 +142,10 @@ export async function updateCollection(
   delete data.curationCategoryExternalId;
 
   // And the same thing for IAB categories
-  const IABTopCategoryId = data.IABTopCategoryId;
-  const IABSubCategoryId = data.IABSubCategoryId;
-  delete data.IABTopCategoryId;
-  delete data.IABSubCategoryId;
+  const IABParentCategoryId = data.IABParentCategoryId;
+  const IABChildCategoryId = data.IABChildCategoryId;
+  delete data.IABParentCategoryId;
+  delete data.IABChildCategoryId;
 
   // if the collection is going from unpublished to published, we update its
   // `publishedAt` time
@@ -180,23 +180,23 @@ export async function updateCollection(
   }
 
   // same as above for IAB categories
-  if (IABTopCategoryId) {
-    dbData.IABTopCategory = {
-      connect: { externalId: IABTopCategoryId },
+  if (IABParentCategoryId) {
+    dbData.IABParentCategory = {
+      connect: { externalId: IABParentCategoryId },
     };
 
     // we'd only ever set the sub category if a top category is set
-    if (IABSubCategoryId) {
-      dbData.IABSubCategory = {
-        connect: { externalId: IABSubCategoryId },
+    if (IABChildCategoryId) {
+      dbData.IABChildCategory = {
+        connect: { externalId: IABChildCategoryId },
       };
     }
   } else {
-    dbData.IABTopCategory = {
+    dbData.IABParentCategory = {
       disconnect: true,
     };
 
-    dbData.IABSubCategory = {
+    dbData.IABChildCategory = {
       disconnect: true,
     };
   }
@@ -207,8 +207,8 @@ export async function updateCollection(
     include: {
       authors: true,
       curationCategory: true,
-      IABSubCategory: true,
-      IABTopCategory: true,
+      IABChildCategory: true,
+      IABParentCategory: true,
       stories: {
         orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
         include: {
@@ -242,8 +242,8 @@ export async function updateCollectionImageUrl(
     include: {
       authors: true,
       curationCategory: true,
-      IABSubCategory: true,
-      IABTopCategory: true,
+      IABChildCategory: true,
+      IABParentCategory: true,
       stories: {
         orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
         include: {

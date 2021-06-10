@@ -61,8 +61,8 @@ type Collection {
   We will never return child categories in this type, so there's no need to
   specify `IABParentCategory` here. The basic `IABCategory` is sufficient.
   """
-  IABTopCategory: IABCategory
-  IABSubCategory: IABCategory
+  IABParentCategory: IABCategory
+  IABChildCategory: IABCategory
 }
 
 enum CollectionStatus {

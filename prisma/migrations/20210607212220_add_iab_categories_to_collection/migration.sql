@@ -1,6 +1,6 @@
 -- AlterTable
-ALTER TABLE `Collection` ADD COLUMN `IABSubCategoryId` INTEGER,
-    ADD COLUMN `IABTopCategoryId` INTEGER;
+ALTER TABLE `Collection` ADD COLUMN `IABChildCategoryId` INTEGER,
+    ADD COLUMN `IABParentCategoryId` INTEGER;
 
 -- CreateTable
 CREATE TABLE `IABCategory` (
@@ -21,10 +21,10 @@ CREATE TABLE `IABCategory` (
 ALTER TABLE `IABCategory` ADD FOREIGN KEY (`IABCategoryId`) REFERENCES `IABCategory`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Collection` ADD FOREIGN KEY (`IABTopCategoryId`) REFERENCES `IABCategory`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `Collection` ADD FOREIGN KEY (`IABParentCategoryId`) REFERENCES `IABCategory`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Collection` ADD FOREIGN KEY (`IABSubCategoryId`) REFERENCES `IABCategory`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `Collection` ADD FOREIGN KEY (`IABChildCategoryId`) REFERENCES `IABCategory`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 INSERT INTO IABCategory (externalId, slug, name, updatedAt, IABCategoryId) VALUES ('d8fedc0e-8959-42d3-8f5c-1c5de953f5db', 'Arts-and-Entertainment', 'Arts & Entertainment', CURRENT_TIMESTAMP(0), null);
 INSERT INTO IABCategory (externalId, slug, name, updatedAt, IABCategoryId) SELECT '381cfa19-e457-45a0-a6da-222e84c12595', 'Books-and-Literature', 'Books & Literature', CURRENT_TIMESTAMP(0), id FROM IABCategory WHERE slug = 'Arts-and-Entertainment' AND IABCategoryId IS NULL;

@@ -43,8 +43,8 @@ export interface createCollectionHelperOptionalInput {
   publishedAt?: Date;
   imageUrl?: string;
   addStories?: boolean;
-  IABTopCategory?: IABCategory;
-  IABSubCategory?: IABCategory;
+  IABParentCategory?: IABCategory;
+  IABChildCategory?: IABCategory;
 }
 
 // the input for the `createCollectionHelper` function is a combo of the
@@ -59,8 +59,8 @@ const createCollectionHelperDefaults: createCollectionHelperOptionalInput = {
   curationCategory: null,
   publishedAt: null,
   imageUrl: null,
-  IABTopCategory: null,
-  IABSubCategory: null,
+  IABParentCategory: null,
+  IABChildCategory: null,
 };
 
 export async function createCollectionHelper(
@@ -82,8 +82,8 @@ export async function createCollectionHelper(
     publishedAt,
     imageUrl,
     addStories,
-    IABTopCategory,
-    IABSubCategory,
+    IABParentCategory,
+    IABChildCategory,
   } = mergedParams;
 
   const data: Prisma.CollectionCreateInput = {
@@ -111,12 +111,12 @@ export async function createCollectionHelper(
     data.curationCategory = { connect: { id: curationCategory.id } };
   }
 
-  if (IABTopCategory) {
-    data.IABTopCategory = { connect: { id: IABTopCategory.id } };
+  if (IABParentCategory) {
+    data.IABParentCategory = { connect: { id: IABParentCategory.id } };
 
     // only set a sub category if the parent was also set
-    if (IABSubCategory) {
-      data.IABSubCategory = { connect: { id: IABSubCategory.id } };
+    if (IABChildCategory) {
+      data.IABChildCategory = { connect: { id: IABChildCategory.id } };
     }
   }
 
