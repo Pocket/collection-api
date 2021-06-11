@@ -13,7 +13,6 @@ import {
   CollectionStoryAuthor,
   CreateCollectionAuthorInput,
   CreateCollectionStoryInput,
-  CreateCurationCategoryInput,
 } from '../database/types';
 import faker from 'faker';
 import config from '../config';
@@ -168,3 +167,11 @@ export function sortCollectionStoryAuthors(
     return a.sortOrder - b.sortOrder;
   });
 }
+
+/**
+ * The minimum information required to create a curation category
+ */
+export type CreateCurationCategoryInput = {
+  name: string;
+  slug: string;
+};
