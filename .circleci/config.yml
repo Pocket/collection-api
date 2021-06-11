@@ -190,14 +190,15 @@ workflows:
       - build
 
       # Try building the ECS docker image on each branch
-      - docker_build:
+      - pocket/docker_build:
           <<: *not_dev_main
           context: pocket
           name: build_docker
-          environment: 'Dev'
-          tag: latest,$CIRCLE_SHA1
-          repo_name: collectionapi-dev-app
-          ecr_url: 410318598490.dkr.ecr.us-east-1.amazonaws.com
+          aws-access-key-id: Dev_AWS_ACCESS_KEY
+          aws-secret-access-key: Dev_AWS_SECRET_ACCESS_KEY
+          aws-region: Dev_AWS_DEFAULT_REGION
+          repo-name: collectionapi-dev-app
+          ecr-url: 410318598490.dkr.ecr.us-east-1.amazonaws.com
           push: false
           requires:
             - build
