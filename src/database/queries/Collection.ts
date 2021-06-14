@@ -21,6 +21,8 @@ export async function getCollection(
     include: {
       authors: true,
       curationCategory: true,
+      IABChildCategory: true,
+      IABParentCategory: true,
       stories: {
         include: {
           authors: {
@@ -59,6 +61,8 @@ export async function getCollectionBySlug(
     include: {
       authors: true,
       curationCategory: true,
+      IABParentCategory: true,
+      IABChildCategory: true,
       stories: {
         include: {
           authors: {
@@ -84,6 +88,8 @@ export async function getCollectionsBySlugs(
     include: {
       authors: true,
       curationCategory: true,
+      IABChildCategory: true,
+      IABParentCategory: true,
       stories: {
         include: {
           authors: {
@@ -111,6 +117,8 @@ export async function getPublishedCollections(
     include: {
       authors: true,
       curationCategory: true,
+      IABChildCategory: true,
+      IABParentCategory: true,
       stories: {
         include: {
           authors: {
@@ -157,6 +165,8 @@ export async function searchCollections(
     include: {
       authors: true,
       curationCategory: true,
+      IABParentCategory: true,
+      IABChildCategory: true,
       stories: {
         include: {
           authors: {
