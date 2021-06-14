@@ -1,11 +1,10 @@
-import { CollectionStatus, PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { getCollectionStory } from './CollectionStory';
 import {
   clear as clearDb,
   createAuthorHelper,
   createCollectionHelper,
   createCollectionStoryHelper,
-  createCurationCategoryHelper,
   sortCollectionStoryAuthors,
 } from '../../test/helpers';
 
@@ -25,17 +24,10 @@ describe('queries: CollectionStory', () => {
 
     beforeEach(async () => {
       const author = await createAuthorHelper(db, 'donny');
-      const curationCategory = await createCurationCategoryHelper(
-        db,
-        'Entertainment'
-      );
-      const collection = await createCollectionHelper(
-        db,
-        'test me',
+      const collection = await createCollectionHelper(db, {
+        title: 'test me',
         author,
-        CollectionStatus.DRAFT,
-        curationCategory
-      );
+      });
       story = await createCollectionStoryHelper(
         db,
         collection.id,

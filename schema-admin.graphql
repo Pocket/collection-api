@@ -47,6 +47,8 @@ input CreateCollectionInput {
   status: CollectionStatus
   authorExternalId: String!
   curationCategoryExternalId: String
+  IABParentCategoryExternalId: String
+  IABChildCategoryExternalId: String
 }
 
 input UpdateCollectionInput {
@@ -59,6 +61,8 @@ input UpdateCollectionInput {
   status: CollectionStatus!
   authorExternalId: String!
   curationCategoryExternalId: String
+  IABParentCategoryExternalId: String
+  IABChildCategoryExternalId: String
 }
 
 input UpdateCollectionImageUrlInput {
@@ -140,6 +144,10 @@ type Query {
   Retrieves a list of CurationCategories, sorted alphabetically
   """
   getCurationCategories: [CurationCategory!]!
+  """
+  Retrieves the nested list of IAB top/sub categories.
+  """
+  getIABCategories: [IABParentCategory!]!
 }
 
 type Mutation {

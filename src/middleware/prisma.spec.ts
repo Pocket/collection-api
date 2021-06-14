@@ -16,6 +16,8 @@ describe('prisma middleware', () => {
     publishedAt: new Date(),
     createdAt: new Date(),
     updatedAt: new Date(),
+    IABParentCategoryId: 1,
+    IABChildCategoryId: 2,
     stories: [
       {
         id: 1,
@@ -59,6 +61,8 @@ describe('prisma middleware', () => {
     publishedAt: new Date(),
     createdAt: new Date(),
     updatedAt: new Date(),
+    IABParentCategoryId: 1,
+    IABChildCategoryId: 2,
     stories: [
       {
         id: 1,

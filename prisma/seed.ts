@@ -3,6 +3,7 @@ import {
   createAuthorHelper,
   createCollectionHelper,
   createCurationCategoryHelper,
+  createIABCategoryHelper,
 } from '../src/test/helpers';
 
 const prisma = new PrismaClient();
@@ -15,83 +16,85 @@ async function main() {
   const daniel = await createAuthorHelper(prisma, 'Daniel');
   const nina = await createAuthorHelper(prisma, 'Nina');
 
-  const curationCategory = await createCurationCategoryHelper(
+  const curationCategory1 = await createCurationCategoryHelper(
     prisma,
     'Lorem Ipsum'
   );
 
-  await createCollectionHelper(
+  const curationCategory2 = await createCurationCategoryHelper(
     prisma,
-    `Kelvin's first collection`,
-    kelvin,
-    CollectionStatus.DRAFT,
-    curationCategory
+    'Bowling'
   );
-  await createCollectionHelper(
+
+  const IABParentCategory = await createIABCategoryHelper(
     prisma,
-    `Daniel's first collection`,
-    daniel,
-    CollectionStatus.PUBLISHED,
-    curationCategory,
-    new Date()
+    'Entertainment'
   );
-  await createCollectionHelper(
+  const IABChildCategory = await createIABCategoryHelper(
     prisma,
-    `Nina's first collection`,
-    nina,
-    CollectionStatus.DRAFT,
-    curationCategory
+    'Bowling',
+    IABParentCategory
   );
-  await createCollectionHelper(
-    prisma,
-    `Chelsea's first collection`,
-    chelsea,
-    CollectionStatus.DRAFT,
-    curationCategory
-  );
-  await createCollectionHelper(
-    prisma,
-    `Mathijs's' first collection`,
-    mathijs,
-    CollectionStatus.PUBLISHED,
-    curationCategory,
-    new Date()
-  );
-  await createCollectionHelper(
-    prisma,
-    `Jonathan's' first collection`,
-    jonathan,
-    CollectionStatus.DRAFT,
-    curationCategory
-  );
-  await createCollectionHelper(
-    prisma,
-    `Chelsea's second collection`,
-    chelsea,
-    CollectionStatus.DRAFT,
-    curationCategory
-  );
-  await createCollectionHelper(
-    prisma,
-    `Daniel's second collection`,
-    daniel,
-    CollectionStatus.DRAFT,
-    curationCategory
-  );
-  await createCollectionHelper(
-    prisma,
-    `Jonathan's second collection`,
-    jonathan,
-    CollectionStatus.DRAFT,
-    curationCategory
-  );
-  await createCollectionHelper(
-    prisma,
-    `Chelsea's' third collection`,
-    chelsea,
-    CollectionStatus.ARCHIVED,
-    curationCategory
-  );
+
+  await createCollectionHelper(prisma, {
+    title: `Kelvin's first collection`,
+    author: kelvin,
+    curationCategory: curationCategory1,
+  });
+  await createCollectionHelper(prisma, {
+    title: `Daniel's first collection`,
+    author: daniel,
+    status: CollectionStatus.PUBLISHED,
+    publishedAt: new Date(),
+    IABParentCategory,
+    IABChildCategory,
+  });
+  await createCollectionHelper(prisma, {
+    title: `Nina's first collection`,
+    author: nina,
+    curationCategory: curationCategory2,
+  });
+  await createCollectionHelper(prisma, {
+    title: `Chelsea's first collection`,
+    author: chelsea,
+    curationCategory: curationCategory1,
+  });
+  await createCollectionHelper(prisma, {
+    title: `Mathijs's' first collection`,
+    author: mathijs,
+    status: CollectionStatus.PUBLISHED,
+    publishedAt: new Date(),
+  });
+  await createCollectionHelper(prisma, {
+    title: `Jonathan's' first collection`,
+    author: jonathan,
+    curationCategory: curationCategory2,
+    IABParentCategory,
+    IABChildCategory,
+  });
+  await createCollectionHelper(prisma, {
+    title: `Chelsea's second collection`,
+    author: chelsea,
+  });
+  await createCollectionHelper(prisma, {
+    title: `Daniel's second collection`,
+    author: daniel,
+    curationCategory: curationCategory2,
+    IABParentCategory,
+    IABChildCategory,
+  });
+  await createCollectionHelper(prisma, {
+    title: `Jonathan's second collection`,
+    author: jonathan,
+    curationCategory: curationCategory1,
+  });
+  await createCollectionHelper(prisma, {
+    title: `Chelsea's' third collection`,
+    author: chelsea,
+    status: CollectionStatus.ARCHIVED,
+    IABParentCategory,
+    IABChildCategory,
+  });
 }
 
 main()

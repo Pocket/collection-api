@@ -10,12 +10,3 @@ export async function getCurationCategories(
     orderBy: { name: 'asc' },
   });
 }
-
-/**
- * @param db
- */
-export async function countCurationCategories(
-  db: PrismaClient
-): Promise<number> {
-  return db.curationCategory.count();
-}
