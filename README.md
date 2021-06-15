@@ -20,7 +20,7 @@ This application has two GraphQL schemas - one public for clients (Web, Android,
 
 Having two schemas means we need two GraphQL endpoints, meaning two Apollo Servers. These servers are located in `src/admin/server.ts` and `src/public/server.ts`. In `src/main.ts`, we add both Apollo Servers to Express.
 
-## Local development
+## Local Development
 
 ### Fresh Setup
 
@@ -36,9 +36,14 @@ Prepare Prisma:
 
 Start Docker container:
 
-- `docker-compose up`
+- `docker compose up`
 
 After Docker completes, you should be able to hit the GraphQL playground at `http://localhost:4004`.
+
+### Limitations
+
+- Images saved to S3 via [localstack](https://github.com/localstack/localstack) do not render. This appears to be an access/URL issue and could potentially be fixed.
+- Running integration tests will wipe your local database. The database can be re-seeded - see (Resetting & Seeding the Database)[#Resetting-&-Seeding-the-Database] below.
 
 ### Working with Prisma
 
@@ -48,21 +53,15 @@ When you run `docker compose up`, all existing Prisma migrations will be run, ge
 
 Though `docker compose up` will get your database schema set, you'll probably want some test data in there to play with. You can wipe the database and inject seed data by running `docker compose exec app npx prisma migrate reset`. This will ensure all migrations have been run (which they will have been during `docker compose up`), and will also run the `prisma/seed.ts` file, which will create data for the following entities: `CollectionAuthor`, `Collection`, and `CollectionStory`.
 
-TODO: Add images to our seeder?
-
 #### Adding a Migration
 
 If you need to change the Prisma schema (in `prisma/schema.prisma`), you'll need to create a migration to ensure the database is in sync. After you have made your changes to `schema.prisma`, run `docker compose exec app npx prisma migrate dev --name some_meaningful_migration_name`. This will create a migration script in `prisma/migrations` and will automatically run the new migration. This will also re-create your Prisma Typescript types.
 
-##### Resetting Your Local Database
-
-If you want to wipe your local database (e.g. to re-run all migrations or the seeder script), run `docker compose exec app npx prisma migrate reset`.
-
 #### Re-creating Prisma Typescript Types
 
-If your local environment gets messed up (it happens), you can re-create your Prisma Typescript types by running `npx prisma generate`. (Note that you don't have to do this within the Docker container, but you can if you want.)
+If your local environment gets messed up (it happens - for example switching to a branch with a different prisma schema), you can re-create your Prisma Typescript types by running `npx prisma generate`. (Note that you don't have to do this within the Docker container, but you can if you want.)
 
-## Running Tests
+### Running Tests
 
 We have two test commands, one for unit/functional tests and one for integration tests. These are both run by [Jest](https://jestjs.io/) and are differentiated by file names. Any file ending with `.spec.ts` will be run in the unit/functional suite, while integration tests should have the `.integration.ts` suffix.
 
@@ -73,7 +72,9 @@ Test are run via `npm` commands:
 - Unit/functional: `npm test`
 - Integration: `docker compose exec app npm run test-integrations`
 
-### Testing Federated Resolvers
+**NOTE** Running integration tests locally will result in your local database being emptied. Refer to (Resetting & Seeding the Database)[#Resetting-&-Seeding-the-Database] above to repopulate seed data.
+
+#### Testing Federated Resolvers
 
 TODO: Describe what Federated Resolvers are
 
@@ -102,7 +103,7 @@ query {
 }
 ```
 
-## Digging into the Database
+### Digging into the Database
 
 Sometimes it's nice to look in the database to see what's actually going on with data. Here are a few handy commands for that.
 
@@ -121,25 +122,25 @@ From there, you can inspect the structure and data of tables contained within:
 
 From here you can issue any SQL statements you want to view/change data. Don't mess with the table schemas though. If you need to change table schemas, do that through Prisma migrations (see above).
 
-### What About a GUI?
+#### What About a GUI?
 
 Command line not your thing? That's fine. You can connect to MySQL through any GUI you like. It's available at `localhost:3308`. You're responsible for setting up your own GUI though. 😉
 
-## Adding a Query or Mutation
+### Adding a Query or Mutation
 
 Whether against the public or admin endpoint, there are a lot of connected pieces involved in adding a Query or Mutation. There are two primary areas you'll be working in here - the database and the GraphQL API.
 
-### Database
+#### Database
 
 1. Create a function that either retrieves information from the database (query) or updates information in the database (mutation). This function will live in a file in either [database/queries](./src/database/queries) or [database/mutations](./src/database/mutations). Choose the file named after the entity on which you are operating. For example, if you needed a new query against the `CollectionStory` entity, you'd add a function in [database/queries/CollectionStory.ts](./src/database/queries/CollectionStory.ts).
 2. Add tests for this new function in the associated `{entity}.integration.ts` file.
 3. Add this new function to the export list in either [database/queries.ts](./src/database/queries.ts) or [database/mutations.ts](./src/database/mutations.ts) (depending on if you wrote a query or a mutation, of course).
 
-### GraphQL API
+#### GraphQL API
 
 Once you have the database stuff ironed out, it's time to move on to connecting this database operation to the GraphQL API.
 
-1. Add your query or mutaiton to the appropriate GraphQL schema file - [schema-admin.graphql](./schema-admin.graphql) or [schema-public.graphql](./schema-public.graphql). You should only add to `schema-public.graphql` if the query should be usable by outside clients - web or mobile. You should never add a mutation to this file. If a query is to be used in the admin tool, or if you're writing a mutation, add it to `schema-admin.graphql`.
+1. Add your query or mutation to the appropriate GraphQL schema file - [schema-admin.graphql](./schema-admin.graphql) or [schema-public.graphql](./schema-public.graphql). You should only add to `schema-public.graphql` if the query should be usable by outside clients - web or mobile. You should never add a mutation to this file. If a query is to be used in the admin tool, or if you're writing a mutation, add it to `schema-admin.graphql`.
 2. Create a resolver that _exactly_ matches the name of the query or mutation you added to the `.graphql` file. This will be in one of four places, depending on endpoint (public or admin) and purpose (query or mutation).
    i. [admin/resolvers/queries.ts](./src/admin/resolvers/queries.ts)
    ii. [admin/resolvers/mutations.ts](./src/admin/resolvers/mutations.ts)
@@ -148,3 +149,23 @@ Once you have the database stuff ironed out, it's time to move on to connecting 
 3. The resolver you just made should call the database function you created at the beginning. (You'll need to import this function, of course.) This is where the GraphQL API connects to the database.
 4. Add your new resolver (both an `import` and an `export`) to the appropriate `index.ts` file - either [admin/resolvers/index.ts](./src/admin/resolvers/index.ts) or [public/resolvers/index.ts](./src/public/resolvers/index.ts)
 5. Test your resolver in the GraphQL playground at `localhost:4004`.
+
+## AWS Dev Environment Testing
+
+There are a few reasons you may want to test the API in AWS:
+
+1. Making sure a schema change/migration will successfully deploy
+2. Developing the admin tool locally without having to also set up/run the API locally
+3. Allowing testing/QA by the editorial team against non-production data
+
+To deploy to the dev environment, just push to the `dev` branch. CirlceCI will detect this change and deploy for you.
+
+`git push origin my-feature-branch:dev`
+
+The current expectation is that our AWS dev environment may be reset/changed at any time. To be safe, you should check with your teammates to make sure no one else is testing against dev before you go deploying to it.
+
+### Resetting Dev
+
+There may come a time when you need to reset the dev environment. For example, if you were testing a schema change and then want to test a different branch _without_ that schema change, the dev database and Prisma schema will be out of sync.
+
+To reset the dev database, ask for instructions in Slack.
