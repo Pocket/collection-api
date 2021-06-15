@@ -38,10 +38,10 @@ export async function createCollection(
   delete data.curationCategoryExternalId;
 
   // And again with IAB categories
-  const IABParentCategoryId = data.IABParentCategoryId;
-  const IABChildCategoryId = data.IABChildCategoryId;
-  delete data.IABParentCategoryId;
-  delete data.IABChildCategoryId;
+  const IABParentCategoryExternalId = data.IABParentCategoryExternalId;
+  const IABChildCategoryExternalId = data.IABChildCategoryExternalId;
+  delete data.IABParentCategoryExternalId;
+  delete data.IABChildCategoryExternalId;
 
   // we need to build dbData conditionally, as some entity connections may or
   // may not need to be created
@@ -58,14 +58,14 @@ export async function createCollection(
   }
 
   // if IAB categories were specified, set up those connections as well
-  if (IABParentCategoryId) {
+  if (IABParentCategoryExternalId) {
     dbData.IABParentCategory = {
-      connect: { externalId: IABParentCategoryId },
+      connect: { externalId: IABParentCategoryExternalId },
     };
 
-    if (IABChildCategoryId) {
+    if (IABChildCategoryExternalId) {
       dbData.IABChildCategory = {
-        connect: { externalId: IABChildCategoryId },
+        connect: { externalId: IABChildCategoryExternalId },
       };
     }
   }
@@ -142,10 +142,10 @@ export async function updateCollection(
   delete data.curationCategoryExternalId;
 
   // And the same thing for IAB categories
-  const IABParentCategoryId = data.IABParentCategoryId;
-  const IABChildCategoryId = data.IABChildCategoryId;
-  delete data.IABParentCategoryId;
-  delete data.IABChildCategoryId;
+  const IABParentCategoryExternalId = data.IABParentCategoryExternalId;
+  const IABChildCategoryExternalId = data.IABChildCategoryExternalId;
+  delete data.IABParentCategoryExternalId;
+  delete data.IABChildCategoryExternalId;
 
   // if the collection is going from unpublished to published, we update its
   // `publishedAt` time
@@ -180,15 +180,15 @@ export async function updateCollection(
   }
 
   // same as above for IAB categories
-  if (IABParentCategoryId) {
+  if (IABParentCategoryExternalId) {
     dbData.IABParentCategory = {
-      connect: { externalId: IABParentCategoryId },
+      connect: { externalId: IABParentCategoryExternalId },
     };
 
     // we'd only ever set the sub category if a top category is set
-    if (IABChildCategoryId) {
+    if (IABChildCategoryExternalId) {
       dbData.IABChildCategory = {
-        connect: { externalId: IABChildCategoryId },
+        connect: { externalId: IABChildCategoryExternalId },
       };
     }
   } else {

@@ -38,8 +38,8 @@ export type CreateCollectionInput = {
   status?: CollectionStatus;
   authorExternalId: string;
   curationCategoryExternalId?: string;
-  IABParentCategoryId?: string;
-  IABChildCategoryId?: string;
+  IABParentCategoryExternalId?: string;
+  IABChildCategoryExternalId?: string;
 };
 
 export type UpdateCollectionInput = {
@@ -47,8 +47,8 @@ export type UpdateCollectionInput = {
   curationCategoryExternalId?: string;
   excerpt?: string;
   externalId: string;
-  IABChildCategoryId?: string;
-  IABParentCategoryId?: string;
+  IABChildCategoryExternalId?: string;
+  IABParentCategoryExternalId?: string;
   imageUrl?: string;
   intro?: string;
   publishedAt?: Date;

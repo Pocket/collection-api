@@ -125,12 +125,12 @@ describe('mutations: Collection', () => {
       expect(collection.stories.length).toEqual(0);
     });
 
-    it('should create a collection with an IAB top category', async () => {
+    it('should create a collection with an IAB parent category', async () => {
       const data: CreateCollectionInput = {
         slug: 'walter-bowls',
         title: 'walter bowls',
         authorExternalId: author.externalId,
-        IABParentCategoryId: IABParentCategory.externalId,
+        IABParentCategoryExternalId: IABParentCategory.externalId,
       };
 
       const c = await createCollection(db, data);
@@ -140,13 +140,13 @@ describe('mutations: Collection', () => {
       );
     });
 
-    it('should create a collection with IAB top and sub categories', async () => {
+    it('should create a collection with IAB parent and child categories', async () => {
       const data: CreateCollectionInput = {
         slug: 'walter-bowls',
         title: 'walter bowls',
         authorExternalId: author.externalId,
-        IABParentCategoryId: IABParentCategory.externalId,
-        IABChildCategoryId: IABChildCategory.externalId,
+        IABParentCategoryExternalId: IABParentCategory.externalId,
+        IABChildCategoryExternalId: IABChildCategory.externalId,
       };
 
       const c = await createCollection(db, data);
@@ -159,12 +159,12 @@ describe('mutations: Collection', () => {
       );
     });
 
-    it('should not connect an IAB sub category if an IAB top category is not set', async () => {
+    it('should not connect an IAB child category if an IAB parent category is not set', async () => {
       const data: CreateCollectionInput = {
         slug: 'walter-bowls',
         title: 'walter bowls',
         authorExternalId: author.externalId,
-        IABChildCategoryId: IABChildCategory.externalId,
+        IABChildCategoryExternalId: IABChildCategory.externalId,
       };
 
       const c = await createCollection(db, data);
@@ -250,7 +250,7 @@ describe('mutations: Collection', () => {
       expect(updated.curationCategory).toBeNull();
     });
 
-    it('should update a collection with an IAB top category', async () => {
+    it('should update a collection with an IAB parent category', async () => {
       const initial = await createCollectionHelper(db, {
         title: 'first iteration',
         author,
@@ -261,7 +261,7 @@ describe('mutations: Collection', () => {
         slug: initial.slug,
         title: 'second iteration',
         authorExternalId: author.externalId,
-        IABParentCategoryId: IABParentCategory.externalId,
+        IABParentCategoryExternalId: IABParentCategory.externalId,
       };
 
       const updated = await updateCollection(db, data);
@@ -269,7 +269,7 @@ describe('mutations: Collection', () => {
       expect(updated.IABParentCategory.name).toEqual(IABParentCategory.name);
     });
 
-    it('should update a collection with IAB top and sub categories', async () => {
+    it('should update a collection with IAB parent and child categories', async () => {
       const initial = await createCollectionHelper(db, {
         title: 'first iteration',
         author,
@@ -280,8 +280,8 @@ describe('mutations: Collection', () => {
         slug: initial.slug,
         title: 'second iteration',
         authorExternalId: author.externalId,
-        IABParentCategoryId: IABParentCategory.externalId,
-        IABChildCategoryId: IABChildCategory.externalId,
+        IABParentCategoryExternalId: IABParentCategory.externalId,
+        IABChildCategoryExternalId: IABChildCategory.externalId,
       };
 
       const updated = await updateCollection(db, data);
@@ -323,8 +323,8 @@ describe('mutations: Collection', () => {
         title: 'second iteration',
         authorExternalId: author.externalId,
         curationCategoryExternalId: curationCategory.externalId,
-        IABParentCategoryId: IABParentCategory.externalId,
-        IABChildCategoryId: IABChildCategory.externalId,
+        IABParentCategoryExternalId: IABParentCategory.externalId,
+        IABChildCategoryExternalId: IABChildCategory.externalId,
       };
 
       // should return the updated info
