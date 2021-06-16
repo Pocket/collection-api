@@ -30,9 +30,10 @@ async function main() {
     prisma,
     'Entertainment'
   );
+
   const IABChildCategory = await createIABCategoryHelper(
     prisma,
-    'Bowling',
+    'Live Music',
     IABParentCategory
   );
 
