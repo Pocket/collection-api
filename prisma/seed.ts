@@ -16,15 +16,15 @@ async function main() {
   const daniel = await createAuthorHelper(prisma, { name: 'Daniel' });
   const nina = await createAuthorHelper(prisma, { name: 'Nina' });
 
-  const curationCategory = await createCurationCategoryHelper(prisma, {
+  const curationCategory1 = await createCurationCategoryHelper(prisma, {
     name: 'Lorem Ipsum',
     slug: 'lorem-ipsum',
   });
 
-  const curationCategory2 = await createCurationCategoryHelper(
-    prisma,
-    'Bowling'
-  );
+  const curationCategory2 = await createCurationCategoryHelper(prisma, {
+    name: 'Bowling',
+    slug: 'bowling',
+  });
 
   const IABParentCategory = await createIABCategoryHelper(
     prisma,
