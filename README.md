@@ -124,3 +124,27 @@ From here you can issue any SQL statements you want to view/change data. Don't m
 ### What About a GUI?
 
 Command line not your thing? That's fine. You can connect to MySQL through any GUI you like. It's available at `localhost:3308`. You're responsible for setting up your own GUI though. 😉
+
+## Adding a Query or Mutation
+
+Whether against the public or admin endpoint, there are a lot of connected pieces involved in adding a Query or Mutation. There are two primary areas you'll be working in here - the database and the GraphQL API.
+
+### Database
+
+1. Create a function that either retrieves information from the database (query) or updates information in the database (mutation). This function will live in a file in either [database/queries](./src/database/queries) or [database/mutations](./src/database/mutations). Choose the file named after the entity on which you are operating. For example, if you needed a new query against the `CollectionStory` entity, you'd add a function in [database/queries/CollectionStory.ts](./src/database/queries/CollectionStory.ts).
+2. Add tests for this new function in the associated `{entity}.integration.ts` file.
+3. Add this new function to the export list in either [database/queries.ts](./src/database/queries.ts) or [database/mutations.ts](./src/database/mutations.ts) (depending on if you wrote a query or a mutation, of course).
+
+### GraphQL API
+
+Once you have the database stuff ironed out, it's time to move on to connecting this database operation to the GraphQL API.
+
+1. Add your query or mutaiton to the appropriate GraphQL schema file - [schema-admin.graphql](./schema-admin.graphql) or [schema-public.graphql](./schema-public.graphql). You should only add to `schema-public.graphql` if the query should be usable by outside clients - web or mobile. You should never add a mutation to this file. If a query is to be used in the admin tool, or if you're writing a mutation, add it to `schema-admin.graphql`.
+2. Create a resolver that _exactly_ matches the name of the query or mutation you added to the `.graphql` file. This will be in one of four places, depending on endpoint (public or admin) and purpose (query or mutation).
+   i. [admin/resolvers/queries.ts](./src/admin/resolvers/queries.ts)
+   ii. [admin/resolvers/mutations.ts](./src/admin/resolvers/mutations.ts)
+   iii. [public/resolvers/queries.ts](./src/public/resolvers/queries.ts)
+   iv. [public/resolvers/mutations.ts](./src/public/resolvers/mutations.ts)
+3. The resolver you just made should call the database function you created at the beginning. (You'll need to import this function, of course.) This is where the GraphQL API connects to the database.
+4. Add your new resolver (both an `import` and an `export`) to the appropriate `index.ts` file - either [admin/resolvers/index.ts](./src/admin/resolvers/index.ts) or [public/resolvers/index.ts](./src/public/resolvers/index.ts)
+5. Test your resolver in the GraphQL playground at `localhost:4004`.

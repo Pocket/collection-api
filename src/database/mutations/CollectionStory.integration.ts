@@ -1,4 +1,4 @@
-import { CollectionStatus, PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { getCollectionStory } from '../queries';
 import {
   CreateCollectionStoryInput,
@@ -8,7 +8,6 @@ import {
   clear as clearDb,
   createAuthorHelper,
   createCollectionHelper,
-  createCurationCategoryHelper,
 } from '../../test/helpers';
 import {
   createCollectionStory,
@@ -22,24 +21,17 @@ const db = new PrismaClient();
 
 describe('mutations: CollectionStory', () => {
   let author;
-  let curationCategory;
   let collection;
 
   beforeEach(async () => {
     await clearDb(db);
 
     author = await createAuthorHelper(db, { name: 'maude' });
-    curationCategory = await createCurationCategoryHelper(db, {
-      name: 'Food',
-      slug: 'food',
-    });
-    collection = await createCollectionHelper(
-      db,
-      'a collection: by maude',
+
+    collection = await createCollectionHelper(db, {
+      title: 'a collection: by maude',
       author,
-      CollectionStatus.DRAFT,
-      curationCategory
-    );
+    });
   });
 
   afterAll(async () => {
@@ -128,13 +120,10 @@ describe('mutations: CollectionStory', () => {
       const story = await createCollectionStory(db, data);
 
       // create a second collection
-      const collection2 = await createCollectionHelper(
-        db,
-        'a collection: by walter',
+      const collection2 = await createCollectionHelper(db, {
+        title: 'a collection: by walter',
         author,
-        CollectionStatus.DRAFT,
-        curationCategory
-      );
+      });
 
       // update the collection in the create data to reference the second collection
       data.collectionExternalId = collection2.externalId;
@@ -296,13 +285,10 @@ describe('mutations: CollectionStory', () => {
 
     it('should update to a url that already exists in a different collection', async () => {
       // create a new collection
-      const collection2 = await createCollectionHelper(
-        db,
-        'a collection: by walter',
+      const collection2 = await createCollectionHelper(db, {
+        title: 'a collection: by walter',
         author,
-        CollectionStatus.DRAFT,
-        curationCategory
-      );
+      });
 
       // create a story in the new collection
       const createData: CreateCollectionStoryInput = {

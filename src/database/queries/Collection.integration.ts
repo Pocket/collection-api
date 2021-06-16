@@ -12,6 +12,7 @@ import {
   createAuthorHelper,
   createCollectionHelper,
   createCurationCategoryHelper,
+  createIABCategoryHelper,
   sortCollectionStoryAuthors,
 } from '../../test/helpers';
 
@@ -20,6 +21,8 @@ const db = new PrismaClient();
 describe('queries: Collection', () => {
   let author;
   let curationCategory;
+  let IABParentCategory;
+  let IABChildCategory;
 
   beforeEach(async () => {
     await clearDb(db);
@@ -28,6 +31,12 @@ describe('queries: Collection', () => {
       name: 'Business',
       slug: 'business',
     });
+    IABParentCategory = await createIABCategoryHelper(db, 'Entertainment');
+    IABChildCategory = await createIABCategoryHelper(
+      db,
+      'Bowling',
+      IABParentCategory
+    );
   });
 
   afterAll(async () => {
@@ -36,16 +45,14 @@ describe('queries: Collection', () => {
 
   describe('getCollection', () => {
     it('can get a collection with no stories by external id', async () => {
-      const created = await createCollectionHelper(
-        db,
-        'test me',
+      const created = await createCollectionHelper(db, {
+        title: 'test me',
         author,
-        CollectionStatus.DRAFT,
+        addStories: false,
         curationCategory,
-        null,
-        null,
-        false // don't create any stories
-      );
+        IABParentCategory,
+        IABChildCategory,
+      });
 
       const collection = await getCollection(db, created.externalId);
 
@@ -56,8 +63,10 @@ describe('queries: Collection', () => {
 
       // we should return a curation category
       expect(collection.curationCategory).toBeTruthy();
-      expect(collection.curationCategory.name).toEqual('Business');
-      expect(collection.curationCategory.slug).toEqual('business');
+      expect(collection.curationCategory.name).toEqual(curationCategory.name);
+      expect(collection.curationCategory.slug).toEqual(curationCategory.slug);
+      expect(collection.IABParentCategory.name).toEqual(IABParentCategory.name);
+      expect(collection.IABChildCategory.name).toEqual(IABChildCategory.name);
 
       // we should return an array (truthy)
       expect(collection.stories).toBeTruthy();
@@ -67,15 +76,10 @@ describe('queries: Collection', () => {
     });
 
     it('can get a collection with stories with authors by external id', async () => {
-      const created = await createCollectionHelper(
-        db,
-        'test me',
+      const created = await createCollectionHelper(db, {
+        title: 'test me',
         author,
-        CollectionStatus.DRAFT,
-        curationCategory,
-        null,
-        null
-      );
+      });
 
       const collection = await getCollection(db, created.externalId);
 
@@ -85,15 +89,10 @@ describe('queries: Collection', () => {
     });
 
     it('can get a collection with story authors sorted correctly', async () => {
-      const created = await createCollectionHelper(
-        db,
-        'test me',
+      const created = await createCollectionHelper(db, {
+        title: 'test me',
         author,
-        CollectionStatus.DRAFT,
-        curationCategory,
-        null,
-        null
-      );
+      });
 
       const collection = await getCollection(db, created.externalId);
 
@@ -107,13 +106,14 @@ describe('queries: Collection', () => {
 
   describe('getCollectionBySlug', () => {
     it('can get a collection by slug', async () => {
-      await createCollectionHelper(
-        db,
-        'test me',
+      await createCollectionHelper(db, {
+        title: 'test me',
         author,
-        CollectionStatus.PUBLISHED,
-        curationCategory
-      );
+        status: CollectionStatus.PUBLISHED,
+        curationCategory,
+        IABParentCategory,
+        IABChildCategory,
+      });
 
       const collection = await getCollectionBySlug(db, 'test-me');
 
@@ -124,16 +124,16 @@ describe('queries: Collection', () => {
       expect(collection.stories).toBeTruthy();
       expect(collection.curationCategory).toBeTruthy();
       expect(collection.stories[0].authors).toBeTruthy();
+      expect(collection.IABParentCategory).toBeTruthy();
+      expect(collection.IABChildCategory).toBeTruthy();
     });
 
     it("should not get a collection that isn't published", async () => {
-      await createCollectionHelper(
-        db,
-        'test me',
+      // the helper defaults to 'DRAFT' status
+      await createCollectionHelper(db, {
+        title: 'test me',
         author,
-        CollectionStatus.DRAFT,
-        curationCategory
-      );
+      });
 
       const collection = await getCollectionBySlug(db, 'test-me');
 
@@ -141,13 +141,11 @@ describe('queries: Collection', () => {
     });
 
     it('can get a collection by slug with story authors sorted correctly', async () => {
-      await createCollectionHelper(
-        db,
-        'test me',
+      await createCollectionHelper(db, {
+        title: 'test me',
         author,
-        CollectionStatus.PUBLISHED,
-        curationCategory
-      );
+        status: CollectionStatus.PUBLISHED,
+      });
 
       const collection = await getCollectionBySlug(db, 'test-me');
 
@@ -161,20 +159,18 @@ describe('queries: Collection', () => {
 
   describe('getCollectionsBySlugs', () => {
     it('can get collections by slugs', async () => {
-      await createCollectionHelper(
-        db,
-        'test me',
+      await createCollectionHelper(db, {
+        title: 'test me',
         author,
-        CollectionStatus.PUBLISHED,
-        curationCategory
-      );
-      await createCollectionHelper(
-        db,
-        'test me 2',
+        status: CollectionStatus.PUBLISHED,
+      });
+      await createCollectionHelper(db, {
+        title: 'test me 2',
         author,
-        CollectionStatus.PUBLISHED,
-        curationCategory
-      );
+        status: CollectionStatus.PUBLISHED,
+        IABParentCategory,
+        IABChildCategory,
+      });
 
       const collections = await getCollectionsBySlugs(db, [
         'test-me',
@@ -190,37 +186,34 @@ describe('queries: Collection', () => {
       expect(collections[0].stories[0].authors[0]).toBeTruthy();
       expect(collections[1].stories).toBeTruthy();
       expect(collections[0].stories[1].authors.length).toBeGreaterThan(0);
+      expect(collections[1].IABParentCategory.name).toEqual(
+        IABParentCategory.name
+      );
+      expect(collections[1].IABChildCategory.name).toEqual(
+        IABChildCategory.name
+      );
     });
 
     it('gets only published collections', async () => {
-      await createCollectionHelper(
-        db,
-        'published 1',
+      await createCollectionHelper(db, {
+        title: 'published 1',
         author,
-        CollectionStatus.PUBLISHED,
-        curationCategory
-      );
-      await createCollectionHelper(
-        db,
-        'published 2',
+        status: CollectionStatus.PUBLISHED,
+      });
+      await createCollectionHelper(db, {
+        title: 'published 2',
         author,
-        CollectionStatus.PUBLISHED,
-        curationCategory
-      );
-      await createCollectionHelper(
-        db,
-        'i am le draft',
+        status: CollectionStatus.PUBLISHED,
+      });
+      await createCollectionHelper(db, {
+        title: 'i am le draft',
         author,
-        CollectionStatus.DRAFT,
-        curationCategory
-      );
-      await createCollectionHelper(
-        db,
-        'look at me i am archived',
+      });
+      await createCollectionHelper(db, {
+        title: 'look at me i am archived',
         author,
-        CollectionStatus.ARCHIVED,
-        curationCategory
-      );
+        status: CollectionStatus.ARCHIVED,
+      });
 
       const collections = await getCollectionsBySlugs(db, [
         'published-1',
@@ -232,20 +225,16 @@ describe('queries: Collection', () => {
     });
 
     it('can get collections by slugs with story authors sorted correctly', async () => {
-      await createCollectionHelper(
-        db,
-        'test me',
+      await createCollectionHelper(db, {
+        title: 'test me',
         author,
-        CollectionStatus.PUBLISHED,
-        curationCategory
-      );
-      await createCollectionHelper(
-        db,
-        'test me 2',
+        status: CollectionStatus.PUBLISHED,
+      });
+      await createCollectionHelper(db, {
+        title: 'test me 2',
         author,
-        CollectionStatus.PUBLISHED,
-        curationCategory
-      );
+        status: CollectionStatus.PUBLISHED,
+      });
 
       const collections = await getCollectionsBySlugs(db, [
         'test-me',
@@ -262,34 +251,27 @@ describe('queries: Collection', () => {
 
   describe('getPublishedCollections', () => {
     it('gets only published collections', async () => {
-      await createCollectionHelper(
-        db,
-        'first',
+      await createCollectionHelper(db, {
+        title: 'first',
         author,
-        CollectionStatus.PUBLISHED,
-        curationCategory
-      );
-      await createCollectionHelper(
-        db,
-        'second',
+        status: CollectionStatus.PUBLISHED,
+        IABParentCategory,
+        IABChildCategory,
+      });
+      await createCollectionHelper(db, {
+        title: 'second',
         author,
-        CollectionStatus.DRAFT,
-        curationCategory
-      );
-      await createCollectionHelper(
-        db,
-        'third',
+      });
+      await createCollectionHelper(db, {
+        title: 'third',
         author,
-        CollectionStatus.ARCHIVED,
-        curationCategory
-      );
-      await createCollectionHelper(
-        db,
-        'fourth',
+        status: CollectionStatus.ARCHIVED,
+      });
+      await createCollectionHelper(db, {
+        title: 'fourth',
         author,
-        CollectionStatus.PUBLISHED,
-        curationCategory
-      );
+        status: CollectionStatus.PUBLISHED,
+      });
 
       const collections = await getPublishedCollections(db, 1, 10);
 
@@ -299,52 +281,47 @@ describe('queries: Collection', () => {
       expect(collections[0].stories).toBeTruthy();
       expect(collections[0].authors).toBeTruthy();
       expect(collections[0].stories[0].authors).toBeTruthy();
-      expect(collections[0].curationCategory).toBeTruthy();
+      expect(collections[0].IABParentCategory.name).toEqual(
+        IABParentCategory.name
+      );
+      expect(collections[0].IABChildCategory.name).toEqual(
+        IABChildCategory.name
+      );
     });
 
     it('respects pagination', async () => {
       // `getPublishedCollections` sorts by `publishedAt` descending, so
       // these should be returned bottom to top
-      await createCollectionHelper(
-        db,
-        '1',
+      await createCollectionHelper(db, {
+        title: '1',
         author,
-        CollectionStatus.PUBLISHED,
-        curationCategory,
-        new Date(2021, 0, 1)
-      );
-      await createCollectionHelper(
-        db,
-        '2',
+        status: CollectionStatus.PUBLISHED,
+        publishedAt: new Date(2021, 0, 1),
+      });
+      await createCollectionHelper(db, {
+        title: '2',
         author,
-        CollectionStatus.PUBLISHED,
-        curationCategory,
-        new Date(2021, 0, 2)
-      );
-      await createCollectionHelper(
-        db,
-        '3',
+        status: CollectionStatus.PUBLISHED,
+        publishedAt: new Date(2021, 0, 2),
+      });
+      await createCollectionHelper(db, {
+        title: '3',
         author,
-        CollectionStatus.PUBLISHED,
-        curationCategory,
-        new Date(2021, 0, 3)
-      );
-      await createCollectionHelper(
-        db,
-        '4',
+        status: CollectionStatus.PUBLISHED,
+        publishedAt: new Date(2021, 0, 3),
+      });
+      await createCollectionHelper(db, {
+        title: '4',
         author,
-        CollectionStatus.PUBLISHED,
-        curationCategory,
-        new Date(2021, 0, 4)
-      );
-      await createCollectionHelper(
-        db,
-        '5',
+        status: CollectionStatus.PUBLISHED,
+        publishedAt: new Date(2021, 0, 4),
+      });
+      await createCollectionHelper(db, {
+        title: '5',
         author,
-        CollectionStatus.PUBLISHED,
-        curationCategory,
-        new Date(2021, 0, 5)
-      );
+        status: CollectionStatus.PUBLISHED,
+        publishedAt: new Date(2021, 0, 5),
+      });
 
       // we are getting two collections per page, and are requesting page 2
       // page 1 should be 5 and 4. page 2 should be 3 and 2, page 3 should be 1
@@ -356,20 +333,16 @@ describe('queries: Collection', () => {
     });
 
     it('can get published collections with story authors sorted correctly', async () => {
-      await createCollectionHelper(
-        db,
-        'first',
+      await createCollectionHelper(db, {
+        title: 'first',
         author,
-        CollectionStatus.PUBLISHED,
-        curationCategory
-      );
-      await createCollectionHelper(
-        db,
-        'fourth',
+        status: CollectionStatus.PUBLISHED,
+      });
+      await createCollectionHelper(db, {
+        title: 'fourth',
         author,
-        CollectionStatus.PUBLISHED,
-        curationCategory
-      );
+        status: CollectionStatus.PUBLISHED,
+      });
 
       const collections = await getPublishedCollections(db, 1, 10);
 
@@ -383,41 +356,30 @@ describe('queries: Collection', () => {
 
   describe('countPublishedCollections', () => {
     it('should retrieve the correct count of published collections', async () => {
-      await createCollectionHelper(
-        db,
-        '1',
+      await createCollectionHelper(db, {
+        title: '1',
         author,
-        CollectionStatus.DRAFT,
-        curationCategory
-      );
-      await createCollectionHelper(
-        db,
-        '2',
+      });
+      await createCollectionHelper(db, {
+        title: '2',
         author,
-        CollectionStatus.ARCHIVED,
-        curationCategory
-      );
-      await createCollectionHelper(
-        db,
-        '3',
+        status: CollectionStatus.ARCHIVED,
+      });
+      await createCollectionHelper(db, {
+        title: '3',
         author,
-        CollectionStatus.PUBLISHED,
-        curationCategory
-      );
-      await createCollectionHelper(
-        db,
-        '4',
+        status: CollectionStatus.PUBLISHED,
+      });
+      await createCollectionHelper(db, {
+        title: '4',
         author,
-        CollectionStatus.PUBLISHED,
-        curationCategory
-      );
-      await createCollectionHelper(
-        db,
-        '5',
+        status: CollectionStatus.PUBLISHED,
+      });
+      await createCollectionHelper(db, {
+        title: '5',
         author,
-        CollectionStatus.PUBLISHED,
-        curationCategory
-      );
+        status: CollectionStatus.PUBLISHED,
+      });
 
       const count = await countPublishedCollections(db);
 
@@ -433,47 +395,32 @@ describe('queries: Collection', () => {
       author2 = await createAuthorHelper(db, { name: 'the dude' });
 
       // create a batch of collections to search
-      await createCollectionHelper(
-        db,
-        'the dude abides',
-        author2,
-        CollectionStatus.DRAFT,
-        curationCategory,
-        null,
-        null,
-        false
-      );
-      await createCollectionHelper(
-        db,
-        'does the dude abide?',
+      await createCollectionHelper(db, {
+        title: 'the dude abides',
+        author: author2,
+        addStories: false,
+      });
+      await createCollectionHelper(db, {
+        title: 'does the dude abide?',
         author,
-        CollectionStatus.ARCHIVED,
-        curationCategory,
-        null,
-        null,
-        false
-      );
-      await createCollectionHelper(
-        db,
-        'your opinion man',
-        author2,
-        CollectionStatus.PUBLISHED,
-        curationCategory
-      );
-      await createCollectionHelper(
-        db,
-        'finishing my coffee',
+        status: CollectionStatus.ARCHIVED,
+        addStories: false,
+      });
+      await createCollectionHelper(db, {
+        title: 'your opinion man',
+        author: author2,
+        status: CollectionStatus.PUBLISHED,
+      });
+      await createCollectionHelper(db, {
+        title: 'finishing my coffee',
         author,
-        CollectionStatus.PUBLISHED,
-        curationCategory
-      );
-      await createCollectionHelper(
-        db,
-        'the dude abides man',
+        status: CollectionStatus.PUBLISHED,
+      });
+      await createCollectionHelper(db, {
+        title: 'the dude abides man',
         author,
-        CollectionStatus.PUBLISHED,
-        curationCategory
-      );
+        status: CollectionStatus.PUBLISHED,
+      });
     });
 
     it('should search by status', async () => {
