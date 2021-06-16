@@ -28,11 +28,11 @@ describe('mutations: Collection', () => {
 
   beforeEach(async () => {
     await clearDb(db);
-    author = await createAuthorHelper(db, 'walter');
-    curationCategory = await createCurationCategoryHelper(
-      db,
-      'Personal Finance'
-    );
+    author = await createAuthorHelper(db, { name: 'walter' });
+    curationCategory = await createCurationCategoryHelper(db, {
+      name: 'Personal Finance',
+      slug: 'personal-finance',
+    });
     IABParentCategory = await createIABCategoryHelper(db, 'Entertainment');
     IABChildCategory = await createIABCategoryHelper(
       db,
@@ -180,7 +180,7 @@ describe('mutations: Collection', () => {
         author,
       });
 
-      const newAuthor = await createAuthorHelper(db, 'Leo Tolstoy');
+      const newAuthor = await createAuthorHelper(db, { name: 'Leo Tolstoy' });
 
       const data: UpdateCollectionInput = {
         externalId: initial.externalId,
@@ -208,12 +208,12 @@ describe('mutations: Collection', () => {
         author,
       });
 
-      const newCurationCategory = await createCurationCategoryHelper(
-        db,
-        'Travel'
-      );
+      const newCurationCategory = await createCurationCategoryHelper(db, {
+        name: 'Travel',
+        slug: 'travel',
+      });
 
-      const newAuthor = await createAuthorHelper(db, 'Leo Tolstoy');
+      const newAuthor = await createAuthorHelper(db, { name: 'Leo Tolstoy' });
 
       const data: UpdateCollectionInput = {
         externalId: initial.externalId,
