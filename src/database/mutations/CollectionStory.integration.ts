@@ -26,7 +26,8 @@ describe('mutations: CollectionStory', () => {
   beforeEach(async () => {
     await clearDb(db);
 
-    author = await createAuthorHelper(db, 'maude');
+    author = await createAuthorHelper(db, { name: 'maude' });
+
     collection = await createCollectionHelper(db, {
       title: 'a collection: by maude',
       author,
