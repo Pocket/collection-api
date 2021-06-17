@@ -45,18 +45,31 @@ type IABParentCategory {
   children: [IABCategory!]!
 }
 
+type Brand {
+  name: String!
+  url: Url!
+  imageUrl: Url!
+  blurb: Markdown!
+}
+
 type Collection {
   externalId: ID!
   slug: String!
   title: String!
   excerpt: Markdown
   status: CollectionStatus!
+  partnershipStatus: PartershipStatus!
   curationCategory: CurationCategory
   intro: Markdown
   imageUrl: Url
   publishedAt: DateString
   authors: [CollectionAuthor!]!
   stories: [CollectionStory!]!
+  """
+  if `partnershipStatus` is not NONE, `brand` will contain information on the
+  brand that we partnered with on this collection
+  """
+  brand: Brand
   """
   We will never return child categories in this type, so there's no need to
   specify `IABParentCategory` here. The basic `IABCategory` is sufficient.
@@ -69,6 +82,12 @@ enum CollectionStatus {
   DRAFT
   PUBLISHED
   ARCHIVED
+}
+
+enum PartershipStatus {
+  NONE
+  PARTNERED
+  SPONSORED
 }
 
 type CollectionAuthor {
@@ -96,6 +115,10 @@ type CollectionStory @key(fields: "item { givenUrl }") {
   publisher: String
   sortOrder: Int
   item: Item
+  """
+  if True, the story is provided by a partner and should be displayed as such
+  """
+  isPartner: Boolean!
 }
 
 type CollectionStoryAuthor {
