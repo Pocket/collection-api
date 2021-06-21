@@ -105,12 +105,35 @@ export type CollectionStoryWithAuthors = CollectionStory & {
   authors: CollectionStoryAuthor[];
 };
 
+// changes here are currently just brainstorming partnerships
+
+// this will eventually come from @prisma/client
+export enum PartnershipType {
+  PARTNERED = 'PARTNERED',
+  SPONSORED = 'SPONSORED',
+}
+
+export type Brand = {
+  name: string;
+  url: string;
+  imageUrl: string;
+  blurb: string;
+};
+
+export type Partnership = {
+  brand: Brand;
+  type: PartnershipType;
+};
+
+// this type needs to be renamed :/
+// maybe CollectionFull? CollectionAll? yuck.
 export type CollectionWithAuthorsAndStories = Collection & {
   authors?: CollectionAuthor[];
   curationCategory?: CurationCategory;
   IABParentCategory?: IABCategory;
   IABChildCategory?: IABCategory;
   stories?: CollectionStoryWithAuthors[];
+  partnership?: Partnership;
 };
 
 export type CreateImageInput = {

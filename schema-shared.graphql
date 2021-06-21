@@ -45,11 +45,24 @@ type IABParentCategory {
   children: [IABCategory!]!
 }
 
+"""
+Type and enums related to Collections made in partnership with a company.
+"""
+enum PartershipType {
+  PARTNERED
+  SPONSORED
+}
+
 type Brand {
   name: String!
   url: Url!
   imageUrl: Url!
   blurb: Markdown!
+}
+
+type Partnership {
+  type: PartershipType!
+  brand: Brand!
 }
 
 type Collection {
@@ -58,7 +71,6 @@ type Collection {
   title: String!
   excerpt: Markdown
   status: CollectionStatus!
-  partnershipStatus: PartershipStatus!
   curationCategory: CurationCategory
   intro: Markdown
   imageUrl: Url
@@ -66,28 +78,22 @@ type Collection {
   authors: [CollectionAuthor!]!
   stories: [CollectionStory!]!
   """
-  if `partnershipStatus` is not NONE, `brand` will contain information on the
-  brand that we partnered with on this collection
-  """
-  brand: Brand
-  """
   We will never return child categories in this type, so there's no need to
   specify `IABParentCategory` here. The basic `IABCategory` is sufficient.
   """
   IABParentCategory: IABCategory
   IABChildCategory: IABCategory
+  """
+  If a collection was made in partnership with an external company, this
+  property will hold all required info about that partnership.
+  """
+  partnership: Partnership
 }
 
 enum CollectionStatus {
   DRAFT
   PUBLISHED
   ARCHIVED
-}
-
-enum PartershipStatus {
-  NONE
-  PARTNERED
-  SPONSORED
 }
 
 type CollectionAuthor {
