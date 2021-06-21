@@ -53,7 +53,7 @@ enum PartershipType {
   SPONSORED
 }
 
-type Brand {
+type Partner {
   name: String!
   url: Url!
   imageUrl: Url!
@@ -62,7 +62,7 @@ type Brand {
 
 type Partnership {
   type: PartershipType!
-  brand: Brand!
+  partner: Partner!
 }
 
 type Collection {
@@ -124,7 +124,7 @@ type CollectionStory @key(fields: "item { givenUrl }") {
   """
   if True, the story is provided by a partner and should be displayed as such
   """
-  isPartner: Boolean!
+  fromPartner: Boolean!
 }
 
 type CollectionStoryAuthor {
