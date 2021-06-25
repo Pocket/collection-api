@@ -113,7 +113,7 @@ export enum PartnershipType {
   SPONSORED = 'SPONSORED',
 }
 
-export type Brand = {
+export type Partner = {
   name: string;
   url: string;
   imageUrl: string;
@@ -121,7 +121,7 @@ export type Brand = {
 };
 
 export type Partnership = {
-  brand: Brand;
+  partner: Partner;
   type: PartnershipType;
 };
 
