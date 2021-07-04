@@ -9,22 +9,22 @@ import {
 const prisma = new PrismaClient();
 
 async function main() {
-  const kelvin = await createAuthorHelper(prisma, { name: 'Kelvin' });
-  const jonathan = await createAuthorHelper(prisma, { name: 'Jonathan' });
-  const chelsea = await createAuthorHelper(prisma, { name: 'Chelsea' });
-  const mathijs = await createAuthorHelper(prisma, { name: 'Mathijs' });
-  const daniel = await createAuthorHelper(prisma, { name: 'Daniel' });
-  const nina = await createAuthorHelper(prisma, { name: 'Nina' });
+  const kelvin = await createAuthorHelper(prisma, 'Kelvin');
+  const jonathan = await createAuthorHelper(prisma, 'Jonathan');
+  const chelsea = await createAuthorHelper(prisma, 'Chelsea');
+  const mathijs = await createAuthorHelper(prisma, 'Mathijs');
+  const daniel = await createAuthorHelper(prisma, 'Daniel');
+  const nina = await createAuthorHelper(prisma, 'Nina');
 
-  const curationCategory1 = await createCurationCategoryHelper(prisma, {
-    name: 'Lorem Ipsum',
-    slug: 'lorem-ipsum',
-  });
+  const curationCategory1 = await createCurationCategoryHelper(
+    prisma,
+    'Lorem Ipsum'
+  );
 
-  const curationCategory2 = await createCurationCategoryHelper(prisma, {
-    name: 'Bowling',
-    slug: 'bowling',
-  });
+  const curationCategory2 = await createCurationCategoryHelper(
+    prisma,
+    'Bowling'
+  );
 
   const IABParentCategory = await createIABCategoryHelper(
     prisma,

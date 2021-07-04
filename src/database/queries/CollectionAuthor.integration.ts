@@ -15,7 +15,7 @@ describe('queries: CollectionAuthor', () => {
 
   describe('getAuthor', () => {
     it('should get an author by their externalId', async () => {
-      const author = await createAuthorHelper(db, { name: 'the dude' });
+      const author = await createAuthorHelper(db, 'the dude');
 
       const found = await getAuthor(db, author.externalId);
 
@@ -23,7 +23,7 @@ describe('queries: CollectionAuthor', () => {
     });
 
     it('should fail on an invalid externalId', async () => {
-      const author = await createAuthorHelper(db, { name: 'the dude' });
+      const author = await createAuthorHelper(db, 'the dude');
 
       const found = await getAuthor(db, author.externalId + 'typo');
 
@@ -34,11 +34,11 @@ describe('queries: CollectionAuthor', () => {
   describe('getAuthors', () => {
     it('should get authors and respect paging', async () => {
       // create some authors to retrieve
-      await createAuthorHelper(db, { name: 'the dude' });
-      await createAuthorHelper(db, { name: 'walter' });
-      await createAuthorHelper(db, { name: 'donny' });
-      await createAuthorHelper(db, { name: 'maude' });
-      await createAuthorHelper(db, { name: 'brandt' });
+      await createAuthorHelper(db, 'the dude');
+      await createAuthorHelper(db, 'walter');
+      await createAuthorHelper(db, 'donny');
+      await createAuthorHelper(db, 'maude');
+      await createAuthorHelper(db, 'brandt');
 
       // get page 2, with 2 per page
       const results = await getAuthors(db, 2, 2);
@@ -53,11 +53,11 @@ describe('queries: CollectionAuthor', () => {
   describe('countAuthors', () => {
     it('should accurately count collection authors in the system', async () => {
       // create some authors
-      await createAuthorHelper(db, { name: 'the dude' });
-      await createAuthorHelper(db, { name: 'walter' });
-      await createAuthorHelper(db, { name: 'donny' });
-      await createAuthorHelper(db, { name: 'maude' });
-      await createAuthorHelper(db, { name: 'brandt' });
+      await createAuthorHelper(db, 'the dude');
+      await createAuthorHelper(db, 'walter');
+      await createAuthorHelper(db, 'donny');
+      await createAuthorHelper(db, 'maude');
+      await createAuthorHelper(db, 'brandt');
 
       const result = await countAuthors(db);
 

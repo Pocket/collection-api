@@ -22,13 +22,13 @@ const slugifyConfig = config.slugify;
 
 export async function createAuthorHelper(
   prisma: PrismaClient,
-  author: CreateCollectionAuthorInput
+  name: string
 ): Promise<CollectionAuthor> {
-  if (!author.slug) {
-    author.slug = slugify(author.name, slugifyConfig);
-  }
+  const slug = slugify(name, slugifyConfig);
 
-  return await prisma.collectionAuthor.create({ data: author });
+  const data: CreateCollectionAuthorInput = { name, slug };
+
+  return await prisma.collectionAuthor.create({ data });
 }
 
 // the minimum information required to create a collection
@@ -173,9 +173,13 @@ export async function createCollectionStoryHelper(
 
 export async function createCurationCategoryHelper(
   prisma: PrismaClient,
-  curationCategory: CreateCurationCategoryInput
+  name: string
 ): Promise<CurationCategory> {
-  return await prisma.curationCategory.create({ data: curationCategory });
+  const slug = slugify(name, slugifyConfig);
+
+  const data: Prisma.CurationCategoryCreateInput = { name, slug };
+
+  return await prisma.curationCategory.create({ data });
 }
 
 export async function createIABCategoryHelper(
@@ -241,11 +245,3 @@ export function sortCollectionStoryAuthors(
     return a.sortOrder - b.sortOrder;
   });
 }
-
-/**
- * The minimum information required to create a curation category
- */
-export type CreateCurationCategoryInput = {
-  name: string;
-  slug: string;
-};

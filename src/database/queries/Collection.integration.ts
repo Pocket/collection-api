@@ -26,11 +26,8 @@ describe('queries: Collection', () => {
 
   beforeEach(async () => {
     await clearDb(db);
-    author = await createAuthorHelper(db, { name: 'walter' });
-    curationCategory = await createCurationCategoryHelper(db, {
-      name: 'Business',
-      slug: 'business',
-    });
+    author = await createAuthorHelper(db, 'walter');
+    curationCategory = await createCurationCategoryHelper(db, 'Business');
     IABParentCategory = await createIABCategoryHelper(db, 'Entertainment');
     IABChildCategory = await createIABCategoryHelper(
       db,
@@ -392,7 +389,7 @@ describe('queries: Collection', () => {
 
     beforeEach(async () => {
       // create a second author for variety
-      author2 = await createAuthorHelper(db, { name: 'the dude' });
+      author2 = await createAuthorHelper(db, 'the dude');
 
       // create a batch of collections to search
       await createCollectionHelper(db, {

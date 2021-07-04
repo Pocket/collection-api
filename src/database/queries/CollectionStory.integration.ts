@@ -23,7 +23,7 @@ describe('queries: CollectionStory', () => {
     let story;
 
     beforeEach(async () => {
-      const author = await createAuthorHelper(db, { name: 'donny' });
+      const author = await createAuthorHelper(db, 'donny');
       const collection = await createCollectionHelper(db, {
         title: 'test me',
         author,
