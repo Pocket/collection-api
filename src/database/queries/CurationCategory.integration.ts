@@ -19,26 +19,11 @@ describe('queries: CurationCategory', () => {
   describe('getCurationCategories', () => {
     it('should get all curation categories and respect ordering', async () => {
       // create some curation categories to retrieve
-      await createCurationCategoryHelper(db, {
-        name: 'Endless Articles',
-        slug: 'endless-articles',
-      });
-      await createCurationCategoryHelper(db, {
-        name: 'To Read About',
-        slug: 'to-read-about',
-      });
-      await createCurationCategoryHelper(db, {
-        name: 'While The World',
-        slug: 'while-the-world',
-      });
-      await createCurationCategoryHelper(db, {
-        name: 'Is Standing Still',
-        slug: 'is-standing-still',
-      });
-      await createCurationCategoryHelper(db, {
-        name: 'Thanks To A Virus',
-        slug: 'thanks-to-a-virus',
-      });
+      await createCurationCategoryHelper(db, 'Endless Articles');
+      await createCurationCategoryHelper(db, 'To Read About');
+      await createCurationCategoryHelper(db, 'While The World');
+      await createCurationCategoryHelper(db, 'Is Standing Still');
+      await createCurationCategoryHelper(db, 'Thanks To A Virus');
 
       const results = await getCurationCategories(db);
 
