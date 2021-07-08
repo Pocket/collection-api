@@ -69,7 +69,7 @@ describe('mutations: CollectionAuthor', () => {
 
     describe('updateAuthor', () => {
       it('should update a collection author', async () => {
-        const author = await createAuthorHelper(db, { name: 'the dude' });
+        const author = await createAuthorHelper(db, 'the dude');
 
         const data: UpdateCollectionAuthorInput = {
           externalId: author.externalId,
@@ -85,7 +85,7 @@ describe('mutations: CollectionAuthor', () => {
       });
 
       it('should update to a specified collection author slug', async () => {
-        const author = await createAuthorHelper(db, { name: 'the dude' });
+        const author = await createAuthorHelper(db, 'the dude');
 
         const data: UpdateCollectionAuthorInput = {
           externalId: author.externalId,
@@ -100,9 +100,9 @@ describe('mutations: CollectionAuthor', () => {
 
       it('should fail to update a collection author slug if another author has that slug', async () => {
         // will create a slug of 'the-dude'
-        await createAuthorHelper(db, { name: 'the dude' });
+        await createAuthorHelper(db, 'the dude');
         // will create a slug of 'walter'
-        const author2 = await createAuthorHelper(db, { name: 'walter' });
+        const author2 = await createAuthorHelper(db, 'walter');
 
         // try to make walter's slug 'the-dude'
         const data: UpdateCollectionAuthorInput = {
@@ -120,7 +120,7 @@ describe('mutations: CollectionAuthor', () => {
     });
     describe('updateAuthorImageUrl', () => {
       it('should update a collection author image url', async () => {
-        const author = await createAuthorHelper(db, { name: 'the dude' });
+        const author = await createAuthorHelper(db, 'the dude');
         const randomKitten = 'https://placekitten.com/g/200/300';
 
         const data: UpdateCollectionAuthorImageUrlInput = {
@@ -134,7 +134,7 @@ describe('mutations: CollectionAuthor', () => {
       });
 
       it('should not update any other author fields', async () => {
-        const author = await createAuthorHelper(db, { name: 'the dude' });
+        const author = await createAuthorHelper(db, 'the dude');
         const randomKitten = 'https://placekitten.com/g/200/300';
 
         const data: UpdateCollectionAuthorImageUrlInput = {
