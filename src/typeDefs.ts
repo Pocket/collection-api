@@ -3,7 +3,7 @@ import fs from 'fs';
 import { gql } from 'apollo-server';
 
 import { CollectionAuthor } from '@prisma/client';
-import { CollectionWithAuthorsAndStories } from './database/types';
+import { CollectionComplete } from './database/types';
 
 const sharedSchema = fs
   .readFileSync(path.join(__dirname, '..', 'schema-shared.graphql'))
@@ -35,7 +35,7 @@ export type Pagination = {
 
 export type CollectionsResult = {
   pagination: Pagination;
-  collections: CollectionWithAuthorsAndStories[];
+  collections: CollectionComplete[];
 };
 
 export type CollectionAuthorsResult = {

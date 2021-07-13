@@ -1,7 +1,4 @@
-import {
-  CollectionWithAuthorsAndStories,
-  IABParentCategory,
-} from '../../database/types';
+import { CollectionComplete, IABParentCategory } from '../../database/types';
 import {
   countAuthors,
   getAuthor,
@@ -30,7 +27,7 @@ export async function getCollection(
   parent,
   { externalId },
   { db }
-): Promise<CollectionWithAuthorsAndStories> {
+): Promise<CollectionComplete> {
   return dbGetCollection(db, externalId);
 }
 

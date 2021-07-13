@@ -1,4 +1,4 @@
-import { CollectionWithAuthorsAndStories } from '../../database/types';
+import { CollectionComplete } from '../../database/types';
 import {
   countPublishedCollections,
   getCollectionBySlug as dbGetCollectionBySlug,
@@ -17,7 +17,7 @@ export async function getCollectionBySlug(
   parent,
   { slug },
   { db }
-): Promise<CollectionWithAuthorsAndStories> {
+): Promise<CollectionComplete> {
   return dbGetCollectionBySlug(db, slug);
 }
 

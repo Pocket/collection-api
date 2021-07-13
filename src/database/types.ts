@@ -5,6 +5,7 @@ import {
   CollectionStory,
   CurationCategory,
   IABCategory,
+  Partnership,
 } from '@prisma/client';
 
 export type CreateCollectionAuthorInput = {
@@ -105,29 +106,7 @@ export type CollectionStoryWithAuthors = CollectionStory & {
   authors: CollectionStoryAuthor[];
 };
 
-// changes here are currently just brainstorming partnerships
-
-// this will eventually come from @prisma/client
-export enum PartnershipType {
-  PARTNERED = 'PARTNERED',
-  SPONSORED = 'SPONSORED',
-}
-
-export type Partner = {
-  name: string;
-  url: string;
-  imageUrl: string;
-  blurb: string;
-};
-
-export type Partnership = {
-  partner: Partner;
-  type: PartnershipType;
-};
-
-// this type needs to be renamed :/
-// maybe CollectionFull? CollectionAll? yuck.
-export type CollectionWithAuthorsAndStories = Collection & {
+export type CollectionComplete = Collection & {
   authors?: CollectionAuthor[];
   curationCategory?: CurationCategory;
   IABParentCategory?: IABCategory;

@@ -48,7 +48,7 @@ type IABParentCategory {
 """
 Type and enums related to Collections made in partnership with a company.
 """
-enum PartershipType {
+enum PartnershipType {
   PARTNERED
   SPONSORED
 }
@@ -61,7 +61,7 @@ type Partner {
 }
 
 type Partnership {
-  type: PartershipType!
+  type: PartnershipType!
   partner: Partner!
 }
 
