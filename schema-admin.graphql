@@ -118,6 +118,26 @@ input CollectionImageUploadInput {
   fileSizeBytes: Int!
 }
 
+type CollectionPartnersResult {
+    pagination: Pagination
+    partners: [CollectionPartner!]!
+}
+
+input CreateCollectionPartnerInput {
+    name: String!
+    url: Url!
+    imageUrl: Url!
+    blurb: Markdown!
+}
+
+input UpdateCollectionPartnerInput {
+    externalId: String!
+    name: String!
+    url: Url!
+    imageUrl: Url!
+    blurb: Markdown!
+}
+
 type Query {
   searchCollections(
     filters: SearchCollectionsFilters!
@@ -135,7 +155,15 @@ type Query {
   """
   Retrieves a paged list of CollectionAuthors.
   """
-  getCollectionAuthors(page: Int, perPage: Int): CollectionAuthorsResult!
+  getCollectionAuthors(page: Int, perPage: Int): CollectionAuthorsResult
+  """
+  Retrieves a CollectionAuthor by externalId.
+  """
+  getCollectionPartner(externalId: String!): CollectionPartner
+  """
+  Retrieves a paged list of CollectionAuthors.
+  """
+  getCollectionPartners(page: Int, perPage: Int): CollectionPartnersResult!
   """
   Retrieves a CollectionStory by a combination of collectionId and url.
   """
@@ -205,4 +233,12 @@ type Mutation {
   Uploads an image to S3. Does *not* save the image to any entity (CollectionAuthor/Collection/CollectionStory).
   """
   collectionImageUpload(data: CollectionImageUploadInput!): CollectionImageUrl!
+  """
+  Creates a CollectionPartner.
+  """
+  createCollectionPartner(data: CreateCollectionPartnerInput!): CollectionPartner!
+  """
+  Updates a CollectionPartner.
+  """
+  updateCollectionPartner(data: UpdateCollectionPartnerInput!): CollectionPartner!
 }

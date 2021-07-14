@@ -1,6 +1,7 @@
 import {
   Collection,
   CollectionAuthor,
+  CollectionPartner,
   CollectionStory,
   Image,
   ImageEntityType,
@@ -10,12 +11,14 @@ import * as Sentry from '@sentry/node';
 import {
   CreateCollectionAuthorInput,
   CreateCollectionInput,
+  CreateCollectionPartnerInput,
   CreateCollectionStoryInput,
   CreateImageInput,
   UpdateCollectionAuthorImageUrlInput,
   UpdateCollectionAuthorInput,
   UpdateCollectionImageUrlInput,
   UpdateCollectionInput,
+  UpdateCollectionPartnerInput,
   UpdateCollectionStoryImageUrlInput,
   UpdateCollectionStoryInput,
   UpdateCollectionStorySortOrderInput,
@@ -24,6 +27,7 @@ import {
   associateImageWithEntity,
   createCollectionAuthor as dbCreateCollectionAuthor,
   createCollection as dbCreateCollection,
+  createCollectionPartner as dbCreateCollectionPartner,
   createCollectionStory as dbCreateCollectionStory,
   createImage,
   deleteCollectionStory as dbDeleteCollectionStory,
@@ -31,6 +35,7 @@ import {
   updateCollectionAuthorImageUrl as dbUpdateCollectionAuthorImageUrl,
   updateCollection as dbUpdateCollection,
   updateCollectionImageUrl as dbUpdateCollectionImageUrl,
+  updateCollectionPartner as dbUpdateCollectionPartner,
   updateCollectionStory as dbUpdateCollectionStory,
   updateCollectionStorySortOrder as dbUpdateCollectionStorySortOrder,
   updateCollectionStoryImageUrl as dbUpdateCollectionStoryImageUrl,
@@ -177,6 +182,42 @@ export async function updateCollectionImageUrl(
     data,
     dbUpdateCollectionImageUrl,
     ImageEntityType.COLLECTION
+  );
+}
+
+/**
+ * @param parent
+ * @param data
+ * @param db
+ */
+export async function createCollectionPartner(
+  parent,
+  { data },
+  { db }
+): Promise<CollectionPartner> {
+  return executeMutation<CreateCollectionPartnerInput, CollectionPartner>(
+    db,
+    data,
+    dbCreateCollectionPartner,
+    ImageEntityType.COLLECTION_PARTNER
+  );
+}
+
+/**
+ * @param parent
+ * @param data
+ * @param db
+ */
+export async function updateCollectionPartner(
+  parent,
+  { data },
+  { db }
+): Promise<CollectionPartner> {
+  return executeMutation<UpdateCollectionPartnerInput, CollectionPartner>(
+    db,
+    data,
+    dbUpdateCollectionPartner,
+    ImageEntityType.COLLECTION_PARTNER
   );
 }
 

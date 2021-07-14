@@ -23,8 +23,8 @@ model IABCategory {
   parentCollections Collection[]  @relation("CollectionIABParentCategory")
   childCollections  Collection[]  @relation("CollectionIABChildCategory")
 
-  @@index([IABCategoryId], name: "IABCategoryId")
   @@unique([externalId], name: "externalId")
+  @@index([IABCategoryId], name: "IABCategoryId")
 }
 
 model CollectionStoryAuthor {
@@ -94,27 +94,27 @@ model CollectionAuthor {
 }
 
 model Collection {
-  id                  Int                @id @default(autoincrement())
-  externalId          String             @default(uuid()) @db.VarChar(255)
-  slug                String             @unique @db.VarChar(300)
-  title               String             @db.VarChar(255)
-  excerpt             String?            @db.Text
-  intro               String?            @db.Text
-  imageUrl            String?            @db.VarChar(500)
-  publishedAt         DateTime?          @db.DateTime(0)
-  createdAt           DateTime           @default(now()) @db.DateTime(0)
-  updatedAt           DateTime           @updatedAt
+  id                  Int                    @id @default(autoincrement())
+  externalId          String                 @default(uuid()) @db.VarChar(255)
+  slug                String                 @unique @db.VarChar(300)
+  title               String                 @db.VarChar(255)
+  excerpt             String?                @db.Text
+  intro               String?                @db.Text
+  imageUrl            String?                @db.VarChar(500)
+  publishedAt         DateTime?              @db.DateTime(0)
+  createdAt           DateTime               @default(now()) @db.DateTime(0)
+  updatedAt           DateTime               @updatedAt
   curationCategoryId  Int?
   IABParentCategoryId Int?
   IABChildCategoryId  Int?
   partnershipId       Int?
-  status              CollectionStatus?  @default(DRAFT)
+  status              CollectionStatus?      @default(DRAFT)
   authors             CollectionAuthor[]
   stories             CollectionStory[]
-  curationCategory    CurationCategory?  @relation(fields: [curationCategoryId], references: [id])
-  IABParentCategory   IABCategory?       @relation("CollectionIABParentCategory", fields: [IABParentCategoryId], references: [id])
-  IABChildCategory    IABCategory?       @relation("CollectionIABChildCategory", fields: [IABChildCategoryId], references: [id])
-  partnership         Partnership?       @relation(fields: [partnershipId], references: [id])
+  curationCategory    CurationCategory?      @relation(fields: [curationCategoryId], references: [id])
+  IABParentCategory   IABCategory?           @relation("CollectionIABParentCategory", fields: [IABParentCategoryId], references: [id])
+  IABChildCategory    IABCategory?           @relation("CollectionIABChildCategory", fields: [IABChildCategoryId], references: [id])
+  partnership         CollectionPartnership? @relation(fields: [partnershipId], references: [id])
 
   @@unique([externalId], name: "externalId")
   @@index([slug], name: "slug")
@@ -127,25 +127,42 @@ model CurationCategory {
   slug       String @unique @db.VarChar(300)
   name       String @db.VarChar(255)
 
-  @@unique([externalId], name: "externalId")
   collections Collection[]
+  @@unique([externalId], name: "externalId")
 }
 
-model Partnership {
-  id          Int    @id @default(autoincrement())
-  externalId  String @default(uuid()) @db.VarChar(255)
-  url         String @db.VarChar(500)
-  imageUrl    String @db.VarChar(500)
-  blurb       String @db.Text
-
+model CollectionPartner {
+  id                    Int                     @id @default(autoincrement())
+  externalId            String                  @default(uuid()) @db.VarChar(255)
+  name                  String                  @db.VarChar(500)
+  url                   String                  @db.VarChar(500)
+  imageUrl              String                  @db.VarChar(500)
+  blurb                 String                  @db.Text
+  CollectionPartnership CollectionPartnership[]
   @@unique([externalId], name: "externalId")
+}
+
+model CollectionPartnership {
+  id         Int                       @id @default(autoincrement())
+  externalId String                    @default(uuid()) @db.VarChar(255)
+  type       CollectionPartnershipType @default(PARTNERED)
+  partnerId  Int
+  name       String?                   @db.VarChar(500)
+  url        String?                   @db.VarChar(500)
+  imageUrl   String?                   @db.VarChar(500)
+  blurb      String?                   @db.Text
+
+  partner     CollectionPartner @relation(fields: [partnerId], references: [id])
   collections Collection[]
+  @@unique([externalId], name: "externalId")
 }
 
 enum ImageEntityType {
   COLLECTION
   COLLECTION_STORY
   COLLECTION_AUTHOR
+  COLLECTION_PARTNER
+  COLLECTION_PARTNERSHIP
 }
 
 enum ImageSizeCategory {
@@ -160,7 +177,7 @@ enum CollectionStatus {
   ARCHIVED
 }
 
-enum PartnershipType {
+enum CollectionPartnershipType {
   PARTNERED
   SPONSORED
 }

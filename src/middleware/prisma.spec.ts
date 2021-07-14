@@ -18,6 +18,7 @@ describe('prisma middleware', () => {
     updatedAt: new Date(),
     IABParentCategoryId: 1,
     IABChildCategoryId: 2,
+    partnershipId: 1,
     stories: [
       {
         id: 1,
@@ -29,6 +30,7 @@ describe('prisma middleware', () => {
         imageUrl: 'test',
         publisher: 'test',
         sortOrder: 0,
+        fromPartner: false,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -42,6 +44,7 @@ describe('prisma middleware', () => {
         imageUrl: 'test',
         publisher: 'test',
         sortOrder: 0,
+        fromPartner: false,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -63,6 +66,7 @@ describe('prisma middleware', () => {
     updatedAt: new Date(),
     IABParentCategoryId: 1,
     IABChildCategoryId: 2,
+    partnershipId: 1,
     stories: [
       {
         id: 1,
@@ -74,6 +78,7 @@ describe('prisma middleware', () => {
         imageUrl: 'test',
         publisher: 'test',
         sortOrder: 0,
+        fromPartner: false,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -87,6 +92,7 @@ describe('prisma middleware', () => {
         imageUrl: 'test',
         publisher: 'test',
         sortOrder: 0,
+        fromPartner: false,
         createdAt: new Date(),
         updatedAt: new Date(),
       },

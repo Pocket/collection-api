@@ -1,11 +1,11 @@
 import {
   Collection,
   CollectionAuthor,
+  CollectionPartnership,
   CollectionStatus,
   CollectionStory,
   CurationCategory,
   IABCategory,
-  Partnership,
 } from '@prisma/client';
 
 export type CreateCollectionAuthorInput = {
@@ -96,6 +96,21 @@ export type UpdateCollectionStoryImageUrlInput = {
   imageUrl: string;
 };
 
+export type CreateCollectionPartnerInput = {
+  name: string;
+  url: string;
+  imageUrl: string;
+  blurb: string;
+};
+
+export type UpdateCollectionPartnerInput = {
+  externalId: string;
+  name: string;
+  url: string;
+  imageUrl: string;
+  blurb: string;
+};
+
 export type SearchCollectionsFilters = {
   author?: string;
   title?: string;
@@ -112,7 +127,7 @@ export type CollectionComplete = Collection & {
   IABParentCategory?: IABCategory;
   IABChildCategory?: IABCategory;
   stories?: CollectionStoryWithAuthors[];
-  partnership?: Partnership;
+  partnership?: CollectionPartnership;
 };
 
 export type CreateImageInput = {
