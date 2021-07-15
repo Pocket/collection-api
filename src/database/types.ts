@@ -127,7 +127,6 @@ export type CollectionComplete = Collection & {
   IABParentCategory?: IABCategory;
   IABChildCategory?: IABCategory;
   stories?: CollectionStoryWithAuthors[];
-  partnership?: CollectionPartnership;
 };
 
 export type CreateImageInput = {
