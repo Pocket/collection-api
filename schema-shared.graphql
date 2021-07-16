@@ -54,29 +54,17 @@ enum CollectionPartnershipType {
 }
 
 """
-Details of a partner company sponsored collections are associated with.
-"""
-type CollectionPartner {
-  externalId: String!
-  name: String!
-  url: Url!
-  imageUrl: Url!
-  blurb: Markdown!
-}
-
-"""
 If a collection was made in partnership with an external company, this
 entity will hold all required info about that partnership.
 """
 type CollectionPartnership {
   externalId: String!
   type: CollectionPartnershipType!
-  partner: CollectionPartner!
   collection: Collection!
-  name: String
-  url: Url
-  imageUrl: Url
-  blurb: Markdown
+  name: String!
+  url: Url!
+  imageUrl: Url!
+  blurb: Markdown!
 }
 
 type Collection {
@@ -97,6 +85,7 @@ type Collection {
   """
   IABParentCategory: IABCategory
   IABChildCategory: IABCategory
+  partnership: CollectionPartnership
 }
 
 enum CollectionStatus {

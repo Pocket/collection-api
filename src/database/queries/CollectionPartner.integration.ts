@@ -43,10 +43,10 @@ describe('queries: CollectionPartner', () => {
       // get page 2, with 2 per page
       const results = await getPartners(db, 2, 2);
 
-      // as we order by name ascending, this should give us citizen & cloud
+      // as we order by name ascending, this should give us authority & beyond
       expect(results.length).toEqual(2);
-      expect(results[0].name).toEqual('Citizen Podcast');
-      expect(results[1].name).toEqual('Cloud Podcast');
+      expect(results[0].name).toEqual('Podcast Authority');
+      expect(results[1].name).toEqual('Podcast Beyond');
     });
   });
 

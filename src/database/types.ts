@@ -1,7 +1,6 @@
 import {
   Collection,
   CollectionAuthor,
-  CollectionPartnership,
   CollectionStatus,
   CollectionStory,
   CurationCategory,
