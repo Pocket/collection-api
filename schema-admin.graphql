@@ -129,23 +129,6 @@ type CollectionPartner {
     blurb: Markdown!
 }
 
-"""
-If a collection was made in partnership with an external company, this
-entity will hold all required info about that partnership.
-
-This admin-only type is more granular than the one for public consumption.
-"""
-type CollectionPartnershipComplete {
-    externalId: String!
-    type: CollectionPartnershipType!
-    partner: CollectionPartner!
-    collection: Collection!
-    name: String
-    url: Url
-    imageUrl: Url
-    blurb: Markdown
-}
-
 type CollectionPartnersResult {
     pagination: Pagination
     partners: [CollectionPartner!]!

@@ -85,7 +85,6 @@ type Collection {
   """
   IABParentCategory: IABCategory
   IABChildCategory: IABCategory
-  partnership: CollectionPartnership
 }
 
 enum CollectionStatus {
