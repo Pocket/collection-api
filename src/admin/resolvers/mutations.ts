@@ -18,6 +18,7 @@ import {
   UpdateCollectionAuthorInput,
   UpdateCollectionImageUrlInput,
   UpdateCollectionInput,
+  UpdateCollectionPartnerImageUrlInput,
   UpdateCollectionPartnerInput,
   UpdateCollectionStoryImageUrlInput,
   UpdateCollectionStoryInput,
@@ -36,6 +37,7 @@ import {
   updateCollection as dbUpdateCollection,
   updateCollectionImageUrl as dbUpdateCollectionImageUrl,
   updateCollectionPartner as dbUpdateCollectionPartner,
+  updateCollectionPartnerImageUrl as dbUpdateCollectionPartnerImageUrl,
   updateCollectionStory as dbUpdateCollectionStory,
   updateCollectionStorySortOrder as dbUpdateCollectionStorySortOrder,
   updateCollectionStoryImageUrl as dbUpdateCollectionStoryImageUrl,
@@ -217,6 +219,27 @@ export async function updateCollectionPartner(
     db,
     data,
     dbUpdateCollectionPartner,
+    ImageEntityType.COLLECTION_PARTNER
+  );
+}
+
+/**
+ * @param parent
+ * @param data
+ * @param db
+ */
+export async function updateCollectionPartnerImageUrl(
+  parent,
+  { data },
+  { db }
+): Promise<CollectionPartner> {
+  return executeMutation<
+    UpdateCollectionPartnerImageUrlInput,
+    CollectionPartner
+  >(
+    db,
+    data,
+    dbUpdateCollectionPartnerImageUrl,
     ImageEntityType.COLLECTION_PARTNER
   );
 }

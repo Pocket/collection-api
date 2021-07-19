@@ -2,6 +2,7 @@ import { CollectionPartner, PrismaClient } from '@prisma/client';
 
 import {
   CreateCollectionPartnerInput,
+  UpdateCollectionPartnerImageUrlInput,
   UpdateCollectionPartnerInput,
 } from '../types';
 
@@ -23,6 +24,24 @@ export async function createCollectionPartner(
 export async function updateCollectionPartner(
   db: PrismaClient,
   data: UpdateCollectionPartnerInput
+): Promise<CollectionPartner> {
+  if (!data.externalId) {
+    throw new Error('externalId must be provided.');
+  }
+
+  return db.collectionPartner.update({
+    where: { externalId: data.externalId },
+    data: { ...data },
+  });
+}
+
+/**
+ * @param db
+ * @param data
+ */
+export async function updateCollectionPartnerImageUrl(
+  db: PrismaClient,
+  data: UpdateCollectionPartnerImageUrlInput
 ): Promise<CollectionPartner> {
   if (!data.externalId) {
     throw new Error('externalId must be provided.');

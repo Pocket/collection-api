@@ -106,8 +106,13 @@ export type UpdateCollectionPartnerInput = {
   externalId: string;
   name: string;
   url: string;
-  imageUrl: string;
+  imageUrl?: string;
   blurb: string;
+};
+
+export type UpdateCollectionPartnerImageUrlInput = {
+  externalId: string;
+  imageUrl: string;
 };
 
 export type SearchCollectionsFilters = {

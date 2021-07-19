@@ -145,8 +145,13 @@ input UpdateCollectionPartnerInput {
     externalId: String!
     name: String!
     url: Url!
-    imageUrl: Url!
+    imageUrl: Url
     blurb: Markdown!
+}
+
+input UpdateCollectionPartnerImageUrlInput {
+    externalId: String!
+    imageUrl: Url!
 }
 
 type Query {

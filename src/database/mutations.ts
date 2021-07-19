@@ -13,6 +13,7 @@ export {
 export {
   createCollectionPartner,
   updateCollectionPartner,
+  updateCollectionPartnerImageUrl,
 } from './mutations/CollectionPartner';
 export {
   createCollectionStory,
