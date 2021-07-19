@@ -257,4 +257,10 @@ type Mutation {
   Updates a CollectionPartner.
   """
   updateCollectionPartner(data: UpdateCollectionPartnerInput!): CollectionPartner!
+  """
+  Updates only the `imageUrl` property of a CollectionPartner. Dedicated to uploading images within the UI.
+  """
+  updateCollectionPartnerImageUrl(
+      data: UpdateCollectionPartnerImageUrlInput!
+  ): CollectionPartner!
 }
