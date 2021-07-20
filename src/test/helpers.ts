@@ -2,6 +2,7 @@ import slugify from 'slugify';
 import {
   Collection,
   CollectionAuthor,
+  CollectionPartner,
   CollectionStatus,
   CollectionStory,
   CurationCategory,
@@ -198,6 +199,20 @@ export async function createIABCategoryHelper(
   return await prisma.iABCategory.create({ data });
 }
 
+export async function createPartnerHelper(
+  prisma: PrismaClient,
+  name?: string
+): Promise<CollectionPartner> {
+  const data: Prisma.CollectionPartnerCreateInput = {
+    name: name ? name : faker.company.companyName(),
+    url: faker.internet.url(),
+    imageUrl: faker.image.imageUrl(),
+    blurb: faker.lorem.paragraphs(2),
+  };
+
+  return await prisma.collectionPartner.create({ data });
+}
+
 export async function createImageHelper(
   prisma: PrismaClient,
   fileName: string,
@@ -223,6 +238,8 @@ export async function clear(prisma: PrismaClient): Promise<void> {
   const tables = [
     'CollectionStory',
     'CurationCategory',
+    'CollectionPartnership',
+    'CollectionPartner',
     'Collection',
     'CollectionAuthor',
     'IABCategory',

@@ -1,9 +1,6 @@
 import { CollectionStatus, PrismaClient } from '@prisma/client';
 
-import {
-  SearchCollectionsFilters,
-  CollectionWithAuthorsAndStories,
-} from '../types';
+import { SearchCollectionsFilters, CollectionComplete } from '../types';
 
 /**
  * this is primarily an admin query, which is why we don't return any author
@@ -15,7 +12,7 @@ import {
 export async function getCollection(
   db: PrismaClient,
   externalId: string
-): Promise<CollectionWithAuthorsAndStories> {
+): Promise<CollectionComplete> {
   const collection = db.collection.findUnique({
     where: { externalId },
     include: {
@@ -53,7 +50,7 @@ export async function getCollection(
 export async function getCollectionBySlug(
   db: PrismaClient,
   slug: string
-): Promise<CollectionWithAuthorsAndStories> {
+): Promise<CollectionComplete> {
   // slug is unique, but the generated type for `findUnique` here doesn't
   // include `status`, so using `findFirst` instead
   return db.collection.findFirst({
@@ -82,7 +79,7 @@ export async function getCollectionBySlug(
 export async function getCollectionsBySlugs(
   db: PrismaClient,
   slugs: string[]
-): Promise<CollectionWithAuthorsAndStories[]> {
+): Promise<CollectionComplete[]> {
   return await db.collection.findMany({
     where: { slug: { in: slugs }, status: CollectionStatus.PUBLISHED },
     include: {
@@ -111,7 +108,7 @@ export async function getPublishedCollections(
   db: PrismaClient,
   page: number,
   perPage: number
-): Promise<CollectionWithAuthorsAndStories[]> {
+): Promise<CollectionComplete[]> {
   return db.collection.findMany({
     where: { status: CollectionStatus.PUBLISHED },
     include: {
@@ -154,7 +151,7 @@ export async function searchCollections(
   filters: SearchCollectionsFilters,
   page: number = undefined,
   perPage: number = undefined
-): Promise<CollectionWithAuthorsAndStories[]> {
+): Promise<CollectionComplete[]> {
   let queryParams: any = {
     where: {
       status: filters.status,

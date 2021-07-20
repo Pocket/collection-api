@@ -95,6 +95,26 @@ export type UpdateCollectionStoryImageUrlInput = {
   imageUrl: string;
 };
 
+export type CreateCollectionPartnerInput = {
+  name: string;
+  url: string;
+  imageUrl: string;
+  blurb: string;
+};
+
+export type UpdateCollectionPartnerInput = {
+  externalId: string;
+  name: string;
+  url: string;
+  imageUrl?: string;
+  blurb: string;
+};
+
+export type UpdateCollectionPartnerImageUrlInput = {
+  externalId: string;
+  imageUrl: string;
+};
+
 export type SearchCollectionsFilters = {
   author?: string;
   title?: string;
@@ -105,35 +125,12 @@ export type CollectionStoryWithAuthors = CollectionStory & {
   authors: CollectionStoryAuthor[];
 };
 
-// changes here are currently just brainstorming partnerships
-
-// this will eventually come from @prisma/client
-export enum PartnershipType {
-  PARTNERED = 'PARTNERED',
-  SPONSORED = 'SPONSORED',
-}
-
-export type Partner = {
-  name: string;
-  url: string;
-  imageUrl: string;
-  blurb: string;
-};
-
-export type Partnership = {
-  partner: Partner;
-  type: PartnershipType;
-};
-
-// this type needs to be renamed :/
-// maybe CollectionFull? CollectionAll? yuck.
-export type CollectionWithAuthorsAndStories = Collection & {
+export type CollectionComplete = Collection & {
   authors?: CollectionAuthor[];
   curationCategory?: CurationCategory;
   IABParentCategory?: IABCategory;
   IABChildCategory?: IABCategory;
   stories?: CollectionStoryWithAuthors[];
-  partnership?: Partnership;
 };
 
 export type CreateImageInput = {

@@ -45,26 +45,6 @@ type IABParentCategory {
   children: [IABCategory!]!
 }
 
-"""
-Type and enums related to Collections made in partnership with a company.
-"""
-enum PartershipType {
-  PARTNERED
-  SPONSORED
-}
-
-type Partner {
-  name: String!
-  url: Url!
-  imageUrl: Url!
-  blurb: Markdown!
-}
-
-type Partnership {
-  type: PartershipType!
-  partner: Partner!
-}
-
 type Collection {
   externalId: ID!
   slug: String!
@@ -83,11 +63,6 @@ type Collection {
   """
   IABParentCategory: IABCategory
   IABChildCategory: IABCategory
-  """
-  If a collection was made in partnership with an external company, this
-  property will hold all required info about that partnership.
-  """
-  partnership: Partnership
 }
 
 enum CollectionStatus {

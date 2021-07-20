@@ -16,3 +16,8 @@ export {
 export { getCollectionStory } from './queries/CollectionStory';
 export { getCurationCategories } from './queries/CurationCategory';
 export { getIABCategories } from './queries/IABCategory';
+export {
+  countPartners,
+  getPartner,
+  getPartners,
+} from './queries/CollectionPartner';
