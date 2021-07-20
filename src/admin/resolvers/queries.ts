@@ -1,7 +1,4 @@
-import {
-  CollectionWithAuthorsAndStories,
-  IABParentCategory,
-} from '../../database/types';
+import { CollectionComplete, IABParentCategory } from '../../database/types';
 import {
   countAuthors,
   getAuthor,
@@ -11,12 +8,20 @@ import {
   getCurationCategories as dbGetCurationCategories,
   searchCollections as dbSearchCollections,
   getIABCategories as dbGetIABCategories,
+  countPartners,
+  getPartner,
+  getPartners,
 } from '../../database/queries';
 import config from '../../config';
-import { CollectionAuthorsResult, CollectionsResult } from '../../typeDefs';
+import {
+  CollectionAuthorsResult,
+  CollectionPartnersResult,
+  CollectionsResult,
+} from '../../typeDefs';
 import { getPagination } from '../../utils';
 import {
   CollectionAuthor,
+  CollectionPartner,
   CollectionStory,
   CurationCategory,
 } from '@prisma/client';
@@ -30,7 +35,7 @@ export async function getCollection(
   parent,
   { externalId },
   { db }
-): Promise<CollectionWithAuthorsAndStories> {
+): Promise<CollectionComplete> {
   return dbGetCollection(db, externalId);
 }
 
@@ -131,4 +136,37 @@ export async function getIABCategories(
   const IABCategories = dbGetIABCategories(db);
 
   return IABCategories;
+}
+
+/**
+ * @param parent
+ * @param page
+ * @param perPage
+ * @param db
+ */
+export async function getCollectionPartners(
+  parent,
+  { page = 1, perPage = config.app.pagination.partnersPerPage },
+  { db }
+): Promise<CollectionPartnersResult> {
+  const totalResults = await countPartners(db);
+  const partners = await getPartners(db, page, perPage);
+
+  return {
+    pagination: getPagination(totalResults, page, perPage),
+    partners,
+  };
+}
+
+/**
+ * @param parent
+ * @param externalId
+ * @param db
+ */
+export async function getCollectionPartner(
+  parent,
+  { externalId },
+  { db }
+): Promise<CollectionPartner> {
+  return getPartner(db, externalId);
 }
