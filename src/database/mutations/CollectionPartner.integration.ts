@@ -40,46 +40,26 @@ describe('mutations: CollectionPartner', () => {
       );
       expect(partner.imageUrl).toEqual('https://i.imgur.com/b0O3wZo.jpg');
     });
-
-    describe('updatePartner', () => {
-      it('should update a collection partner', async () => {
-        const partner = await createPartnerHelper(db, 'Podcast Kings');
-
-        const data: UpdateCollectionPartnerInput = {
-          externalId: partner.externalId,
-          name: 'Podcast Kings',
-          url: 'https://test.com',
-          blurb: 'What else is there to talk on a podcast about? Only kittens',
-          imageUrl: 'https://i.imgur.com/b0O3wZo.jpg',
-        };
-
-        const updated = await updateCollectionPartner(db, data);
-
-        expect(updated.name).toEqual(data.name);
-        expect(updated.url).toEqual(data.url);
-        expect(updated.blurb).toEqual(data.blurb);
-        expect(updated.imageUrl).toEqual(data.imageUrl);
-      });
-    });
   });
 
   describe('updatePartner', () => {
     it('should update a collection partner', async () => {
-      const partner = await createPartnerHelper(db, 'Slim Skyline');
+      const partner = await createPartnerHelper(db, 'Podcast Kings');
 
       const data: UpdateCollectionPartnerInput = {
         externalId: partner.externalId,
-        name: 'Embrace Platform',
-        url: 'https://www.test.com/',
-        blurb:
-          'A devops blockchain AI startup in the health and wellness space.',
+        name: 'Podcast Kings',
+        url: 'https://test.com',
+        blurb: 'What else is there to talk on a podcast about? Only kittens',
+        imageUrl: 'https://i.imgur.com/b0O3wZo.jpg',
       };
 
       const updated = await updateCollectionPartner(db, data);
 
       expect(updated.name).toEqual(data.name);
-      expect(updated.name).toEqual(data.name);
+      expect(updated.url).toEqual(data.url);
       expect(updated.blurb).toEqual(data.blurb);
+      expect(updated.imageUrl).toEqual(data.imageUrl);
     });
   });
 

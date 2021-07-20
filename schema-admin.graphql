@@ -171,7 +171,7 @@ type Query {
   """
   Retrieves a paged list of CollectionAuthors.
   """
-  getCollectionAuthors(page: Int, perPage: Int): CollectionAuthorsResult
+  getCollectionAuthors(page: Int, perPage: Int): CollectionAuthorsResult!
   """
   Retrieves a CollectionAuthor by externalId.
   """

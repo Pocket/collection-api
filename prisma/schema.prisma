@@ -131,13 +131,13 @@ model CurationCategory {
 }
 
 model CollectionPartner {
-  id                    Int                     @id @default(autoincrement())
-  externalId            String                  @default(uuid()) @db.VarChar(255)
-  name                  String                  @db.VarChar(500)
-  url                   String                  @db.VarChar(500)
-  imageUrl              String                  @db.VarChar(500)
-  blurb                 String                  @db.Text
-  CollectionPartnership CollectionPartnership[]
+  id           Int                     @id @default(autoincrement())
+  externalId   String                  @default(uuid()) @db.VarChar(255)
+  name         String                  @db.VarChar(500)
+  url          String                  @db.VarChar(500)
+  imageUrl     String                  @db.VarChar(500)
+  blurb        String                  @db.Text
+  partnerships CollectionPartnership[]
 
   @@unique([externalId], name: "externalId")
 }
