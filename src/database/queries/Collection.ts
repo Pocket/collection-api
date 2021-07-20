@@ -1,6 +1,10 @@
 import { CollectionStatus, PrismaClient } from '@prisma/client';
-
-import { SearchCollectionsFilters, CollectionComplete } from '../types';
+import {
+  SearchCollectionsFilters,
+  CollectionComplete,
+  CollectionsFilters,
+} from '../types';
+import { buildGetPublishedCollectionsWhere } from '../../utils';
 
 /**
  * this is primarily an admin query, which is why we don't return any author
@@ -107,10 +111,11 @@ export async function getCollectionsBySlugs(
 export async function getPublishedCollections(
   db: PrismaClient,
   page: number,
-  perPage: number
+  perPage: number,
+  filters: CollectionsFilters = null
 ): Promise<CollectionComplete[]> {
   return db.collection.findMany({
-    where: { status: CollectionStatus.PUBLISHED },
+    where: buildGetPublishedCollectionsWhere(filters),
     include: {
       authors: true,
       curationCategory: true,
@@ -135,9 +140,12 @@ export async function getPublishedCollections(
  * @param db
  */
 export async function countPublishedCollections(
-  db: PrismaClient
+  db: PrismaClient,
+  filters: CollectionsFilters = null
 ): Promise<number> {
-  return db.collection.count({ where: { status: CollectionStatus.PUBLISHED } });
+  return db.collection.count({
+    where: buildGetPublishedCollectionsWhere(filters),
+  });
 }
 
 /**

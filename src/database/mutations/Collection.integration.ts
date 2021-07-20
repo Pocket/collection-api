@@ -46,36 +46,35 @@ describe('mutations: Collection', () => {
   });
 
   describe('createCollection', () => {
-    it('should create a collection with a default status of `draft`', async () => {
-      const data: CreateCollectionInput = {
+    let minimumData: CreateCollectionInput;
+
+    beforeEach(() => {
+      // this needs to be in a beforeEach so we have `author` defined
+      // (which is created in the beforeEach one level up)
+      minimumData = {
+        authorExternalId: author.externalId,
+        language: 'en',
         slug: 'walter-bowls',
         title: 'walter bowls',
-        authorExternalId: author.externalId,
       };
+    });
 
-      const collection = await createCollection(db, data);
+    it('should create a collection with a default status of `draft`', async () => {
+      const collection = await createCollection(db, minimumData);
 
       expect(collection).not.toBeNull();
       expect(collection.status).toEqual(CollectionStatus.DRAFT);
     });
 
     it('should create a collection with a null publishedAt', async () => {
-      const data: CreateCollectionInput = {
-        slug: 'walter-bowls',
-        title: 'walter bowls',
-        authorExternalId: author.externalId,
-      };
-
-      const collection = await createCollection(db, data);
+      const collection = await createCollection(db, minimumData);
 
       expect(collection.publishedAt).toBeFalsy();
     });
 
     it('should store the curation category when provided', async () => {
       const data: CreateCollectionInput = {
-        slug: 'walter-bowls',
-        title: 'walter bowls',
-        authorExternalId: author.externalId,
+        ...minimumData,
         curationCategoryExternalId: curationCategory.externalId,
       };
 
@@ -85,22 +84,15 @@ describe('mutations: Collection', () => {
     });
 
     it('should fail on a duplicate slug', async () => {
-      // create our first collection
-      const data1: CreateCollectionInput = {
-        slug: 'walter-bowls',
-        title: 'walter bowls',
-        authorExternalId: author.externalId,
-        curationCategoryExternalId: curationCategory.externalId,
-      };
-
-      await createCollection(db, data1);
+      await createCollection(db, minimumData);
 
       // create our second collection, trying to use the same slug
       const data2: CreateCollectionInput = {
-        slug: 'walter-bowls',
-        title: 'walter bowls, again',
         authorExternalId: author.externalId,
         curationCategoryExternalId: curationCategory.externalId,
+        language: 'en',
+        slug: 'walter-bowls',
+        title: 'walter bowls, again',
       };
 
       await expect(createCollection(db, data2)).rejects.toThrow(
@@ -110,9 +102,7 @@ describe('mutations: Collection', () => {
 
     it('should return authors, stories and curation category when a collection is created', async () => {
       const data: CreateCollectionInput = {
-        slug: 'walter-bowls',
-        title: 'walter bowls',
-        authorExternalId: author.externalId,
+        ...minimumData,
         curationCategoryExternalId: curationCategory.externalId,
       };
 
@@ -127,9 +117,7 @@ describe('mutations: Collection', () => {
 
     it('should create a collection with an IAB parent category', async () => {
       const data: CreateCollectionInput = {
-        slug: 'walter-bowls',
-        title: 'walter bowls',
-        authorExternalId: author.externalId,
+        ...minimumData,
         IABParentCategoryExternalId: IABParentCategory.externalId,
       };
 
@@ -142,9 +130,7 @@ describe('mutations: Collection', () => {
 
     it('should create a collection with IAB parent and child categories', async () => {
       const data: CreateCollectionInput = {
-        slug: 'walter-bowls',
-        title: 'walter bowls',
-        authorExternalId: author.externalId,
+        ...minimumData,
         IABParentCategoryExternalId: IABParentCategory.externalId,
         IABChildCategoryExternalId: IABChildCategory.externalId,
       };
@@ -161,9 +147,7 @@ describe('mutations: Collection', () => {
 
     it('should not connect an IAB child category if an IAB parent category is not set', async () => {
       const data: CreateCollectionInput = {
-        slug: 'walter-bowls',
-        title: 'walter bowls',
-        authorExternalId: author.externalId,
+        ...minimumData,
         IABChildCategoryExternalId: IABChildCategory.externalId,
       };
 
@@ -183,15 +167,17 @@ describe('mutations: Collection', () => {
       const newAuthor = await createAuthorHelper(db, 'Leo Tolstoy');
 
       const data: UpdateCollectionInput = {
+        authorExternalId: newAuthor.externalId,
         externalId: initial.externalId,
+        language: 'de',
         slug: initial.slug,
         title: 'second iteration',
-        authorExternalId: newAuthor.externalId,
       };
 
       // should return the updated info
       const updated = await updateCollection(db, data);
       expect(updated.title).toEqual('second iteration');
+      expect(updated.language).toEqual('de');
 
       // should return the updated author
       expect(updated.authors[0].name).toEqual(newAuthor.name);
@@ -216,11 +202,12 @@ describe('mutations: Collection', () => {
       const newAuthor = await createAuthorHelper(db, 'Leo Tolstoy');
 
       const data: UpdateCollectionInput = {
-        externalId: initial.externalId,
-        slug: initial.slug,
-        title: 'second iteration',
         authorExternalId: newAuthor.externalId,
         curationCategoryExternalId: newCurationCategory.externalId,
+        externalId: initial.externalId,
+        language: 'en',
+        slug: initial.slug,
+        title: 'second iteration',
       };
 
       const updated = await updateCollection(db, data);
@@ -238,10 +225,11 @@ describe('mutations: Collection', () => {
       });
 
       const data: UpdateCollectionInput = {
+        authorExternalId: author.externalId,
         externalId: initial.externalId,
+        language: 'en',
         slug: initial.slug,
         title: 'second iteration',
-        authorExternalId: author.externalId,
       };
 
       const updated = await updateCollection(db, data);
@@ -257,11 +245,12 @@ describe('mutations: Collection', () => {
       });
 
       const data: UpdateCollectionInput = {
+        IABParentCategoryExternalId: IABParentCategory.externalId,
+        authorExternalId: author.externalId,
         externalId: initial.externalId,
+        language: 'en',
         slug: initial.slug,
         title: 'second iteration',
-        authorExternalId: author.externalId,
-        IABParentCategoryExternalId: IABParentCategory.externalId,
       };
 
       const updated = await updateCollection(db, data);
@@ -276,12 +265,13 @@ describe('mutations: Collection', () => {
       });
 
       const data: UpdateCollectionInput = {
+        IABChildCategoryExternalId: IABChildCategory.externalId,
+        IABParentCategoryExternalId: IABParentCategory.externalId,
+        authorExternalId: author.externalId,
         externalId: initial.externalId,
+        language: 'en',
         slug: initial.slug,
         title: 'second iteration',
-        authorExternalId: author.externalId,
-        IABParentCategoryExternalId: IABParentCategory.externalId,
-        IABChildCategoryExternalId: IABChildCategory.externalId,
       };
 
       const updated = await updateCollection(db, data);
@@ -299,10 +289,11 @@ describe('mutations: Collection', () => {
       });
 
       const data: UpdateCollectionInput = {
+        authorExternalId: author.externalId,
         externalId: initial.externalId,
+        language: 'de',
         slug: initial.slug,
         title: 'second iteration',
-        authorExternalId: author.externalId,
       };
 
       const updated = await updateCollection(db, data);
@@ -318,13 +309,14 @@ describe('mutations: Collection', () => {
       });
 
       const data: UpdateCollectionInput = {
-        externalId: initial.externalId,
-        slug: initial.slug,
-        title: 'second iteration',
+        IABChildCategoryExternalId: IABChildCategory.externalId,
+        IABParentCategoryExternalId: IABParentCategory.externalId,
         authorExternalId: author.externalId,
         curationCategoryExternalId: curationCategory.externalId,
-        IABParentCategoryExternalId: IABParentCategory.externalId,
-        IABChildCategoryExternalId: IABChildCategory.externalId,
+        externalId: initial.externalId,
+        language: 'es',
+        slug: initial.slug,
+        title: 'second iteration',
       };
 
       // should return the updated info
@@ -349,10 +341,11 @@ describe('mutations: Collection', () => {
       });
 
       const data: UpdateCollectionInput = {
+        authorExternalId: author.externalId,
         externalId: initial.externalId,
+        language: 'de',
         slug: initial.slug,
         title: 'second iteration',
-        authorExternalId: author.externalId,
       };
 
       // should return the updated info
@@ -370,11 +363,12 @@ describe('mutations: Collection', () => {
       });
 
       const data: UpdateCollectionInput = {
-        externalId: initial.externalId,
-        slug: initial.slug,
-        title: 'second iteration',
         authorExternalId: author.externalId,
+        externalId: initial.externalId,
+        language: 'en',
+        slug: initial.slug,
         status: CollectionStatus.PUBLISHED,
+        title: 'second iteration',
       };
 
       // publishedAt should have a value
@@ -390,22 +384,24 @@ describe('mutations: Collection', () => {
 
       // update the collection to published
       let data: UpdateCollectionInput = {
-        externalId: initial.externalId,
-        slug: initial.slug,
-        title: 'second iteration',
         authorExternalId: author.externalId,
+        externalId: initial.externalId,
+        language: 'en',
+        slug: initial.slug,
         status: CollectionStatus.PUBLISHED,
+        title: 'second iteration',
       };
 
       const published = await updateCollection(db, data);
 
       // update the collection title (leaving all other fields the same)
       data = {
-        externalId: initial.externalId,
-        slug: initial.slug,
-        title: 'third iteration',
         authorExternalId: author.externalId,
+        externalId: initial.externalId,
+        language: 'en',
+        slug: initial.slug,
         status: CollectionStatus.PUBLISHED,
+        title: 'third iteration',
       };
 
       const updated = await updateCollection(db, data);
@@ -428,10 +424,11 @@ describe('mutations: Collection', () => {
 
       // try to update the second collection with the same slug as the first
       const data: UpdateCollectionInput = {
-        title: second.title,
-        externalId: second.externalId,
-        slug: first.slug,
         authorExternalId: author.externalId,
+        externalId: second.externalId,
+        language: 'es',
+        slug: first.slug,
+        title: second.title,
       };
 
       await expect(updateCollection(db, data)).rejects.toThrow(

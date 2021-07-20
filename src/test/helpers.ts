@@ -44,6 +44,7 @@ export interface createCollectionHelperOptionalInput {
   curationCategory?: CurationCategory;
   publishedAt?: Date;
   imageUrl?: string;
+  language?: string;
   addStories?: boolean;
   IABParentCategory?: IABCategory;
   IABChildCategory?: IABCategory;
@@ -61,6 +62,7 @@ const createCollectionHelperDefaults: createCollectionHelperOptionalInput = {
   curationCategory: null,
   publishedAt: null,
   imageUrl: null,
+  language: 'en',
   IABParentCategory: null,
   IABChildCategory: null,
 };
@@ -83,6 +85,7 @@ export async function createCollectionHelper(
     curationCategory,
     publishedAt,
     imageUrl,
+    language,
     addStories,
     IABParentCategory,
     IABChildCategory,
@@ -94,6 +97,7 @@ export async function createCollectionHelper(
     excerpt: faker.lorem.sentences(2),
     intro: faker.lorem.paragraphs(2),
     status,
+    language,
     authors: {
       connect: {
         id: author.id,

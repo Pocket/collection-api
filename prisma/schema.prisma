@@ -101,6 +101,7 @@ model Collection {
   excerpt               String?                @db.Text
   intro                 String?                @db.Text
   imageUrl              String?                @db.VarChar(500)
+  language              String                 @db.VarChar(2) @default("en")
   publishedAt           DateTime?              @db.DateTime(0)
   createdAt             DateTime               @default(now()) @db.DateTime(0)
   updatedAt             DateTime               @updatedAt

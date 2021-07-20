@@ -48,6 +48,7 @@ async function main() {
     author: daniel,
     status: CollectionStatus.PUBLISHED,
     publishedAt: new Date(),
+    language: 'de',
     IABParentCategory,
     IABChildCategory,
   });
@@ -96,6 +97,14 @@ async function main() {
     status: CollectionStatus.ARCHIVED,
     IABParentCategory,
     IABChildCategory,
+  });
+  await createCollectionHelper(prisma, {
+    title: `Jonathan's third collection`,
+    author: jonathan,
+    curationCategory: curationCategory1,
+    status: CollectionStatus.PUBLISHED,
+    publishedAt: new Date(),
+    language: 'es',
   });
 
   await createPartnerHelper(prisma, 'Wellness Storm');
