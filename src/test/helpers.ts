@@ -2,6 +2,7 @@ import slugify from 'slugify';
 import {
   Collection,
   CollectionAuthor,
+  CollectionPartner,
   CollectionStatus,
   CollectionStory,
   CurationCategory,
@@ -22,13 +23,13 @@ const slugifyConfig = config.slugify;
 
 export async function createAuthorHelper(
   prisma: PrismaClient,
-  author: CreateCollectionAuthorInput
+  name: string
 ): Promise<CollectionAuthor> {
-  if (!author.slug) {
-    author.slug = slugify(author.name, slugifyConfig);
-  }
+  const slug = slugify(name, slugifyConfig);
 
-  return await prisma.collectionAuthor.create({ data: author });
+  const data: CreateCollectionAuthorInput = { name, slug };
+
+  return await prisma.collectionAuthor.create({ data });
 }
 
 // the minimum information required to create a collection
@@ -173,9 +174,13 @@ export async function createCollectionStoryHelper(
 
 export async function createCurationCategoryHelper(
   prisma: PrismaClient,
-  curationCategory: CreateCurationCategoryInput
+  name: string
 ): Promise<CurationCategory> {
-  return await prisma.curationCategory.create({ data: curationCategory });
+  const slug = slugify(name, slugifyConfig);
+
+  const data: Prisma.CurationCategoryCreateInput = { name, slug };
+
+  return await prisma.curationCategory.create({ data });
 }
 
 export async function createIABCategoryHelper(
@@ -192,6 +197,20 @@ export async function createIABCategoryHelper(
   }
 
   return await prisma.iABCategory.create({ data });
+}
+
+export async function createPartnerHelper(
+  prisma: PrismaClient,
+  name?: string
+): Promise<CollectionPartner> {
+  const data: Prisma.CollectionPartnerCreateInput = {
+    name: name ? name : faker.company.companyName(),
+    url: faker.internet.url(),
+    imageUrl: faker.image.imageUrl(),
+    blurb: faker.lorem.paragraphs(2),
+  };
+
+  return await prisma.collectionPartner.create({ data });
 }
 
 export async function createImageHelper(
@@ -219,6 +238,8 @@ export async function clear(prisma: PrismaClient): Promise<void> {
   const tables = [
     'CollectionStory',
     'CurationCategory',
+    'CollectionPartnership',
+    'CollectionPartner',
     'Collection',
     'CollectionAuthor',
     'IABCategory',
@@ -241,11 +262,3 @@ export function sortCollectionStoryAuthors(
     return a.sortOrder - b.sortOrder;
   });
 }
-
-/**
- * The minimum information required to create a curation category
- */
-export type CreateCurationCategoryInput = {
-  name: string;
-  slug: string;
-};

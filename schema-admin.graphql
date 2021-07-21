@@ -118,6 +118,42 @@ input CollectionImageUploadInput {
   fileSizeBytes: Int!
 }
 
+"""
+Details of a partner company sponsored collections are associated with.
+"""
+type CollectionPartner {
+    externalId: String!
+    name: String!
+    url: Url!
+    imageUrl: Url!
+    blurb: Markdown!
+}
+
+type CollectionPartnersResult {
+    pagination: Pagination
+    partners: [CollectionPartner!]!
+}
+
+input CreateCollectionPartnerInput {
+    name: String!
+    url: Url!
+    imageUrl: Url!
+    blurb: Markdown!
+}
+
+input UpdateCollectionPartnerInput {
+    externalId: String!
+    name: String!
+    url: Url!
+    imageUrl: Url
+    blurb: Markdown!
+}
+
+input UpdateCollectionPartnerImageUrlInput {
+    externalId: String!
+    imageUrl: Url!
+}
+
 type Query {
   searchCollections(
     filters: SearchCollectionsFilters!
@@ -136,6 +172,14 @@ type Query {
   Retrieves a paged list of CollectionAuthors.
   """
   getCollectionAuthors(page: Int, perPage: Int): CollectionAuthorsResult!
+  """
+  Retrieves a CollectionAuthor by externalId.
+  """
+  getCollectionPartner(externalId: String!): CollectionPartner
+  """
+  Retrieves a paged list of CollectionAuthors.
+  """
+  getCollectionPartners(page: Int, perPage: Int): CollectionPartnersResult!
   """
   Retrieves a CollectionStory by a combination of collectionId and url.
   """
@@ -205,4 +249,18 @@ type Mutation {
   Uploads an image to S3. Does *not* save the image to any entity (CollectionAuthor/Collection/CollectionStory).
   """
   collectionImageUpload(data: CollectionImageUploadInput!): CollectionImageUrl!
+  """
+  Creates a CollectionPartner.
+  """
+  createCollectionPartner(data: CreateCollectionPartnerInput!): CollectionPartner!
+  """
+  Updates a CollectionPartner.
+  """
+  updateCollectionPartner(data: UpdateCollectionPartnerInput!): CollectionPartner!
+  """
+  Updates only the `imageUrl` property of a CollectionPartner. Dedicated to uploading images within the UI.
+  """
+  updateCollectionPartnerImageUrl(
+      data: UpdateCollectionPartnerImageUrlInput!
+  ): CollectionPartner!
 }

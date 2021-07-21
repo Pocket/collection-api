@@ -2,7 +2,7 @@ import { CollectionStatus, PrismaClient } from '@prisma/client';
 import { getCollection } from '../queries';
 
 import {
-  CollectionWithAuthorsAndStories,
+  CollectionComplete,
   CreateCollectionInput,
   UpdateCollectionImageUrlInput,
   UpdateCollectionInput,
@@ -15,7 +15,7 @@ import {
 export async function createCollection(
   db: PrismaClient,
   data: CreateCollectionInput
-): Promise<CollectionWithAuthorsAndStories> {
+): Promise<CollectionComplete> {
   const slugExists = await db.collection.count({
     where: { slug: data.slug },
   });
@@ -99,7 +99,7 @@ export async function createCollection(
 export async function updateCollection(
   db: PrismaClient,
   data: UpdateCollectionInput
-): Promise<CollectionWithAuthorsAndStories> {
+): Promise<CollectionComplete> {
   // retrieve the current record, pre-update
   const existingCollection = await getCollection(db, data.externalId);
 
@@ -224,7 +224,7 @@ export async function updateCollection(
 export async function updateCollectionImageUrl(
   db: PrismaClient,
   data: UpdateCollectionImageUrlInput
-): Promise<CollectionWithAuthorsAndStories> {
+): Promise<CollectionComplete> {
   if (!data.externalId) {
     throw new Error('externalId must be provided.');
   }
