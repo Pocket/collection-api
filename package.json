@@ -32,7 +32,7 @@
     "graphql": "^15.5.1",
     "graphql-upload": "^12.0.0",
     "mime-types": "^2.1.31",
-    "slugify": "^1.5.3",
+    "slugify": "^1.6.0",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
