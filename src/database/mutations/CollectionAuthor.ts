@@ -55,6 +55,10 @@ export async function updateCollectionAuthor(
   });
 }
 
+/**
+ * @param db
+ * @param data
+ */
 export async function updateCollectionAuthorImageUrl(
   db: PrismaClient,
   data: UpdateCollectionAuthorImageUrlInput

@@ -11,6 +11,11 @@ export {
   updateCollectionImageUrl,
 } from './mutations/Collection';
 export {
+  createCollectionPartner,
+  updateCollectionPartner,
+  updateCollectionPartnerImageUrl,
+} from './mutations/CollectionPartner';
+export {
   createCollectionStory,
   deleteCollectionStory,
   updateCollectionStory,

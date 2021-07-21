@@ -10,6 +10,7 @@ export default {
     pagination: {
       collectionsPerPage: 30,
       authorsPerPage: 20,
+      partnersPerPage: 20,
     },
     upload: {
       maxSize: 10000000, // in bytes => 10MB

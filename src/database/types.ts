@@ -95,6 +95,26 @@ export type UpdateCollectionStoryImageUrlInput = {
   imageUrl: string;
 };
 
+export type CreateCollectionPartnerInput = {
+  name: string;
+  url: string;
+  imageUrl: string;
+  blurb: string;
+};
+
+export type UpdateCollectionPartnerInput = {
+  externalId: string;
+  name: string;
+  url: string;
+  imageUrl?: string;
+  blurb: string;
+};
+
+export type UpdateCollectionPartnerImageUrlInput = {
+  externalId: string;
+  imageUrl: string;
+};
+
 export type SearchCollectionsFilters = {
   author?: string;
   title?: string;
@@ -105,7 +125,7 @@ export type CollectionStoryWithAuthors = CollectionStory & {
   authors: CollectionStoryAuthor[];
 };
 
-export type CollectionWithAuthorsAndStories = Collection & {
+export type CollectionComplete = Collection & {
   authors?: CollectionAuthor[];
   curationCategory?: CurationCategory;
   IABParentCategory?: IABCategory;

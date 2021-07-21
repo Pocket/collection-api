@@ -96,6 +96,10 @@ type CollectionStory @key(fields: "item { givenUrl }") {
   publisher: String
   sortOrder: Int
   item: Item
+  """
+  if True, the story is provided by a partner and should be displayed as such
+  """
+  fromPartner: Boolean!
 }
 
 type CollectionStoryAuthor {

@@ -4,6 +4,7 @@ import {
   createCollectionHelper,
   createCurationCategoryHelper,
   createIABCategoryHelper,
+  createPartnerHelper,
 } from '../src/test/helpers';
 
 const prisma = new PrismaClient();
@@ -96,6 +97,12 @@ async function main() {
     IABParentCategory,
     IABChildCategory,
   });
+
+  await createPartnerHelper(prisma, 'Wellness Storm');
+  await createPartnerHelper(prisma, 'Urban Craft Blockchain');
+  await createPartnerHelper(prisma, 'Martial Power Cycling');
+  await createPartnerHelper(prisma, 'Dollar Rabbit Fund');
+  await createPartnerHelper(prisma, 'Alpine Octopus');
 }
 
 main()
