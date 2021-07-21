@@ -32,7 +32,7 @@
     "graphql": "^15.5.1",
     "graphql-upload": "^12.0.0",
     "mime-types": "^2.1.31",
-    "slugify": "^1.5.3",
+    "slugify": "^1.6.0",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
@@ -48,13 +48,13 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^3.3.1",
     "faker": "^5.5.3",
-    "jest": "^26.6.3",
+    "jest": "^27.0.6",
     "nock": "^13.1.1",
     "nodemon": "^2.0.10",
     "prettier": "^2.3.2",
     "prisma": "^2.27.0",
-    "ts-jest": "^26.5.6",
-    "ts-node": "^10.0.0",
+    "ts-jest": "^27.0.3",
+    "ts-node": "^10.1.0",
     "typescript": "^4.3.5"
   }
 }
