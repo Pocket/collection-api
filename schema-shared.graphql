@@ -106,7 +106,6 @@ type CollectionStoryAuthor {
 type CollectionsResult {
   pagination: Pagination!
   collections: [Collection!]!
-  filters: CollectionsFilters! # defined uniquely for public and admin
 }
 
 type Pagination {

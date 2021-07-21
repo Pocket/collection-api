@@ -5,7 +5,7 @@ input CollectionInput {
   excerpt: String!
 }
 
-input CollectionsFilters {
+input SearchCollectionsFilters {
   author: String
   title: String
   status: CollectionStatus
@@ -120,7 +120,7 @@ input CollectionImageUploadInput {
 
 type Query {
   searchCollections(
-    filters: CollectionsFilters!
+    filters: SearchCollectionsFilters!
     page: Int
     perPage: Int
   ): CollectionsResult!

@@ -1,4 +1,7 @@
-type CollectionsFilters {
+input CollectionsFiltersInput {
+  """
+  if not provided, language will default to `en`
+  """
   language: String
 }
 
@@ -9,7 +12,7 @@ type Query {
   getCollections(
     page: Int
     perPage: Int
-    filters: CollectionsFilters
+    filters: CollectionsFiltersInput
   ): CollectionsResult!
   """
   Retrieves a Collection by the given slug. The Collection must be published.
