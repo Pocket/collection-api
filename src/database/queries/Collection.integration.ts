@@ -252,7 +252,6 @@ describe('queries: Collection', () => {
         title: 'first',
         author,
         status: CollectionStatus.PUBLISHED,
-        language: 'de',
         IABParentCategory,
         IABChildCategory,
       });
@@ -301,14 +300,12 @@ describe('queries: Collection', () => {
         author,
         status: CollectionStatus.PUBLISHED,
         publishedAt: new Date(2021, 0, 2),
-        language: 'de',
       });
       await createCollectionHelper(db, {
         title: '3',
         author,
         status: CollectionStatus.PUBLISHED,
         publishedAt: new Date(2021, 0, 3),
-        language: 'es',
       });
       await createCollectionHelper(db, {
         title: '4',
@@ -514,13 +511,11 @@ describe('queries: Collection', () => {
         title: '3',
         author,
         status: CollectionStatus.PUBLISHED,
-        language: 'de',
       });
       await createCollectionHelper(db, {
         title: '4',
         author,
         status: CollectionStatus.PUBLISHED,
-        language: 'es',
       });
       await createCollectionHelper(db, {
         title: '5',

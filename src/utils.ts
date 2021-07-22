@@ -1,6 +1,7 @@
 import { CollectionStatus, Prisma } from '@prisma/client';
 import { Pagination } from './typeDefs';
 import { CollectionsFilters } from './database/types';
+import config from './config';
 
 /**
  * Returns the pagination response object
@@ -37,11 +38,12 @@ export function buildGetPublishedCollectionsWhere(
     status: CollectionStatus.PUBLISHED,
   };
 
-  // there may be no filtering going on
-  if (filters) {
-    if (filters.language) {
-      where.language = filters.language.toLowerCase();
-    }
+  if (filters?.language) {
+    // if a specific language was requested, filter by it
+    where.language = filters.language.toLowerCase();
+  } else {
+    // if not, default to filtering en only
+    where.language = config.app.defaultLanguage;
   }
 
   return where;

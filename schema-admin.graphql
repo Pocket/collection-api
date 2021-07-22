@@ -154,6 +154,9 @@ input UpdateCollectionPartnerImageUrlInput {
   imageUrl: Url!
 }
 
+"""
+represents a language supported in the system
+"""
 type Language {
   code: String!
 }

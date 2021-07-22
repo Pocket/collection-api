@@ -18,6 +18,7 @@ export default {
     },
     // languages we currently support
     languages: ['en', 'de'],
+    defaultLanguage: 'en',
   },
   aws: {
     s3: {
