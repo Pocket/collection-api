@@ -170,3 +170,11 @@ export async function getCollectionPartner(
 ): Promise<CollectionPartner> {
   return getPartner(db, externalId);
 }
+
+export function getLanguages(parent, _, { db }): any {
+  return config.app.languages.map((lang) => {
+    return {
+      code: lang,
+    };
+  });
+}

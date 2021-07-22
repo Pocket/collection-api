@@ -100,6 +100,19 @@ describe('mutations: Collection', () => {
       );
     });
 
+    it('should fail on an unsupported language', async () => {
+      const data = {
+        ...minimumData,
+      };
+
+      // this language is not supported!
+      data.language = 'xx';
+
+      await expect(createCollection(db, data)).rejects.toThrow(
+        `xx is not a supported language`
+      );
+    });
+
     it('should return authors, stories and curation category when a collection is created', async () => {
       const data: CreateCollectionInput = {
         ...minimumData,
@@ -314,7 +327,7 @@ describe('mutations: Collection', () => {
         authorExternalId: author.externalId,
         curationCategoryExternalId: curationCategory.externalId,
         externalId: initial.externalId,
-        language: 'es',
+        language: 'de',
         slug: initial.slug,
         title: 'second iteration',
       };
@@ -433,6 +446,27 @@ describe('mutations: Collection', () => {
 
       await expect(updateCollection(db, data)).rejects.toThrow(
         `A collection with the slug "${first.slug}" already exists`
+      );
+    });
+
+    it('should fail on an unsupported language', async () => {
+      // this should create a slug of 'let-us-go-bowling'
+      const collection = await createCollectionHelper(db, {
+        title: 'let us go bowling',
+        author,
+      });
+
+      // try to update the second collection with an unsupported language
+      const data: UpdateCollectionInput = {
+        authorExternalId: author.externalId,
+        externalId: collection.externalId,
+        language: 'xx',
+        slug: collection.slug,
+        title: collection.title,
+      };
+
+      await expect(updateCollection(db, data)).rejects.toThrow(
+        `xx is not a supported language`
       );
     });
   });

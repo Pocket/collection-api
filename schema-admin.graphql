@@ -122,36 +122,40 @@ input CollectionImageUploadInput {
 Details of a partner company sponsored collections are associated with.
 """
 type CollectionPartner {
-    externalId: String!
-    name: String!
-    url: Url!
-    imageUrl: Url!
-    blurb: Markdown!
+  externalId: String!
+  name: String!
+  url: Url!
+  imageUrl: Url!
+  blurb: Markdown!
 }
 
 type CollectionPartnersResult {
-    pagination: Pagination
-    partners: [CollectionPartner!]!
+  pagination: Pagination
+  partners: [CollectionPartner!]!
 }
 
 input CreateCollectionPartnerInput {
-    name: String!
-    url: Url!
-    imageUrl: Url!
-    blurb: Markdown!
+  name: String!
+  url: Url!
+  imageUrl: Url!
+  blurb: Markdown!
 }
 
 input UpdateCollectionPartnerInput {
-    externalId: String!
-    name: String!
-    url: Url!
-    imageUrl: Url
-    blurb: Markdown!
+  externalId: String!
+  name: String!
+  url: Url!
+  imageUrl: Url
+  blurb: Markdown!
 }
 
 input UpdateCollectionPartnerImageUrlInput {
-    externalId: String!
-    imageUrl: Url!
+  externalId: String!
+  imageUrl: Url!
+}
+
+type Language {
+  code: String!
 }
 
 type Query {
@@ -192,6 +196,10 @@ type Query {
   Retrieves the nested list of IAB top/sub categories.
   """
   getIABCategories: [IABParentCategory!]!
+  """
+  Retrieves the languages currently supported.
+  """
+  getLanguages: [Language!]!
 }
 
 type Mutation {
@@ -252,15 +260,19 @@ type Mutation {
   """
   Creates a CollectionPartner.
   """
-  createCollectionPartner(data: CreateCollectionPartnerInput!): CollectionPartner!
+  createCollectionPartner(
+    data: CreateCollectionPartnerInput!
+  ): CollectionPartner!
   """
   Updates a CollectionPartner.
   """
-  updateCollectionPartner(data: UpdateCollectionPartnerInput!): CollectionPartner!
+  updateCollectionPartner(
+    data: UpdateCollectionPartnerInput!
+  ): CollectionPartner!
   """
   Updates only the `imageUrl` property of a CollectionPartner. Dedicated to uploading images within the UI.
   """
   updateCollectionPartnerImageUrl(
-      data: UpdateCollectionPartnerImageUrlInput!
+    data: UpdateCollectionPartnerImageUrlInput!
   ): CollectionPartner!
 }

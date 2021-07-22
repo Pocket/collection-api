@@ -11,17 +11,16 @@ describe('test utils', () => {
     });
 
     it('should add a language clause when supplied in filters', () => {
-      const result = buildGetPublishedCollectionsWhere({ language: 'es' });
+      const result = buildGetPublishedCollectionsWhere({ language: 'en' });
 
       expect(result.status).toEqual(CollectionStatus.PUBLISHED);
-      expect(result.language).toEqual('es');
+      expect(result.language).toEqual('en');
     });
 
     it('should add a lowercase language clause when supplied as upper case in filters', () => {
-      const result = buildGetPublishedCollectionsWhere({ language: 'ES' });
+      const result = buildGetPublishedCollectionsWhere({ language: 'DE' });
 
-      expect(result.status).toEqual(CollectionStatus.PUBLISHED);
-      expect(result.language).toEqual('es');
+      expect(result.language).toEqual('de');
     });
   });
 });

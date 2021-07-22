@@ -1,5 +1,6 @@
 import { CollectionStatus, PrismaClient } from '@prisma/client';
 import { getCollection } from '../queries';
+import config from '../../config';
 
 import {
   CollectionComplete,
@@ -22,6 +23,10 @@ export async function createCollection(
 
   if (slugExists) {
     throw new Error(`A collection with the slug "${data.slug}" already exists`);
+  }
+
+  if (data.language && !config.app.languages.includes(data.language)) {
+    throw new Error(`${data.language} is not a supported language`);
   }
 
   // We have to pull the authorExternalId property out of data
@@ -125,6 +130,10 @@ export async function updateCollection(
         `A collection with the slug "${data.slug}" already exists`
       );
     }
+  }
+
+  if (data.language && !config.app.languages.includes(data.language)) {
+    throw new Error(`${data.language} is not a supported language`);
   }
 
   // We have to pull the authorExternalId property out of data
