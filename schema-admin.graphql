@@ -154,6 +154,51 @@ input UpdateCollectionPartnerImageUrlInput {
     imageUrl: Url!
 }
 
+"""
+If a collection was made in partnership with an external company, this
+entity will hold all required info about that partnership.
+
+Note that this admin-only type exposes both the optional customized fields
+and the CollectionPartner entity with the default values.
+
+The consolidated CollectionPartnership type is available in the public schema.
+"""
+type CollectionPartnerAssociation {
+  externalId: String!
+  type: CollectionPartnershipType!
+  partner: CollectionPartner!
+  collection: Collection!
+  name: String
+  url: Url
+  imageUrl: Url
+  blurb: Markdown
+}
+
+input CreateCollectionPartnerAssociationInput {
+  type: CollectionPartnershipType!
+  partner: CollectionPartner!
+  collection: Collection!
+  name: String
+  url: Url
+  imageUrl: Url
+  blurb: Markdown
+}
+
+input UpdateCollectionPartnerAssociationInput {
+  externalId: String!
+  type: CollectionPartnershipType!
+  partner: CollectionPartner!
+  collection: Collection!
+  name: String
+  url: Url
+  imageUrl: Url
+  blurb: Markdown
+}
+
+input DeleteCollectionPartnerAssociationInput {
+  externalId: String!
+}
+
 type Query {
   searchCollections(
     filters: SearchCollectionsFilters!
@@ -204,7 +249,8 @@ type Mutation {
   """
   updateCollectionAuthor(data: UpdateCollectionAuthorInput!): CollectionAuthor!
   """
-  Updates only the `imageUrl` property of a CollectionAuthor. Dedicated to uploading images within the UI.
+  Updates only the `imageUrl` property of a CollectionAuthor.
+  Dedicated to uploading images within the UI.
   """
   updateCollectionAuthorImageUrl(
     data: UpdateCollectionAuthorImageUrlInput!
@@ -218,7 +264,8 @@ type Mutation {
   """
   updateCollection(data: UpdateCollectionInput!): Collection!
   """
-  Updates only the `imageUrl` property of a Collection. Dedicated to uploading images within the UI.
+  Updates only the `imageUrl` property of a Collection.
+  Dedicated to uploading images within the UI.
   """
   updateCollectionImageUrl(data: UpdateCollectionImageUrlInput!): Collection!
   """
@@ -230,13 +277,15 @@ type Mutation {
   """
   updateCollectionStory(data: UpdateCollectionStoryInput!): CollectionStory!
   """
-  Updates only the `sortOrder` property of a CollectionStory. Dedicated to ordering stories within the UI.
+  Updates only the `sortOrder` property of a CollectionStory.
+  Dedicated to ordering stories within the UI.
   """
   updateCollectionStorySortOrder(
     data: UpdateCollectionStorySortOrderInput!
   ): CollectionStory!
   """
-  Updates only the `imageUrl` property of a CollectionStory. Dedicated to uploading images within the UI.
+  Updates only the `imageUrl` property of a CollectionStory.
+  Dedicated to uploading images within the UI.
   """
   updateCollectionStoryImageUrl(
     data: UpdateCollectionStoryImageUrlInput!
@@ -246,7 +295,8 @@ type Mutation {
   """
   deleteCollectionStory(externalId: String!): CollectionStory!
   """
-  Uploads an image to S3. Does *not* save the image to any entity (CollectionAuthor/Collection/CollectionStory).
+  Uploads an image to S3. Does *not* save the image to any entity
+  (CollectionAuthor/Collection/CollectionStory).
   """
   collectionImageUpload(data: CollectionImageUploadInput!): CollectionImageUrl!
   """
@@ -258,9 +308,28 @@ type Mutation {
   """
   updateCollectionPartner(data: UpdateCollectionPartnerInput!): CollectionPartner!
   """
-  Updates only the `imageUrl` property of a CollectionPartner. Dedicated to uploading images within the UI.
+  Updates only the `imageUrl` property of a CollectionPartner.
+  Dedicated to uploading images within the UI.
   """
   updateCollectionPartnerImageUrl(
-      data: UpdateCollectionPartnerImageUrlInput!
+    data: UpdateCollectionPartnerImageUrlInput!
   ): CollectionPartner!
+  """
+  Creates a CollectionPartnerAssociation.
+  """
+  createCollectionPartnerAssociation(
+    data: CreateCollectionPartnerAssociationInput!
+  ): CollectionPartnerAssociation!
+  """
+  Updates a CollectionPartnerAssociation.
+  """
+  updateCollectionPartnerAssociation(
+    data: UpdateCollectionPartnerAssociationInput!
+  ): CollectionPartnerAssociation!
+  """
+  Deletes a CollectionPartnerAssociation.
+  """
+  deleteCollectionPartnerAssociation(
+    data: DeleteCollectionPartnerAssociationInput!
+  ): CollectionPartnerAssociation!
 }

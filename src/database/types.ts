@@ -1,6 +1,8 @@
 import {
   Collection,
   CollectionAuthor,
+  CollectionPartner,
+  CollectionPartnershipType,
   CollectionStatus,
   CollectionStory,
   CurationCategory,
@@ -109,6 +111,20 @@ export type UpdateCollectionPartnerInput = {
   imageUrl?: string;
   blurb: string;
 };
+
+export type CreateCollectionPartnerAssociationInput = {
+  type: CollectionPartnershipType;
+  partnerExternalId: string;
+  collectionExternalId: string;
+  name?: string;
+  url?: string;
+  imageUrl?: string;
+  blurb?: string;
+};
+
+export type UpdateCollectionPartnerAssociationInput = {
+  externalId: string;
+} & CreateCollectionPartnerAssociationInput;
 
 export type UpdateCollectionPartnerImageUrlInput = {
   externalId: string;
