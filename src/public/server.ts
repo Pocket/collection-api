@@ -1,10 +1,12 @@
 import { ApolloServer } from 'apollo-server-express';
+import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
 import { buildFederatedSchema } from '@apollo/federation';
 import { typeDefsPublic } from '../typeDefs';
 import { resolvers as publicResolvers } from './resolvers';
 import responseCachePlugin from 'apollo-server-plugin-response-cache';
 import { GraphQLRequestContext } from 'apollo-server-types';
-import { sentryPlugin } from '@pocket-tools/apollo-utils';
+//import { sentryPlugin } from '@pocket-tools/apollo-utils';
+import { sentryPlugin } from '../sentry-plugin';
 import { client } from '../database/client';
 import { collectionLoader } from '../dataLoaders/collectionLoader';
 
@@ -23,6 +25,7 @@ export const server = new ApolloServer({
           : null,
     }),
     sentryPlugin,
+    ApolloServerPluginLandingPageGraphQLPlayground(),
   ],
   context: {
     db: client(),
@@ -30,5 +33,4 @@ export const server = new ApolloServer({
       collectionLoader,
     },
   },
-  playground: true,
 });

@@ -1,4 +1,5 @@
 {
+  "name": "collection-api",
   "main": "dist/main.js",
   "scripts": {
     "build": "rm -rf dist && tsc",

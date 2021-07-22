@@ -44,10 +44,14 @@ app.use(
 );
 
 // Apply the admin graphql (This is not part of the federated graph i.e. Client API)
-adminServer.applyMiddleware({ app, path: '/admin' });
+adminServer.start().then(() => {
+  adminServer.applyMiddleware({ app, path: '/admin' });
+});
 
 // Apply the public graphql (This is part of the federated graph)
-publicServer.applyMiddleware({ app, path: '/' });
+publicServer.start().then(() => {
+  publicServer.applyMiddleware({ app, path: '/' });
+});
 
 //Make sure the express app has the xray close segment handler
 app.use(xrayExpress.closeSegment());
