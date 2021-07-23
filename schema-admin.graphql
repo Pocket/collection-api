@@ -176,8 +176,8 @@ type CollectionPartnerAssociation {
 
 input CreateCollectionPartnerAssociationInput {
   type: CollectionPartnershipType!
-  partner: CollectionPartner!
-  collection: Collection!
+  partnerExternalId: String!
+  collectionExternalId: String!
   name: String
   url: Url
   imageUrl: Url
@@ -187,8 +187,8 @@ input CreateCollectionPartnerAssociationInput {
 input UpdateCollectionPartnerAssociationInput {
   externalId: String!
   type: CollectionPartnershipType!
-  partner: CollectionPartner!
-  collection: Collection!
+  partnerExternalId: String!
+  collectionExternalId: String!
   name: String
   url: Url
   imageUrl: Url

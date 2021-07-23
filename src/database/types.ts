@@ -2,6 +2,7 @@ import {
   Collection,
   CollectionAuthor,
   CollectionPartner,
+  CollectionPartnership,
   CollectionPartnershipType,
   CollectionStatus,
   CollectionStory,
@@ -129,6 +130,15 @@ export type UpdateCollectionPartnerAssociationInput = {
 export type UpdateCollectionPartnerImageUrlInput = {
   externalId: string;
   imageUrl: string;
+};
+
+export type CollectionPartnerAssociation = Omit<
+  CollectionPartnership,
+  'partnerExternalId' | 'collectionExternalId'
+> & {
+  type: CollectionPartnershipType;
+  partner: CollectionPartner;
+  collection: Collection;
 };
 
 export type SearchCollectionsFilters = {
