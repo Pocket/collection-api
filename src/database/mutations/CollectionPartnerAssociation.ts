@@ -59,7 +59,7 @@ export async function updateCollectionPartnerAssociation(
 
   const dbData: Prisma.CollectionPartnershipUpdateInput = {
     ...data,
-    partner: { update: { externalId: partnerExternalId } },
+    partner: { connect: { externalId: partnerExternalId } },
   };
 
   return db.collectionPartnership.update({
