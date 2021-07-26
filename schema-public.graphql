@@ -1,8 +1,19 @@
+input CollectionsFiltersInput {
+  """
+  if not provided, or if an unsupported language is requested, defaults to `en`
+  """
+  language: String
+}
+
 type Query {
   """
   Retrievs a paged set of published Collections.
   """
-  getCollections(page: Int, perPage: Int): CollectionsResult!
+  getCollections(
+    page: Int
+    perPage: Int
+    filters: CollectionsFiltersInput
+  ): CollectionsResult!
   """
   Retrieves a Collection by the given slug. The Collection must be published.
   """

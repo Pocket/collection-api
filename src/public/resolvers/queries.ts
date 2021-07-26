@@ -25,15 +25,20 @@ export async function getCollectionBySlug(
  * @param parent
  * @param page
  * @param perPage
+ * @param filters
  * @param db
  */
 export async function getCollections(
   parent,
-  { page = 1, perPage = config.app.pagination.collectionsPerPage },
+  {
+    page = 1,
+    perPage = config.app.pagination.collectionsPerPage,
+    filters = {},
+  },
   { db }
 ): Promise<CollectionsResult> {
-  const totalResults = await countPublishedCollections(db);
-  const collections = await getPublishedCollections(db, page, perPage);
+  const totalResults = await countPublishedCollections(db, filters);
+  const collections = await getPublishedCollections(db, page, perPage, filters);
 
   return {
     pagination: getPagination(totalResults, page, perPage),
