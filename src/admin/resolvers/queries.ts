@@ -1,9 +1,14 @@
-import { CollectionComplete, IABParentCategory } from '../../database/types';
+import {
+  CollectionComplete,
+  CollectionPartnerAssociation,
+  IABParentCategory,
+} from '../../database/types';
 import {
   countAuthors,
   getAuthor,
   getAuthors,
   getCollection as dbGetCollection,
+  getCollectionPartnerAssociation as dbGetCollectionPartnerAssociation,
   getCollectionStory as dbGetCollectionStory,
   getCurationCategories as dbGetCurationCategories,
   searchCollections as dbSearchCollections,
@@ -169,4 +174,17 @@ export async function getCollectionPartner(
   { db }
 ): Promise<CollectionPartner> {
   return getPartner(db, externalId);
+}
+
+/**
+ * @param parent
+ * @param externalId
+ * @param db
+ */
+export async function getCollectionPartnerAssociation(
+  parent,
+  { externalId },
+  { db }
+): Promise<CollectionPartnerAssociation> {
+  return dbGetCollectionPartnerAssociation(db, externalId);
 }

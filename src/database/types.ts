@@ -123,9 +123,15 @@ export type CreateCollectionPartnerAssociationInput = {
   blurb?: string;
 };
 
+/**
+ * We omit the collection external id from the input since, once a collection
+ * to partner relationship is set up on the frontend, it won't ever be updated
+ * to another collection, but it may be updated to point to another partner if
+ * a mistake has been made while entering the collection details into the system.
+ */
 export type UpdateCollectionPartnerAssociationInput = {
   externalId: string;
-} & CreateCollectionPartnerAssociationInput;
+} & Omit<CreateCollectionPartnerAssociationInput, 'collectionExternalId'>;
 
 export type UpdateCollectionPartnerImageUrlInput = {
   externalId: string;

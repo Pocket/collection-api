@@ -1,19 +1,15 @@
 import { CollectionPartnershipType, PrismaClient } from '@prisma/client';
-// import {
-//   CreateCollectionPartnerAssociationInput,
-//   UpdateCollectionPartnerAssociationInput,
-// } from '../types';
 import {
   clear as clearDb,
   createCollectionPartnerAssociationHelper,
+  createPartnerHelper,
 } from '../../test/helpers';
 import { UpdateCollectionPartnerAssociationInput } from '../types';
-import { updateCollectionPartnerAssociation } from './CollectionPartnerAssociation';
-// import {
-//   createCollectionPartnerAssociation,
-//   updateCollectionPartnerAssociation,
-//   deleteCollectionPartnerAssociation,
-// } from './CollectionPartnerAssociation';
+import {
+  deleteCollectionPartnerAssociation,
+  updateCollectionPartnerAssociation,
+} from '../mutations';
+import { getCollectionPartnerAssociation } from '../queries';
 
 const db = new PrismaClient();
 
@@ -98,7 +94,6 @@ describe('mutations: CollectionPartnerAssociation', () => {
         blurb: 'What else is there to talk on a podcast about? Only kittens',
         imageUrl: 'https://i.imgur.com/b0O3wZo.jpg',
         partnerExternalId: association.partner.externalId,
-        collectionExternalId: association.collection.externalId,
       };
 
       const updated = await updateCollectionPartnerAssociation(db, data);
@@ -109,37 +104,62 @@ describe('mutations: CollectionPartnerAssociation', () => {
       expect(updated.blurb).toEqual(data.blurb);
       expect(updated.imageUrl).toEqual(data.imageUrl);
     });
+
+    it('should update to a different collection partner', async () => {
+      const association = await createCollectionPartnerAssociationHelper(db, {
+        name: 'Anything',
+        type: CollectionPartnershipType.SPONSORED,
+      });
+
+      const newPartner = await createPartnerHelper(db);
+
+      const data: UpdateCollectionPartnerAssociationInput = {
+        externalId: association.externalId,
+        type: association.type,
+        name: association.name,
+        url: association.url,
+        blurb: association.blurb,
+        imageUrl: association.imageUrl,
+        partnerExternalId: newPartner.externalId,
+      };
+
+      const updated = await updateCollectionPartnerAssociation(db, data);
+
+      expect(updated.partner).toEqual(newPartner);
+    });
   });
 
-  // describe('deleteCollectionPartnerAssociation', () => {
-  //   let association;
-  //
-  //   beforeEach(async () => {
-  //     association = await createCollectionPartnerAssociationHelper(db, {
-  //       type: CollectionPartnershipType.PARTNERED,
-  //     });
-  //   });
-  //
-  //   it('should delete a collection partner association and return deleted data', async () => {
-  //     const deleted = await deleteCollectionPartnerAssociation(
-  //       db,
-  //       association.externalId
-  //     );
-  //
-  //     expect(deleted.type).toEqual(association.type);
-  //
-  //     expect(deleted.partnerId).toEqual(association.collection.externalId);
-  //     expect(deleted.collectionId).toEqual(association.collection.externalId);
-  //
-  //     // make sure the association is really gone
-  //     // const found = await getCollectionPartnerAssociation(db, association.externalId);
-  //     // expect(found).toBeFalsy();
-  //   });
-  //
-  //   it('should fail to delete a collection partner association if the externalId cannot be found', async () => {
-  //     await expect(
-  //       deleteCollectionPartnerAssociation(db, association.externalId + 'typo')
-  //     ).rejects.toThrow();
-  //   });
-  // });
+  describe('deleteCollectionPartnerAssociation', () => {
+    let association;
+
+    beforeEach(async () => {
+      association = await createCollectionPartnerAssociationHelper(db, {
+        type: CollectionPartnershipType.PARTNERED,
+      });
+    });
+
+    it('should delete a collection partner association and return deleted data', async () => {
+      const deleted = await deleteCollectionPartnerAssociation(
+        db,
+        association.externalId
+      );
+
+      expect(deleted.type).toEqual(association.type);
+      expect(deleted.partnerId).toEqual(association.partner.id);
+      expect(deleted.collectionId).toEqual(association.collection.id);
+
+      // make sure the association is really gone
+      const found = await getCollectionPartnerAssociation(
+        db,
+        association.externalId
+      );
+      expect(found).toBeFalsy();
+    });
+
+    it('should fail to delete a collection partner association if the externalId cannot be found', async () => {
+      await expect(
+        deleteCollectionPartnerAssociation(db, association.externalId + 'typo')
+      ).rejects.toThrow();
+    });
+  });
 });

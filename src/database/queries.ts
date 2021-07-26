@@ -21,3 +21,4 @@ export {
   getPartner,
   getPartners,
 } from './queries/CollectionPartner';
+export { getCollectionPartnerAssociation } from './queries/CollectionPartnerAssociation';

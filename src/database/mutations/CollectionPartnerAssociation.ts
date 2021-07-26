@@ -5,6 +5,7 @@ import {
   CreateCollectionPartnerAssociationInput,
   UpdateCollectionPartnerAssociationInput,
 } from '../types';
+import { getCollectionPartnerAssociation } from '../queries';
 
 /**
  * @param db
@@ -56,15 +57,9 @@ export async function updateCollectionPartnerAssociation(
   const partnerExternalId = data.partnerExternalId;
   delete data.partnerExternalId;
 
-  // this property doesn't exist on the Association type returned by this
-  // function, instead we return the Collection object
-  const collectionExternalId = data.collectionExternalId;
-  delete data.collectionExternalId;
-
   const dbData: Prisma.CollectionPartnershipUpdateInput = {
     ...data,
-    partner: { connect: { externalId: partnerExternalId } },
-    collection: { connect: { externalId: collectionExternalId } },
+    partner: { update: { externalId: partnerExternalId } },
   };
 
   return db.collectionPartnership.update({
@@ -81,16 +76,23 @@ export async function updateCollectionPartnerAssociation(
  * @param db
  * @param externalId
  */
-// export async function deleteCollectionPartnerAssociation(
-//   db: PrismaClient,
-//   externalId: string
-// ): Promise<CollectionPartnerAssociation> {
-//   if (externalId) {
-//     throw new Error('externalId must be provided.');
-//   }
-//
-//   // delete the association between partner and collection
-//   return db.collectionPartnership.delete({
-//     where: { externalId },
-//   });
-// }
+export async function deleteCollectionPartnerAssociation(
+  db: PrismaClient,
+  externalId: string
+): Promise<CollectionPartnerAssociation> {
+  if (!externalId) {
+    throw new Error('externalId must be provided.');
+  }
+  // get the existing association for the internal id
+  const association = await getCollectionPartnerAssociation(db, externalId);
+
+  await db.collectionPartnership.delete({
+    where: {
+      externalId: association.externalId,
+    },
+  });
+
+  // to conform with the schema, we return the association
+  // as it was before we deleted it
+  return association;
+}

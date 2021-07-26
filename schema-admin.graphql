@@ -188,7 +188,6 @@ input UpdateCollectionPartnerAssociationInput {
   externalId: String!
   type: CollectionPartnershipType!
   partnerExternalId: String!
-  collectionExternalId: String!
   name: String
   url: Url
   imageUrl: Url
@@ -237,6 +236,10 @@ type Query {
   Retrieves the nested list of IAB top/sub categories.
   """
   getIABCategories: [IABParentCategory!]!
+  """
+  Retrieves a CollectionPartnerAssociation by externalId
+  """
+  getCollectionPartnerAssociation(externalId: String!): CollectionPartnerAssociation
 }
 
 type Mutation {
@@ -329,7 +332,5 @@ type Mutation {
   """
   Deletes a CollectionPartnerAssociation.
   """
-  deleteCollectionPartnerAssociation(
-    data: DeleteCollectionPartnerAssociationInput!
-  ): CollectionPartnerAssociation!
+  deleteCollectionPartnerAssociation(externalId: String!): CollectionPartnerAssociation!
 }
