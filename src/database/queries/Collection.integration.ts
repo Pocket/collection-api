@@ -322,13 +322,48 @@ describe('queries: Collection', () => {
 
       // we are getting two collections per page, and are requesting page 2
       // page 1 should be 5 and 4. page 2 should be 3 and 2, page 3 should be 1
-      // note - we aren't filtering by language so all PUBLISHED should be
-      // retrieved
       const collections = await getPublishedCollections(db, 2, 2);
 
       expect(collections.length).toEqual(2);
       expect(collections[0].title).toEqual('3');
       expect(collections[1].title).toEqual('2');
+    });
+
+    it('gets only `en` published collections if no language is specified', async () => {
+      await createCollectionHelper(db, {
+        title: 'first',
+        author,
+        status: CollectionStatus.PUBLISHED,
+        language: 'en',
+      });
+      await createCollectionHelper(db, {
+        title: 'second',
+        author,
+        language: 'en',
+      });
+      await createCollectionHelper(db, {
+        title: 'third',
+        author,
+        status: CollectionStatus.ARCHIVED,
+        language: 'en',
+      });
+      await createCollectionHelper(db, {
+        title: 'fourth',
+        author,
+        status: CollectionStatus.PUBLISHED,
+        language: 'de',
+      });
+      await createCollectionHelper(db, {
+        title: 'fifth',
+        author,
+        status: CollectionStatus.PUBLISHED,
+        language: 'en',
+      });
+
+      const collections = await getPublishedCollections(db, 1, 10);
+
+      // only two publisedh collections are in `en`
+      expect(collections.length).toEqual(2);
     });
 
     it('gets only published collections filtered by language', async () => {
@@ -367,11 +402,6 @@ describe('queries: Collection', () => {
       });
 
       expect(collections.length).toEqual(2);
-      expect(collections[0].title).toEqual('first');
-      expect(collections[1].title).toEqual('fifth');
-      expect(collections[0].stories).toBeTruthy();
-      expect(collections[0].authors).toBeTruthy();
-      expect(collections[0].stories[0].authors).toBeTruthy();
     });
 
     it('gets only published collections filtered by language in ALL CAPS', async () => {
@@ -415,6 +445,46 @@ describe('queries: Collection', () => {
       expect(collections[0].stories).toBeTruthy();
       expect(collections[0].authors).toBeTruthy();
       expect(collections[0].stories[0].authors).toBeTruthy();
+    });
+
+    it('gets only `en` published collections if an unsupported language is provided', async () => {
+      await createCollectionHelper(db, {
+        title: 'first',
+        author,
+        status: CollectionStatus.PUBLISHED,
+        language: 'en',
+      });
+      await createCollectionHelper(db, {
+        title: 'second',
+        author,
+        language: 'en',
+      });
+      await createCollectionHelper(db, {
+        title: 'third',
+        author,
+        status: CollectionStatus.ARCHIVED,
+        language: 'en',
+      });
+      await createCollectionHelper(db, {
+        title: 'fourth',
+        author,
+        status: CollectionStatus.PUBLISHED,
+        language: 'de',
+      });
+      await createCollectionHelper(db, {
+        title: 'fifth',
+        author,
+        status: CollectionStatus.PUBLISHED,
+        language: 'en',
+      });
+
+      const collections = await getPublishedCollections(db, 1, 10, {
+        // this is not a supported language
+        language: 'xx',
+      });
+
+      // we default to `en` if the language specified is not supported
+      expect(collections.length).toEqual(2);
     });
 
     it('respects pagination when filtering by language', async () => {
@@ -525,7 +595,7 @@ describe('queries: Collection', () => {
 
       const count = await countPublishedCollections(db);
 
-      // we aren't filtering by language so we just get them all
+      // we aren't filtering by language so the default language is applied to get all matching records
       expect(count).toEqual(3);
     });
 

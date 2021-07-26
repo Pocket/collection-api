@@ -4,7 +4,7 @@ import {
   CollectionComplete,
   CollectionsFilters,
 } from '../types';
-import { buildGetPublishedCollectionsWhere } from '../../utils';
+import { buildGetPublishedCollectionsWhere } from '../utils';
 
 /**
  * this is primarily an admin query, which is why we don't return any author

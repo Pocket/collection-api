@@ -1,6 +1,6 @@
 import { CollectionStatus, PrismaClient } from '@prisma/client';
 import { getCollection } from '../queries';
-import config from '../../config';
+import { isSupportedLanguage } from '../utils';
 
 import {
   CollectionComplete,
@@ -25,7 +25,10 @@ export async function createCollection(
     throw new Error(`A collection with the slug "${data.slug}" already exists`);
   }
 
-  if (data.language && !config.app.languages.includes(data.language)) {
+  // standardize lanuage format
+  data.language = data.language.toLowerCase();
+
+  if (!isSupportedLanguage(data.language)) {
     throw new Error(`${data.language} is not a supported language`);
   }
 
@@ -132,7 +135,10 @@ export async function updateCollection(
     }
   }
 
-  if (data.language && !config.app.languages.includes(data.language)) {
+  // standardize lanuage format
+  data.language = data.language.toLowerCase();
+
+  if (!isSupportedLanguage(data.language)) {
     throw new Error(`${data.language} is not a supported language`);
   }
 
