@@ -177,6 +177,20 @@ export async function getCollectionPartner(
 }
 
 /**
+ *
+ * @param parent
+ * @param _ (empty because this takes no params)
+ * @param db
+ */
+export function getLanguages(parent, _, { db }): any {
+  return config.app.languages.map((lang) => {
+    return {
+      code: lang,
+    };
+  });
+}
+
+/**
  * @param parent
  * @param externalId
  * @param db

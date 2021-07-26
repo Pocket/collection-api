@@ -33,16 +33,17 @@ export type UpdateCollectionAuthorImageUrlInput = {
 };
 
 export type CreateCollectionInput = {
-  slug: string;
-  title: string;
-  excerpt?: string;
-  intro?: string;
-  imageUrl?: string;
-  status?: CollectionStatus;
   authorExternalId: string;
   curationCategoryExternalId?: string;
-  IABParentCategoryExternalId?: string;
+  excerpt?: string;
   IABChildCategoryExternalId?: string;
+  IABParentCategoryExternalId?: string;
+  imageUrl?: string;
+  intro?: string;
+  language: string;
+  slug: string;
+  status?: CollectionStatus;
+  title: string;
 };
 
 export type UpdateCollectionInput = {
@@ -54,6 +55,7 @@ export type UpdateCollectionInput = {
   IABParentCategoryExternalId?: string;
   imageUrl?: string;
   intro?: string;
+  language: string;
   publishedAt?: Date;
   slug: string;
   status?: CollectionStatus;
@@ -176,4 +178,8 @@ export type CreateImageInput = {
 
 export type IABParentCategory = IABCategory & {
   children: IABCategory[];
+};
+
+export type CollectionsFilters = {
+  language?: string;
 };

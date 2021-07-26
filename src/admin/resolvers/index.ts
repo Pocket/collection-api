@@ -7,6 +7,7 @@ import {
   getCollectionPartners,
   getCollectionStory,
   getCurationCategories,
+  getLanguages,
   getIABCategories,
   searchCollections,
 } from './queries';
@@ -63,5 +64,6 @@ export const resolvers = {
     getCollectionStory,
     getCurationCategories,
     getIABCategories,
+    getLanguages,
   },
 };
