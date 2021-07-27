@@ -44,6 +44,7 @@ input CreateCollectionInput {
   excerpt: Markdown
   intro: Markdown
   imageUrl: Url
+  language: String!
   status: CollectionStatus
   authorExternalId: String!
   curationCategoryExternalId: String
@@ -58,6 +59,7 @@ input UpdateCollectionInput {
   excerpt: Markdown!
   intro: Markdown
   imageUrl: Url
+  language: String!
   status: CollectionStatus!
   authorExternalId: String!
   curationCategoryExternalId: String

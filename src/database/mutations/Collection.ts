@@ -25,7 +25,7 @@ export async function createCollection(
     throw new Error(`A collection with the slug "${data.slug}" already exists`);
   }
 
-  // standardize lanuage format
+  // standardize language format
   data.language = data.language.toLowerCase();
 
   if (!isSupportedLanguage(data.language)) {
@@ -135,7 +135,7 @@ export async function updateCollection(
     }
   }
 
-  // standardize lanuage format
+  // standardize language format
   data.language = data.language.toLowerCase();
 
   if (!isSupportedLanguage(data.language)) {
