@@ -1,11 +1,10 @@
-import { CollectionPartner, Prisma, PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 
 import {
   CollectionPartnerAssociation,
   CreateCollectionPartnerAssociationInput,
   UpdateCollectionPartnerAssociationImageUrlInput,
   UpdateCollectionPartnerAssociationInput,
-  UpdateCollectionPartnerImageUrlInput,
 } from '../types';
 import { getCollectionPartnerAssociation } from '../queries';
 
