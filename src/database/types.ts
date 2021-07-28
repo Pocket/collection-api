@@ -135,6 +135,11 @@ export type UpdateCollectionPartnerAssociationInput = {
   externalId: string;
 } & Omit<CreateCollectionPartnerAssociationInput, 'collectionExternalId'>;
 
+export type UpdateCollectionPartnerAssociationImageUrlInput = {
+  externalId: string;
+  imageUrl: string;
+};
+
 export type UpdateCollectionPartnerImageUrlInput = {
   externalId: string;
   imageUrl: string;
@@ -146,7 +151,6 @@ export type CollectionPartnerAssociation = Omit<
 > & {
   type: CollectionPartnershipType;
   partner: CollectionPartner;
-  collection: Collection;
 };
 
 export type SearchCollectionsFilters = {

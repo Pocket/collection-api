@@ -12,7 +12,6 @@ export async function getCollectionPartnerAssociation(
     where: { externalId },
     include: {
       partner: true,
-      collection: true,
     },
   });
 

@@ -1,9 +1,11 @@
-import { Prisma, PrismaClient } from '@prisma/client';
+import { CollectionPartner, Prisma, PrismaClient } from '@prisma/client';
 
 import {
   CollectionPartnerAssociation,
   CreateCollectionPartnerAssociationInput,
+  UpdateCollectionPartnerAssociationImageUrlInput,
   UpdateCollectionPartnerAssociationInput,
+  UpdateCollectionPartnerImageUrlInput,
 } from '../types';
 import { getCollectionPartnerAssociation } from '../queries';
 
@@ -35,7 +37,6 @@ export async function createCollectionPartnerAssociation(
     data: dbData,
     include: {
       partner: true,
-      collection: true,
     },
   });
 }
@@ -67,7 +68,27 @@ export async function updateCollectionPartnerAssociation(
     data: dbData,
     include: {
       partner: true,
-      collection: true,
+    },
+  });
+}
+
+/**
+ * @param db
+ * @param data
+ */
+export async function updateCollectionPartnerAssociationImageUrl(
+  db: PrismaClient,
+  data: UpdateCollectionPartnerAssociationImageUrlInput
+): Promise<CollectionPartnerAssociation> {
+  if (!data.externalId) {
+    throw new Error('externalId must be provided.');
+  }
+
+  return db.collectionPartnership.update({
+    where: { externalId: data.externalId },
+    data: { ...data },
+    include: {
+      partner: true,
     },
   });
 }

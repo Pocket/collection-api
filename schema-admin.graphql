@@ -174,7 +174,6 @@ type CollectionPartnerAssociation {
   externalId: String!
   type: CollectionPartnershipType!
   partner: CollectionPartner!
-  collection: Collection!
   name: String
   url: Url
   imageUrl: Url
@@ -199,6 +198,11 @@ input UpdateCollectionPartnerAssociationInput {
   url: Url
   imageUrl: Url
   blurb: Markdown
+}
+
+input UpdateCollectionPartnerAssociationImageUrlInput {
+    externalId: String!
+    imageUrl: Url!
 }
 
 input DeleteCollectionPartnerAssociationInput {
@@ -343,6 +347,13 @@ type Mutation {
   """
   updateCollectionPartnerAssociation(
     data: UpdateCollectionPartnerAssociationInput!
+  ): CollectionPartnerAssociation!
+  """
+  Updates only the `imageUrl` property of a CollectionPartner.
+  Dedicated to uploading images within the UI.
+  """
+  updateCollectionPartnerAssociationImageUrl(
+    data: UpdateCollectionPartnerAssociationImageUrlInput!
   ): CollectionPartnerAssociation!
   """
   Deletes a CollectionPartnerAssociation.

@@ -18,6 +18,7 @@ export {
 export {
   createCollectionPartnerAssociation,
   updateCollectionPartnerAssociation,
+  updateCollectionPartnerAssociationImageUrl,
   deleteCollectionPartnerAssociation,
 } from './mutations/CollectionPartnerAssociation';
 export {

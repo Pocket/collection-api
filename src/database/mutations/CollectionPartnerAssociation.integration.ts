@@ -4,10 +4,14 @@ import {
   createCollectionPartnerAssociationHelper,
   createPartnerHelper,
 } from '../../test/helpers';
-import { UpdateCollectionPartnerAssociationInput } from '../types';
+import {
+  UpdateCollectionPartnerAssociationImageUrlInput,
+  UpdateCollectionPartnerAssociationInput,
+} from '../types';
 import {
   deleteCollectionPartnerAssociation,
   updateCollectionPartnerAssociation,
+  updateCollectionPartnerAssociationImageUrl,
 } from '../mutations';
 import { getCollectionPartnerAssociation } from '../queries';
 
@@ -40,10 +44,6 @@ describe('mutations: CollectionPartnerAssociation', () => {
       // There should be a linked partner
       expect(association.partner.externalId).toBeTruthy();
       expect(association.partner.name).toBeTruthy();
-
-      // and a linked collection
-      expect(association.collection.externalId).toBeTruthy();
-      expect(association.collection.title).toBeTruthy();
     });
 
     it('should create a collection partner association with customized partner data', async () => {
@@ -72,10 +72,6 @@ describe('mutations: CollectionPartnerAssociation', () => {
       // There should be a linked partner
       expect(association.partner.externalId).toBeTruthy();
       expect(association.partner.name).toBeTruthy();
-
-      // and a linked collection
-      expect(association.collection.externalId).toBeTruthy();
-      expect(association.collection.title).toBeTruthy();
     });
   });
 
@@ -126,6 +122,50 @@ describe('mutations: CollectionPartnerAssociation', () => {
       const updated = await updateCollectionPartnerAssociation(db, data);
 
       expect(updated.partner).toEqual(newPartner);
+    });
+  });
+
+  describe('updateCollectionPartnerAssociationImageUrl', () => {
+    it('should update a collection-partner association image url', async () => {
+      const association = await createCollectionPartnerAssociationHelper(db, {
+        name: 'High Performance Rain',
+      });
+      const randomKitten = 'https://placekitten.com/g/200/300';
+
+      const data: UpdateCollectionPartnerAssociationImageUrlInput = {
+        externalId: association.externalId,
+        imageUrl: randomKitten,
+      };
+
+      const updated = await updateCollectionPartnerAssociationImageUrl(
+        db,
+        data
+      );
+
+      expect(updated.imageUrl).toEqual(data.imageUrl);
+    });
+
+    it('should not update any other association fields', async () => {
+      const association = await createCollectionPartnerAssociationHelper(db, {
+        name: 'High Performance Rain',
+        url: 'https://www.example.com',
+        blurb: 'Bringing the highest quality rain to your backyard.',
+      });
+      const randomKitten = 'https://placekitten.com/g/200/300';
+
+      const data: UpdateCollectionPartnerAssociationImageUrlInput = {
+        externalId: association.externalId,
+        imageUrl: randomKitten,
+      };
+
+      const updated = await updateCollectionPartnerAssociationImageUrl(
+        db,
+        data
+      );
+
+      expect(updated.name).toEqual(association.name);
+      expect(updated.url).toEqual(association.url);
+      expect(updated.blurb).toEqual(association.blurb);
     });
   });
 
