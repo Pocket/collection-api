@@ -114,7 +114,7 @@ model Collection {
   curationCategory      CurationCategory?      @relation(fields: [curationCategoryId], references: [id])
   IABParentCategory     IABCategory?           @relation("CollectionIABParentCategory", fields: [IABParentCategoryId], references: [id])
   IABChildCategory      IABCategory?           @relation("CollectionIABChildCategory", fields: [IABChildCategoryId], references: [id])
-  CollectionPartnership CollectionPartnership?
+  partnership           CollectionPartnership?
 
   @@unique([externalId], name: "externalId")
   @@index([slug], name: "slug")
