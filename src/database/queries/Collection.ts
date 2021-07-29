@@ -24,7 +24,11 @@ export async function getCollection(
       curationCategory: true,
       IABChildCategory: true,
       IABParentCategory: true,
-      partnership: true,
+      partnership: {
+        include: {
+          partner: true,
+        },
+      },
       stories: {
         include: {
           authors: {
@@ -65,7 +69,9 @@ export async function getCollectionBySlug(
       curationCategory: true,
       IABParentCategory: true,
       IABChildCategory: true,
-      partnership: true,
+      partnership: {
+        include: { partner: true },
+      },
       stories: {
         include: {
           authors: {
@@ -93,7 +99,9 @@ export async function getCollectionsBySlugs(
       curationCategory: true,
       IABChildCategory: true,
       IABParentCategory: true,
-      partnership: true,
+      partnership: {
+        include: { partner: true },
+      },
       stories: {
         include: {
           authors: {
@@ -124,7 +132,9 @@ export async function getPublishedCollections(
       curationCategory: true,
       IABChildCategory: true,
       IABParentCategory: true,
-      partnership: true,
+      partnership: {
+        include: { partner: true },
+      },
       stories: {
         include: {
           authors: {
@@ -176,7 +186,7 @@ export async function searchCollections(
       curationCategory: true,
       IABParentCategory: true,
       IABChildCategory: true,
-      partnership: true,
+      partnership: { include: { partner: true } },
       stories: {
         include: {
           authors: {

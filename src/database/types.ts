@@ -172,12 +172,16 @@ export type CollectionStoryWithAuthors = CollectionStory & {
   authors: CollectionStoryAuthor[];
 };
 
+export type CollectionPartnershipComplete = PrismaCollectionPartnership & {
+  partner: CollectionPartner;
+};
+
 export type CollectionComplete = Collection & {
   authors?: CollectionAuthor[];
   curationCategory?: CurationCategory;
   IABParentCategory?: IABCategory;
   IABChildCategory?: IABCategory;
-  partnership?: CollectionPartnership;
+  partnership?: CollectionPartnershipComplete;
   stories?: CollectionStoryWithAuthors[];
 };
 

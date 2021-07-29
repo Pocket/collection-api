@@ -87,7 +87,9 @@ export async function createCollection(
       IABChildCategory: true,
       // Note that partnership is included to conform to the return type - there
       // will never be a partnership set up at the time a collection is created.
-      partnership: true,
+      partnership: {
+        include: { partner: true },
+      },
       stories: {
         // note that this include is only present to satisfy the return type
         // there will never be any stories (or story authors) at the time a
@@ -227,7 +229,9 @@ export async function updateCollection(
       curationCategory: true,
       IABChildCategory: true,
       IABParentCategory: true,
-      partnership: true,
+      partnership: {
+        include: { partner: true },
+      },
       stories: {
         orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
         include: {
@@ -263,7 +267,9 @@ export async function updateCollectionImageUrl(
       curationCategory: true,
       IABChildCategory: true,
       IABParentCategory: true,
-      partnership: true,
+      partnership: {
+        include: { partner: true },
+      },
       stories: {
         orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
         include: {

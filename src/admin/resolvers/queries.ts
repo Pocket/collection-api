@@ -41,7 +41,23 @@ export async function getCollection(
   { externalId },
   { db }
 ): Promise<CollectionComplete> {
-  return dbGetCollection(db, externalId);
+  const collection: CollectionComplete = await dbGetCollection(db, externalId);
+
+  // consolidate partnership fields
+  // this should be refactored into a helper function
+  if (collection.partnership) {
+    collection.partnership.blurb =
+      collection.partnership.blurb || collection.partnership.partner.blurb;
+    collection.partnership.imageUrl =
+      collection.partnership.imageUrl ||
+      collection.partnership.partner.imageUrl;
+    collection.partnership.name =
+      collection.partnership.name || collection.partnership.partner.name;
+    collection.partnership.url =
+      collection.partnership.url || collection.partnership.partner.url;
+  }
+
+  return collection;
 }
 
 /**
