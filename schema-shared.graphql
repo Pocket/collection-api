@@ -44,6 +44,14 @@ type IABParentCategory {
   children: [IABCategory!]!
 }
 
+"""
+Type and enums related to Collections made in partnership with a company.
+"""
+enum CollectionPartnershipType {
+    PARTNERED
+    SPONSORED
+}
+
 type Collection {
   externalId: ID!
   slug: String!

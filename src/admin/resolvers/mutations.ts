@@ -9,8 +9,10 @@ import {
 } from '@prisma/client';
 import * as Sentry from '@sentry/node';
 import {
+  CollectionPartnerAssociation,
   CreateCollectionAuthorInput,
   CreateCollectionInput,
+  CreateCollectionPartnerAssociationInput,
   CreateCollectionPartnerInput,
   CreateCollectionStoryInput,
   CreateImageInput,
@@ -18,6 +20,8 @@ import {
   UpdateCollectionAuthorInput,
   UpdateCollectionImageUrlInput,
   UpdateCollectionInput,
+  UpdateCollectionPartnerAssociationImageUrlInput,
+  UpdateCollectionPartnerAssociationInput,
   UpdateCollectionPartnerImageUrlInput,
   UpdateCollectionPartnerInput,
   UpdateCollectionStoryImageUrlInput,
@@ -29,15 +33,19 @@ import {
   createCollectionAuthor as dbCreateCollectionAuthor,
   createCollection as dbCreateCollection,
   createCollectionPartner as dbCreateCollectionPartner,
+  createCollectionPartnerAssociation as dbCreateCollectionPartnerAssociation,
   createCollectionStory as dbCreateCollectionStory,
   createImage,
   deleteCollectionStory as dbDeleteCollectionStory,
+  deleteCollectionPartnerAssociation as dbDeleteCollectionPartnerAssociation,
   updateCollectionAuthor as dbUpdateCollectionAuthor,
   updateCollectionAuthorImageUrl as dbUpdateCollectionAuthorImageUrl,
   updateCollection as dbUpdateCollection,
   updateCollectionImageUrl as dbUpdateCollectionImageUrl,
   updateCollectionPartner as dbUpdateCollectionPartner,
   updateCollectionPartnerImageUrl as dbUpdateCollectionPartnerImageUrl,
+  updateCollectionPartnerAssociation as dbUpdateCollectionPartnerAssociation,
+  updateCollectionPartnerAssociationImageUrl as dbUpdateCollectionPartnerAssociationImageUrl,
   updateCollectionStory as dbUpdateCollectionStory,
   updateCollectionStorySortOrder as dbUpdateCollectionStorySortOrder,
   updateCollectionStoryImageUrl as dbUpdateCollectionStoryImageUrl,
@@ -241,6 +249,86 @@ export async function updateCollectionPartnerImageUrl(
     data,
     dbUpdateCollectionPartnerImageUrl,
     ImageEntityType.COLLECTION_PARTNER
+  );
+}
+
+/**
+ * @param parent
+ * @param data
+ * @param db
+ */
+export async function createCollectionPartnerAssociation(
+  parent,
+  { data },
+  { db }
+): Promise<CollectionPartnerAssociation> {
+  return executeMutation<
+    CreateCollectionPartnerAssociationInput,
+    CollectionPartnerAssociation
+  >(
+    db,
+    data,
+    dbCreateCollectionPartnerAssociation,
+    ImageEntityType.COLLECTION_PARTNERSHIP
+  );
+}
+
+/**
+ * @param parent
+ * @param data
+ * @param db
+ */
+export async function updateCollectionPartnerAssociation(
+  parent,
+  { data },
+  { db }
+): Promise<CollectionPartnerAssociation> {
+  return executeMutation<
+    UpdateCollectionPartnerAssociationInput,
+    CollectionPartnerAssociation
+  >(
+    db,
+    data,
+    dbUpdateCollectionPartnerAssociation,
+    ImageEntityType.COLLECTION_PARTNERSHIP
+  );
+}
+
+/**
+ * @param parent
+ * @param data
+ * @param db
+ */
+export async function updateCollectionPartnerAssociationImageUrl(
+  parent,
+  { data },
+  { db }
+): Promise<CollectionPartnerAssociation> {
+  return executeMutation<
+    UpdateCollectionPartnerAssociationImageUrlInput,
+    CollectionPartnerAssociation
+  >(
+    db,
+    data,
+    dbUpdateCollectionPartnerAssociationImageUrl,
+    ImageEntityType.COLLECTION_PARTNERSHIP
+  );
+}
+
+/**
+ * @param parent
+ * @param externalId
+ * @param db
+ */
+export async function deleteCollectionPartnerAssociation(
+  parent,
+  { externalId },
+  { db }
+): Promise<CollectionPartnerAssociation> {
+  return await executeMutation<string, CollectionPartnerAssociation>(
+    db,
+    externalId,
+    dbDeleteCollectionPartnerAssociation
   );
 }
 

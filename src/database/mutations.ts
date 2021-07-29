@@ -16,6 +16,12 @@ export {
   updateCollectionPartnerImageUrl,
 } from './mutations/CollectionPartner';
 export {
+  createCollectionPartnerAssociation,
+  updateCollectionPartnerAssociation,
+  updateCollectionPartnerAssociationImageUrl,
+  deleteCollectionPartnerAssociation,
+} from './mutations/CollectionPartnerAssociation';
+export {
   createCollectionStory,
   deleteCollectionStory,
   updateCollectionStory,
