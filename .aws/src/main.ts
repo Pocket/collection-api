@@ -12,7 +12,7 @@ import {
   DataAwsRegion,
   DataAwsSnsTopic,
   S3Bucket,
-} from '../.gen/providers/aws';
+} from '@cdktf/provider-aws';
 import { config } from './config';
 import {
   ApplicationRDSCluster,
