@@ -1,37 +1,13 @@
-import { CollectionPartnership } from '../../database/types';
 import { CollectionPartnership as PrismaCollectionPartnership } from '@prisma/client';
 
 /**
- * This should work, but doesn't. It isn't even being called if I add it to resolvers
+ * Field-level resolvers for the public CollectionPartnership type.
  *
- * @param parent
- * @param _
- * @param db
+ * Even though it appears that we're querying the partner up to four times
+ * to retrieve the information for the four fields below, Prisma is actually
+ * batching the queries behind the scenes and there is no performance hit.
  */
-export async function partnership(
-  parent,
-  _,
-  { db }
-): Promise<CollectionPartnership> {
-  const partner = await db.collectionPartner.findUnique({
-    where: { id: parent.partnerId },
-  });
-
-  return {
-    externalId: parent.externalId,
-    type: parent.type,
-    name: parent.name ? parent.name : partner.name,
-    url: parent.url ? parent.url : partner.url,
-    imageUrl: parent.imageUrl ? parent.imageUrl : partner.imageUrl,
-    blurb: parent.blurb ? parent.blurb : partner.blurb,
-  };
-}
-
-/**
- * And this one works, but since fields are resolved separately, it's essentially
- * the same function repeated four times???
- */
-export const partnershipFields = {
+export const collectionPartnershipFieldResolvers = {
   async name(parent: PrismaCollectionPartnership, _, { db }): Promise<string> {
     if (parent.name) {
       return parent.name;

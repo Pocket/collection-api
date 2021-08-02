@@ -32,7 +32,7 @@ import {
   updateCollectionStorySortOrder,
   updateCollectionStoryImageUrl,
 } from './mutations';
-import { partnershipFields } from './types';
+import { collectionPartnershipFieldResolvers } from './types';
 
 export const resolvers = {
   Mutation: {
@@ -69,5 +69,5 @@ export const resolvers = {
     getIABCategories,
     getLanguages,
   },
-  CollectionPartnership: partnershipFields,
+  CollectionPartnership: collectionPartnershipFieldResolvers,
 };
