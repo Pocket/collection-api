@@ -29,8 +29,7 @@ extend type Item @key(fields: "givenUrl") {
 }
 
 """
-TODO: add comments to all the fields in here!
-there's a documentation ticket - do this in that ticket
+Interactive Advertising Bureau Category - these are used on clients to serve relevant ads
 """
 type IABCategory {
   externalId: String!
@@ -45,6 +44,14 @@ type IABParentCategory {
   children: [IABCategory!]!
 }
 
+"""
+Type and enums related to Collections made in partnership with a company.
+"""
+enum CollectionPartnershipType {
+    PARTNERED
+    SPONSORED
+}
+
 type Collection {
   externalId: ID!
   slug: String!
@@ -54,6 +61,11 @@ type Collection {
   curationCategory: CurationCategory
   intro: Markdown
   imageUrl: Url
+  """
+  note that language is *not* being used as locale - only to specify the
+  language of the collection.
+  """
+  language: String!
   publishedAt: DateString
   authors: [CollectionAuthor!]!
   stories: [CollectionStory!]!

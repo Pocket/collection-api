@@ -1,7 +1,12 @@
-import { CollectionStatus, PrismaClient } from '@prisma/client';
+import {
+  CollectionStatus,
+  CollectionPartnershipType,
+  PrismaClient,
+} from '@prisma/client';
 import {
   createAuthorHelper,
   createCollectionHelper,
+  createCollectionPartnerAssociationHelper,
   createCurationCategoryHelper,
   createIABCategoryHelper,
   createPartnerHelper,
@@ -38,20 +43,21 @@ async function main() {
     IABParentCategory
   );
 
-  await createCollectionHelper(prisma, {
+  const collection1 = await createCollectionHelper(prisma, {
     title: `Kelvin's first collection`,
     author: kelvin,
     curationCategory: curationCategory1,
   });
-  await createCollectionHelper(prisma, {
+  const collection2 = await createCollectionHelper(prisma, {
     title: `Daniel's first collection`,
     author: daniel,
     status: CollectionStatus.PUBLISHED,
     publishedAt: new Date(),
+    language: 'de',
     IABParentCategory,
     IABChildCategory,
   });
-  await createCollectionHelper(prisma, {
+  const collection3 = await createCollectionHelper(prisma, {
     title: `Nina's first collection`,
     author: nina,
     curationCategory: curationCategory2,
@@ -97,12 +103,36 @@ async function main() {
     IABParentCategory,
     IABChildCategory,
   });
+  await createCollectionHelper(prisma, {
+    title: `Jonathan's third collection`,
+    author: jonathan,
+    curationCategory: curationCategory1,
+    status: CollectionStatus.PUBLISHED,
+    publishedAt: new Date(),
+    language: 'es',
+  });
 
-  await createPartnerHelper(prisma, 'Wellness Storm');
-  await createPartnerHelper(prisma, 'Urban Craft Blockchain');
+  const partner1 = await createPartnerHelper(prisma, 'Wellness Storm');
+  const partner2 = await createPartnerHelper(prisma, 'Urban Craft Blockchain');
   await createPartnerHelper(prisma, 'Martial Power Cycling');
   await createPartnerHelper(prisma, 'Dollar Rabbit Fund');
   await createPartnerHelper(prisma, 'Alpine Octopus');
+
+  await createCollectionPartnerAssociationHelper(prisma, {
+    type: CollectionPartnershipType.PARTNERED,
+    collection: collection1,
+    partner: partner1,
+  });
+
+  await createCollectionPartnerAssociationHelper(prisma, {
+    collection: collection2,
+    partner: partner2,
+  });
+
+  await createCollectionPartnerAssociationHelper(prisma, {
+    collection: collection3,
+    partner: partner2,
+  });
 }
 
 main()

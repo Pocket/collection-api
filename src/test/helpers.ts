@@ -3,6 +3,7 @@ import {
   Collection,
   CollectionAuthor,
   CollectionPartner,
+  CollectionPartnershipType,
   CollectionStatus,
   CollectionStory,
   CurationCategory,
@@ -12,6 +13,7 @@ import {
   PrismaClient,
 } from '@prisma/client';
 import {
+  CollectionPartnerAssociation,
   CollectionStoryAuthor,
   CreateCollectionAuthorInput,
   CreateCollectionStoryInput,
@@ -44,6 +46,7 @@ export interface createCollectionHelperOptionalInput {
   curationCategory?: CurationCategory;
   publishedAt?: Date;
   imageUrl?: string;
+  language?: string;
   addStories?: boolean;
   IABParentCategory?: IABCategory;
   IABChildCategory?: IABCategory;
@@ -61,9 +64,20 @@ const createCollectionHelperDefaults: createCollectionHelperOptionalInput = {
   curationCategory: null,
   publishedAt: null,
   imageUrl: null,
+  language: 'en',
   IABParentCategory: null,
   IABChildCategory: null,
 };
+
+export interface createCollectionPartnerAssociationHelperInput {
+  type?: CollectionPartnershipType;
+  partner?: CollectionPartner;
+  collection?: Collection;
+  name?: string;
+  url?: string;
+  imageUrl?: string;
+  blurb?: string;
+}
 
 export async function createCollectionHelper(
   prisma: PrismaClient,
@@ -83,6 +97,7 @@ export async function createCollectionHelper(
     curationCategory,
     publishedAt,
     imageUrl,
+    language,
     addStories,
     IABParentCategory,
     IABChildCategory,
@@ -94,6 +109,7 @@ export async function createCollectionHelper(
     excerpt: faker.lorem.sentences(2),
     intro: faker.lorem.paragraphs(2),
     status,
+    language,
     authors: {
       connect: {
         id: author.id,
@@ -211,6 +227,54 @@ export async function createPartnerHelper(
   };
 
   return await prisma.collectionPartner.create({ data });
+}
+
+export async function createCollectionPartnerAssociationHelper(
+  prisma: PrismaClient,
+  params: createCollectionPartnerAssociationHelperInput
+): Promise<CollectionPartnerAssociation> {
+  let partner: CollectionPartner;
+  if (!params.partner) {
+    partner = await createPartnerHelper(prisma, faker.company.companyName());
+  } else {
+    partner = params.partner;
+  }
+
+  let collection: Collection;
+  if (!params.collection) {
+    // create a collection author
+    const author = await createAuthorHelper(
+      prisma,
+      `${faker.name.firstName()} ${faker.name.lastName()}`
+    );
+
+    // use this author to create a collection
+    collection = await createCollectionHelper(prisma, {
+      title: faker.lorem.sentence(),
+      author,
+    });
+  } else {
+    collection = params.collection;
+  }
+
+  if (!params.type) {
+    params.type = CollectionPartnershipType.SPONSORED;
+  }
+
+  const data: Prisma.CollectionPartnershipCreateInput = {
+    // add optional variables
+    ...params,
+    partner: { connect: { externalId: partner.externalId } },
+    collection: { connect: { externalId: collection.externalId } },
+  };
+
+  return await prisma.collectionPartnership.create({
+    data,
+    include: {
+      partner: true,
+      collection: true,
+    },
+  });
 }
 
 export async function createImageHelper(

@@ -1,9 +1,14 @@
-import { CollectionComplete, IABParentCategory } from '../../database/types';
+import {
+  CollectionComplete,
+  CollectionPartnerAssociation,
+  IABParentCategory,
+} from '../../database/types';
 import {
   countAuthors,
   getAuthor,
   getAuthors,
   getCollection as dbGetCollection,
+  getCollectionPartnerAssociation as dbGetCollectionPartnerAssociation,
   getCollectionStory as dbGetCollectionStory,
   getCurationCategories as dbGetCurationCategories,
   searchCollections as dbSearchCollections,
@@ -169,4 +174,31 @@ export async function getCollectionPartner(
   { db }
 ): Promise<CollectionPartner> {
   return getPartner(db, externalId);
+}
+
+/**
+ *
+ * @param parent
+ * @param _ (empty because this takes no params)
+ * @param db
+ */
+export function getLanguages(parent, _, { db }): any {
+  return config.app.languages.map((lang) => {
+    return {
+      code: lang,
+    };
+  });
+}
+
+/**
+ * @param parent
+ * @param externalId
+ * @param db
+ */
+export async function getCollectionPartnerAssociation(
+  parent,
+  { externalId },
+  { db }
+): Promise<CollectionPartnerAssociation> {
+  return dbGetCollectionPartnerAssociation(db, externalId);
 }

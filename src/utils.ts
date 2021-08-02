@@ -1,10 +1,11 @@
+import { Pagination } from './typeDefs';
+
 /**
  * Returns the pagination response object
  * @param totalResults
  * @param page
  * @param perPage
  */
-import { Pagination } from './typeDefs';
 
 export function getPagination(
   totalResults: number,

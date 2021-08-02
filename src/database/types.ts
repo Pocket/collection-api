@@ -1,6 +1,9 @@
 import {
   Collection,
   CollectionAuthor,
+  CollectionPartner,
+  CollectionPartnership,
+  CollectionPartnershipType,
   CollectionStatus,
   CollectionStory,
   CurationCategory,
@@ -30,16 +33,17 @@ export type UpdateCollectionAuthorImageUrlInput = {
 };
 
 export type CreateCollectionInput = {
-  slug: string;
-  title: string;
-  excerpt?: string;
-  intro?: string;
-  imageUrl?: string;
-  status?: CollectionStatus;
   authorExternalId: string;
   curationCategoryExternalId?: string;
-  IABParentCategoryExternalId?: string;
+  excerpt?: string;
   IABChildCategoryExternalId?: string;
+  IABParentCategoryExternalId?: string;
+  imageUrl?: string;
+  intro?: string;
+  language: string;
+  slug: string;
+  status?: CollectionStatus;
+  title: string;
 };
 
 export type UpdateCollectionInput = {
@@ -51,6 +55,7 @@ export type UpdateCollectionInput = {
   IABParentCategoryExternalId?: string;
   imageUrl?: string;
   intro?: string;
+  language: string;
   publishedAt?: Date;
   slug: string;
   status?: CollectionStatus;
@@ -110,9 +115,42 @@ export type UpdateCollectionPartnerInput = {
   blurb: string;
 };
 
+export type CreateCollectionPartnerAssociationInput = {
+  type: CollectionPartnershipType;
+  partnerExternalId: string;
+  collectionExternalId: string;
+  name?: string;
+  url?: string;
+  imageUrl?: string;
+  blurb?: string;
+};
+
+/**
+ * We omit the collection external id from the input since, once a collection
+ * to partner relationship is set up on the frontend, it won't ever be updated
+ * to another collection, but it may be updated to point to another partner if
+ * a mistake has been made while entering the collection details into the system.
+ */
+export type UpdateCollectionPartnerAssociationInput = {
+  externalId: string;
+} & Omit<CreateCollectionPartnerAssociationInput, 'collectionExternalId'>;
+
+export type UpdateCollectionPartnerAssociationImageUrlInput = {
+  externalId: string;
+  imageUrl: string;
+};
+
 export type UpdateCollectionPartnerImageUrlInput = {
   externalId: string;
   imageUrl: string;
+};
+
+export type CollectionPartnerAssociation = Omit<
+  CollectionPartnership,
+  'partnerExternalId' | 'collectionExternalId'
+> & {
+  type: CollectionPartnershipType;
+  partner: CollectionPartner;
 };
 
 export type SearchCollectionsFilters = {
@@ -144,4 +182,8 @@ export type CreateImageInput = {
 
 export type IABParentCategory = IABCategory & {
   children: IABCategory[];
+};
+
+export type CollectionsFilters = {
+  language?: string;
 };
