@@ -10,7 +10,6 @@ export function client(): PrismaClient {
   // Always log errors
   const logOptions: any[] = ['error'];
 
-  console.log(config.app.environment);
   // In the local dev environment, emit 'query' events
   if (config.app.environment == 'local') {
     logOptions.push({

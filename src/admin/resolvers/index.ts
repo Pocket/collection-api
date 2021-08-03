@@ -32,7 +32,7 @@ import {
   updateCollectionStorySortOrder,
   updateCollectionStoryImageUrl,
 } from './mutations';
-import { collectionPartnershipFieldResolvers } from './types';
+import { collectionPartnershipFieldResolvers } from '../../shared/resolvers/types';
 
 export const resolvers = {
   Mutation: {
