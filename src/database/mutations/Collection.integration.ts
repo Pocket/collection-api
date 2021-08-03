@@ -168,6 +168,16 @@ describe('mutations: Collection', () => {
 
       expect(c.IABChildCategory).toBeNull();
     });
+
+    it('should not connect a partnership', async () => {
+      const data: CreateCollectionInput = {
+        ...minimumData,
+      };
+
+      const c = await createCollection(db, data);
+
+      expect(c.partnership).toBeNull();
+    });
   });
 
   describe('updateCollection', () => {

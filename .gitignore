@@ -2,6 +2,7 @@
 dist
 .env
 .idea
+.vscode
 .aws/.terraform/
 
 docker-compose.override.yml
