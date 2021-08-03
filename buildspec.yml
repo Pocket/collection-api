@@ -59,8 +59,7 @@ phases:
       - npm run build
       # synthesize the js into terraform json with the proper node environment
       - 'if [ "$GIT_BRANCH" == "$DEV_BRANCH" ]; then NODE_ENV=development npm run synth; else npm run synth; fi'
-      - cd cdktf.out
-      - rm -rf .terraform # remove sym-link to ../.terraform (if this sym-link exists, terraform doesn't apply correctly. hmmmm)
+      - cd cdktf.out/stacks/collection-api
       - terraform init
   build:
     commands:
@@ -73,9 +72,9 @@ phases:
       - 'if [ "$GIT_BRANCH" == "$MAIN_BRANCH" ]; then terraform apply -auto-approve -no-color; fi'
   post_build:
     commands:
-      - 'if [ "$GIT_BRANCH" == "$MAIN_BRANCH" ] || [ "$GIT_BRANCH" == "$DEV_BRANCH" ]; then cp appspec.json taskdef.json ../../; fi'
+      - 'if [ "$GIT_BRANCH" == "$MAIN_BRANCH" ] || [ "$GIT_BRANCH" == "$DEV_BRANCH" ]; then cp appspec.json taskdef.json ../../../../; fi'
       # get back to the root dir
-      - cd ../../
+      - cd ../../../../
       - echo Build completed on `date`
 
 artifacts:
