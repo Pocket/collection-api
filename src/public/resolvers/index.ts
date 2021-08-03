@@ -1,5 +1,6 @@
 import { getCollectionBySlug, getCollections } from './queries';
 import { collection } from './item';
+import { collectionPartnershipFieldResolvers } from '../../shared/resolvers/types';
 
 /**
  * Resolvers
@@ -12,4 +13,5 @@ export const resolvers = {
   Item: {
     collection,
   },
+  CollectionPartnership: collectionPartnershipFieldResolvers,
 };
