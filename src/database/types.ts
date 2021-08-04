@@ -2,7 +2,7 @@ import {
   Collection,
   CollectionAuthor,
   CollectionPartner,
-  CollectionPartnership,
+  CollectionPartnership as PrismaCollectionPartnership,
   CollectionPartnershipType,
   CollectionStatus,
   CollectionStory,
@@ -146,11 +146,20 @@ export type UpdateCollectionPartnerImageUrlInput = {
 };
 
 export type CollectionPartnerAssociation = Omit<
-  CollectionPartnership,
+  PrismaCollectionPartnership,
   'partnerExternalId' | 'collectionExternalId'
 > & {
   type: CollectionPartnershipType;
   partner: CollectionPartner;
+};
+
+export type CollectionPartnership = {
+  externalId: string;
+  type: CollectionPartnershipType;
+  name: string;
+  url: string;
+  imageUrl: string;
+  blurb: string;
 };
 
 export type SearchCollectionsFilters = {
@@ -168,6 +177,7 @@ export type CollectionComplete = Collection & {
   curationCategory?: CurationCategory;
   IABParentCategory?: IABCategory;
   IABChildCategory?: IABCategory;
+  partnership?: CollectionPartnership;
   stories?: CollectionStoryWithAuthors[];
 };
 
