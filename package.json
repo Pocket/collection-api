@@ -27,7 +27,7 @@
     "apollo-server-cache-redis": "^3.0.3",
     "apollo-server-express": "^3.1.1",
     "apollo-server-plugin-response-cache": "^3.1.1",
-    "aws-sdk": "^2.958.0",
+    "aws-sdk": "^2.960.0",
     "aws-xray-sdk-core": "^3.3.3",
     "aws-xray-sdk-express": "^3.3.3",
     "graphql": "^15.5.1",
