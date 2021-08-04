@@ -11,6 +11,7 @@ import {
   clear as clearDb,
   createAuthorHelper,
   createCollectionHelper,
+  createCollectionPartnerAssociationHelper,
   createCurationCategoryHelper,
   createIABCategoryHelper,
   sortCollectionStoryAuthors,
@@ -70,6 +71,9 @@ describe('queries: Collection', () => {
 
       // the array should be empty (bc we skipped creating stories above)
       expect(collection.stories.length).toEqual(0);
+
+      // there should be no partnership (we didn't set one up)
+      expect(collection.partnership).toBeNull();
     });
 
     it('can get a collection with stories with authors by external id', async () => {
@@ -98,6 +102,21 @@ describe('queries: Collection', () => {
       expect(collection.stories[0].authors).toEqual(
         sortCollectionStoryAuthors(collection.stories[0].authors)
       );
+    });
+
+    it('can get consolidated partnership information for a collection', async () => {
+      const created = await createCollectionHelper(db, {
+        title: 'test me',
+        author,
+      });
+
+      const association = await createCollectionPartnerAssociationHelper(db, {
+        collection: created,
+      });
+      const collection = await getCollection(db, created.externalId);
+
+      expect(collection.partnership.externalId).toEqual(association.externalId);
+      expect(collection.partnership.type).toEqual(association.type);
     });
   });
 
@@ -362,7 +381,7 @@ describe('queries: Collection', () => {
 
       const collections = await getPublishedCollections(db, 1, 10);
 
-      // only two publisedh collections are in `en`
+      // only two published collections are in `en`
       expect(collections.length).toEqual(2);
     });
 
