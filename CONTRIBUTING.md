@@ -4,7 +4,7 @@ Thank you for checking out our Collection API work. We welcome contributions fro
 
 ### Asking questions / receiving updates
 
-- Slack channel (Mozilla staff only): #p-curation-tools
+- Slack channel (Pocket staff only): #p-curation-tools
 
 - File issues/questions on Github: [https://github.com/Pocket/collection-api/issues](https://github.com/Pocket/collection-api/issues). We typically triage new issues every Monday.
 
