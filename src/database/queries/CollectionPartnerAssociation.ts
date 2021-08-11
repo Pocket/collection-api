@@ -23,3 +23,31 @@ export async function getCollectionPartnerAssociation(
 
   return association;
 }
+
+/**
+ * @param db
+ * @param externalId
+ */
+export async function getCollectionPartnerAssociationForCollection(
+  db: PrismaClient,
+  externalId: string
+): Promise<CollectionPartnerAssociation> {
+  const association = db.collectionPartnership.findFirst({
+    where: {
+      collection: {
+        externalId,
+      },
+    },
+    include: {
+      partner: true,
+    },
+  });
+
+  if (!association) {
+    throw new Error(
+      `Association for collection with external ID: ${externalId} does not exist.`
+    );
+  }
+
+  return association;
+}
