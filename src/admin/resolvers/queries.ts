@@ -9,6 +9,7 @@ import {
   getAuthors,
   getCollection as dbGetCollection,
   getCollectionPartnerAssociation as dbGetCollectionPartnerAssociation,
+  getCollectionPartnerAssociationForCollection as dbGetCollectionPartnerAssociationForCollection,
   getCollectionStory as dbGetCollectionStory,
   getCurationCategories as dbGetCurationCategories,
   searchCollections as dbSearchCollections,
@@ -201,4 +202,17 @@ export async function getCollectionPartnerAssociation(
   { db }
 ): Promise<CollectionPartnerAssociation> {
   return dbGetCollectionPartnerAssociation(db, externalId);
+}
+
+/**
+ * @param parent
+ * @param externalId
+ * @param db
+ */
+export async function getCollectionPartnerAssociationForCollection(
+  parent,
+  { externalId },
+  { db }
+): Promise<CollectionPartnerAssociation> {
+  return dbGetCollectionPartnerAssociationForCollection(db, externalId);
 }
