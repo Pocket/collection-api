@@ -53,6 +53,7 @@ describe('mutations: CollectionStory', () => {
           { name: 'walter', sortOrder: 2 },
         ],
         publisher: 'little lebowskis',
+        fromPartner: false,
       };
     });
 
@@ -152,6 +153,7 @@ describe('mutations: CollectionStory', () => {
         ],
         publisher: 'little lebowskis',
         sortOrder: 4,
+        fromPartner: false,
       };
 
       story = await createCollectionStory(db, data);
@@ -170,6 +172,7 @@ describe('mutations: CollectionStory', () => {
         ],
         publisher: 'the cast',
         sortOrder: 3,
+        fromPartner: true,
       };
 
       const updated = await updateCollectionStory(db, updateData);
@@ -196,6 +199,7 @@ describe('mutations: CollectionStory', () => {
         ],
         publisher: 'the cast',
         sortOrder: 3,
+        fromPartner: false,
       };
 
       const updated = await updateCollectionStory(db, updateData);
@@ -217,6 +221,7 @@ describe('mutations: CollectionStory', () => {
         authors: [],
         publisher: 'the cast',
         sortOrder: 3,
+        fromPartner: false,
       };
 
       const updated = await updateCollectionStory(db, updateData);
@@ -237,6 +242,7 @@ describe('mutations: CollectionStory', () => {
         ],
         publisher: 'the cast',
         sortOrder: 3,
+        fromPartner: false,
       };
 
       const updated = await updateCollectionStory(db, updateData);
@@ -258,6 +264,7 @@ describe('mutations: CollectionStory', () => {
         ],
         publisher: 'random penguin',
         sortOrder: 5,
+        fromPartner: false,
       };
 
       await createCollectionStory(db, createData);
@@ -275,6 +282,7 @@ describe('mutations: CollectionStory', () => {
         ],
         publisher: 'random penguin',
         sortOrder: 1,
+        fromPartner: false,
       };
 
       // Return a custom error message instead of "Unique constraint failed..."
@@ -303,6 +311,7 @@ describe('mutations: CollectionStory', () => {
         ],
         publisher: 'random penguin',
         sortOrder: 5,
+        fromPartner: false,
       };
 
       await createCollectionStory(db, createData);
@@ -320,6 +329,7 @@ describe('mutations: CollectionStory', () => {
         ],
         publisher: 'random penguin',
         sortOrder: 1,
+        fromPartner: false,
       };
 
       const updated = await updateCollectionStory(db, updateData);
@@ -344,6 +354,7 @@ describe('mutations: CollectionStory', () => {
         ],
         publisher: 'little lebowskis',
         sortOrder: 4,
+        fromPartner: false,
       };
 
       story = await createCollectionStory(db, data);
@@ -389,6 +400,7 @@ describe('mutations: CollectionStory', () => {
         ],
         publisher: 'little lebowskis',
         sortOrder: 4,
+        fromPartner: false,
       };
 
       story = await createCollectionStory(db, data);
@@ -435,6 +447,7 @@ describe('mutations: CollectionStory', () => {
         ],
         publisher: 'little lebowskis',
         sortOrder: 4,
+        fromPartner: false,
       };
 
       story = await createCollectionStory(db, data);
