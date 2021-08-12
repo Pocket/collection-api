@@ -10,6 +10,7 @@ import {
   getLanguages,
   getIABCategories,
   searchCollections,
+  getCollectionPartnerAssociationForCollection,
 } from './queries';
 import {
   collectionImageUpload,
@@ -64,6 +65,7 @@ export const resolvers = {
     getCollectionPartner,
     getCollectionPartners,
     getCollectionPartnerAssociation,
+    getCollectionPartnerAssociationForCollection,
     getCollectionStory,
     getCurationCategories,
     getIABCategories,
