@@ -257,6 +257,11 @@ type Query {
   Retrieves a CollectionPartnerAssociation by externalId
   """
   getCollectionPartnerAssociation(externalId: String!): CollectionPartnerAssociation
+  """
+  Retrieves a CollectionPartnerAssociation by the externalId of the collection
+  it is related to.
+  """
+  getCollectionPartnerAssociationForCollection(externalId: String!): CollectionPartnerAssociation
 }
 
 type Mutation {
