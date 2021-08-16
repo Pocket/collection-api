@@ -52,10 +52,14 @@ jobs:
     steps:
       - checkout
       - run:
-          name: install apollo
+          name: install rover
           # CircleCI needs global installs to be sudo
           command: |
-            sudo npm install -g apollo
+            # download and install Rover
+            curl -sSL https://rover.apollo.dev/nix/v0.1.0 | sh
+
+            # This allows the PATH changes to persist to the next `run` step
+            echo 'export PATH=$HOME/.rover/bin:$PATH' >> $BASH_ENV
       - run:
           name: build public schema
           # We have to send one file for the federated schema which means we have to concat our shared scheme
@@ -63,14 +67,14 @@ jobs:
           command: cat schema-shared.graphql schema-public.graphql > schema.graphql
       - run:
           name: check service
-          command: apollo service:check --graph=pocket-client-api --localSchemaFile=schema.graphql --serviceName=collection --variant=current
+          command: rover subgraph check pocket-client-api@current --schema ./schema.graphql --name=collection
       - when:
           condition:
-            equal: [ main, << pipeline.git.branch >>]
+            equal: [main, << pipeline.git.branch >>]
           steps:
             - run:
                 name: push service
-                command: apollo service:push --graph=pocket-client-api --localSchemaFile=schema.graphql --serviceURL=https://collection-api.readitlater.com/ --serviceName=collection --variant=current
+                command: rover subgraph publish pocket-client-api@current --schema ./schema.graphql --routing-url https://collection-api.readitlater.com/ --name=collection
 
   build:
     docker:
@@ -310,4 +314,3 @@ workflows:
           workspace-path: /tmp/workspace
           requires:
             - deploy_dev
-
