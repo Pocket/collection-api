@@ -5,6 +5,9 @@ input CollectionInput {
   excerpt: String!
 }
 
+"""
+available filters for searching collections
+"""
 input SearchCollectionsFilters {
   author: String
   title: String
@@ -205,8 +208,8 @@ input UpdateCollectionPartnerAssociationInput {
 }
 
 input UpdateCollectionPartnerAssociationImageUrlInput {
-    externalId: String!
-    imageUrl: Url!
+  externalId: String!
+  imageUrl: Url!
 }
 
 input DeleteCollectionPartnerAssociationInput {
@@ -258,12 +261,16 @@ type Query {
   """
   Retrieves a CollectionPartnerAssociation by externalId
   """
-  getCollectionPartnerAssociation(externalId: String!): CollectionPartnerAssociation
+  getCollectionPartnerAssociation(
+    externalId: String!
+  ): CollectionPartnerAssociation
   """
   Retrieves a CollectionPartnerAssociation by the externalId of the collection
   it is related to.
   """
-  getCollectionPartnerAssociationForCollection(externalId: String!): CollectionPartnerAssociation
+  getCollectionPartnerAssociationForCollection(
+    externalId: String!
+  ): CollectionPartnerAssociation
 }
 
 type Mutation {
@@ -367,5 +374,7 @@ type Mutation {
   """
   Deletes a CollectionPartnerAssociation.
   """
-  deleteCollectionPartnerAssociation(externalId: String!): CollectionPartnerAssociation!
+  deleteCollectionPartnerAssociation(
+    externalId: String!
+  ): CollectionPartnerAssociation!
 }
