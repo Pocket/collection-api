@@ -73,6 +73,13 @@ describe('mutations: CollectionStory', () => {
       expect(story.sortOrder).toEqual(0);
     });
 
+    it('should create a collection story with a default `fromPartner` value', async () => {
+      const story = await createCollectionStory(db, data);
+
+      // default 'fromPartner' value of 'false' should be present
+      expect(story.fromPartner).toEqual(false);
+    });
+
     it('should return story authors sorted correctly', async () => {
       const story = await createCollectionStory(db, data);
 
@@ -152,6 +159,7 @@ describe('mutations: CollectionStory', () => {
         ],
         publisher: 'little lebowskis',
         sortOrder: 4,
+        fromPartner: false,
       };
 
       story = await createCollectionStory(db, data);
@@ -170,6 +178,7 @@ describe('mutations: CollectionStory', () => {
         ],
         publisher: 'the cast',
         sortOrder: 3,
+        fromPartner: true,
       };
 
       const updated = await updateCollectionStory(db, updateData);
@@ -196,6 +205,7 @@ describe('mutations: CollectionStory', () => {
         ],
         publisher: 'the cast',
         sortOrder: 3,
+        fromPartner: false,
       };
 
       const updated = await updateCollectionStory(db, updateData);
@@ -217,6 +227,7 @@ describe('mutations: CollectionStory', () => {
         authors: [],
         publisher: 'the cast',
         sortOrder: 3,
+        fromPartner: false,
       };
 
       const updated = await updateCollectionStory(db, updateData);
@@ -237,6 +248,7 @@ describe('mutations: CollectionStory', () => {
         ],
         publisher: 'the cast',
         sortOrder: 3,
+        fromPartner: false,
       };
 
       const updated = await updateCollectionStory(db, updateData);
@@ -258,6 +270,7 @@ describe('mutations: CollectionStory', () => {
         ],
         publisher: 'random penguin',
         sortOrder: 5,
+        fromPartner: false,
       };
 
       await createCollectionStory(db, createData);
@@ -275,6 +288,7 @@ describe('mutations: CollectionStory', () => {
         ],
         publisher: 'random penguin',
         sortOrder: 1,
+        fromPartner: false,
       };
 
       // Return a custom error message instead of "Unique constraint failed..."
@@ -303,6 +317,7 @@ describe('mutations: CollectionStory', () => {
         ],
         publisher: 'random penguin',
         sortOrder: 5,
+        fromPartner: false,
       };
 
       await createCollectionStory(db, createData);
@@ -320,11 +335,30 @@ describe('mutations: CollectionStory', () => {
         ],
         publisher: 'random penguin',
         sortOrder: 1,
+        fromPartner: false,
       };
 
       const updated = await updateCollectionStory(db, updateData);
 
       expect(updated.url).toEqual(updateData.url);
+    });
+
+    it('should allow updates with optional fields omitted in input data', async () => {
+      const updateData: UpdateCollectionStoryInput = {
+        externalId: story.externalId,
+        url: 'https://www.lebowskifest.com/bowling',
+        title: 'a fest of lebowskis',
+        excerpt: 'new excerpt',
+        imageUrl: 'new image url',
+        authors: [],
+        publisher: 'the cast',
+      };
+
+      const updated = await updateCollectionStory(db, updateData);
+
+      // The two optional fields should stay as they are
+      expect(updated.sortOrder).toEqual(story.sortOrder);
+      expect(updated.fromPartner).toEqual(story.fromPartner);
     });
   });
 
@@ -344,6 +378,7 @@ describe('mutations: CollectionStory', () => {
         ],
         publisher: 'little lebowskis',
         sortOrder: 4,
+        fromPartner: false,
       };
 
       story = await createCollectionStory(db, data);
@@ -389,6 +424,7 @@ describe('mutations: CollectionStory', () => {
         ],
         publisher: 'little lebowskis',
         sortOrder: 4,
+        fromPartner: false,
       };
 
       story = await createCollectionStory(db, data);
@@ -435,6 +471,7 @@ describe('mutations: CollectionStory', () => {
         ],
         publisher: 'little lebowskis',
         sortOrder: 4,
+        fromPartner: false,
       };
 
       story = await createCollectionStory(db, data);

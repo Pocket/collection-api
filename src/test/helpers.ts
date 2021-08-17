@@ -165,6 +165,7 @@ export async function createCollectionHelper(
           },
         ],
         publisher: faker.company.companyName(),
+        fromPartner: faker.datatype.boolean(),
       });
     }
   }
