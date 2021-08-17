@@ -53,7 +53,6 @@ describe('mutations: CollectionStory', () => {
           { name: 'walter', sortOrder: 2 },
         ],
         publisher: 'little lebowskis',
-        fromPartner: false,
       };
     });
 
@@ -72,6 +71,13 @@ describe('mutations: CollectionStory', () => {
 
       // default sort order of 0 should be there
       expect(story.sortOrder).toEqual(0);
+    });
+
+    it('should create a collection story with a default `fromPartner` value', async () => {
+      const story = await createCollectionStory(db, data);
+
+      // default 'fromPartner' value of 'false' should be present
+      expect(story.fromPartner).toEqual(false);
     });
 
     it('should return story authors sorted correctly', async () => {
@@ -335,6 +341,24 @@ describe('mutations: CollectionStory', () => {
       const updated = await updateCollectionStory(db, updateData);
 
       expect(updated.url).toEqual(updateData.url);
+    });
+
+    it('should allow updates with optional fields omitted in input data', async () => {
+      const updateData: UpdateCollectionStoryInput = {
+        externalId: story.externalId,
+        url: 'https://www.lebowskifest.com/bowling',
+        title: 'a fest of lebowskis',
+        excerpt: 'new excerpt',
+        imageUrl: 'new image url',
+        authors: [],
+        publisher: 'the cast',
+      };
+
+      const updated = await updateCollectionStory(db, updateData);
+
+      // The two optional fields should stay as they are
+      expect(updated.sortOrder).toEqual(story.sortOrder);
+      expect(updated.fromPartner).toEqual(story.fromPartner);
     });
   });
 
