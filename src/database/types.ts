@@ -81,6 +81,7 @@ export type CreateCollectionStoryInput = {
   authors: CollectionStoryAuthor[];
   publisher: string;
   sortOrder?: number;
+  fromPartner?: boolean;
 };
 
 export type UpdateCollectionStoryInput = Omit<

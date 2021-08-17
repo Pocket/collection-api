@@ -89,6 +89,7 @@ input CreateCollectionStoryInput {
   authors: [CollectionStoryAuthorInput!]!
   publisher: String!
   sortOrder: Int
+  fromPartner: Boolean
 }
 
 input UpdateCollectionStoryInput {
@@ -100,6 +101,7 @@ input UpdateCollectionStoryInput {
   authors: [CollectionStoryAuthorInput!]!
   publisher: String!
   sortOrder: Int
+  fromPartner: Boolean
 }
 
 input UpdateCollectionStorySortOrderInput {
@@ -241,7 +243,7 @@ type Query {
   """
   getCollectionPartners(page: Int, perPage: Int): CollectionPartnersResult!
   """
-  Retrieves a CollectionStory by a combination of collectionId and url.
+  Retrieves a CollectionStory by externalId. Used for tests only.
   """
   getCollectionStory(externalId: String!): CollectionStory
   """
@@ -257,7 +259,7 @@ type Query {
   """
   getLanguages: [Language!]!
   """
-  Retrieves a CollectionPartnerAssociation by externalId
+  Retrieves a CollectionPartnerAssociation by externalId. Used for tests only.
   """
   getCollectionPartnerAssociation(
     externalId: String!
