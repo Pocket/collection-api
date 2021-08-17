@@ -36,6 +36,7 @@ describe('queries: CollectionStory', () => {
         imageUrl: 'https://some.image',
         authors: [{ name: 'donny', sortOrder: 0 }],
         publisher: 'the verge',
+        fromPartner: false,
       });
     });
 

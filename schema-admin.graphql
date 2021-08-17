@@ -89,6 +89,7 @@ input CreateCollectionStoryInput {
   authors: [CollectionStoryAuthorInput!]!
   publisher: String!
   sortOrder: Int
+  fromPartner: Boolean
 }
 
 input UpdateCollectionStoryInput {
@@ -100,6 +101,7 @@ input UpdateCollectionStoryInput {
   authors: [CollectionStoryAuthorInput!]!
   publisher: String!
   sortOrder: Int
+  fromPartner: Boolean
 }
 
 input UpdateCollectionStorySortOrderInput {
