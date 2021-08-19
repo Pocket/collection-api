@@ -112,6 +112,14 @@ export async function deleteCollectionPartnerAssociation(
     },
   });
 
+  // When a collection-partner association is deleted, we need to make sure that
+  // none of the related collection stories still have a 'fromPartner' value
+  // set to true.
+  await db.collectionStory.updateMany({
+    where: { collectionId: association.collectionId, fromPartner: true },
+    data: { fromPartner: false },
+  });
+
   // to conform with the schema, we return the association
   // as it was before we deleted it
   return association;

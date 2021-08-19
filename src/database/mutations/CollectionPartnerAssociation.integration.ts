@@ -201,5 +201,23 @@ describe('mutations: CollectionPartnerAssociation', () => {
         deleteCollectionPartnerAssociation(db, association.externalId + 'typo')
       ).rejects.toThrow();
     });
+
+    it("should update related stories' sponsorship status", async () => {
+      const deleted = await deleteCollectionPartnerAssociation(
+        db,
+        association.externalId
+      );
+
+      // check that none of the related collection stories have 'fromPartner'
+      // set to true
+      const sponsoredStories = await db.collectionStory.findMany({
+        where: {
+          collectionId: deleted.collectionId,
+          fromPartner: true,
+        },
+      });
+
+      expect(sponsoredStories.length).toEqual(0);
+    });
   });
 });
