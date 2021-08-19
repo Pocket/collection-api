@@ -41,7 +41,7 @@
     "@types/faker": "^5.5.7",
     "@types/graphql-upload": "^8.0.6",
     "@types/jest": "^27.0.1",
-    "@types/node": "^16.4.12",
+    "@types/node": "^16.6.2",
     "@typescript-eslint/eslint-plugin": "^4.29.0",
     "@typescript-eslint/parser": "^4.29.1",
     "chai": "^4.3.4",
