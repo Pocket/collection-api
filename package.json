@@ -43,7 +43,7 @@
     "@types/jest": "^27.0.1",
     "@types/node": "^16.6.2",
     "@typescript-eslint/eslint-plugin": "^4.29.0",
-    "@typescript-eslint/parser": "^4.29.1",
+    "@typescript-eslint/parser": "^4.29.2",
     "chai": "^4.3.4",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
@@ -53,7 +53,7 @@
     "nock": "^13.1.1",
     "nodemon": "^2.0.10",
     "prettier": "^2.3.2",
-    "prisma": "^2.28.0",
+    "prisma": "^2.29.1",
     "ts-jest": "^27.0.4",
     "ts-node": "^10.2.1",
     "typescript": "^4.3.5"
