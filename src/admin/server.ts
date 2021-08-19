@@ -3,8 +3,7 @@ import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-co
 import { buildFederatedSchema } from '@apollo/federation';
 import { typeDefsAdmin } from '../typeDefs';
 import { resolvers as adminResolvers } from './resolvers';
-//import { sentryPlugin } from '@pocket-tools/apollo-utils';
-import { sentryPlugin } from '../sentry-plugin';
+import { sentryPlugin } from '@pocket-tools/apollo-utils';
 import { client } from '../database/client';
 import s3 from '../aws/s3';
 

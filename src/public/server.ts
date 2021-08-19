@@ -5,8 +5,7 @@ import { typeDefsPublic } from '../typeDefs';
 import { resolvers as publicResolvers } from './resolvers';
 import responseCachePlugin from 'apollo-server-plugin-response-cache';
 import { GraphQLRequestContext } from 'apollo-server-types';
-//import { sentryPlugin } from '@pocket-tools/apollo-utils';
-import { sentryPlugin } from '../sentry-plugin';
+import { sentryPlugin } from '@pocket-tools/apollo-utils';
 import { client } from '../database/client';
 import { collectionLoader } from '../dataLoaders/collectionLoader';
 
