@@ -144,7 +144,30 @@ describe('queries: Collection', () => {
       expect(collection.IABChildCategory).toBeTruthy();
     });
 
-    it("should not get a collection that isn't published", async () => {
+    it('should get a collection that is under review', async () => {
+      await createCollectionHelper(db, {
+        title: 'I am under review',
+        author,
+        status: CollectionStatus.REVIEW,
+        curationCategory,
+        IABParentCategory,
+        IABChildCategory,
+      });
+
+      const collection = await getCollectionBySlug(db, 'i-am-under-review');
+
+      expect(collection.title).toEqual('I am under review');
+
+      // ensure we are getting extra client data
+      expect(collection.authors).toBeTruthy();
+      expect(collection.stories).toBeTruthy();
+      expect(collection.curationCategory).toBeTruthy();
+      expect(collection.stories[0].authors).toBeTruthy();
+      expect(collection.IABParentCategory).toBeTruthy();
+      expect(collection.IABChildCategory).toBeTruthy();
+    });
+
+    it("should not get a collection that isn't published/under review", async () => {
       // the helper defaults to 'DRAFT' status
       await createCollectionHelper(db, {
         title: 'test me',

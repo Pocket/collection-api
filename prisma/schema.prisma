@@ -175,6 +175,7 @@ enum ImageSizeCategory {
 
 enum CollectionStatus {
   DRAFT
+  REVIEW
   PUBLISHED
   ARCHIVED
 }
