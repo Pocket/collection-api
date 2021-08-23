@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `Collection` MODIFY `status` ENUM('DRAFT', 'REVIEW', 'PUBLISHED', 'ARCHIVED') DEFAULT 'DRAFT';

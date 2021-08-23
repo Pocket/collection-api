@@ -59,7 +59,13 @@ export async function getCollectionBySlug(
   // slug is unique, but the generated type for `findUnique` here doesn't
   // include `status`, so using `findFirst` instead
   return db.collection.findFirst({
-    where: { slug, status: CollectionStatus.PUBLISHED },
+    where: {
+      slug,
+      // Allow not only published collections, but also collections under review
+      // so that the curators can preview a collection before it goes live
+      // officially.
+      status: { in: [CollectionStatus.REVIEW, CollectionStatus.PUBLISHED] },
+    },
     include: {
       authors: true,
       curationCategory: true,
@@ -110,6 +116,7 @@ export async function getCollectionsBySlugs(
  * @param db
  * @param page
  * @param perPage
+ * @param filters
  */
 export async function getPublishedCollections(
   db: PrismaClient,
@@ -142,6 +149,7 @@ export async function getPublishedCollections(
 
 /**
  * @param db
+ * @param filters
  */
 export async function countPublishedCollections(
   db: PrismaClient,

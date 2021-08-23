@@ -97,6 +97,18 @@ async function main() {
     curationCategory: curationCategory1,
   });
   await createCollectionHelper(prisma, {
+    title: `Nina's second collection`,
+    author: nina,
+    curationCategory: curationCategory2,
+    status: CollectionStatus.REVIEW,
+  });
+  await createCollectionHelper(prisma, {
+    title: `Mathijs's' second collection`,
+    author: mathijs,
+    status: CollectionStatus.REVIEW,
+    publishedAt: new Date(),
+  });
+  await createCollectionHelper(prisma, {
     title: `Chelsea's' third collection`,
     author: chelsea,
     status: CollectionStatus.ARCHIVED,
