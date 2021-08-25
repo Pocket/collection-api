@@ -6,6 +6,9 @@ import { sentryPlugin } from '@pocket-tools/apollo-utils';
 import { client } from '../database/client';
 import s3 from '../aws/s3';
 
+// Export this separately so that it can be used in Apollo integration tests
+export const db = client();
+
 export const server = new ApolloServer({
   // NOTE! this server is *not* part of the federated schema
   // the only reason we are calling `buildFederatedSchema` here is because
@@ -17,7 +20,7 @@ export const server = new ApolloServer({
   ]),
   plugins: [sentryPlugin],
   context: {
-    db: client(),
+    db,
     s3,
   },
   uploads: false,
