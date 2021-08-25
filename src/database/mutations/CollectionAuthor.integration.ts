@@ -13,7 +13,7 @@ import {
 
 const db = new PrismaClient();
 
-describe('createCollectionAuthor', () => {
+describe('mutations: CollectionAuthor', () => {
   beforeEach(async () => {
     await clearDb(db);
   });
