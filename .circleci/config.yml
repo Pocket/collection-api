@@ -180,7 +180,7 @@ jobs:
           command: |
             export $(egrep -v '^#' .docker/local.env | xargs -0)
             npm run migrate:reset -- --skip-seed --force
-            ${<< parameters.command >>}
+            << parameters.command >>
 
 workflows:
   all:
