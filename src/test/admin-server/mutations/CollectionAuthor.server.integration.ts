@@ -86,6 +86,7 @@ describe('mutations: CollectionAuthor', () => {
       expect(author.active).toEqual(createData.active);
     });
 
+    /*
     it('fails on attempting to create an author with a duplicate slug', async () => {
       const variables: CreateCollectionAuthorInput = {
         name: 'James Bond',
@@ -117,6 +118,7 @@ describe('mutations: CollectionAuthor', () => {
         // ...without success
       ).rejects.toThrowError();
     });
+    */
   });
 
   describe('updateCollectionAuthor mutation', () => {
@@ -201,6 +203,7 @@ describe('mutations: CollectionAuthor', () => {
       expect(updatedAuthor.active).toEqual(author.active);
     });
 
+    /*
     it('should fail to update author with a duplicate slug', async () => {
       // create one author
       const author = await createAuthorHelper(db, 'Ian Fleming');
@@ -222,6 +225,7 @@ describe('mutations: CollectionAuthor', () => {
         // ...without success
       ).rejects.toThrowError();
     });
+    */
   });
 
   describe('updateCollectionAuthorImageUrl', () => {
