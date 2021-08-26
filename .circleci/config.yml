@@ -122,6 +122,10 @@ jobs:
 
   test_integrations:
     description: Run integration tests against external services, e.g. MySQL
+    parameters:
+      command:
+        description: 'Test scripts to run'
+        type: string
     docker:
       - image: circleci/node:15
         auth:
@@ -176,7 +180,7 @@ jobs:
           command: |
             export $(egrep -v '^#' .docker/local.env | xargs -0)
             npm run migrate:reset -- --skip-seed --force
-            npm run test-integrations
+            ${<< parameters.command >>}
 
 workflows:
   all:
@@ -188,6 +192,12 @@ workflows:
       - test_integrations:
           <<: *not_main
           name: test_integrations
+          command: 'npm run test-integrations'
+
+      - test_integrations:
+          <<: *not_main
+          name: test_server_integrations
+          command: 'npm run test-server-integrations'
 
       - apollo
 
