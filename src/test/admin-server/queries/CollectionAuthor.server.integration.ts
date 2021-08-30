@@ -3,7 +3,7 @@ import slugify from 'slugify';
 import * as faker from 'faker';
 import { CollectionAuthor } from '@prisma/client';
 import config from '../../../config';
-import { db, server } from '../../../admin/server';
+import { db, server } from '../';
 import { clear as clearDb, createAuthorHelper } from '../../helpers';
 import { CreateCollectionAuthorInput } from '../../../database/types';
 

@@ -1,7 +1,7 @@
 import { gql } from 'apollo-server-express';
 import * as faker from 'faker';
 import slugify from 'slugify';
-import { db, server } from '../../../admin/server';
+import { db, server } from '../';
 import config from '../../../config';
 import { clear as clearDb, createAuthorHelper } from '../../helpers';
 import {
