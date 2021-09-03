@@ -54,7 +54,7 @@
     "nodemon": "^2.0.10",
     "prettier": "^2.3.2",
     "prisma": "^2.29.1",
-    "ts-jest": "^27.0.4",
+    "ts-jest": "^27.0.5",
     "ts-node": "^10.2.1",
     "typescript": "^4.3.5"
   }
