@@ -99,23 +99,34 @@ describe('mutations: CollectionAuthor', () => {
       });
 
       // Attempt to use the same slug one more time...
-      await expect(
-        server.executeOperation({
-          query: CREATE_COLLECTION_AUTHOR,
-          variables,
-        })
-        // ...without success
-      ).rejects.toThrowError();
+      const result = await server.executeOperation({
+        query: CREATE_COLLECTION_AUTHOR,
+        variables,
+      });
+
+      // ...without success. There is no data
+      expect(result.data).toBeFalsy();
+
+      // And there is the correct error from the resolvers
+      expect(result.errors[0].message).toMatch(
+        `An author with the slug "${variables.slug}" already exists`
+      );
     });
 
     it('fails when no data is supplied', async () => {
       // Attempt to create an author with no input data...
-      await expect(
-        server.executeOperation({
-          query: CREATE_COLLECTION_AUTHOR,
-        })
-        // ...without success
-      ).rejects.toThrowError();
+      const result = await server.executeOperation({
+        query: CREATE_COLLECTION_AUTHOR,
+      });
+
+      // ...without success. There is no data
+      expect(result.data).toBeFalsy();
+
+      // And the server responds with an error about the first variable in the input
+      // that is missing
+      expect(result.errors[0].message).toMatch(
+        'Variable "$name" of required type "String!" was not provided.'
+      );
     });
   });
 
@@ -214,13 +225,18 @@ describe('mutations: CollectionAuthor', () => {
       };
 
       // Attempt to use the same slug one more time...
-      await expect(
-        server.executeOperation({
-          query: UPDATE_COLLECTION_AUTHOR,
-          variables: input,
-        })
-        // ...without success
-      ).rejects.toThrowError();
+      const result = await server.executeOperation({
+        query: UPDATE_COLLECTION_AUTHOR,
+        variables: input,
+      });
+
+      // ...without success. There is no data
+      expect(result.data).toBeFalsy();
+
+      // And there is the correct error from the resolvers
+      expect(result.errors[0].message).toMatch(
+        `An author with the slug "${input.slug}" already exists`
+      );
     });
   });
 
