@@ -30,6 +30,7 @@ describe('getCollectionAuthors query', () => {
   `;
 
   beforeAll(async () => {
+    await server.start();
     await clearDb(db);
 
     // Create some authors

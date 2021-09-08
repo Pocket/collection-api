@@ -19,13 +19,17 @@ describe('mutations: CollectionAuthor', () => {
     active: true,
   };
 
-  beforeEach(async () => {
-    await clearDb(db);
+  beforeAll(async () => {
+    await server.start();
   });
 
   afterAll(async () => {
     await db.$disconnect();
     await server.stop();
+  });
+
+  beforeEach(async () => {
+    await clearDb(db);
   });
 
   describe('createCollectionAuthor mutation', () => {
