@@ -9,7 +9,7 @@
     "test-ci": "npm test",
     "test": "jest \"\\.spec\\.ts\"",
     "test-integrations": "jest --testPathPattern=src/database --runInBand",
-    "test-server-integrations": "jest \"\\.server\\.integration\\.ts\" --runInBand",
+    "test-server-integrations": "jest \"\\.server\\.integration\\.ts\" --runInBand --detectOpenHandles",
     "lint-check": "eslint --fix-dry-run \"src/**/*.ts\"",
     "lint-fix": "eslint --fix \"src/**/*.ts\"",
     "db:generate-client": "prisma generate",
