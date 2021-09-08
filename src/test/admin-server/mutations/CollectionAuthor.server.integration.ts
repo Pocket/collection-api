@@ -25,6 +25,7 @@ describe('mutations: CollectionAuthor', () => {
 
   afterAll(async () => {
     await db.$disconnect();
+    await server.stop();
   });
 
   describe('createCollectionAuthor mutation', () => {
