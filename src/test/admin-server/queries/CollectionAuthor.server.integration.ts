@@ -54,6 +54,7 @@ describe('getCollectionAuthors query', () => {
 
   afterAll(async () => {
     await db.$disconnect();
+    await server.stop();
   });
 
   it('should get authors in alphabetical order', async () => {
