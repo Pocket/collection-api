@@ -66,89 +66,90 @@ describe('mutations: CollectionAuthor', () => {
         `An author with the slug "${data.slug}" already exists`
       );
     });
+  });
 
-    describe('updateAuthor', () => {
-      it('should update a collection author', async () => {
-        const author = await createAuthorHelper(db, 'the dude');
+  describe('updateAuthor', () => {
+    it('should update a collection author', async () => {
+      const author = await createAuthorHelper(db, 'the dude');
 
-        const data: UpdateCollectionAuthorInput = {
-          externalId: author.externalId,
-          name: 'el duderino',
-          slug: 'el-duderino',
-          bio: 'he abides, man',
-        };
+      const data: UpdateCollectionAuthorInput = {
+        externalId: author.externalId,
+        name: 'el duderino',
+        slug: 'el-duderino',
+        bio: 'he abides, man',
+      };
 
-        const updated = await updateCollectionAuthor(db, data);
+      const updated = await updateCollectionAuthor(db, data);
 
-        expect(updated.name).toEqual(data.name);
-        expect(updated.bio).toEqual(data.bio);
-      });
-
-      it('should update to a specified collection author slug', async () => {
-        const author = await createAuthorHelper(db, 'the dude');
-
-        const data: UpdateCollectionAuthorInput = {
-          externalId: author.externalId,
-          name: 'el duderino',
-          slug: 'his-dudeness',
-        };
-
-        const updated = await updateCollectionAuthor(db, data);
-
-        expect(updated.slug).toEqual(data.slug);
-      });
-
-      it('should fail to update a collection author slug if another author has that slug', async () => {
-        // will create a slug of 'the-dude'
-        await createAuthorHelper(db, 'the dude');
-        // will create a slug of 'walter'
-        const author2 = await createAuthorHelper(db, 'walter');
-
-        // try to make walter's slug 'the-dude'
-        const data: UpdateCollectionAuthorInput = {
-          externalId: author2.externalId,
-          name: author2.name,
-          slug: 'the-dude',
-        };
-
-        // should fail trying to make walter's slug 'the dude'
-        // there's only one the dude
-        await expect(updateCollectionAuthor(db, data)).rejects.toThrow(
-          `An author with the slug "${data.slug}" already exists`
-        );
-      });
+      expect(updated.name).toEqual(data.name);
+      expect(updated.bio).toEqual(data.bio);
     });
-    describe('updateAuthorImageUrl', () => {
-      it('should update a collection author image url', async () => {
-        const author = await createAuthorHelper(db, 'the dude');
-        const randomKitten = 'https://placekitten.com/g/200/300';
 
-        const data: UpdateCollectionAuthorImageUrlInput = {
-          externalId: author.externalId,
-          imageUrl: randomKitten,
-        };
+    it('should update to a specified collection author slug', async () => {
+      const author = await createAuthorHelper(db, 'the dude');
 
-        const updated = await updateCollectionAuthorImageUrl(db, data);
+      const data: UpdateCollectionAuthorInput = {
+        externalId: author.externalId,
+        name: 'el duderino',
+        slug: 'his-dudeness',
+      };
 
-        expect(updated.imageUrl).toEqual(data.imageUrl);
-      });
+      const updated = await updateCollectionAuthor(db, data);
 
-      it('should not update any other author fields', async () => {
-        const author = await createAuthorHelper(db, 'the dude');
-        const randomKitten = 'https://placekitten.com/g/200/300';
+      expect(updated.slug).toEqual(data.slug);
+    });
 
-        const data: UpdateCollectionAuthorImageUrlInput = {
-          externalId: author.externalId,
-          imageUrl: randomKitten,
-        };
+    it('should fail to update a collection author slug if another author has that slug', async () => {
+      // will create a slug of 'the-dude'
+      await createAuthorHelper(db, 'the dude');
+      // will create a slug of 'walter'
+      const author2 = await createAuthorHelper(db, 'walter');
 
-        const updated = await updateCollectionAuthorImageUrl(db, data);
+      // try to make walter's slug 'the-dude'
+      const data: UpdateCollectionAuthorInput = {
+        externalId: author2.externalId,
+        name: author2.name,
+        slug: 'the-dude',
+      };
 
-        expect(updated.name).toEqual(author.name);
-        expect(updated.slug).toEqual(author.slug);
-        expect(updated.bio).toEqual(author.bio);
-        expect(updated.active).toEqual(author.active);
-      });
+      // should fail trying to make walter's slug 'the dude'
+      // there's only one the dude
+      await expect(updateCollectionAuthor(db, data)).rejects.toThrow(
+        `An author with the slug "${data.slug}" already exists`
+      );
+    });
+  });
+
+  describe('updateAuthorImageUrl', () => {
+    it('should update a collection author image url', async () => {
+      const author = await createAuthorHelper(db, 'the dude');
+      const randomKitten = 'https://placekitten.com/g/200/300';
+
+      const data: UpdateCollectionAuthorImageUrlInput = {
+        externalId: author.externalId,
+        imageUrl: randomKitten,
+      };
+
+      const updated = await updateCollectionAuthorImageUrl(db, data);
+
+      expect(updated.imageUrl).toEqual(data.imageUrl);
+    });
+
+    it('should not update any other author fields', async () => {
+      const author = await createAuthorHelper(db, 'the dude');
+      const randomKitten = 'https://placekitten.com/g/200/300';
+
+      const data: UpdateCollectionAuthorImageUrlInput = {
+        externalId: author.externalId,
+        imageUrl: randomKitten,
+      };
+
+      const updated = await updateCollectionAuthorImageUrl(db, data);
+
+      expect(updated.name).toEqual(author.name);
+      expect(updated.slug).toEqual(author.slug);
+      expect(updated.bio).toEqual(author.bio);
+      expect(updated.active).toEqual(author.active);
     });
   });
 });
