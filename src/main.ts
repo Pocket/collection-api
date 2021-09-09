@@ -27,37 +27,45 @@ Sentry.init({
   debug: config.sentry.environment == 'development',
 });
 
-const app = express();
+(async () => {
+  const app = express();
 
-//If there is no host header (really there always should be..) then use collection-api as the name
-app.use(xrayExpress.openSegment('collections-api'));
+  //If there is no host header (really there always should be..) then use collection-api as the name
+  app.use(xrayExpress.openSegment('collections-api'));
 
-//Set XRay to use the host header to open its segment name.
-AWSXRay.middleware.enableDynamicNaming('*');
+  //Set XRay to use the host header to open its segment name.
+  AWSXRay.middleware.enableDynamicNaming('*');
 
-// Upload middleware
-app.use(
-  graphqlUploadExpress({
-    maxFileSize: config.app.upload.maxSize,
-    maxFiles: config.app.upload.maxFiles,
-  })
-);
-
-// Apply the admin graphql (This is not part of the federated graph i.e. Client API)
-adminServer.applyMiddleware({ app, path: '/admin' });
-
-// Apply the public graphql (This is part of the federated graph)
-publicServer.applyMiddleware({ app, path: '/' });
-
-//Make sure the express app has the xray close segment handler
-app.use(xrayExpress.closeSegment());
-
-// The `listen` method launches a web server.
-app.listen({ port: 4004 }, () => {
-  console.log(
-    `🚀 Public server ready at http://localhost:4004${publicServer.graphqlPath}`
+  // Upload middleware
+  app.use(
+    graphqlUploadExpress({
+      maxFileSize: config.app.upload.maxSize,
+      maxFiles: config.app.upload.maxFiles,
+    })
   );
-  console.log(
-    `🚀 Admin server ready at http://localhost:4004${adminServer.graphqlPath}`
-  );
-});
+
+  // From v.3 onwards, Apollo Server must be started before applying middleware
+  await adminServer.start();
+
+  // Apply the admin graphql (This is not part of the federated graph i.e. Client API)
+  adminServer.applyMiddleware({ app, path: '/admin' });
+
+  // Same thing for the public server
+  await publicServer.start();
+
+  // Apply the public graphql (This is part of the federated graph)
+  publicServer.applyMiddleware({ app, path: '/' });
+
+  //Make sure the express app has the xray close segment handler
+  app.use(xrayExpress.closeSegment());
+
+  // The `listen` method launches a web server.
+  app.listen({ port: 4004 }, () => {
+    console.log(
+      `🚀 Public server ready at http://localhost:4004${publicServer.graphqlPath}`
+    );
+    console.log(
+      `🚀 Admin server ready at http://localhost:4004${adminServer.graphqlPath}`
+    );
+  });
+})();
