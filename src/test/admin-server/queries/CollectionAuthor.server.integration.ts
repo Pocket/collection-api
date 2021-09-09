@@ -1,4 +1,3 @@
-import { gql } from 'apollo-server-express';
 import slugify from 'slugify';
 import * as faker from 'faker';
 import { CollectionAuthor } from '@prisma/client';
@@ -6,6 +5,7 @@ import config from '../../../config';
 import { db, server } from '../';
 import { clear as clearDb, createAuthorHelper } from '../../helpers';
 import { CreateCollectionAuthorInput } from '../../../database/types';
+import { GET_COLLECTION_AUTHOR, GET_COLLECTION_AUTHORS } from './queries.gql';
 
 describe('queries: CollectionAuthor', () => {
   beforeAll(async () => {
@@ -19,27 +19,6 @@ describe('queries: CollectionAuthor', () => {
   });
 
   describe('getCollectionAuthors query', () => {
-    const GET_COLLECTION_AUTHORS = gql`
-      query getAuthors($page: Int, $perPage: Int) {
-        getCollectionAuthors(page: $page, perPage: $perPage) {
-          authors {
-            externalId
-            name
-            slug
-            bio
-            imageUrl
-            active
-          }
-          pagination {
-            currentPage
-            totalPages
-            totalResults
-            perPage
-          }
-        }
-      }
-    `;
-
     beforeAll(async () => {
       // Create some authors
       await createAuthorHelper(db, 'William Shakespeare');
@@ -155,19 +134,6 @@ describe('queries: CollectionAuthor', () => {
 
   describe('getCollectionAuthor query', () => {
     let author: CollectionAuthor;
-
-    const GET_COLLECTION_AUTHOR = gql`
-      query getAuthor($id: String!) {
-        getCollectionAuthor(externalId: $id) {
-          externalId
-          name
-          slug
-          bio
-          imageUrl
-          active
-        }
-      }
-    `;
 
     beforeAll(async () => {
       const name = 'Anna Burns';

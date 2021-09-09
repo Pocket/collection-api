@@ -194,11 +194,6 @@ workflows:
           name: test_integrations
           command: 'npm run test-integrations'
 
-      - test_integrations:
-          <<: *not_main
-          name: test_server_integrations
-          command: 'npm run test-server-integrations'
-
       - apollo
 
       - build

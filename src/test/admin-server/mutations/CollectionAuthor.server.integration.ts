@@ -1,4 +1,3 @@
-import { gql } from 'apollo-server-express';
 import * as faker from 'faker';
 import slugify from 'slugify';
 import { db, server } from '../';
@@ -9,6 +8,11 @@ import {
   UpdateCollectionAuthorImageUrlInput,
   UpdateCollectionAuthorInput,
 } from '../../../database/types';
+import {
+  CREATE_COLLECTION_AUTHOR,
+  UPDATE_COLLECTION_AUTHOR,
+  UPDATE_COLLECTION_AUTHOR_IMAGE_URL,
+} from './mutations.gql';
 
 describe('mutations: CollectionAuthor', () => {
   const createData: CreateCollectionAuthorInput = {
@@ -33,33 +37,6 @@ describe('mutations: CollectionAuthor', () => {
   });
 
   describe('createCollectionAuthor mutation', () => {
-    const CREATE_COLLECTION_AUTHOR = gql`
-      mutation createCollectionAuthor(
-        $name: String!
-        $slug: String
-        $bio: Markdown
-        $imageUrl: Url
-        $active: Boolean
-      ) {
-        createCollectionAuthor(
-          data: {
-            name: $name
-            slug: $slug
-            bio: $bio
-            imageUrl: $imageUrl
-            active: $active
-          }
-        ) {
-          externalId
-          name
-          slug
-          bio
-          imageUrl
-          active
-        }
-      }
-    `;
-
     it('creates an author with just the name supplied', async () => {
       const name = 'Ian Fleming';
 
@@ -136,35 +113,6 @@ describe('mutations: CollectionAuthor', () => {
   });
 
   describe('updateCollectionAuthor mutation', () => {
-    const UPDATE_COLLECTION_AUTHOR = gql`
-      mutation updateCollectionAuthor(
-        $externalId: String!
-        $name: String!
-        $slug: String!
-        $bio: Markdown
-        $imageUrl: Url
-        $active: Boolean
-      ) {
-        updateCollectionAuthor(
-          data: {
-            externalId: $externalId
-            name: $name
-            slug: $slug
-            bio: $bio
-            imageUrl: $imageUrl
-            active: $active
-          }
-        ) {
-          externalId
-          name
-          slug
-          bio
-          imageUrl
-          active
-        }
-      }
-    `;
-
     it('updates an author', async () => {
       const author = await createAuthorHelper(db, 'Ian Fleming');
 
@@ -246,24 +194,6 @@ describe('mutations: CollectionAuthor', () => {
   });
 
   describe('updateCollectionAuthorImageUrl', () => {
-    const UPDATE_COLLECTION_AUTHOR_IMAGE_URL = gql`
-      mutation updateCollectionAuthorImageUrl(
-        $externalId: String!
-        $imageUrl: Url!
-      ) {
-        updateCollectionAuthorImageUrl(
-          data: { externalId: $externalId, imageUrl: $imageUrl }
-        ) {
-          externalId
-          name
-          slug
-          bio
-          imageUrl
-          active
-        }
-      }
-    `;
-
     it("updates an author's imageUrl and doesn't touch the other props", async () => {
       const author = await createAuthorHelper(db, 'Ian Fleming');
       const newImageUrl = 'https://www.example.com/ian-fleming.jpg';
