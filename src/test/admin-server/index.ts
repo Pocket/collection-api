@@ -1,5 +1,6 @@
 import { ApolloServer } from 'apollo-server-express';
 import { buildFederatedSchema } from '@apollo/federation';
+import { ApolloServerPluginLandingPageDisabled } from 'apollo-server-core';
 import { typeDefsAdmin } from '../../typeDefs';
 import { resolvers as adminResolvers } from '../../admin/resolvers';
 import { client } from '../../database/client';
@@ -16,11 +17,9 @@ export const server = new ApolloServer({
   context: {
     db,
   },
-  uploads: false,
-  playground: false,
   // Note the absence of the Sentry plugin - it emits
   // "Cannot read property 'headers' of undefined" errors in tests.
   // We get console.log statements that resolvers emit instead
   // but the tests pass.
-  plugins: [],
+  plugins: [ApolloServerPluginLandingPageDisabled()],
 });
