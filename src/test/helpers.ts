@@ -28,8 +28,9 @@ export async function createAuthorHelper(
   name: string
 ): Promise<CollectionAuthor> {
   const slug = slugify(name, slugifyConfig);
+  const imageUrl = faker.image.avatar();
 
-  const data: CreateCollectionAuthorInput = { name, slug };
+  const data: CreateCollectionAuthorInput = { name, slug, imageUrl };
 
   return await prisma.collectionAuthor.create({ data });
 }
@@ -121,9 +122,8 @@ export async function createCollectionHelper(
     data.publishedAt = publishedAt;
   }
 
-  if (imageUrl) {
-    data.imageUrl = imageUrl;
-  }
+  data.imageUrl =
+    imageUrl || faker.image.imageUrl(640, 480, 'arch', true, true);
 
   if (curationCategory) {
     data.curationCategory = { connect: { id: curationCategory.id } };
@@ -153,7 +153,8 @@ export async function createCollectionHelper(
         url: faker.internet.url(),
         title: faker.lorem.sentence(),
         excerpt: faker.lorem.paragraph(),
-        imageUrl: imageUrl || faker.image.imageUrl(),
+        imageUrl:
+          imageUrl || faker.image.imageUrl(640, 480, 'nature', true, true),
         authors: [
           {
             name: `${faker.name.firstName()} ${faker.name.lastName()}`,
@@ -223,7 +224,7 @@ export async function createPartnerHelper(
   const data: Prisma.CollectionPartnerCreateInput = {
     name: name ? name : faker.company.companyName(),
     url: faker.internet.url(),
-    imageUrl: faker.image.imageUrl(),
+    imageUrl: faker.image.imageUrl(640, 480, 'tech', true, true),
     blurb: faker.lorem.paragraphs(2),
   };
 
