@@ -70,19 +70,6 @@ export const GET_COLLECTION_PARTNER = gql`
   }
 `;
 
-export const GET_COLLECTION_AUTHOR = gql`
-  query getAuthor($id: String!) {
-    getCollectionAuthor(externalId: $id) {
-      externalId
-      name
-      slug
-      bio
-      imageUrl
-      active
-    }
-  }
-`;
-
 export const GET_LANGUAGES = gql`
   query getLanguages {
     getLanguages {
