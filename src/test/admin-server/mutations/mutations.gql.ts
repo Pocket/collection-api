@@ -77,3 +77,65 @@ export const UPDATE_COLLECTION_AUTHOR_IMAGE_URL = gql`
     }
   }
 `;
+
+export const CREATE_COLLECTION_PARTNER = gql`
+  mutation createCollectionPartner(
+    $name: String!
+    $url: Url!
+    $blurb: Markdown!
+    $imageUrl: Url!
+  ) {
+    createCollectionPartner(
+      data: { name: $name, url: $url, blurb: $blurb, imageUrl: $imageUrl }
+    ) {
+      externalId
+      name
+      url
+      imageUrl
+      blurb
+    }
+  }
+`;
+
+export const UPDATE_COLLECTION_PARTNER = gql`
+  mutation updateCollectionPartner(
+    $externalId: String!
+    $name: String!
+    $url: Url!
+    $blurb: Markdown!
+    $imageUrl: Url
+  ) {
+    updateCollectionPartner(
+      data: {
+        externalId: $externalId
+        name: $name
+        url: $url
+        blurb: $blurb
+        imageUrl: $imageUrl
+      }
+    ) {
+      externalId
+      name
+      url
+      imageUrl
+      blurb
+    }
+  }
+`;
+
+export const UPDATE_COLLECTION_PARTNER_IMAGE_URL = gql`
+  mutation updateCollectionPartnerImageUrl(
+    $externalId: String!
+    $imageUrl: Url!
+  ) {
+    updateCollectionPartnerImageUrl(
+      data: { externalId: $externalId, imageUrl: $imageUrl }
+    ) {
+      externalId
+      name
+      url
+      imageUrl
+      blurb
+    }
+  }
+`;
