@@ -69,3 +69,36 @@ export const GET_COLLECTION_PARTNER = gql`
     }
   }
 `;
+
+export const GET_LANGUAGES = gql`
+  query getLanguages {
+    getLanguages {
+      code
+    }
+  }
+`;
+
+export const GET_CURATION_CATEGORIES = gql`
+  query getCurationCategories {
+    getCurationCategories {
+      externalId
+      name
+      slug
+    }
+  }
+`;
+
+export const GET_IAB_CATEGORIES = gql`
+  query getIABCategories {
+    getIABCategories {
+      externalId
+      name
+      slug
+      children {
+        externalId
+        name
+        slug
+      }
+    }
+  }
+`;
