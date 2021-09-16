@@ -128,6 +128,13 @@ describe('prisma middleware', () => {
 
       expect(res).toEqual(c);
     });
+
+    it('should return null if no collection was found', () => {
+      // if no collection was found, `null` will be passed
+      const res: any = PrismaMiddleware.injectItemIntoCollectionStories(null);
+
+      expect(res).toEqual(null);
+    });
   });
 
   describe('collectionStoryInjectItemMiddleware', () => {
