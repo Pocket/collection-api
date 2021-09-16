@@ -29,8 +29,13 @@ export type CollectionWithStoriesWithItem = Collection & {
 export function injectItemIntoCollectionStories(
   collection: CollectionWithStories
 ): CollectionWithStoriesWithItem {
-  // a collection may not include stories - if there are none, do nothing
-  if (!collection.stories) {
+  // a collection may not have been found - e.g. looking for a collection by
+  // an incorrect/no longer available slug.
+
+  // a collection may not include stories.
+
+  // in either case, just return the passed in value unmodified.
+  if (!collection?.stories) {
     return collection;
   }
 
