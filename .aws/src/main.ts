@@ -153,10 +153,10 @@ class CollectionAPI extends TerraformStack {
       prefix: config.prefix,
       service: {
         criticalEscalationPolicyId: incidentManagement.get(
-          'policy_backend_critical_id'
+          'policy_backend_product_critical_id'
         ),
         nonCriticalEscalationPolicyId: incidentManagement.get(
-          'policy_backend_non_critical_id'
+          'policy_backend_product_non_critical_id'
         ),
       },
     });
