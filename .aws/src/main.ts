@@ -132,7 +132,12 @@ class CollectionAPI extends TerraformStack {
    * Create PagerDuty service for alerts
    * @private
    */
-  private createPagerDuty() {
+  private createPagerDuty(): PocketPagerDuty | undefined {
+    if (config.isDev) {
+      // Don't create pagerduty services for a dev service.
+      return null;
+    }
+
     const incidentManagement = new DataTerraformRemoteState(
       this,
       'incident_management',
