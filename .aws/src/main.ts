@@ -306,22 +306,12 @@ class CollectionAPI extends TerraformStack {
         targetMaxCapacity: 10,
       },
       alarms: {
-        //TODO: When we start using this more we will change from non-critical to critical
-        http5xxError: {
-          threshold: 10,
-          evaluationPeriods: 2,
-          period: 600,
-          actions: [pagerDuty.snsNonCriticalAlarmTopic.arn],
-        },
-        httpLatency: {
-          evaluationPeriods: 2,
-          threshold: 500,
-          actions: [pagerDuty.snsNonCriticalAlarmTopic.arn],
-        },
-        httpRequestCount: {
-          threshold: 5000,
-          evaluationPeriods: 2,
-          actions: [pagerDuty.snsNonCriticalAlarmTopic.arn],
+        // alarms if >= 25% of responses are 5xx over 20 minutes
+        http5xxErrorPercentage: {
+          threshold: 25, // 25%
+          period: 300, // 5 minutes
+          evaluationPeriods: 4, // 20 minutes total
+          actions: config.isDev ? [] : [pagerDuty.snsCriticalAlarmTopic.arn],
         },
       },
     });
