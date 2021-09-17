@@ -17,6 +17,7 @@ const branch = isDev ? 'dev' : 'main';
 
 export const config = {
   name,
+  isDev,
   prefix: `${name}-${environment}`,
   circleCIPrefix: `/${name}/CircleCI/${environment}`,
   shortName: 'COLAPI',
@@ -33,5 +34,4 @@ export const config = {
     service: name,
     environment,
   },
-  isDev,
 };
