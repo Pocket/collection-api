@@ -23,8 +23,8 @@ model IABCategory {
   parentCollections Collection[]  @relation("CollectionIABParentCategory")
   childCollections  Collection[]  @relation("CollectionIABChildCategory")
 
-  @@unique([externalId], name: "externalId")
-  @@index([IABCategoryId], name: "IABCategoryId")
+  @@unique([externalId])
+  @@index([IABCategoryId])
 }
 
 model CollectionStoryAuthor {
@@ -34,7 +34,7 @@ model CollectionStoryAuthor {
   sortOrder         Int             @default(0)
   collectionStory   CollectionStory @relation(fields: [collectionStoryId], references: [id])
 
-  @@index([collectionStoryId], name: "collectionStoryId")
+  @@index([collectionStoryId])
 }
 
 model CollectionStory {
@@ -53,10 +53,10 @@ model CollectionStory {
   fromPartner  Boolean                 @default(false)
   collection   Collection              @relation(fields: [collectionId], references: [id])
 
-  @@unique([collectionId, url], name: "collectionIdUrl")
-  @@unique([externalId], name: "externalId")
-  @@index([collectionId], name: "collectionId")
-  @@index([url], name: "url")
+  @@unique([collectionId, url])
+  @@unique([externalId])
+  @@index([collectionId])
+  @@index([url])
 }
 
 model Image {
@@ -73,8 +73,8 @@ model Image {
   createdAt     DateTime          @default(now()) @db.DateTime(0)
   updatedAt     DateTime          @updatedAt
 
-  @@unique([path], name: "path")
-  @@index([entityId, entityType], name: "entityIdEntityType")
+  @@unique([path])
+  @@index([entityId, entityType])
 }
 
 model CollectionAuthor {
@@ -89,36 +89,36 @@ model CollectionAuthor {
   active      Boolean?     @default(true)
   collections Collection[]
 
-  @@unique([externalId], name: "externalId")
-  @@index([name], name: "name")
+  @@unique([externalId])
+  @@index([name])
 }
 
 model Collection {
-  id                    Int                    @id @default(autoincrement())
-  externalId            String                 @default(uuid()) @db.VarChar(255)
-  slug                  String                 @unique @db.VarChar(300)
-  title                 String                 @db.VarChar(255)
-  excerpt               String?                @db.Text
-  intro                 String?                @db.Text
-  imageUrl              String?                @db.VarChar(500)
-  language              String                 @db.VarChar(2) @default("en")
-  publishedAt           DateTime?              @db.DateTime(0)
-  createdAt             DateTime               @default(now()) @db.DateTime(0)
-  updatedAt             DateTime               @updatedAt
-  curationCategoryId    Int?
-  IABParentCategoryId   Int?
-  IABChildCategoryId    Int?
-  status                CollectionStatus?      @default(DRAFT)
-  authors               CollectionAuthor[]
-  stories               CollectionStory[]
-  curationCategory      CurationCategory?      @relation(fields: [curationCategoryId], references: [id])
-  IABParentCategory     IABCategory?           @relation("CollectionIABParentCategory", fields: [IABParentCategoryId], references: [id])
-  IABChildCategory      IABCategory?           @relation("CollectionIABChildCategory", fields: [IABChildCategoryId], references: [id])
-  partnership           CollectionPartnership?
+  id                  Int                    @id @default(autoincrement())
+  externalId          String                 @default(uuid()) @db.VarChar(255)
+  slug                String                 @unique @db.VarChar(300)
+  title               String                 @db.VarChar(255)
+  excerpt             String?                @db.Text
+  intro               String?                @db.Text
+  imageUrl            String?                @db.VarChar(500)
+  language            String                 @default("en") @db.VarChar(2)
+  publishedAt         DateTime?              @db.DateTime(0)
+  createdAt           DateTime               @default(now()) @db.DateTime(0)
+  updatedAt           DateTime               @updatedAt
+  curationCategoryId  Int?
+  IABParentCategoryId Int?
+  IABChildCategoryId  Int?
+  status              CollectionStatus?      @default(DRAFT)
+  authors             CollectionAuthor[]
+  stories             CollectionStory[]
+  curationCategory    CurationCategory?      @relation(fields: [curationCategoryId], references: [id])
+  IABParentCategory   IABCategory?           @relation("CollectionIABParentCategory", fields: [IABParentCategoryId], references: [id])
+  IABChildCategory    IABCategory?           @relation("CollectionIABChildCategory", fields: [IABChildCategoryId], references: [id])
+  partnership         CollectionPartnership?
 
-  @@unique([externalId], name: "externalId")
-  @@index([slug], name: "slug")
-  @@index([title], name: "title")
+  @@unique([externalId])
+  @@index([slug])
+  @@index([title])
 }
 
 model CurationCategory {
@@ -128,7 +128,7 @@ model CurationCategory {
   name       String @db.VarChar(255)
 
   collections Collection[]
-  @@unique([externalId], name: "externalId")
+  @@unique([externalId])
 }
 
 model CollectionPartner {
@@ -140,7 +140,7 @@ model CollectionPartner {
   blurb        String                  @db.Text
   partnerships CollectionPartnership[]
 
-  @@unique([externalId], name: "externalId")
+  @@unique([externalId])
 }
 
 model CollectionPartnership {
@@ -156,7 +156,7 @@ model CollectionPartnership {
   partner      CollectionPartner         @relation(fields: [partnerId], references: [id])
   collection   Collection                @relation(fields: [collectionId], references: [id])
 
-  @@unique([externalId], name: "externalId")
+  @@unique([externalId])
 }
 
 enum ImageEntityType {
