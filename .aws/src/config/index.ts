@@ -34,5 +34,4 @@ export const config = {
     service: name,
     environment,
   },
-  isDev,
 };
