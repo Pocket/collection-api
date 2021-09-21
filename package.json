@@ -37,7 +37,7 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "@types/chai": "^4.2.21",
+    "@types/chai": "^4.2.22",
     "@types/faker": "^5.5.8",
     "@types/graphql-upload": "^8.0.7",
     "@types/jest": "^27.0.1",
