@@ -48,7 +48,7 @@ only_dev: &only_dev
 jobs:
   apollo:
     docker:
-      - image: circleci/node:15
+      - image: circleci/node:16
     steps:
       - checkout
       - run:
@@ -78,7 +78,7 @@ jobs:
 
   build:
     docker:
-      - image: circleci/node:15
+      - image: circleci/node:16
     steps:
       - checkout
       # Define the working directory for this job
@@ -127,7 +127,7 @@ jobs:
         description: 'Test scripts to run'
         type: string
     docker:
-      - image: circleci/node:15
+      - image: circleci/node:16
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
