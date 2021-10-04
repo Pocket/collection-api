@@ -43,7 +43,7 @@ After Docker completes, you should be able to hit the GraphQL playground at `htt
 ### Limitations
 
 - Images saved to S3 via [localstack](https://github.com/localstack/localstack) do not render. This appears to be an access/URL issue and could potentially be fixed.
-- Running integration tests will wipe your local database. The database can be re-seeded - see (Resetting & Seeding the Database)[#resetting--seeding-the-database] below.
+- Running integration tests will wipe your local database. The database can be re-seeded - see [Resetting & Seeding the Database](#resetting--seeding-the-database) below.
 
 ### Working with Prisma
 
@@ -90,7 +90,7 @@ npm test
 docker compose exec app npm run test-integrations
 ```
 
-**NOTE** Running integration tests locally will result in your local database being emptied. Refer to (Resetting & Seeding the Database)[#resetting--seeding-the-database] above to repopulate seed data.
+**NOTE** Running integration tests locally will result in your local database being emptied. Refer to [Resetting & Seeding the Database](#resetting--seeding-the-database) above to repopulate seed data.
 
 #### Testing Federated Resolvers
 
