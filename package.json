@@ -14,8 +14,10 @@
     "db:generate-client": "prisma generate",
     "migrate:dev": "prisma migrate dev",
     "migrate:deploy": "prisma migrate deploy",
-    "migrate:reset": "prisma migrate reset",
-    "db:seed": "prisma db seed --preview-feature"
+    "migrate:reset": "prisma migrate reset"
+  },
+  "prisma": {
+    "seed": "ts-node --emit=false prisma/seed.ts"
   },
   "dependencies": {
     "@apollo/federation": "^0.33.0",
