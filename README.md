@@ -43,7 +43,7 @@ After Docker completes, you should be able to hit the GraphQL playground at `htt
 ### Limitations
 
 - Images saved to S3 via [localstack](https://github.com/localstack/localstack) do not render. This appears to be an access/URL issue and could potentially be fixed.
-- Running integration tests will wipe your local database. The database can be re-seeded - see (Resetting & Seeding the Database)[#Resetting-&-Seeding-the-Database] below.
+- Running integration tests will wipe your local database. The database can be re-seeded - see [Resetting & Seeding the Database](#resetting--seeding-the-database) below.
 
 ### Working with Prisma
 
@@ -51,11 +51,23 @@ When you run `docker compose up`, all existing Prisma migrations will be run, ge
 
 #### Resetting & Seeding the Database
 
-Though `docker compose up` will get your database schema set, you'll probably want some test data in there to play with. You can wipe the database and inject seed data by running `docker compose exec app npx prisma migrate reset`. This will ensure all migrations have been run (which they will have been during `docker compose up`), and will also run the `prisma/seed.ts` file, which will create data for the following entities: `CollectionAuthor`, `Collection`, and `CollectionStory`.
+Though `docker compose up` will get your database schema set, you'll probably want some test data in there to play with. You can wipe the database and inject seed data by running
+
+```bash
+docker compose exec app npx prisma migrate reset
+```
+
+This will ensure all migrations have been run (which they will have been during `docker compose up`), and will also run the `prisma/seed.ts` file, which will create sample data for all the entities in the database.
 
 #### Adding a Migration
 
-If you need to change the Prisma schema (in `prisma/schema.prisma`), you'll need to create a migration to ensure the database is in sync. After you have made your changes to `schema.prisma`, run `docker compose exec app npx prisma migrate dev --name some_meaningful_migration_name`. This will create a migration script in `prisma/migrations` and will automatically run the new migration. This will also re-create your Prisma Typescript types.
+If you need to change the Prisma schema (in `prisma/schema.prisma`), you'll need to create a migration to ensure the database is in sync. After you have made your changes to `schema.prisma`, run
+
+```bash
+docker compose exec app npx prisma migrate dev --name some_meaningful_migration_name
+```
+
+This will create a migration script in `prisma/migrations` and will automatically run the new migration. This will also re-create your Prisma Typescript types.
 
 #### Re-creating Prisma Typescript Types
 
@@ -69,10 +81,16 @@ Unit/functional tests are self-contained, meaning they do not rely on any extern
 
 Test are run via `npm` commands:
 
-- Unit/functional: `npm test`
-- Integration: `docker compose exec app npm run test-integrations`
+- Unit/functional:
+```bash
+npm test
+```
+- Integration:
+```bash
+docker compose exec app npm run test-integrations
+```
 
-**NOTE** Running integration tests locally will result in your local database being emptied. Refer to (Resetting & Seeding the Database)[#Resetting-&-Seeding-the-Database] above to repopulate seed data.
+**NOTE** Running integration tests locally will result in your local database being emptied. Refer to [Resetting & Seeding the Database](#resetting--seeding-the-database) above to repopulate seed data.
 
 #### Testing Federated Resolvers
 
@@ -109,8 +127,10 @@ Sometimes it's nice to look in the database to see what's actually going on with
 
 First, get into MySQL:
 
-- `docker compose exec mysql bash`
-- `mysql -u root`
+```bash
+docker compose exec mysql bash
+mysql -u root
+```
 
 Once you're there, you can inspect the available databases with `show databases;`. Select the `collections` database with `use collections;`.
 
@@ -160,7 +180,9 @@ There are a few reasons you may want to test the API in AWS:
 
 To deploy to the dev environment, just push to the `dev` branch. CirlceCI will detect this change and deploy for you.
 
-`git push origin my-feature-branch:dev`
+```bash
+git push origin my-feature-branch:dev
+```
 
 The current expectation is that our AWS dev environment may be reset/changed at any time. To be safe, you should check with your teammates to make sure no one else is testing against dev before you go deploying to it.
 
