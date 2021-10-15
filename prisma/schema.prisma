@@ -32,7 +32,7 @@ model CollectionStoryAuthor {
   name              String          @db.VarChar(255)
   collectionStoryId Int
   sortOrder         Int             @default(0)
-  collectionStory   CollectionStory @relation(fields: [collectionStoryId], references: [id])
+  collectionStory   CollectionStory @relation(fields: [collectionStoryId], references: [id], onDelete: Cascade)
 
   @@index([collectionStoryId])
 }
@@ -148,7 +148,7 @@ model CollectionPartnership {
   externalId   String                    @default(uuid()) @db.VarChar(255)
   type         CollectionPartnershipType @default(PARTNERED)
   partnerId    Int
-  collectionId Int
+  collectionId Int                       @unique
   name         String?                   @db.VarChar(500)
   url          String?                   @db.VarChar(500)
   imageUrl     String?                   @db.VarChar(500)
