@@ -38,7 +38,7 @@
   },
   "devDependencies": {
     "@types/chai": "^4.2.22",
-    "@types/faker": "^5.5.8",
+    "@types/faker": "^5.5.9",
     "@types/graphql-upload": "^8.0.7",
     "@types/jest": "^27.0.2",
     "@types/node": "^16.11.0",
