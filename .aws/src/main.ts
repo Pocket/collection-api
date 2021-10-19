@@ -20,8 +20,8 @@ import {
   PocketECSCodePipeline,
   PocketPagerDuty,
   PocketVPC,
-} from '@pocket/terraform-modules';
-import { PagerdutyProvider } from '../.gen/providers/pagerduty';
+} from '@pocket-tools/terraform-modules';
+import { PagerdutyProvider } from '@cdktf/provider-pagerduty';
 
 class CollectionAPI extends TerraformStack {
   constructor(scope: Construct, name: string) {
