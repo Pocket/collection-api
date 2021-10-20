@@ -22,7 +22,7 @@
   "dependencies": {
     "@apollo/federation": "^0.33.3",
     "@pocket-tools/apollo-utils": "^2.0.0",
-    "@prisma/client": "^3.2.1",
+    "@prisma/client": "^3.3.0",
     "@sentry/node": "^6.13.3",
     "@sentry/tracing": "^6.13.0",
     "apollo-server": "^3.4.0",
@@ -55,7 +55,7 @@
     "nock": "^13.1.3",
     "nodemon": "^2.0.14",
     "prettier": "^2.4.1",
-    "prisma": "^3.2.1",
+    "prisma": "^3.3.0",
     "ts-jest": "^27.0.7",
     "ts-node": "^10.3.0",
     "typescript": "^4.4.4"
