@@ -1,4 +1,4 @@
-FROM node:15
+FROM node:17
 WORKDIR /usr/src/app
 
 ARG GIT_SHA
