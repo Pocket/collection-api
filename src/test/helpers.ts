@@ -301,20 +301,24 @@ export async function createImageHelper(
 }
 
 export async function clear(prisma: PrismaClient): Promise<void> {
-  const tables = [
-    'CollectionStory',
-    'CurationCategory',
-    'CollectionPartnership',
-    'CollectionPartner',
-    'Collection',
-    'CollectionAuthor',
-    'IABCategory',
-    'Image',
-  ];
+  // partnerships and partner information
+  await prisma.collectionPartnership.deleteMany({});
+  await prisma.collectionPartner.deleteMany({});
 
-  for (let i = 0; i < tables.length; i++) {
-    await prisma.$executeRaw(`DELETE FROM ${tables[i]}`);
-  }
+  // collection stories
+  await prisma.collectionStoryAuthor.deleteMany({});
+  await prisma.collectionStory.deleteMany({});
+
+  // collection authors and collections themselves
+  await prisma.collectionAuthor.deleteMany({});
+  await prisma.collection.deleteMany({});
+
+  // categorisation data for collections
+  await prisma.iABCategory.deleteMany({});
+  await prisma.curationCategory.deleteMany({});
+
+  // images
+  await prisma.image.deleteMany({});
 }
 
 export function sortCollectionStoryAuthors(
