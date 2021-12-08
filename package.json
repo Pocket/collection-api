@@ -32,7 +32,7 @@
     "aws-sdk": "^2.1044.0",
     "aws-xray-sdk-core": "^3.3.4",
     "aws-xray-sdk-express": "^3.3.4",
-    "graphql": "^15.7.2",
+    "graphql": "^15.8.0",
     "graphql-upload": "^12.0.0",
     "mime-types": "^2.1.34",
     "slugify": "^1.6.3",
@@ -56,7 +56,7 @@
     "nodemon": "^2.0.15",
     "prettier": "^2.5.0",
     "prisma": "^3.3.0",
-    "ts-jest": "^27.0.7",
+    "ts-jest": "^27.1.0",
     "ts-node": "^10.4.0",
     "typescript": "^4.5.2"
   }
