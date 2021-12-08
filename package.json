@@ -29,7 +29,7 @@
     "apollo-server-cache-redis": "^3.3.0",
     "apollo-server-express": "^3.4.1",
     "apollo-server-plugin-response-cache": "^3.3.0",
-    "aws-sdk": "^2.1038.0",
+    "aws-sdk": "^2.1044.0",
     "aws-xray-sdk-core": "^3.3.4",
     "aws-xray-sdk-express": "^3.3.4",
     "graphql": "^15.7.2",
@@ -39,7 +39,7 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "@types/chai": "^4.2.22",
+    "@types/chai": "^4.3.0",
     "@types/faker": "^5.5.9",
     "@types/graphql-upload": "^8.0.7",
     "@types/jest": "^27.0.3",
