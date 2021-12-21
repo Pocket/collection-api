@@ -33,7 +33,7 @@
     "aws-xray-sdk-core": "^3.3.4",
     "aws-xray-sdk-express": "^3.3.4",
     "graphql": "^15.8.0",
-    "graphql-upload": "^12.0.0",
+    "graphql-upload": "^13.0.0",
     "mime-types": "^2.1.34",
     "slugify": "^1.6.3",
     "uuid": "^8.3.2"
