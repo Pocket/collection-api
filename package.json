@@ -29,7 +29,7 @@
     "apollo-server-cache-redis": "^3.3.0",
     "apollo-server-express": "^3.4.1",
     "apollo-server-plugin-response-cache": "^3.3.0",
-    "aws-sdk": "^2.1047.0",
+    "aws-sdk": "^2.1048.0",
     "aws-xray-sdk-core": "^3.3.4",
     "aws-xray-sdk-express": "^3.3.4",
     "graphql": "^15.8.0",
@@ -56,7 +56,7 @@
     "nodemon": "^2.0.15",
     "prettier": "^2.5.1",
     "prisma": "^3.3.0",
-    "ts-jest": "^27.1.1",
+    "ts-jest": "^27.1.2",
     "ts-node": "^10.4.0",
     "typescript": "^4.5.4"
   }
