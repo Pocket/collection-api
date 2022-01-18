@@ -1,4 +1,4 @@
-import { gql } from 'apollo-server';
+import { gql } from 'apollo-server-express';
 
 /**
  * Sample mutations for Apollo Server integration tests as used in
