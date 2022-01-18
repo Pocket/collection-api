@@ -27,7 +27,7 @@
     "@sentry/tracing": "^6.15.0",
     "apollo-server": "^3.4.1",
     "apollo-server-cache-redis": "^3.3.0",
-    "apollo-server-express": "^3.4.1",
+    "apollo-server-express": "^3.6.1",
     "apollo-server-plugin-response-cache": "^3.3.0",
     "aws-sdk": "^2.1058.0",
     "aws-xray-sdk-core": "^3.3.4",
