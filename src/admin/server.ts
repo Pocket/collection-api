@@ -11,11 +11,6 @@ import { client } from '../database/client';
 import s3 from '../aws/s3';
 
 export const server = new ApolloServer({
-  // NOTE! this server is *not* part of the federated schema
-  // the only reason we are calling `buildFederatedSchema` here is because
-  // our shared schema file incorporates federation-related syntax,
-  // and ApolloServer will fail on that *unless* we build the schema
-  // as federated.
   schema: buildFederatedSchema([
     { typeDefs: typeDefsAdmin, resolvers: adminResolvers },
   ]),
