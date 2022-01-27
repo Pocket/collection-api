@@ -62,19 +62,39 @@ jobs:
             echo 'export PATH=$HOME/.rover/bin:$PATH' >> $BASH_ENV
       - run:
           name: build public schema
-          # We have to send one file for the federated schema which means we have to concat our shared scheme
+          # We have to send one file for the federated schema which means we have to concat our shared schema
           # to the public schema before pushing up to apollo studio (this happens in the next step)
-          command: cat schema-shared.graphql schema-public.graphql > schema.graphql
+          command: cat schema-shared.graphql schema-public.graphql > schema-client-api.graphql
       - run:
-          name: check service
-          command: rover subgraph check pocket-client-api@current --schema ./schema.graphql --name=collection
+          name: build admin schema
+          # We have to send one file for the federated schema which means we have to concat our shared schema
+          # to the admin schema before pushing up to apollo studio (this happens in the next step)
+          command: cat schema-shared.graphql schema-admin.graphql > schema-admin-api.graphql
+      - run:
+          name: check service - client-api
+          command:
+            rover subgraph check pocket-client-api@current --schema ./schema-client-api.graphql --name=collection
+      - run:
+          name: check service - admin-api
+          # rover expects an APOLLO_KEY env var, which is set in circleci. however, there's a different key for admin-api,
+          # so we specifically override the APOLLO_KEY value here
+          command: |
+            export APOLLO_KEY=$ADMIN_APOLLO_KEY
+            rover subgraph check pocket-admin-api@current --schema ./schema-admin-api.graphql --name=collection
       - when:
           condition:
             equal: [main, << pipeline.git.branch >>]
           steps:
             - run:
-                name: push service
-                command: rover subgraph publish pocket-client-api@current --schema ./schema.graphql --routing-url https://collection-api.readitlater.com/ --name=collection
+                name: push service to client-api
+                command: rover subgraph publish pocket-client-api@current --schema ./schema-client-api.graphql --routing-url https://collection-api.readitlater.com/ --name=collection
+            - run:
+                name: push service to admin-api
+                # rover expects an APOLLO_KEY env var, which is set in circleci. however, there's a different key for admin-api,
+                # so we specifically override the APOLLO_KEY value here
+                command: |
+                  export APOLLO_KEY=$ADMIN_APOLLO_KEY
+                  rover subgraph publish pocket-admin-api@current --schema ./schema-admin-api.graphql --routing-url https://collection-api.readitlater.com/admin --name=collection
 
   build:
     docker:
