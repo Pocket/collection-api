@@ -439,6 +439,7 @@ export async function collectionImageUpload(
   { s3, db }: { s3: S3; db: PrismaClient }
 ) {
   const { image, ...imageData } = data;
+  await data.image.promise;
   const upload = await uploadImage(s3, image.file);
 
   await executeMutation<CreateImageInput, Image>(
