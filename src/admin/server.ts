@@ -1,5 +1,5 @@
 import { ApolloServer } from 'apollo-server-express';
-import { buildFederatedSchema } from '@apollo/federation';
+import { buildSubgraphSchema } from '@apollo/federation';
 import { typeDefsAdmin } from '../typeDefs';
 import { resolvers as adminResolvers } from './resolvers';
 import { sentryPlugin } from '@pocket-tools/apollo-utils';
@@ -11,7 +11,7 @@ import { client } from '../database/client';
 import s3 from '../aws/s3';
 
 export const server = new ApolloServer({
-  schema: buildFederatedSchema([
+  schema: buildSubgraphSchema([
     { typeDefs: typeDefsAdmin, resolvers: adminResolvers },
   ]),
   plugins: [
