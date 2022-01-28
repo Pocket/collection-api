@@ -86,15 +86,29 @@ jobs:
             equal: [main, << pipeline.git.branch >>]
           steps:
             - run:
-                name: push service to client-api
+                name: push service to prod client-api
                 command: rover subgraph publish pocket-client-api@current --schema ./schema-client-api.graphql --routing-url https://collection-api.readitlater.com/ --name=collection
             - run:
-                name: push service to admin-api
+                name: push service to prod admin-api
                 # rover expects an APOLLO_KEY env var, which is set in circleci. however, there's a different key for admin-api,
                 # so we specifically override the APOLLO_KEY value here
                 command: |
                   export APOLLO_KEY=$ADMIN_APOLLO_KEY
                   rover subgraph publish pocket-admin-api@current --schema ./schema-admin-api.graphql --routing-url https://collection-api.readitlater.com/admin --name=collection
+      - when:
+          condition:
+            equal: [dev, << pipeline.git.branch >>]
+          steps:
+            - run:
+                name: push service to dev client-api
+                command: rover subgraph publish pocket-client-api@development --schema ./schema-client-api.graphql --routing-url https://collection-api.getpocket.dev/ --name=collection
+            - run:
+                name: push service to dev admin-api
+                # rover expects an APOLLO_KEY env var, which is set in circleci. however, there's a different key for admin-api,
+                # so we specifically override the APOLLO_KEY value here
+                command: |
+                  export APOLLO_KEY=$ADMIN_APOLLO_KEY
+                  rover subgraph publish pocket-admin-api@development --schema ./schema-admin-api.graphql --routing-url https://collection-api.getpocket.dev/admin --name=collection
 
   build:
     docker:
