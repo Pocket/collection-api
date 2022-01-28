@@ -1,8 +1,9 @@
-const awsEnvironments = ['production', 'development'];
-let localEndpoint;
-if (!awsEnvironments.includes(process.env.NODE_ENV)) {
-  localEndpoint = process.env.AWS_S3_ENDPOINT || 'http://localhost:4566';
-}
+//const awsEnvironments = ['production', 'development'];
+//let localEndpoint;
+// if (!awsEnvironments.includes(process.env.NODE_ENV)) {
+//   localEndpoint = process.env.AWS_S3_ENDPOINT || 'http://localhost:4566';
+// }
+const localEndpoint = process.env.AWS_S3_ENDPOINT;
 
 export default {
   app: {
