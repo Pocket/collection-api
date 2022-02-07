@@ -54,7 +54,7 @@
     "eslint-plugin-prettier": "^4.0.0",
     "faker": "^5.5.3",
     "jest": "^27.4.7",
-    "nock": "^13.2.3",
+    "nock": "^13.2.4",
     "nodemon": "^2.0.15",
     "prettier": "^2.5.1",
     "prisma": "^3.3.0",
