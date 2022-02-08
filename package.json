@@ -20,7 +20,7 @@
     "seed": "ts-node --emit=false prisma/seed.ts"
   },
   "dependencies": {
-    "@apollo/federation": "^0.33.9",
+    "@apollo/federation": "^0.34.0",
     "@pocket-tools/apollo-utils": "^2.2.0",
     "@prisma/client": "^3.3.0",
     "@sentry/node": "^6.17.5",
