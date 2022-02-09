@@ -5,8 +5,9 @@ import xrayExpress from 'aws-xray-sdk-express';
 import express from 'express';
 import https from 'https';
 import { graphqlUploadExpress } from 'graphql-upload';
-import { server as adminServer } from './admin/server';
+import { startAdminServer } from './admin/server';
 import { server as publicServer } from './public/server';
+import { getContext } from './admin/context';
 
 //Set XRAY to just log if the context is missing instead of a runtime error
 AWSXRay.setContextMissingStrategy('LOG_ERROR');
@@ -44,8 +45,13 @@ Sentry.init({
     })
   );
 
+  // Set up Admin Server context, including request headers
+  const contextFactory = (req: express.Request) => {
+    return getContext(req);
+  };
+
   // From v.3 onwards, Apollo Server must be started before applying middleware
-  await adminServer.start();
+  const adminServer = await startAdminServer(contextFactory);
 
   // Apply the admin graphql (This is not part of the federated graph i.e. Client API)
   adminServer.applyMiddleware({ app, path: '/admin' });
