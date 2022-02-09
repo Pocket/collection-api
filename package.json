@@ -24,7 +24,7 @@
     "@pocket-tools/apollo-utils": "^2.2.0",
     "@prisma/client": "^3.3.0",
     "@sentry/node": "^6.17.5",
-    "@sentry/tracing": "^6.17.1",
+    "@sentry/tracing": "^6.17.6",
     "apollo-server-cache-redis": "^3.3.1",
     "apollo-server-core": "^3.6.2",
     "apollo-server-errors": "^3.3.1",
