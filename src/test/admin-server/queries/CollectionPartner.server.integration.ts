@@ -1,12 +1,14 @@
 import * as faker from 'faker';
 import { CollectionPartner } from '@prisma/client';
 import config from '../../../config';
-import { db, server } from '../';
+import { db, getServer } from '../';
 import { clear as clearDb, createPartnerHelper } from '../../helpers';
 import { CreateCollectionPartnerInput } from '../../../database/types';
 import { GET_COLLECTION_PARTNER, GET_COLLECTION_PARTNERS } from './queries.gql';
 
 describe('queries: CollectionPartner', () => {
+  const server = getServer();
+
   beforeAll(async () => {
     await clearDb(db);
     await server.start();

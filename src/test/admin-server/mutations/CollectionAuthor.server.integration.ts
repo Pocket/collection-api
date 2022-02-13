@@ -1,8 +1,12 @@
 import * as faker from 'faker';
 import slugify from 'slugify';
-import { db, server } from '../';
+import { COLLECTION_CURATOR_FULL, db } from '../';
 import config from '../../../config';
-import { clear as clearDb, createAuthorHelper } from '../../helpers';
+import {
+  clear as clearDb,
+  createAuthorHelper,
+  getServerWithMockedHeaders,
+} from '../../helpers';
 import {
   CreateCollectionAuthorInput,
   UpdateCollectionAuthorImageUrlInput,
@@ -22,6 +26,14 @@ describe('mutations: CollectionAuthor', () => {
     imageUrl: faker.image.imageUrl(),
     active: true,
   };
+
+  const headers = {
+    name: 'Test User',
+    username: 'test.user@test.com',
+    groups: `group1,group2,${COLLECTION_CURATOR_FULL}`,
+  };
+
+  const server = getServerWithMockedHeaders(headers);
 
   beforeAll(async () => {
     await server.start();

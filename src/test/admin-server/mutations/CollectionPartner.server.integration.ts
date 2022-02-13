@@ -1,5 +1,5 @@
 import * as faker from 'faker';
-import { db, server } from '../';
+import { db, getServer } from '../';
 import { clear as clearDb, createPartnerHelper } from '../../helpers';
 import {
   CreateCollectionPartnerInput,
@@ -19,6 +19,8 @@ describe('mutations: CollectionPartner', () => {
     imageUrl: faker.image.imageUrl(),
     blurb: faker.lorem.paragraphs(2),
   };
+
+  const server = getServer();
 
   beforeAll(async () => {
     await server.start();
