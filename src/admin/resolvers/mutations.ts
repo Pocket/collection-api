@@ -8,6 +8,7 @@ import {
   PrismaClient,
 } from '@prisma/client';
 import * as Sentry from '@sentry/node';
+import { AuthenticationError } from 'apollo-server-errors';
 import {
   CollectionPartnerAssociation,
   CreateCollectionAuthorInput,
@@ -83,7 +84,9 @@ export async function executeMutation<T, U>(
 
       return entity;
     } else {
-      throw new Error(`You do not have access to perform this action.`);
+      throw new AuthenticationError(
+        `You do not have access to perform this action.`
+      );
     }
   } catch (ex) {
     console.log(ex);

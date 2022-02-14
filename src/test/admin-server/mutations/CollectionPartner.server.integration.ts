@@ -97,7 +97,7 @@ describe('mutations: CollectionPartner', () => {
 
       // And there is an access denied error
       expect(result.errors[0].message).toMatch(
-        `Error: You do not have access to perform this action.`
+        `You do not have access to perform this action.`
       );
 
       await server.stop();
@@ -191,7 +191,7 @@ describe('mutations: CollectionPartner', () => {
 
       // And there is an access denied error
       expect(result.errors[0].message).toMatch(
-        `Error: You do not have access to perform this action.`
+        `You do not have access to perform this action.`
       );
 
       await server.stop();
@@ -258,7 +258,7 @@ describe('mutations: CollectionPartner', () => {
 
       // And there is an access denied error
       expect(result.errors[0].message).toMatch(
-        `Error: You do not have access to perform this action.`
+        `You do not have access to perform this action.`
       );
 
       await server.stop();
