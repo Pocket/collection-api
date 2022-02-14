@@ -44,7 +44,7 @@ export class ContextManager implements IContext {
     const COLLECTION_CURATOR_FULL =
       'mozilliansorg_pocket_collection_curator_full';
 
-    const hasFullAccess = COLLECTION_CURATOR_FULL in accessGroups;
+    const hasFullAccess = accessGroups.includes(COLLECTION_CURATOR_FULL);
 
     return {
       name: this.config.request.headers.name,
