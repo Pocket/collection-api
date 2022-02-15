@@ -1,6 +1,6 @@
 import * as faker from 'faker';
 import slugify from 'slugify';
-import { COLLECTION_CURATOR_FULL, db } from '../';
+import { db } from '../';
 import config from '../../../config';
 import {
   clear as clearDb,
@@ -17,6 +17,7 @@ import {
   UPDATE_COLLECTION_AUTHOR,
   UPDATE_COLLECTION_AUTHOR_IMAGE_URL,
 } from './mutations.gql';
+import { COLLECTION_CURATOR_FULL } from '../../../shared/constants';
 
 describe('mutations: CollectionAuthor', () => {
   const createData: CreateCollectionAuthorInput = {

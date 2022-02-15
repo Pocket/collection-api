@@ -1,13 +1,14 @@
 import * as Sentry from '@sentry/node';
-import config from './config';
 import AWSXRay from 'aws-xray-sdk-core';
 import xrayExpress from 'aws-xray-sdk-express';
 import express from 'express';
 import https from 'https';
 import { graphqlUploadExpress } from 'graphql-upload';
-import { startAdminServer } from './admin/server';
+
+import config from './config';
+import { startServer as startAdminServer } from './admin/server';
+import { getContext as getAdminContext } from './admin/context';
 import { server as publicServer } from './public/server';
-import { getContext } from './admin/context';
 
 //Set XRAY to just log if the context is missing instead of a runtime error
 AWSXRay.setContextMissingStrategy('LOG_ERROR');
@@ -31,7 +32,7 @@ Sentry.init({
 (async () => {
   const app = express();
 
-  //If there is no host header (really there always should be..) then use collection-api as the name
+  // If there is no host header (really there always should be...) then use collection-api as the name
   app.use(xrayExpress.openSegment('collections-api'));
 
   //Set XRay to use the host header to open its segment name.
@@ -46,12 +47,12 @@ Sentry.init({
   );
 
   // Set up Admin Server context, including request headers
-  const contextFactory = (req: express.Request) => {
-    return getContext(req);
+  const adminContextFactory = (req: express.Request) => {
+    return getAdminContext(req);
   };
 
   // From v.3 onwards, Apollo Server must be started before applying middleware
-  const adminServer = await startAdminServer(contextFactory);
+  const adminServer = await startAdminServer(adminContextFactory);
 
   // Apply the admin graphql (This is not part of the federated graph i.e. Client API)
   adminServer.applyMiddleware({ app, path: '/admin' });

@@ -8,7 +8,6 @@ import {
   CollectionStory,
   CurationCategory,
   IABCategory,
-  Image,
   Prisma,
   PrismaClient,
 } from '@prisma/client';
@@ -20,7 +19,7 @@ import {
 } from '../database/types';
 import faker from 'faker';
 import config from '../config';
-import s3 from '../aws/s3';
+import s3service from '../aws/s3';
 import { client } from '../database/client';
 import { ContextManager } from '../admin/context';
 import { getServer } from './admin-server';
@@ -283,27 +282,6 @@ export async function createCollectionPartnerAssociationHelper(
   });
 }
 
-export async function createImageHelper(
-  prisma: PrismaClient,
-  fileName: string,
-  mimeType: string,
-  fileSizeBytes: number,
-  width: number,
-  height: number,
-  path: string
-): Promise<Image> {
-  return prisma.image.create({
-    data: {
-      fileName,
-      width,
-      height,
-      path,
-      mimeType,
-      fileSizeBytes,
-    },
-  });
-}
-
 export async function clear(prisma: PrismaClient): Promise<void> {
   // partnerships and partner information
   await prisma.collectionPartnership.deleteMany({});
@@ -340,7 +318,7 @@ export function sortCollectionStoryAuthors(
 const sharedConfigContext = {
   request: { headers: {} },
   db: client(),
-  s3,
+  s3service,
 };
 
 /**

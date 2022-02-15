@@ -2,7 +2,8 @@ import { PrismaClient } from '@prisma/client';
 import { S3 } from 'aws-sdk';
 import { Request } from 'express';
 import { client } from '../database/client';
-import s3 from '../aws/s3';
+import s3service from '../aws/s3';
+import { COLLECTION_CURATOR_FULL } from '../shared/constants';
 
 // Custom properties we get from Admin API for the authenticated user
 export interface AdminAPIUser {
@@ -16,7 +17,7 @@ export interface AdminAPIUser {
 // Context interface
 export interface IContext {
   db: PrismaClient;
-  s3: S3;
+  s3service: S3;
   authenticatedUser: AdminAPIUser;
 }
 
@@ -25,7 +26,7 @@ export class ContextManager implements IContext {
     private config: {
       request: any;
       db: PrismaClient;
-      s3: S3;
+      s3service: S3;
     }
   ) {}
 
@@ -33,16 +34,12 @@ export class ContextManager implements IContext {
     return this.config.db;
   }
 
-  get s3(): IContext['s3'] {
-    return this.config.s3;
+  get s3service(): IContext['s3service'] {
+    return this.config.s3service;
   }
 
   get authenticatedUser(): AdminAPIUser {
     const accessGroups = this.config.request.headers.groups.split(',');
-
-    // Only using one value from MozillaAccessGroup enum in Pocket Shared Data
-    const COLLECTION_CURATOR_FULL =
-      'mozilliansorg_pocket_collection_curator_full';
 
     const hasFullAccess = accessGroups.includes(COLLECTION_CURATOR_FULL);
 
@@ -56,11 +53,8 @@ export class ContextManager implements IContext {
 }
 
 /**
- * Context factory function. Creates a new context upon
- * every request.
+ * Context factory function. Creates a new context upon every request.
  * @param req server request
- * @param db PrismaClient
- * @param s3 AWS S3 service object
  *
  * @returns ContextManager
  */
@@ -68,6 +62,6 @@ export function getContext(req: Request): ContextManager {
   return new ContextManager({
     request: req,
     db: client(),
-    s3,
+    s3service,
   });
 }

@@ -70,24 +70,24 @@ export async function executeMutation<T, U>(
   try {
     const { db, authenticatedUser } = context;
 
-    if (authenticatedUser.hasFullAccess) {
-      const entity = await callback(db, data);
-      // Associate the image with the entity if the image entity type is provided
-      // and a record for the image exists
-      if (imageEntityType) {
-        await associateImageWithEntity(
-          db,
-          entity as U & { id: number; imageUrl: string },
-          imageEntityType
-        );
-      }
-
-      return entity;
-    } else {
+    if (!authenticatedUser.hasFullAccess) {
       throw new AuthenticationError(
         `You do not have access to perform this action.`
       );
     }
+
+    const entity = await callback(db, data);
+    // Associate the image with the entity if the image entity type is provided
+    // and a record for the image exists
+    if (imageEntityType) {
+      await associateImageWithEntity(
+        db,
+        entity as U & { id: number; imageUrl: string },
+        imageEntityType
+      );
+    }
+
+    return entity;
   } catch (ex) {
     console.log(ex);
     Sentry.captureException(ex);
@@ -439,17 +439,16 @@ export async function deleteCollectionStory(
  * @param parent
  * @param data
  * @param context
- * @param s3
  */
 export async function collectionImageUpload(
   parent,
   { data },
   context: IContext
 ) {
-  const { s3 } = context;
+  const { s3service } = context;
   const { image, ...imageData } = data;
   await data.image.promise;
-  const upload = await uploadImage(s3, image.file);
+  const upload = await uploadImage(s3service, image.file);
 
   await executeMutation<CreateImageInput, Image>(
     context,

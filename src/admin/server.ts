@@ -43,7 +43,7 @@ export function getServer(contextFactory: ContextFactory): ApolloServer {
  * Create and start the apollo server. Required to await server.start()
  * before applying middleware per apollo-server 3 migration.
  */
-export async function startAdminServer(
+export async function startServer(
   contextFactory: ContextFactory
 ): Promise<ApolloServer> {
   const server = getServer(contextFactory);

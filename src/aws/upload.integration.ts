@@ -1,5 +1,5 @@
 import { uploadImage } from './upload';
-import s3 from './s3';
+import s3service from './s3';
 import { FileUpload } from 'graphql-upload';
 import { createReadStream, unlinkSync, writeFileSync } from 'fs';
 import config from '../config';
@@ -23,7 +23,7 @@ describe('Upload', () => {
       createReadStream: () => createReadStream(testFilePath),
     };
 
-    const upload = await uploadImage(s3, image);
+    const upload = await uploadImage(s3service, image);
 
     expect(upload.mimeType).toEqual('image/jpeg');
     // filename should be equal the key (string after last "/" in path) in the path

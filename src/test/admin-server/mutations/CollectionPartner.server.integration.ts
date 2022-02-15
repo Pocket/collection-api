@@ -1,5 +1,5 @@
 import * as faker from 'faker';
-import { COLLECTION_CURATOR_FULL, db } from '../';
+import { db } from '../';
 import {
   clear as clearDb,
   createPartnerHelper,
@@ -15,6 +15,7 @@ import {
   UPDATE_COLLECTION_PARTNER,
   UPDATE_COLLECTION_PARTNER_IMAGE_URL,
 } from './mutations.gql';
+import { COLLECTION_CURATOR_FULL } from '../../../shared/constants';
 
 describe('mutations: CollectionPartner', () => {
   const createData: CreateCollectionPartnerInput = {
