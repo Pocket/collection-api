@@ -1,8 +1,10 @@
-import { db, server } from '../';
+import { db, getServer } from '../';
 import { clear as clearDb, createCurationCategoryHelper } from '../../helpers';
 import { GET_CURATION_CATEGORIES } from './queries.gql';
 
 describe('queries: CurationCategory', () => {
+  const server = getServer();
+
   beforeAll(async () => {
     await clearDb(db);
     await server.start();

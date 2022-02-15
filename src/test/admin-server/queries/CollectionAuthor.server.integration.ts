@@ -2,12 +2,14 @@ import slugify from 'slugify';
 import * as faker from 'faker';
 import { CollectionAuthor } from '@prisma/client';
 import config from '../../../config';
-import { db, server } from '../';
+import { db, getServer } from '../';
 import { clear as clearDb, createAuthorHelper } from '../../helpers';
 import { CreateCollectionAuthorInput } from '../../../database/types';
 import { GET_COLLECTION_AUTHOR, GET_COLLECTION_AUTHORS } from './queries.gql';
 
 describe('queries: CollectionAuthor', () => {
+  const server = getServer();
+
   beforeAll(async () => {
     await clearDb(db);
     await server.start();

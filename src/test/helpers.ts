@@ -8,7 +8,6 @@ import {
   CollectionStory,
   CurationCategory,
   IABCategory,
-  Image,
   Prisma,
   PrismaClient,
 } from '@prisma/client';
@@ -20,6 +19,10 @@ import {
 } from '../database/types';
 import faker from 'faker';
 import config from '../config';
+import s3service from '../aws/s3';
+import { client } from '../database/client';
+import { ContextManager } from '../admin/context';
+import { getServer } from './admin-server';
 
 const slugifyConfig = config.slugify;
 
@@ -279,27 +282,6 @@ export async function createCollectionPartnerAssociationHelper(
   });
 }
 
-export async function createImageHelper(
-  prisma: PrismaClient,
-  fileName: string,
-  mimeType: string,
-  fileSizeBytes: number,
-  width: number,
-  height: number,
-  path: string
-): Promise<Image> {
-  return prisma.image.create({
-    data: {
-      fileName,
-      width,
-      height,
-      path,
-      mimeType,
-      fileSizeBytes,
-    },
-  });
-}
-
 export async function clear(prisma: PrismaClient): Promise<void> {
   // partnerships and partner information
   await prisma.collectionPartnership.deleteMany({});
@@ -332,3 +314,30 @@ export function sortCollectionStoryAuthors(
     return a.sortOrder - b.sortOrder;
   });
 }
+
+const sharedConfigContext = {
+  request: { headers: {} },
+  db: client(),
+  s3service,
+};
+
+/**
+ * Pass custom mocked headers to Apollo Server to test access control checks
+ * within resolvers.
+ *
+ * @param headers
+ */
+export const getServerWithMockedHeaders = (headers: {
+  name: string;
+  username: string;
+  groups: string;
+}) => {
+  const contextManager = new ContextManager({
+    ...sharedConfigContext,
+    request: {
+      headers,
+    },
+  });
+
+  return getServer(contextManager);
+};

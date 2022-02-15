@@ -1,8 +1,10 @@
 import config from '../../../config';
-import { server } from '../';
+import { getServer } from '../';
 import { GET_LANGUAGES } from './queries.gql';
 
 describe('queries: Language', () => {
+  const server = getServer();
+
   beforeAll(async () => {
     await server.start();
   });

@@ -1,6 +1,10 @@
 import * as faker from 'faker';
-import { db, server } from '../';
-import { clear as clearDb, createPartnerHelper } from '../../helpers';
+import { db, getServer } from '../';
+import {
+  clear as clearDb,
+  createPartnerHelper,
+  getServerWithMockedHeaders,
+} from '../../helpers';
 import {
   CreateCollectionPartnerInput,
   UpdateCollectionPartnerInput,
@@ -11,6 +15,7 @@ import {
   UPDATE_COLLECTION_PARTNER,
   UPDATE_COLLECTION_PARTNER_IMAGE_URL,
 } from './mutations.gql';
+import { COLLECTION_CURATOR_FULL } from '../../../shared/constants';
 
 describe('mutations: CollectionPartner', () => {
   const createData: CreateCollectionPartnerInput = {
@@ -19,6 +24,14 @@ describe('mutations: CollectionPartner', () => {
     imageUrl: faker.image.imageUrl(),
     blurb: faker.lorem.paragraphs(2),
   };
+
+  const headers = {
+    name: 'Test User',
+    username: 'test.user@test.com',
+    groups: `group1,group2,${COLLECTION_CURATOR_FULL}`,
+  };
+
+  const server = getServerWithMockedHeaders(headers);
 
   beforeAll(async () => {
     await server.start();
@@ -63,6 +76,52 @@ describe('mutations: CollectionPartner', () => {
       expect(result.errors[0].message).toMatch(
         'Variable "$name" of required type "String!" was not provided.'
       );
+    });
+
+    it('should fail if user has no access to perform this mutation', async () => {
+      const headers = {
+        name: 'Test User',
+        username: 'test.user@test.com',
+        groups: `group1,group2,no-access-for-you`,
+      };
+
+      const server = getServerWithMockedHeaders(headers);
+      await server.start();
+
+      const result = await server.executeOperation({
+        query: CREATE_COLLECTION_PARTNER,
+        variables: createData,
+      });
+
+      // ...without success. There is no data
+      expect(result.data).toBeFalsy();
+
+      // And there is an access denied error
+      expect(result.errors[0].message).toMatch(
+        `You do not have access to perform this action.`
+      );
+
+      await server.stop();
+    });
+
+    it('should fail if request headers are undefined', async () => {
+      const server = getServer();
+      await server.start();
+
+      const result = await server.executeOperation({
+        query: CREATE_COLLECTION_PARTNER,
+        variables: createData,
+      });
+
+      // ...without success. There is no data
+      expect(result.data).toBeFalsy();
+
+      // And there is an access denied error
+      expect(result.errors[0].message).toMatch(
+        `You do not have access to perform this action.`
+      );
+
+      await server.stop();
     });
   });
 
@@ -119,6 +178,78 @@ describe('mutations: CollectionPartner', () => {
       // And the rest to stay as is
       expect(updatedPartner.imageUrl).toEqual(partner.imageUrl);
     });
+
+    it('should fail if user has no access to perform this mutation', async () => {
+      const headers = {
+        name: 'Test User',
+        username: 'test.user@test.com',
+        groups: `group1,group2,no-access-for-you`,
+      };
+
+      const server = getServerWithMockedHeaders(headers);
+      await server.start();
+
+      const partner = await createPartnerHelper(
+        db,
+        faker.company.companyName()
+      );
+
+      const input: UpdateCollectionPartnerInput = {
+        externalId: partner.externalId,
+        name: 'Agatha Christie',
+        url: faker.internet.url(),
+        blurb: faker.lorem.paragraphs(2),
+        imageUrl: faker.image.imageUrl(),
+      };
+
+      const result = await server.executeOperation({
+        query: UPDATE_COLLECTION_PARTNER,
+        variables: input,
+      });
+
+      // ...without success. There is no data
+      expect(result.data).toBeFalsy();
+
+      // And there is an access denied error
+      expect(result.errors[0].message).toMatch(
+        `You do not have access to perform this action.`
+      );
+
+      await server.stop();
+    });
+
+    it('should fail if request headers are undefined', async () => {
+      const server = getServer();
+      await server.start();
+
+      const partner = await createPartnerHelper(
+        db,
+        faker.company.companyName()
+      );
+
+      const input: UpdateCollectionPartnerInput = {
+        externalId: partner.externalId,
+        name: 'Agatha Christie',
+        url: faker.internet.url(),
+        blurb: faker.lorem.paragraphs(2),
+        imageUrl: faker.image.imageUrl(),
+      };
+
+      const result = await server.executeOperation({
+        query: UPDATE_COLLECTION_PARTNER,
+        variables: input,
+      });
+
+      // ...without success. There is no data
+      expect(result.data).toBeFalsy();
+
+      // And there is an access denied error
+      expect(result.errors[0].message).toMatch(
+        `You do not have access to perform this action.`
+      );
+
+      await server.stop();
+    });
   });
 
   describe('updateCollectionPartnerImageUrl', () => {
@@ -148,6 +279,74 @@ describe('mutations: CollectionPartner', () => {
       expect(updatedPartner.name).toEqual(partner.name);
       expect(updatedPartner.url).toEqual(partner.url);
       expect(updatedPartner.blurb).toEqual(partner.blurb);
+    });
+
+    it('should fail if user has no access to perform this mutation', async () => {
+      const headers = {
+        name: 'Test User',
+        username: 'test.user@test.com',
+        groups: `group1,group2,no-access-for-you`,
+      };
+
+      const server = getServerWithMockedHeaders(headers);
+      await server.start();
+
+      const partner = await createPartnerHelper(
+        db,
+        faker.company.companyName()
+      );
+      const newImageUrl = 'https://www.example.com/ian-fleming.jpg';
+
+      const input: UpdateCollectionPartnerImageUrlInput = {
+        externalId: partner.externalId,
+        imageUrl: newImageUrl,
+      };
+
+      const result = await server.executeOperation({
+        query: UPDATE_COLLECTION_PARTNER_IMAGE_URL,
+        variables: input,
+      });
+
+      // ...without success. There is no data
+      expect(result.data).toBeFalsy();
+
+      // And there is an access denied error
+      expect(result.errors[0].message).toMatch(
+        `You do not have access to perform this action.`
+      );
+
+      await server.stop();
+    });
+
+    it('should fail if request headers are undefined', async () => {
+      const server = getServer();
+      await server.start();
+
+      const partner = await createPartnerHelper(
+        db,
+        faker.company.companyName()
+      );
+      const newImageUrl = 'https://www.example.com/ian-fleming.jpg';
+
+      const input: UpdateCollectionPartnerImageUrlInput = {
+        externalId: partner.externalId,
+        imageUrl: newImageUrl,
+      };
+
+      const result = await server.executeOperation({
+        query: UPDATE_COLLECTION_PARTNER_IMAGE_URL,
+        variables: input,
+      });
+
+      // ...without success. There is no data
+      expect(result.data).toBeFalsy();
+
+      // And there is an access denied error
+      expect(result.errors[0].message).toMatch(
+        `You do not have access to perform this action.`
+      );
+
+      await server.stop();
     });
   });
 });

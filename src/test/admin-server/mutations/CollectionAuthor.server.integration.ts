@@ -1,8 +1,12 @@
 import * as faker from 'faker';
 import slugify from 'slugify';
-import { db, server } from '../';
+import { db, getServer } from '../';
 import config from '../../../config';
-import { clear as clearDb, createAuthorHelper } from '../../helpers';
+import {
+  clear as clearDb,
+  createAuthorHelper,
+  getServerWithMockedHeaders,
+} from '../../helpers';
 import {
   CreateCollectionAuthorInput,
   UpdateCollectionAuthorImageUrlInput,
@@ -13,6 +17,10 @@ import {
   UPDATE_COLLECTION_AUTHOR,
   UPDATE_COLLECTION_AUTHOR_IMAGE_URL,
 } from './mutations.gql';
+import {
+  ACCESS_DENIED_ERROR,
+  COLLECTION_CURATOR_FULL,
+} from '../../../shared/constants';
 
 describe('mutations: CollectionAuthor', () => {
   const createData: CreateCollectionAuthorInput = {
@@ -22,6 +30,14 @@ describe('mutations: CollectionAuthor', () => {
     imageUrl: faker.image.imageUrl(),
     active: true,
   };
+
+  const headers = {
+    name: 'Test User',
+    username: 'test.user@test.com',
+    groups: `group1,group2,${COLLECTION_CURATOR_FULL}`,
+  };
+
+  const server = getServerWithMockedHeaders(headers);
 
   beforeAll(async () => {
     await server.start();
@@ -110,6 +126,60 @@ describe('mutations: CollectionAuthor', () => {
         'Variable "$name" of required type "String!" was not provided.'
       );
     });
+
+    it('should fail if user has no access to perform this mutation', async () => {
+      const headers = {
+        name: 'Test User',
+        username: 'test.user@test.com',
+        groups: `group1,group2,no-access-for-you`,
+      };
+
+      const server = getServerWithMockedHeaders(headers);
+      await server.start();
+
+      const variables: CreateCollectionAuthorInput = {
+        name: 'James Bond',
+        slug: 'james-bond',
+      };
+
+      // Attempt to create an author
+      const result = await server.executeOperation({
+        query: CREATE_COLLECTION_AUTHOR,
+        variables,
+      });
+
+      // ...without success. There is no data
+      expect(result.data).toBeFalsy();
+
+      // And there is an access denied error
+      expect(result.errors[0].message).toMatch(ACCESS_DENIED_ERROR);
+
+      await server.stop();
+    });
+
+    it('should fail if request headers are undefined', async () => {
+      const server = getServer();
+      await server.start();
+
+      const variables: CreateCollectionAuthorInput = {
+        name: 'James Bond',
+        slug: 'james-bond',
+      };
+
+      // Attempt to create an author
+      const result = await server.executeOperation({
+        query: CREATE_COLLECTION_AUTHOR,
+        variables,
+      });
+
+      // ...without success. There is no data
+      expect(result.data).toBeFalsy();
+
+      // And there is an access denied error
+      expect(result.errors[0].message).toMatch(ACCESS_DENIED_ERROR);
+
+      await server.stop();
+    });
   });
 
   describe('updateCollectionAuthor mutation', () => {
@@ -191,6 +261,70 @@ describe('mutations: CollectionAuthor', () => {
         `An author with the slug "${input.slug}" already exists`
       );
     });
+
+    it('should fail if user has no access to perform this mutation', async () => {
+      const headers = {
+        name: 'Test User',
+        username: 'test.user@test.com',
+        groups: `group1,group2,no-access-for-you`,
+      };
+
+      const server = getServerWithMockedHeaders(headers);
+      await server.start();
+
+      const author = await createAuthorHelper(db, 'Ian Fleming');
+
+      const input: UpdateCollectionAuthorInput = {
+        externalId: author.externalId,
+        name: 'Agatha Christie',
+        slug: 'agatha-christie',
+        bio: faker.lorem.paragraphs(2),
+        imageUrl: faker.image.imageUrl(),
+        active: false,
+      };
+
+      const result = await server.executeOperation({
+        query: UPDATE_COLLECTION_AUTHOR,
+        variables: input,
+      });
+
+      // ...without success. There is no data
+      expect(result.data).toBeFalsy();
+
+      // And there is an access denied error
+      expect(result.errors[0].message).toMatch(ACCESS_DENIED_ERROR);
+
+      await server.stop();
+    });
+
+    it('should fail if request headers are undefined', async () => {
+      const server = getServer();
+      await server.start();
+
+      const author = await createAuthorHelper(db, 'Ian Fleming');
+
+      const input: UpdateCollectionAuthorInput = {
+        externalId: author.externalId,
+        name: 'Agatha Christie',
+        slug: 'agatha-christie',
+        bio: faker.lorem.paragraphs(2),
+        imageUrl: faker.image.imageUrl(),
+        active: false,
+      };
+
+      const result = await server.executeOperation({
+        query: UPDATE_COLLECTION_AUTHOR,
+        variables: input,
+      });
+
+      // ...without success. There is no data
+      expect(result.data).toBeFalsy();
+
+      // And there is an access denied error
+      expect(result.errors[0].message).toMatch(ACCESS_DENIED_ERROR);
+
+      await server.stop();
+    });
   });
 
   describe('updateCollectionAuthorImageUrl', () => {
@@ -218,6 +352,64 @@ describe('mutations: CollectionAuthor', () => {
       expect(updatedAuthor.slug).toEqual(author.slug);
       expect(updatedAuthor.bio).toEqual(author.bio);
       expect(updatedAuthor.active).toEqual(author.active);
+    });
+
+    it('should fail if user has no access to perform this mutation', async () => {
+      const headers = {
+        name: 'Test User',
+        username: 'test.user@test.com',
+        groups: `group1,group2,no-access-for-you`,
+      };
+
+      const server = getServerWithMockedHeaders(headers);
+      await server.start();
+
+      const author = await createAuthorHelper(db, 'Ian Fleming');
+      const newImageUrl = 'https://www.example.com/ian-fleming.jpg';
+
+      const input: UpdateCollectionAuthorImageUrlInput = {
+        externalId: author.externalId,
+        imageUrl: newImageUrl,
+      };
+
+      const result = await server.executeOperation({
+        query: UPDATE_COLLECTION_AUTHOR_IMAGE_URL,
+        variables: input,
+      });
+
+      // ...without success. There is no data
+      expect(result.data).toBeFalsy();
+
+      // And there is an access denied error
+      expect(result.errors[0].message).toMatch(ACCESS_DENIED_ERROR);
+
+      await server.stop();
+    });
+
+    it('should fail if request headers are undefined', async () => {
+      const server = getServer();
+      await server.start();
+
+      const author = await createAuthorHelper(db, 'Ian Fleming');
+      const newImageUrl = 'https://www.example.com/ian-fleming.jpg';
+
+      const input: UpdateCollectionAuthorImageUrlInput = {
+        externalId: author.externalId,
+        imageUrl: newImageUrl,
+      };
+
+      const result = await server.executeOperation({
+        query: UPDATE_COLLECTION_AUTHOR_IMAGE_URL,
+        variables: input,
+      });
+
+      // ...without success. There is no data
+      expect(result.data).toBeFalsy();
+
+      // And there is an access denied error
+      expect(result.errors[0].message).toMatch(ACCESS_DENIED_ERROR);
+
+      await server.stop();
     });
   });
 });

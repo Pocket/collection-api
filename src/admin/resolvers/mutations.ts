@@ -8,6 +8,7 @@ import {
   PrismaClient,
 } from '@prisma/client';
 import * as Sentry from '@sentry/node';
+import { AuthenticationError } from 'apollo-server-errors';
 import {
   CollectionPartnerAssociation,
   CreateCollectionAuthorInput,
@@ -50,25 +51,32 @@ import {
   updateCollectionStorySortOrder as dbUpdateCollectionStorySortOrder,
   updateCollectionStoryImageUrl as dbUpdateCollectionStoryImageUrl,
 } from '../../database/mutations';
-import { S3 } from 'aws-sdk';
 import { uploadImage } from '../../aws/upload';
+import { IContext } from '../context';
 
 /**
  * Executes a mutation, catches exceptions and records to sentry and console
- * @param db
+ * @param context
  * @param data
  * @param callback
  * @param imageEntityType
  */
 export async function executeMutation<T, U>(
-  db: PrismaClient,
+  context: IContext,
   data: T,
   callback: (db: PrismaClient, data: T) => Promise<U>,
   imageEntityType: ImageEntityType = undefined
 ): Promise<U> {
   try {
-    const entity = await callback(db, data);
+    const { db, authenticatedUser } = context;
 
+    if (!authenticatedUser.hasFullAccess) {
+      throw new AuthenticationError(
+        `You do not have access to perform this action.`
+      );
+    }
+
+    const entity = await callback(db, data);
     // Associate the image with the entity if the image entity type is provided
     // and a record for the image exists
     if (imageEntityType) {
@@ -90,15 +98,15 @@ export async function executeMutation<T, U>(
 /**
  * @param parent
  * @param data
- * @param db
+ * @param context
  */
 export async function createCollectionAuthor(
   parent,
   { data },
-  { db }
+  context: IContext
 ): Promise<CollectionAuthor> {
   return executeMutation<CreateCollectionAuthorInput, CollectionAuthor>(
-    db,
+    context,
     data,
     dbCreateCollectionAuthor,
     ImageEntityType.COLLECTION_AUTHOR
@@ -108,15 +116,15 @@ export async function createCollectionAuthor(
 /**
  * @param parent
  * @param data
- * @param db
+ * @param context
  */
 export async function updateCollectionAuthor(
   parent,
   { data },
-  { db }
+  context: IContext
 ): Promise<CollectionAuthor> {
   return executeMutation<UpdateCollectionAuthorInput, CollectionAuthor>(
-    db,
+    context,
     data,
     dbUpdateCollectionAuthor,
     ImageEntityType.COLLECTION_AUTHOR
@@ -126,15 +134,15 @@ export async function updateCollectionAuthor(
 /**
  * @param parent
  * @param data
- * @param db
+ * @param context
  */
 export async function updateCollectionAuthorImageUrl(
   parent,
   { data },
-  { db }
+  context: IContext
 ): Promise<CollectionAuthor> {
   return executeMutation<UpdateCollectionAuthorImageUrlInput, CollectionAuthor>(
-    db,
+    context,
     data,
     dbUpdateCollectionAuthorImageUrl,
     ImageEntityType.COLLECTION_AUTHOR
@@ -144,15 +152,15 @@ export async function updateCollectionAuthorImageUrl(
 /**
  * @param parent
  * @param data
- * @param db
+ * @param context
  */
 export async function createCollection(
   parent,
   { data },
-  { db }
+  context: IContext
 ): Promise<Collection> {
   return executeMutation<CreateCollectionInput, Collection>(
-    db,
+    context,
     data,
     dbCreateCollection,
     ImageEntityType.COLLECTION
@@ -162,15 +170,15 @@ export async function createCollection(
 /**
  * @param parent
  * @param data
- * @param db
+ * @param context
  */
 export async function updateCollection(
   parent,
   { data },
-  { db }
+  context: IContext
 ): Promise<Collection> {
   return await executeMutation<UpdateCollectionInput, Collection>(
-    db,
+    context,
     data,
     dbUpdateCollection,
     ImageEntityType.COLLECTION
@@ -180,15 +188,15 @@ export async function updateCollection(
 /**
  * @param parent
  * @param data
- * @param db
+ * @param context
  */
 export async function updateCollectionImageUrl(
   parent,
   { data },
-  { db }
+  context: IContext
 ): Promise<Collection> {
   return await executeMutation<UpdateCollectionImageUrlInput, Collection>(
-    db,
+    context,
     data,
     dbUpdateCollectionImageUrl,
     ImageEntityType.COLLECTION
@@ -198,15 +206,15 @@ export async function updateCollectionImageUrl(
 /**
  * @param parent
  * @param data
- * @param db
+ * @param context
  */
 export async function createCollectionPartner(
   parent,
   { data },
-  { db }
+  context: IContext
 ): Promise<CollectionPartner> {
   return executeMutation<CreateCollectionPartnerInput, CollectionPartner>(
-    db,
+    context,
     data,
     dbCreateCollectionPartner,
     ImageEntityType.COLLECTION_PARTNER
@@ -216,15 +224,15 @@ export async function createCollectionPartner(
 /**
  * @param parent
  * @param data
- * @param db
+ * @param context
  */
 export async function updateCollectionPartner(
   parent,
   { data },
-  { db }
+  context: IContext
 ): Promise<CollectionPartner> {
   return executeMutation<UpdateCollectionPartnerInput, CollectionPartner>(
-    db,
+    context,
     data,
     dbUpdateCollectionPartner,
     ImageEntityType.COLLECTION_PARTNER
@@ -234,18 +242,18 @@ export async function updateCollectionPartner(
 /**
  * @param parent
  * @param data
- * @param db
+ * @param context
  */
 export async function updateCollectionPartnerImageUrl(
   parent,
   { data },
-  { db }
+  context: IContext
 ): Promise<CollectionPartner> {
   return executeMutation<
     UpdateCollectionPartnerImageUrlInput,
     CollectionPartner
   >(
-    db,
+    context,
     data,
     dbUpdateCollectionPartnerImageUrl,
     ImageEntityType.COLLECTION_PARTNER
@@ -255,18 +263,18 @@ export async function updateCollectionPartnerImageUrl(
 /**
  * @param parent
  * @param data
- * @param db
+ * @param context
  */
 export async function createCollectionPartnerAssociation(
   parent,
   { data },
-  { db }
+  context: IContext
 ): Promise<CollectionPartnerAssociation> {
   return executeMutation<
     CreateCollectionPartnerAssociationInput,
     CollectionPartnerAssociation
   >(
-    db,
+    context,
     data,
     dbCreateCollectionPartnerAssociation,
     ImageEntityType.COLLECTION_PARTNERSHIP
@@ -276,18 +284,18 @@ export async function createCollectionPartnerAssociation(
 /**
  * @param parent
  * @param data
- * @param db
+ * @param context
  */
 export async function updateCollectionPartnerAssociation(
   parent,
   { data },
-  { db }
+  context: IContext
 ): Promise<CollectionPartnerAssociation> {
   return executeMutation<
     UpdateCollectionPartnerAssociationInput,
     CollectionPartnerAssociation
   >(
-    db,
+    context,
     data,
     dbUpdateCollectionPartnerAssociation,
     ImageEntityType.COLLECTION_PARTNERSHIP
@@ -297,18 +305,18 @@ export async function updateCollectionPartnerAssociation(
 /**
  * @param parent
  * @param data
- * @param db
+ * @param context
  */
 export async function updateCollectionPartnerAssociationImageUrl(
   parent,
   { data },
-  { db }
+  context: IContext
 ): Promise<CollectionPartnerAssociation> {
   return executeMutation<
     UpdateCollectionPartnerAssociationImageUrlInput,
     CollectionPartnerAssociation
   >(
-    db,
+    context,
     data,
     dbUpdateCollectionPartnerAssociationImageUrl,
     ImageEntityType.COLLECTION_PARTNERSHIP
@@ -318,15 +326,15 @@ export async function updateCollectionPartnerAssociationImageUrl(
 /**
  * @param parent
  * @param externalId
- * @param db
+ * @param context
  */
 export async function deleteCollectionPartnerAssociation(
   parent,
   { externalId },
-  { db }
+  context: IContext
 ): Promise<CollectionPartnerAssociation> {
   return await executeMutation<string, CollectionPartnerAssociation>(
-    db,
+    context,
     externalId,
     dbDeleteCollectionPartnerAssociation
   );
@@ -335,15 +343,15 @@ export async function deleteCollectionPartnerAssociation(
 /**
  * @param parent
  * @param data
- * @param db
+ * @param context
  */
 export async function createCollectionStory(
   parent,
   { data },
-  { db }
+  context: IContext
 ): Promise<CollectionStory> {
   return await executeMutation<CreateCollectionStoryInput, CollectionStory>(
-    db,
+    context,
     data,
     dbCreateCollectionStory,
     ImageEntityType.COLLECTION_STORY
@@ -353,15 +361,15 @@ export async function createCollectionStory(
 /**
  * @param parent
  * @param data
- * @param db
+ * @param context
  */
 export async function updateCollectionStory(
   parent,
   { data },
-  { db }
+  context: IContext
 ): Promise<CollectionStory> {
   return await executeMutation<UpdateCollectionStoryInput, CollectionStory>(
-    db,
+    context,
     data,
     dbUpdateCollectionStory,
     ImageEntityType.COLLECTION_STORY
@@ -371,18 +379,18 @@ export async function updateCollectionStory(
 /**
  * @param parent
  * @param data
- * @param db
+ * @param context
  */
 export async function updateCollectionStorySortOrder(
   parent,
   { data },
-  { db }
+  context: IContext
 ): Promise<CollectionStory> {
   return await executeMutation<
     UpdateCollectionStorySortOrderInput,
     CollectionStory
   >(
-    db,
+    context,
     data,
     dbUpdateCollectionStorySortOrder,
     ImageEntityType.COLLECTION_STORY
@@ -392,18 +400,18 @@ export async function updateCollectionStorySortOrder(
 /**
  * @param parent
  * @param data
- * @param db
+ * @param context
  */
 export async function updateCollectionStoryImageUrl(
   parent,
   { data },
-  { db }
+  context: IContext
 ): Promise<CollectionStory> {
   return await executeMutation<
     UpdateCollectionStoryImageUrlInput,
     CollectionStory
   >(
-    db,
+    context,
     data,
     dbUpdateCollectionStoryImageUrl,
     ImageEntityType.COLLECTION_STORY
@@ -413,15 +421,15 @@ export async function updateCollectionStoryImageUrl(
 /**
  * @param parent
  * @param externalId
- * @param db
+ * @param context
  */
 export async function deleteCollectionStory(
   parent,
   { externalId },
-  { db }
+  context: IContext
 ): Promise<CollectionStory> {
   return await executeMutation<string, CollectionStory>(
-    db,
+    context,
     externalId,
     dbDeleteCollectionStory
   );
@@ -430,20 +438,20 @@ export async function deleteCollectionStory(
 /**
  * @param parent
  * @param data
- * @param s3
- * @param db
+ * @param context
  */
 export async function collectionImageUpload(
   parent,
   { data },
-  { s3, db }: { s3: S3; db: PrismaClient }
+  context: IContext
 ) {
+  const { s3service } = context;
   const { image, ...imageData } = data;
   await data.image.promise;
-  const upload = await uploadImage(s3, image.file);
+  const upload = await uploadImage(s3service, image.file);
 
   await executeMutation<CreateImageInput, Image>(
-    db,
+    context,
     { ...imageData, ...upload },
     createImage
   );

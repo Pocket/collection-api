@@ -1,5 +1,5 @@
 import { ApolloServer } from 'apollo-server-express';
-import { buildFederatedSchema } from '@apollo/federation';
+import { buildSubgraphSchema } from '@apollo/federation';
 import { typeDefsPublic } from '../typeDefs';
 import { resolvers as publicResolvers } from './resolvers';
 import responseCachePlugin from 'apollo-server-plugin-response-cache';
@@ -13,7 +13,7 @@ import { client } from '../database/client';
 import { collectionLoader } from '../dataLoaders/collectionLoader';
 
 export const server = new ApolloServer({
-  schema: buildFederatedSchema([
+  schema: buildSubgraphSchema([
     { typeDefs: typeDefsPublic, resolvers: publicResolvers },
   ]),
   plugins: [
