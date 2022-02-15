@@ -39,13 +39,16 @@ export class ContextManager implements IContext {
   }
 
   get authenticatedUser(): AdminAPIUser {
-    const accessGroups = this.config.request.headers.groups.split(',');
+    // If anyone decides to work with/test the subgraph directly,
+    // make sure we cater for undefined headers.
+    const groups = this.config.request.headers.groups as string;
+    const accessGroups = groups ? groups.split(',') : [];
 
     const hasFullAccess = accessGroups.includes(COLLECTION_CURATOR_FULL);
 
     return {
-      name: this.config.request.headers.name,
-      username: this.config.request.headers.username,
+      name: this.config.request.headers.name as string,
+      username: this.config.request.headers.username as string,
       groups: accessGroups,
       hasFullAccess,
     };
