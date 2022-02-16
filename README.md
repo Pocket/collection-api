@@ -89,6 +89,19 @@ npm test
 ```bash
 docker compose exec app npm run test-integrations
 ```
+If you'd like to be able to run and debug integration tests directly in your IDE, run the following command (note that it may prompt you for your `sudo` password to modify your `/etc/hosts` file):
+
+```bash
+npm run test-setup
+```
+
+Thereafter, you can use
+
+```bash
+npm run test-integrations
+```
+
+on the command line or use your IDE to debug individual tests and test suites.
 
 **NOTE** Running integration tests locally will result in your local database being emptied. Refer to [Resetting & Seeding the Database](#resetting--seeding-the-database) above to repopulate seed data.
 
