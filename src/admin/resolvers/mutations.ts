@@ -52,6 +52,7 @@ import {
   updateCollectionStoryImageUrl as dbUpdateCollectionStoryImageUrl,
 } from '../../database/mutations';
 import { uploadImage } from '../../aws/upload';
+import { ACCESS_DENIED_ERROR } from '../../shared/constants';
 import { IContext } from '../context';
 
 /**
@@ -71,9 +72,7 @@ export async function executeMutation<T, U>(
     const { db, authenticatedUser } = context;
 
     if (!authenticatedUser.hasFullAccess) {
-      throw new AuthenticationError(
-        `You do not have access to perform this action.`
-      );
+      throw new AuthenticationError(ACCESS_DENIED_ERROR);
     }
 
     const entity = await callback(db, data);
@@ -89,7 +88,6 @@ export async function executeMutation<T, U>(
 
     return entity;
   } catch (ex) {
-    console.log(ex);
     Sentry.captureException(ex);
     throw new Error(ex);
   }
@@ -105,7 +103,7 @@ export async function createCollectionAuthor(
   { data },
   context: IContext
 ): Promise<CollectionAuthor> {
-  return executeMutation<CreateCollectionAuthorInput, CollectionAuthor>(
+  return await executeMutation<CreateCollectionAuthorInput, CollectionAuthor>(
     context,
     data,
     dbCreateCollectionAuthor,
@@ -123,7 +121,7 @@ export async function updateCollectionAuthor(
   { data },
   context: IContext
 ): Promise<CollectionAuthor> {
-  return executeMutation<UpdateCollectionAuthorInput, CollectionAuthor>(
+  return await executeMutation<UpdateCollectionAuthorInput, CollectionAuthor>(
     context,
     data,
     dbUpdateCollectionAuthor,
@@ -141,7 +139,10 @@ export async function updateCollectionAuthorImageUrl(
   { data },
   context: IContext
 ): Promise<CollectionAuthor> {
-  return executeMutation<UpdateCollectionAuthorImageUrlInput, CollectionAuthor>(
+  return await executeMutation<
+    UpdateCollectionAuthorImageUrlInput,
+    CollectionAuthor
+  >(
     context,
     data,
     dbUpdateCollectionAuthorImageUrl,
@@ -159,7 +160,7 @@ export async function createCollection(
   { data },
   context: IContext
 ): Promise<Collection> {
-  return executeMutation<CreateCollectionInput, Collection>(
+  return await executeMutation<CreateCollectionInput, Collection>(
     context,
     data,
     dbCreateCollection,
@@ -213,7 +214,7 @@ export async function createCollectionPartner(
   { data },
   context: IContext
 ): Promise<CollectionPartner> {
-  return executeMutation<CreateCollectionPartnerInput, CollectionPartner>(
+  return await executeMutation<CreateCollectionPartnerInput, CollectionPartner>(
     context,
     data,
     dbCreateCollectionPartner,
@@ -231,7 +232,7 @@ export async function updateCollectionPartner(
   { data },
   context: IContext
 ): Promise<CollectionPartner> {
-  return executeMutation<UpdateCollectionPartnerInput, CollectionPartner>(
+  return await executeMutation<UpdateCollectionPartnerInput, CollectionPartner>(
     context,
     data,
     dbUpdateCollectionPartner,
@@ -249,7 +250,7 @@ export async function updateCollectionPartnerImageUrl(
   { data },
   context: IContext
 ): Promise<CollectionPartner> {
-  return executeMutation<
+  return await executeMutation<
     UpdateCollectionPartnerImageUrlInput,
     CollectionPartner
   >(
@@ -270,7 +271,7 @@ export async function createCollectionPartnerAssociation(
   { data },
   context: IContext
 ): Promise<CollectionPartnerAssociation> {
-  return executeMutation<
+  return await executeMutation<
     CreateCollectionPartnerAssociationInput,
     CollectionPartnerAssociation
   >(
@@ -291,7 +292,7 @@ export async function updateCollectionPartnerAssociation(
   { data },
   context: IContext
 ): Promise<CollectionPartnerAssociation> {
-  return executeMutation<
+  return await executeMutation<
     UpdateCollectionPartnerAssociationInput,
     CollectionPartnerAssociation
   >(
@@ -312,7 +313,7 @@ export async function updateCollectionPartnerAssociationImageUrl(
   { data },
   context: IContext
 ): Promise<CollectionPartnerAssociation> {
-  return executeMutation<
+  return await executeMutation<
     UpdateCollectionPartnerAssociationImageUrlInput,
     CollectionPartnerAssociation
   >(
