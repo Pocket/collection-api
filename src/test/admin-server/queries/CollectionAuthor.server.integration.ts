@@ -3,12 +3,28 @@ import * as faker from 'faker';
 import { CollectionAuthor } from '@prisma/client';
 import config from '../../../config';
 import { db, getServer } from '../';
-import { clear as clearDb, createAuthorHelper } from '../../helpers';
+import {
+  clear as clearDb,
+  createAuthorHelper,
+  getServerWithMockedHeaders,
+} from '../../helpers';
 import { CreateCollectionAuthorInput } from '../../../database/types';
 import { GET_COLLECTION_AUTHOR, GET_COLLECTION_AUTHORS } from './queries.gql';
+import {
+  ACCESS_DENIED_ERROR,
+  COLLECTION_CURATOR_FULL,
+  READONLY,
+} from '../../../shared/constants';
 
 describe('queries: CollectionAuthor', () => {
-  const server = getServer();
+  const headers = {
+    name: 'Test User',
+    username: 'test.user@test.com',
+    // default to full access - later tests override this to test other levels of access
+    groups: `group1,group2,${COLLECTION_CURATOR_FULL}`,
+  };
+
+  const server = getServerWithMockedHeaders(headers);
 
   beforeAll(async () => {
     await clearDb(db);
@@ -132,6 +148,69 @@ describe('queries: CollectionAuthor', () => {
         config.app.pagination.authorsPerPage
       );
     });
+
+    it('should succeed if a user has only READONLY access', async () => {
+      const headers = {
+        name: 'Test User',
+        username: 'test.user@test.com',
+        // missing any collection/readoly group
+        groups: `group1,group2,${READONLY}`,
+      };
+
+      const server = getServerWithMockedHeaders(headers);
+
+      const result = await server.executeOperation({
+        query: GET_COLLECTION_AUTHORS,
+      });
+
+      // we shouldn't have any errors
+      expect(result.errors).toBeFalsy();
+
+      // and data should exist
+      expect(result.data).toBeTruthy();
+
+      await server.stop();
+    });
+
+    it('should fail if user does not have access', async () => {
+      const headers = {
+        name: 'Test User',
+        username: 'test.user@test.com',
+        // missing any collection/readoly group
+        groups: `group1,group2`,
+      };
+
+      const server = getServerWithMockedHeaders(headers);
+
+      const result = await server.executeOperation({
+        query: GET_COLLECTION_AUTHORS,
+      });
+
+      // ...without success. There is no data
+      expect(result.data).toBeFalsy();
+
+      // And there is an access denied error
+      expect(result.errors[0].message).toMatch(ACCESS_DENIED_ERROR);
+
+      await server.stop();
+    });
+
+    it('should fail if auth headers are empty', async () => {
+      const server = getServer();
+      await server.start();
+
+      const result = await server.executeOperation({
+        query: GET_COLLECTION_AUTHORS,
+      });
+
+      // ...without success. There is no data
+      expect(result.data).toBeFalsy();
+
+      // And there is an access denied error
+      expect(result.errors[0].message).toMatch(ACCESS_DENIED_ERROR);
+
+      await server.stop();
+    });
   });
 
   describe('getCollectionAuthor query', () => {
@@ -174,6 +253,72 @@ describe('queries: CollectionAuthor', () => {
       });
 
       expect(data).toBeNull();
+    });
+
+    it('should succeed if a user has only READONLY access', async () => {
+      const headers = {
+        name: 'Test User',
+        username: 'test.user@test.com',
+        // missing any collection/readoly group
+        groups: `group1,group2,${READONLY}`,
+      };
+
+      const server = getServerWithMockedHeaders(headers);
+
+      const result = await server.executeOperation({
+        query: GET_COLLECTION_AUTHOR,
+        variables: { id: author.externalId },
+      });
+
+      // we shouldn't have any errors
+      expect(result.errors).toBeFalsy();
+
+      // and data should exist
+      expect(result.data.getCollectionAuthor).toBeTruthy();
+
+      await server.stop();
+    });
+
+    it('should fail if user does not have access', async () => {
+      const headers = {
+        name: 'Test User',
+        username: 'test.user@test.com',
+        // missing any collection/readoly group
+        groups: `group1,group2`,
+      };
+
+      const server = getServerWithMockedHeaders(headers);
+
+      const result = await server.executeOperation({
+        query: GET_COLLECTION_AUTHOR,
+        variables: { id: author.externalId },
+      });
+
+      // ...without success. There is no data
+      expect(result.data.getCollectionAuthor).toBeFalsy();
+
+      // And there is an access denied error
+      expect(result.errors[0].message).toMatch(ACCESS_DENIED_ERROR);
+
+      await server.stop();
+    });
+
+    it('should fail if auth headers are empty', async () => {
+      const server = getServer();
+      await server.start();
+
+      const result = await server.executeOperation({
+        query: GET_COLLECTION_AUTHOR,
+        variables: { id: author.externalId },
+      });
+
+      // ...without success. There is no data
+      expect(result.data.getCollectionAuthor).toBeFalsy();
+
+      // And there is an access denied error
+      expect(result.errors[0].message).toMatch(ACCESS_DENIED_ERROR);
+
+      await server.stop();
     });
   });
 });
