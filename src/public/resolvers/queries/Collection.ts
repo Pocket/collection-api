@@ -1,12 +1,12 @@
-import { CollectionComplete } from '../../database/types';
+import { CollectionComplete } from '../../../database/types';
 import {
   countPublishedCollections,
   getCollectionBySlug as dbGetCollectionBySlug,
   getPublishedCollections,
-} from '../../database/queries';
-import config from '../../config';
-import { CollectionsResult } from '../../typeDefs';
-import { getPagination } from '../../utils';
+} from '../../../database/queries';
+import config from '../../../config';
+import { CollectionsResult } from '../../../typeDefs';
+import { getPagination } from '../../../utils';
 
 /**
  * @param parent
