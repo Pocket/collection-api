@@ -1,4 +1,4 @@
-import { getCollectionBySlug, getCollections } from './queries';
+import { getCollectionBySlug, getCollections } from './queries/Collection';
 import { collection } from './item';
 import { collectionPartnershipFieldResolvers } from '../../shared/resolvers/types';
 
