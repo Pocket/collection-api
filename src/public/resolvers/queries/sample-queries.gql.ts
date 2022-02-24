@@ -26,3 +26,12 @@ export const GET_COLLECTIONS = gql`
   }
   ${CollectionData}
 `;
+
+export const GET_COLLECTION_BY_SLUG = gql`
+  query getCollectionBySlug($slug: String!) {
+    getCollectionBySlug(slug: $slug) {
+      ...CollectionData
+    }
+  }
+  ${CollectionData}
+`;
