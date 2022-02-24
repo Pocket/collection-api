@@ -31,6 +31,7 @@ import {
   CollectionStory,
   CurationCategory,
 } from '@prisma/client';
+import { ACCESS_DENIED_ERROR } from '../../shared/constants';
 
 /**
  * @param parent
@@ -40,9 +41,13 @@ import {
 export async function getCollection(
   parent,
   { externalId },
-  { db }
+  { db, authenticatedUser }
 ): Promise<CollectionComplete> {
-  return dbGetCollection(db, externalId);
+  if (!authenticatedUser.canRead) {
+    throw new Error(ACCESS_DENIED_ERROR);
+  }
+
+  return await dbGetCollection(db, externalId);
 }
 
 /**
@@ -55,8 +60,12 @@ export async function getCollection(
 export async function searchCollections(
   parent,
   { filters, page = 1, perPage = config.app.pagination.collectionsPerPage },
-  { db }
+  { db, authenticatedUser }
 ): Promise<CollectionsResult> {
+  if (!authenticatedUser.canRead) {
+    throw new Error(ACCESS_DENIED_ERROR);
+  }
+
   if (!filters || (!filters.author && !filters.title && !filters.status)) {
     throw new Error(
       `At least one filter('author', 'title', 'status') is required`
@@ -81,8 +90,12 @@ export async function searchCollections(
 export async function getCollectionAuthors(
   parent,
   { page = 1, perPage = config.app.pagination.authorsPerPage },
-  { db }
+  { db, authenticatedUser }
 ): Promise<CollectionAuthorsResult> {
+  if (!authenticatedUser.canRead) {
+    throw new Error(ACCESS_DENIED_ERROR);
+  }
+
   const totalResults = await countAuthors(db);
   const authors = await getAuthors(db, page, perPage);
 
@@ -100,9 +113,13 @@ export async function getCollectionAuthors(
 export async function getCollectionAuthor(
   parent,
   { externalId },
-  { db }
+  { db, authenticatedUser }
 ): Promise<CollectionAuthor> {
-  return getAuthor(db, externalId);
+  if (!authenticatedUser.canRead) {
+    throw new Error(ACCESS_DENIED_ERROR);
+  }
+
+  return await getAuthor(db, externalId);
 }
 
 /**
@@ -113,11 +130,13 @@ export async function getCollectionAuthor(
 export async function getCollectionStory(
   parent,
   { externalId },
-  { db }
+  { db, authenticatedUser }
 ): Promise<CollectionStory> {
-  const collectionStory = await dbGetCollectionStory(db, externalId);
+  if (!authenticatedUser.canRead) {
+    throw new Error(ACCESS_DENIED_ERROR);
+  }
 
-  return collectionStory;
+  return await dbGetCollectionStory(db, externalId);
 }
 
 /**
@@ -127,21 +146,25 @@ export async function getCollectionStory(
 export async function getCurationCategories(
   parent,
   _,
-  { db }
+  { db, authenticatedUser }
 ): Promise<CurationCategory[]> {
-  const curationCategories = await dbGetCurationCategories(db);
+  if (!authenticatedUser.canRead) {
+    throw new Error(ACCESS_DENIED_ERROR);
+  }
 
-  return curationCategories;
+  return await dbGetCurationCategories(db);
 }
 
 export async function getIABCategories(
   parent,
   _,
-  { db }
+  { db, authenticatedUser }
 ): Promise<IABParentCategory[]> {
-  const IABCategories = dbGetIABCategories(db);
+  if (!authenticatedUser.canRead) {
+    throw new Error(ACCESS_DENIED_ERROR);
+  }
 
-  return IABCategories;
+  return await dbGetIABCategories(db);
 }
 
 /**
@@ -153,8 +176,12 @@ export async function getIABCategories(
 export async function getCollectionPartners(
   parent,
   { page = 1, perPage = config.app.pagination.partnersPerPage },
-  { db }
+  { db, authenticatedUser }
 ): Promise<CollectionPartnersResult> {
+  if (!authenticatedUser.canRead) {
+    throw new Error(ACCESS_DENIED_ERROR);
+  }
+
   const totalResults = await countPartners(db);
   const partners = await getPartners(db, page, perPage);
 
@@ -172,9 +199,13 @@ export async function getCollectionPartners(
 export async function getCollectionPartner(
   parent,
   { externalId },
-  { db }
+  { db, authenticatedUser }
 ): Promise<CollectionPartner> {
-  return getPartner(db, externalId);
+  if (!authenticatedUser.canRead) {
+    throw new Error(ACCESS_DENIED_ERROR);
+  }
+
+  return await getPartner(db, externalId);
 }
 
 /**
@@ -183,7 +214,11 @@ export async function getCollectionPartner(
  * @param _ (empty because this takes no params)
  * @param db
  */
-export function getLanguages(parent, _, { db }): any {
+export function getLanguages(parent, _, { db, authenticatedUser }): any {
+  if (!authenticatedUser.canRead) {
+    throw new Error(ACCESS_DENIED_ERROR);
+  }
+
   return config.app.languages.map((lang) => {
     return {
       code: lang,
@@ -199,9 +234,13 @@ export function getLanguages(parent, _, { db }): any {
 export async function getCollectionPartnerAssociation(
   parent,
   { externalId },
-  { db }
+  { db, authenticatedUser }
 ): Promise<CollectionPartnerAssociation> {
-  return dbGetCollectionPartnerAssociation(db, externalId);
+  if (!authenticatedUser.canRead) {
+    throw new Error(ACCESS_DENIED_ERROR);
+  }
+
+  return await dbGetCollectionPartnerAssociation(db, externalId);
 }
 
 /**
@@ -212,7 +251,11 @@ export async function getCollectionPartnerAssociation(
 export async function getCollectionPartnerAssociationForCollection(
   parent,
   { externalId },
-  { db }
+  { db, authenticatedUser }
 ): Promise<CollectionPartnerAssociation> {
-  return dbGetCollectionPartnerAssociationForCollection(db, externalId);
+  if (!authenticatedUser.canRead) {
+    throw new Error(ACCESS_DENIED_ERROR);
+  }
+
+  return await dbGetCollectionPartnerAssociationForCollection(db, externalId);
 }

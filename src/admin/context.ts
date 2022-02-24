@@ -3,15 +3,16 @@ import { S3 } from 'aws-sdk';
 import { Request } from 'express';
 import { client } from '../database/client';
 import s3service from '../aws/s3';
-import { COLLECTION_CURATOR_FULL } from '../shared/constants';
+import { COLLECTION_CURATOR_FULL, READONLY } from '../shared/constants';
 
 // Custom properties we get from Admin API for the authenticated user
 export interface AdminAPIUser {
   name: string;
   groups: string[];
   username: string;
-  // and one property we add for convenience as access to Collections is not granular
+  // access to collections is failry basic - you can either do everything or only read
   hasFullAccess: boolean;
+  canRead: boolean;
 }
 
 // Context interface
@@ -45,12 +46,14 @@ export class ContextManager implements IContext {
     const accessGroups = groups ? groups.split(',') : [];
 
     const hasFullAccess = accessGroups.includes(COLLECTION_CURATOR_FULL);
+    const hasReadOnly = accessGroups.includes(READONLY);
 
     return {
       name: this.config.request.headers.name as string,
       username: this.config.request.headers.username as string,
       groups: accessGroups,
       hasFullAccess,
+      canRead: hasReadOnly || hasFullAccess,
     };
   }
 }
