@@ -26,12 +26,10 @@ describe('queries: CollectionPartner', () => {
 
   beforeAll(async () => {
     await clearDb(db);
-    await server.start();
   });
 
   afterAll(async () => {
     await db.$disconnect();
-    await server.stop();
   });
 
   describe('getCollectionPartners query', () => {
@@ -150,8 +148,6 @@ describe('queries: CollectionPartner', () => {
 
       // and data should exist
       expect(result.data).toBeTruthy();
-
-      await server.stop();
     });
 
     it('should fail if user does not have access', async () => {
@@ -173,13 +169,10 @@ describe('queries: CollectionPartner', () => {
 
       // And there is an access denied error
       expect(result.errors[0].message).toMatch(ACCESS_DENIED_ERROR);
-
-      await server.stop();
     });
 
     it('should fail if auth headers are empty', async () => {
       const server = getServer();
-      await server.start();
 
       const result = await server.executeOperation({
         query: GET_COLLECTION_PARTNERS,
@@ -190,8 +183,6 @@ describe('queries: CollectionPartner', () => {
 
       // And there is an access denied error
       expect(result.errors[0].message).toMatch(ACCESS_DENIED_ERROR);
-
-      await server.stop();
     });
   });
 
@@ -255,8 +246,6 @@ describe('queries: CollectionPartner', () => {
 
       // and data should exist
       expect(result.data).toBeTruthy();
-
-      await server.stop();
     });
 
     it('should fail if user does not have access', async () => {
@@ -279,13 +268,10 @@ describe('queries: CollectionPartner', () => {
 
       // And there is an access denied error
       expect(result.errors[0].message).toMatch(ACCESS_DENIED_ERROR);
-
-      await server.stop();
     });
 
     it('should fail if auth headers are empty', async () => {
       const server = getServer();
-      await server.start();
 
       const result = await server.executeOperation({
         query: GET_COLLECTION_PARTNER,
@@ -297,8 +283,6 @@ describe('queries: CollectionPartner', () => {
 
       // And there is an access denied error
       expect(result.errors[0].message).toMatch(ACCESS_DENIED_ERROR);
-
-      await server.stop();
     });
   });
 });

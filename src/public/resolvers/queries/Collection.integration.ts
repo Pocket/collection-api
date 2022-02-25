@@ -51,7 +51,7 @@ describe('public queries: Collection', () => {
   });
 
   describe('getCollections', () => {
-    it('happy path: should get collections and all associated data', async () => {
+    it('should get collections and all associated data', async () => {
       await createCollectionHelper(db, {
         title: 'ways in which my back hurts',
         author,
@@ -183,6 +183,91 @@ describe('public queries: Collection', () => {
       expect(collections.length).to.equal(2);
       expect(collections[0].title).to.equal('3');
       expect(collections[1].title).to.equal('2');
+
+      // verify pagination
+      const pagination = data?.getCollections?.pagination;
+
+      // there are 5 total published collections
+      expect(pagination.totalResults).to.equal(5);
+      // two collections per page, so we should have 3 pages
+      expect(pagination.totalPages).to.equal(3);
+      // verify the page returned is the one requested
+      expect(pagination.currentPage).to.equal(2);
+    });
+
+    it('should respect pagination when filtering by language', async () => {
+      // default sort is by `publishedAt` descending, so these should be returned bottom to top
+      await createCollectionHelper(db, {
+        title: '1',
+        author,
+        status: CollectionStatus.PUBLISHED,
+        publishedAt: new Date(2021, 0, 1),
+        language: 'de',
+      });
+      await createCollectionHelper(db, {
+        title: '2',
+        author,
+        status: CollectionStatus.PUBLISHED,
+        publishedAt: new Date(2021, 0, 2),
+        language: 'de',
+      });
+      await createCollectionHelper(db, {
+        title: '3',
+        author,
+        status: CollectionStatus.PUBLISHED,
+        publishedAt: new Date(2021, 0, 3),
+        language: 'de',
+      });
+      await createCollectionHelper(db, {
+        title: '4',
+        author,
+        status: CollectionStatus.PUBLISHED,
+        publishedAt: new Date(2021, 0, 4),
+        language: 'de',
+      });
+      await createCollectionHelper(db, {
+        title: '5',
+        author,
+        status: CollectionStatus.PUBLISHED,
+        publishedAt: new Date(2021, 0, 5),
+        language: 'en',
+      });
+      await createCollectionHelper(db, {
+        title: '6',
+        author,
+        status: CollectionStatus.PUBLISHED,
+        publishedAt: new Date(2021, 0, 6),
+        language: 'de',
+      });
+
+      // we are getting two collections per page, and are requesting page 2
+      // page 1 should be 6 and 4. page 2 should be 3 and 2, page 3 should be 1
+      const { data } = await server.executeOperation({
+        query: GET_COLLECTIONS,
+        variables: {
+          filters: {
+            language: 'de',
+          },
+          page: 2,
+          perPage: 2,
+        },
+      });
+
+      const collections = data?.getCollections?.collections;
+
+      expect(collections.length).to.equal(2);
+      expect(collections[0].title).to.equal('3');
+      expect(collections[1].title).to.equal('2');
+
+      // verify pagination
+      const pagination = data?.getCollections?.pagination;
+
+      // there are 5 total published collections
+      expect(pagination.totalResults).to.equal(5);
+      // two collections per page, so we should have 3 pages
+      expect(pagination.totalPages).to.equal(3);
+      // verify the page returned is the one requested
+      expect(pagination.currentPage).to.equal(2);
     });
 
     it('should get only `en` published collections if no language is specified', async () => {
@@ -363,68 +448,6 @@ describe('public queries: Collection', () => {
 
       // there are two `en` language published collections above
       expect(collections.length).to.equal(2);
-    });
-
-    it('should respect pagination when filtering by language', async () => {
-      // default sort is by `publishedAt` descending, so these should be returned bottom to top
-      await createCollectionHelper(db, {
-        title: '1',
-        author,
-        status: CollectionStatus.PUBLISHED,
-        publishedAt: new Date(2021, 0, 1),
-        language: 'en',
-      });
-      await createCollectionHelper(db, {
-        title: '2',
-        author,
-        status: CollectionStatus.PUBLISHED,
-        publishedAt: new Date(2021, 0, 2),
-        language: 'en',
-      });
-      await createCollectionHelper(db, {
-        title: '3',
-        author,
-        status: CollectionStatus.PUBLISHED,
-        publishedAt: new Date(2021, 0, 3),
-        language: 'en',
-      });
-      await createCollectionHelper(db, {
-        title: '4',
-        author,
-        status: CollectionStatus.PUBLISHED,
-        publishedAt: new Date(2021, 0, 4),
-        language: 'en',
-      });
-      await createCollectionHelper(db, {
-        title: '5',
-        author,
-        status: CollectionStatus.PUBLISHED,
-        publishedAt: new Date(2021, 0, 5),
-        language: 'de',
-      });
-      await createCollectionHelper(db, {
-        title: '6',
-        author,
-        status: CollectionStatus.PUBLISHED,
-        publishedAt: new Date(2021, 0, 6),
-        language: 'en',
-      });
-
-      // we are getting two collections per page, and are requesting page 2
-      // page 1 should be 6 and 4. page 2 should be 3 and 2, page 3 should be 1
-      const { data } = await server.executeOperation({
-        query: GET_COLLECTIONS,
-        variables: {
-          page: 2,
-          perPage: 2,
-        },
-      });
-
-      const collections = data?.getCollections?.collections;
-
-      expect(collections.length).to.equal(2);
-      expect(collections[0].title).to.equal('3');
-      expect(collections[1].title).to.equal('2');
     });
 
     it('should get published collections with story authors sorted correctly', async () => {
