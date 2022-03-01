@@ -1,5 +1,4 @@
 import {
-  CollectionComplete,
   CollectionPartnerAssociation,
   IABParentCategory,
 } from '../../database/types';
@@ -7,12 +6,9 @@ import {
   countAuthors,
   getAuthor,
   getAuthors,
-  getCollection as dbGetCollection,
   getCollectionPartnerAssociation as dbGetCollectionPartnerAssociation,
   getCollectionPartnerAssociationForCollection as dbGetCollectionPartnerAssociationForCollection,
-  getCollectionStory as dbGetCollectionStory,
   getCurationCategories as dbGetCurationCategories,
-  searchCollections as dbSearchCollections,
   getIABCategories as dbGetIABCategories,
   countPartners,
   getPartner,
@@ -22,64 +18,14 @@ import config from '../../config';
 import {
   CollectionAuthorsResult,
   CollectionPartnersResult,
-  CollectionsResult,
 } from '../../typeDefs';
 import { getPagination } from '../../utils';
 import {
   CollectionAuthor,
   CollectionPartner,
-  CollectionStory,
   CurationCategory,
 } from '@prisma/client';
 import { ACCESS_DENIED_ERROR } from '../../shared/constants';
-
-/**
- * @param parent
- * @param externalId
- * @param db
- */
-export async function getCollection(
-  parent,
-  { externalId },
-  { db, authenticatedUser }
-): Promise<CollectionComplete> {
-  if (!authenticatedUser.canRead) {
-    throw new Error(ACCESS_DENIED_ERROR);
-  }
-
-  return await dbGetCollection(db, externalId);
-}
-
-/**
- * @param parent
- * @param filters
- * @param page
- * @param perPage
- * @param db
- */
-export async function searchCollections(
-  parent,
-  { filters, page = 1, perPage = config.app.pagination.collectionsPerPage },
-  { db, authenticatedUser }
-): Promise<CollectionsResult> {
-  if (!authenticatedUser.canRead) {
-    throw new Error(ACCESS_DENIED_ERROR);
-  }
-
-  if (!filters || (!filters.author && !filters.title && !filters.status)) {
-    throw new Error(
-      `At least one filter('author', 'title', 'status') is required`
-    );
-  }
-
-  const totalResults = (await dbSearchCollections(db, filters)).length;
-  const collections = await dbSearchCollections(db, filters, page, perPage);
-
-  return {
-    pagination: getPagination(totalResults, page, perPage),
-    collections,
-  };
-}
 
 /**
  * @param parent
@@ -120,23 +66,6 @@ export async function getCollectionAuthor(
   }
 
   return await getAuthor(db, externalId);
-}
-
-/**
- * @param parent
- * @param externalId
- * @param db
- */
-export async function getCollectionStory(
-  parent,
-  { externalId },
-  { db, authenticatedUser }
-): Promise<CollectionStory> {
-  if (!authenticatedUser.canRead) {
-    throw new Error(ACCESS_DENIED_ERROR);
-  }
-
-  return await dbGetCollectionStory(db, externalId);
 }
 
 /**
