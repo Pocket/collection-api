@@ -1,15 +1,14 @@
+import { getCollection, searchCollections } from './queries/Collection';
+import { getCollectionStory } from './queries/CollectionStory';
 import {
-  getCollection,
   getCollectionAuthor,
   getCollectionAuthors,
   getCollectionPartner,
   getCollectionPartnerAssociation,
   getCollectionPartners,
-  getCollectionStory,
   getCurationCategories,
   getLanguages,
   getIABCategories,
-  searchCollections,
   getCollectionPartnerAssociationForCollection,
 } from './queries';
 import {

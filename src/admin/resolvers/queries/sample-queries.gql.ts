@@ -1,5 +1,8 @@
 import { gql } from 'apollo-server-express';
-import { CollectionData } from '../../../shared/fragments.gql';
+import {
+  CollectionData,
+  CollectionStoryData,
+} from '../../../shared/fragments.gql';
 
 /**
  * Sample queries for Apollo Server integration tests as used in
@@ -34,4 +37,13 @@ export const SEARCH_COLLECTIONS = gql`
     }
   }
   ${CollectionData}
+`;
+
+export const GET_COLLECTION_STORY = gql`
+  query getCollectionStory($externalId: String!) {
+    getCollectionStory(externalId: $externalId) {
+      ...CollectionStoryData
+    }
+  }
+  ${CollectionStoryData}
 `;
