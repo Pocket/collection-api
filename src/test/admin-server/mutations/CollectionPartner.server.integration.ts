@@ -1,4 +1,4 @@
-import * as faker from 'faker';
+import { faker } from '@faker-js/faker';
 import { db, getServer } from '../';
 import {
   clear as clearDb,

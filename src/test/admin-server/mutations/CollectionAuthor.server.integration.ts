@@ -1,4 +1,4 @@
-import * as faker from 'faker';
+import { faker } from '@faker-js/faker';
 import slugify from 'slugify';
 import { db, getServer } from '../';
 import config from '../../../config';

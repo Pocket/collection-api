@@ -1,4 +1,4 @@
-import faker from 'faker';
+import { faker } from '@faker-js/faker';
 
 import { CollectionComplete } from '../database/types';
 import { sortCollectionsByGivenSlugs } from './collectionLoader';

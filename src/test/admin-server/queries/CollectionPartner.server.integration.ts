@@ -1,4 +1,4 @@
-import * as faker from 'faker';
+import { faker } from '@faker-js/faker';
 import { CollectionPartner } from '@prisma/client';
 import config from '../../../config';
 import { db, getServer } from '../';
