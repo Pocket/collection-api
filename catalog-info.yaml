@@ -1,0 +1,80 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: collection-api
+  description: Manages the curated collections across Pocket
+  annotations:
+    github.com/project-slug: pocket/collection-api
+    github.com/team-slug: Pocket/backend
+    circleci.com/project-slug: github/pocket/collection-api
+    sentry.io/project-slug: collection-api
+spec:
+  type: service
+  owner: backend
+  lifecycle: production
+  dependsOn:
+    - resource:collection-db
+    - resource:collection-s3-bucket
+  providesApis:
+    - collection-api
+    - collection-api-admin
+
+---
+
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: collection-api
+  description: External facing API for serving collections.
+spec:
+  type: graphql
+  owner: backend
+  definition: |
+    #TODO: Add in graphql api spec
+  lifecycle: production
+
+---
+
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: collection-api-admin
+  description: Internal facing API for managing collections.
+spec:
+  type: graphql
+  owner: backend
+  definition: |
+    #TODO: Add in graphql api spec
+  lifecycle: production
+
+---
+
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: collection-db
+  description: Serverless database that holds the curator collections
+  links:
+    - url: https://console.aws.amazon.com/rds/home?region=us-east-1#database:id=collectionapi-prod2021041417592092570000000d;is-cluster=true
+      title: Amazon RDS
+      icon: dashboard
+spec:
+  type: database
+  owner: backend
+  lifecycle: production
+
+---
+
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: collection-s3-bucket
+  description: S3 bucket to hold images for the collections
+  links:
+    - url: https://s3.console.aws.amazon.com/s3/buckets/pocket-collectionapi-prod-images?region=us-east-1&tab=objects
+      title: Amazon S3
+      icon: dashboard
+spec:
+  type: s3
+  owner: backend
+  lifecycle: production
