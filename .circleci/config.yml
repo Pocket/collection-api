@@ -171,14 +171,14 @@ jobs:
           - NODE_ENV=test
           - AWS_XRAY_LOG_LEVEL=silent
           - AWS_XRAY_CONTEXT_MISSING=LOG_ERROR
-      - image: mysql:5.7
+      - image: mysql:5.7@sha256:66d52e6baa8093820c09fec56992a5ee734f17e9fad8ef5ffc31597b231bd048
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
         environment:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           TZ: 'UTC'
-      - image: localstack/localstack
+      - image: localstack/localstack@sha256:d77a4797cc88ddccccd7adc2c58c015de90321e4963d7c73b9f1df4a58e8aabf
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
