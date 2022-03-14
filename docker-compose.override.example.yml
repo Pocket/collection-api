@@ -1,5 +1,0 @@
-version: '3.1'
-services:
-  app:
-    environment:
-      - SYNDICATION_API_KEY=<your_api_key>

@@ -17,7 +17,7 @@ import {
   CreateCollectionAuthorInput,
   CreateCollectionStoryInput,
 } from '../database/types';
-import faker from 'faker';
+import { faker } from '@faker-js/faker';
 import config from '../config';
 import s3service from '../aws/s3';
 import { client } from '../database/client';

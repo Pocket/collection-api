@@ -7,11 +7,10 @@ import {
 } from 'cdktf';
 import {
   AwsProvider,
-  DataAwsCallerIdentity,
-  DataAwsKmsAlias,
-  DataAwsRegion,
-  DataAwsSnsTopic,
-  S3Bucket,
+  datasources,
+  kms,
+  sns,
+  s3,
 } from '@cdktf/provider-aws';
 import { config } from './config';
 import {
@@ -24,6 +23,7 @@ import {
 import { PagerdutyProvider } from '@cdktf/provider-pagerduty';
 import { LocalProvider } from '@cdktf/provider-local';
 import { NullProvider } from '@cdktf/provider-null';
+import fs from 'fs';
 
 class CollectionAPI extends TerraformStack {
   constructor(scope: Construct, name: string) {
@@ -43,8 +43,8 @@ class CollectionAPI extends TerraformStack {
     });
 
     const pocketVpc = new PocketVPC(this, 'pocket-vpc');
-    const region = new DataAwsRegion(this, 'region');
-    const caller = new DataAwsCallerIdentity(this, 'caller');
+    const region = new datasources.DataAwsRegion(this, 'region');
+    const caller = new datasources.DataAwsCallerIdentity(this, 'caller');
 
     const pocketApp = this.createPocketAlbApplication({
       rds: this.createRds(pocketVpc),
@@ -64,7 +64,7 @@ class CollectionAPI extends TerraformStack {
    * @private
    */
   private getCodeDeploySnsTopic() {
-    return new DataAwsSnsTopic(this, 'backend_notifications', {
+    return new sns.DataAwsSnsTopic(this, 'backend_notifications', {
       name: `Backend-${config.environment}-ChatBot`,
     });
   }
@@ -74,7 +74,7 @@ class CollectionAPI extends TerraformStack {
    * @private
    */
   private getSecretsManagerKmsAlias() {
-    return new DataAwsKmsAlias(this, 'kms_alias', {
+    return new kms.DataAwsKmsAlias(this, 'kms_alias', {
       name: 'alias/aws/secretsmanager',
     });
   }
@@ -84,7 +84,7 @@ class CollectionAPI extends TerraformStack {
    * @private
    */
   private createS3Bucket() {
-    return new S3Bucket(this, 'image-uploads', {
+    return new s3.S3Bucket(this, 'image-uploads', {
       bucket: `pocket-${config.prefix.toLowerCase()}-images`,
     });
   }
@@ -104,13 +104,11 @@ class CollectionAPI extends TerraformStack {
         masterUsername: 'pkt_collections',
         engine: 'aurora-mysql',
         engineMode: 'serverless',
-        scalingConfiguration: [
-          {
-            minCapacity: config.rds.minCapacity,
-            maxCapacity: config.rds.maxCapacity,
-            autoPause: false,
-          },
-        ],
+        scalingConfiguration: {
+          minCapacity: config.rds.minCapacity,
+          maxCapacity: config.rds.maxCapacity,
+          autoPause: false,
+        },
       },
 
       tags: config.tags,
@@ -159,22 +157,22 @@ class CollectionAPI extends TerraformStack {
       service: {
         criticalEscalationPolicyId: incidentManagement.get(
           'policy_backend_product_critical_id'
-        ),
+        ).toString(),
         nonCriticalEscalationPolicyId: incidentManagement.get(
           'policy_backend_product_non_critical_id'
-        ),
+        ).toString(),
       },
     });
   }
 
   private createPocketAlbApplication(dependencies: {
     rds: ApplicationRDSCluster;
-    s3: S3Bucket;
+    s3: s3.S3Bucket;
     pagerDuty: PocketPagerDuty;
-    region: DataAwsRegion;
-    caller: DataAwsCallerIdentity;
-    secretsManagerKmsAlias: DataAwsKmsAlias;
-    snsTopic: DataAwsSnsTopic;
+    region: datasources.DataAwsRegion;
+    caller: datasources.DataAwsCallerIdentity;
+    secretsManagerKmsAlias: kms.DataAwsKmsAlias;
+    snsTopic: sns.DataAwsSnsTopic;
   }): PocketALBApplication {
     const {
       rds,
@@ -324,5 +322,7 @@ class CollectionAPI extends TerraformStack {
 }
 
 const app = new App();
-new CollectionAPI(app, 'collection-api');
+const stack = new CollectionAPI(app, 'collection-api');
+const tfEnvVersion = fs.readFileSync('.terraform-version', 'utf8');
+stack.addOverride("terraform.required_version", tfEnvVersion)
 app.synth();
