@@ -38,7 +38,31 @@ Start Docker container:
 
 - `docker compose up`
 
-After Docker completes, you should be able to hit the GraphQL playground at `http://localhost:4004`.
+After Docker completes, you should be able to access the GraphQL playground at `http://localhost:4004`.
+
+### Admin API Authorization
+
+The admin API requires HTTP headers be set to authorize operations (both queries and mutations). The public API does not require any authorization.
+
+To run queries _against the `/admin` API_ in the GraphQL playground, you'll need to specify some HTTP headers. To do so:
+
+1. Open up the GraphQL playground at `http://localhost:4004` and make sure your playground tab's address is `http://localhost:4004/admin`.
+2. Click the **HTTP HEADERS** link at the bottom of the left hand side of the playground to reveal a text box.
+3. Enter the necessary headers (see sample below) into the box and try an operation - it should work!
+
+The sample headers below allow full access to all queries and mutations:
+
+```typescript
+{
+  "groups": "mozilliansorg_pocket_collection_curator_full",
+  "name": "Matt McPockets",
+  "username": "ad|Mozilla-LDAP|mmcpockets"
+}
+```
+
+Note that the `groups` header can contain mulitple values separated by commas (but still in a single string).
+
+If you'd like to experiment with different levels of authorization, you can find the full list of Mozillian groups on our [Shared Data document](https://getpocket.atlassian.net/wiki/spaces/PE/pages/2584150049/Pocket+Shared+Data#Source-of-Truth.3).
 
 ### Limitations
 
@@ -82,21 +106,32 @@ Unit/functional tests are self-contained, meaning they do not rely on any extern
 Test are run via `npm` commands:
 
 - Unit/functional:
+
 ```bash
 npm test
 ```
+
 - Integration:
+
 ```bash
 docker compose exec app npm run test-integrations
 ```
 
 **NOTE** Running integration tests locally will result in your local database being emptied. Refer to [Resetting & Seeding the Database](#resetting--seeding-the-database) above to repopulate seed data.
 
+### Federated Resolvers
+
+This API acts as a federated resolver for the the `Item` property defined by the `parser-graphql-wrapper` service. This extension is defined in [schema-shared.graphql](./schema-shared.graphql). Based on the `givenUrl` value provided by the `parser-graphql-wrapper`, a Collection may or may not be found.
+
+For example, say someone passes the following URL to the [`getItemByUrl` query on the `parser-graphql-wrapper` service](https://github.com/Pocket/parser-graphql-wrapper/blob/main/schema.graphql#L346): https://getpocket.com/collections/how-to-help-kids-work-through-big-feelings
+
+The federation service (Apollo) will "send" that url to the `Item` extension defined in [schema-shared.graphql](./schema-shared.graphql). The fancy resolver for this operation lives in [./src/public/resolvers/item.ts](./src/public/resolvers/item.ts). This resolver retrieves the slug from the URL (in this case `how-to-help-kids-work-through-big-feelings`) and calls `batchFetchBySlugs` in [./src/dataloaders/collectionLoader.ts](./src/dataloaders/collectionLoader.ts).
+
+And that's how a Collection can be returned from a Parser Item. :D
+
 #### Testing Federated Resolvers
 
-TODO: Describe what Federated Resolvers are
-
-When you want to test the federated resolvers you can use a query like the below:
+If you want to manually test the above, you can "spoof" the call normally made by the federation service:
 
 ```graphql
 query {
@@ -115,11 +150,19 @@ query {
     ... on Item {
       collection {
         title
+        excerpt
+        stories {
+          title
+        }
       }
     }
   }
 }
 ```
+
+You can think of the `_entities` bit as a representation of the federation service.
+
+To see this in action, make sure your local database has collections with slugs that match the URLs you are specifying in each `givenUrl` above. (Or not if you want to test a non-match!)
 
 ### Digging into the Database
 
