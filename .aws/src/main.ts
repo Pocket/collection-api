@@ -5,13 +5,7 @@ import {
   RemoteBackend,
   TerraformStack,
 } from 'cdktf';
-import {
-  AwsProvider,
-  datasources,
-  kms,
-  sns,
-  s3,
-} from '@cdktf/provider-aws';
+import { AwsProvider, datasources, kms, sns, s3 } from '@cdktf/provider-aws';
 import { config } from './config';
 import {
   ApplicationRDSCluster,
@@ -155,12 +149,12 @@ class CollectionAPI extends TerraformStack {
     return new PocketPagerDuty(this, 'pagerduty', {
       prefix: config.prefix,
       service: {
-        criticalEscalationPolicyId: incidentManagement.get(
-          'policy_backend_product_critical_id'
-        ).toString(),
-        nonCriticalEscalationPolicyId: incidentManagement.get(
-          'policy_backend_product_non_critical_id'
-        ).toString(),
+        criticalEscalationPolicyId: incidentManagement
+          .get('policy_backend_product_critical_id')
+          .toString(),
+        nonCriticalEscalationPolicyId: incidentManagement
+          .get('policy_backend_product_non_critical_id')
+          .toString(),
       },
     });
   }
@@ -324,5 +318,5 @@ class CollectionAPI extends TerraformStack {
 const app = new App();
 const stack = new CollectionAPI(app, 'collection-api');
 const tfEnvVersion = fs.readFileSync('.terraform-version', 'utf8');
-stack.addOverride("terraform.required_version", tfEnvVersion)
+stack.addOverride('terraform.required_version', tfEnvVersion);
 app.synth();
