@@ -1,4 +1,4 @@
-FROM node:16@sha256:61b6cc81ecc3f94f614dca6bfdc5262d15a6618f7aabfbfc6f9f05c935ee753c
+FROM node:16@sha256:ca9d3abb9e2228bf849afad8f861e0b446fd62d9f8ba85385e18f31f20cb58b8
 WORKDIR /usr/src/app
 
 ARG GIT_SHA
