@@ -47,7 +47,7 @@ input CreateCollectionInput {
   excerpt: Markdown
   intro: Markdown
   imageUrl: Url
-  language: String!
+  language: CollectionLanguage!
   status: CollectionStatus
   authorExternalId: String!
   curationCategoryExternalId: String
@@ -62,7 +62,7 @@ input UpdateCollectionInput {
   excerpt: Markdown!
   intro: Markdown
   imageUrl: Url
-  language: String!
+  language: CollectionLanguage!
   status: CollectionStatus!
   authorExternalId: String!
   curationCategoryExternalId: String
@@ -162,13 +162,6 @@ input UpdateCollectionPartnerImageUrlInput {
 }
 
 """
-represents a language supported in the system
-"""
-type Language {
-  code: String!
-}
-
-"""
 If a collection was made in partnership with an external company, this
 entity will hold all required info about that partnership.
 
@@ -257,7 +250,7 @@ type Query {
   """
   Retrieves the languages currently supported.
   """
-  getLanguages: [Language!]!
+  getLanguages: [CollectionLanguage!]!
   """
   Retrieves a CollectionPartnerAssociation by externalId. Used for tests only.
   """

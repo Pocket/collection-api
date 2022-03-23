@@ -3,6 +3,7 @@ import {
   CollectionPartnershipType,
   PrismaClient,
 } from '@prisma/client';
+import { CollectionLanguage } from '../src/database/types';
 import {
   createAuthorHelper,
   createCollectionHelper,
@@ -53,7 +54,7 @@ async function main() {
     author: daniel,
     status: CollectionStatus.PUBLISHED,
     publishedAt: new Date(),
-    language: 'de',
+    language: CollectionLanguage.DE,
     IABParentCategory,
     IABChildCategory,
   });
@@ -121,7 +122,7 @@ async function main() {
     curationCategory: curationCategory1,
     status: CollectionStatus.PUBLISHED,
     publishedAt: new Date(),
-    language: 'es',
+    language: CollectionLanguage.DE,
   });
 
   const partner1 = await createPartnerHelper(prisma, 'Wellness Storm');

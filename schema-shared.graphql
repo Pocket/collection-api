@@ -29,6 +29,16 @@ extend type Item @key(fields: "givenUrl") {
 }
 
 """
+valid language codes for collections
+"""
+enum CollectionLanguage {
+  "German"
+  DE
+  "English"
+  EN
+}
+
+"""
 Interactive Advertising Bureau Category - these are used on clients to serve relevant ads
 """
 type IABCategory {
@@ -78,7 +88,7 @@ type Collection {
   note that language is *not* being used as locale - only to specify the
   language of the collection.
   """
-  language: String!
+  language: CollectionLanguage!
   partnership: CollectionPartnership
   publishedAt: DateString
   authors: [CollectionAuthor!]!

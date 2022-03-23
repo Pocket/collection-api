@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import { db, getServer } from '../../../test/public-server';
+import { CollectionLanguage } from '../../../database/types';
 import {
   clear as clearDb,
   createAuthorHelper,
@@ -202,42 +203,42 @@ describe('public queries: Collection', () => {
         author,
         status: CollectionStatus.PUBLISHED,
         publishedAt: new Date(2021, 0, 1),
-        language: 'de',
+        language: CollectionLanguage.DE,
       });
       await createCollectionHelper(db, {
         title: '2',
         author,
         status: CollectionStatus.PUBLISHED,
         publishedAt: new Date(2021, 0, 2),
-        language: 'de',
+        language: CollectionLanguage.DE,
       });
       await createCollectionHelper(db, {
         title: '3',
         author,
         status: CollectionStatus.PUBLISHED,
         publishedAt: new Date(2021, 0, 3),
-        language: 'de',
+        language: CollectionLanguage.DE,
       });
       await createCollectionHelper(db, {
         title: '4',
         author,
         status: CollectionStatus.PUBLISHED,
         publishedAt: new Date(2021, 0, 4),
-        language: 'de',
+        language: CollectionLanguage.DE,
       });
       await createCollectionHelper(db, {
         title: '5',
         author,
         status: CollectionStatus.PUBLISHED,
         publishedAt: new Date(2021, 0, 5),
-        language: 'en',
+        language: CollectionLanguage.EN,
       });
       await createCollectionHelper(db, {
         title: '6',
         author,
         status: CollectionStatus.PUBLISHED,
         publishedAt: new Date(2021, 0, 6),
-        language: 'de',
+        language: CollectionLanguage.DE,
       });
 
       // we are getting two collections per page, and are requesting page 2
@@ -246,7 +247,7 @@ describe('public queries: Collection', () => {
         query: GET_COLLECTIONS,
         variables: {
           filters: {
-            language: 'de',
+            language: 'DE',
           },
           page: 2,
           perPage: 2,
@@ -270,36 +271,36 @@ describe('public queries: Collection', () => {
       expect(pagination.currentPage).to.equal(2);
     });
 
-    it('should get only `en` published collections if no language is specified', async () => {
+    it('should get only `EN` published collections if no language is specified', async () => {
       await createCollectionHelper(db, {
         title: 'first',
         author,
         status: CollectionStatus.PUBLISHED,
-        language: 'en',
+        language: CollectionLanguage.EN,
       });
       await createCollectionHelper(db, {
         title: 'second',
         author,
-        language: 'en',
+        language: CollectionLanguage.EN,
         status: CollectionStatus.DRAFT,
       });
       await createCollectionHelper(db, {
         title: 'third',
         author,
         status: CollectionStatus.ARCHIVED,
-        language: 'en',
+        language: CollectionLanguage.EN,
       });
       await createCollectionHelper(db, {
         title: 'fourth',
         author,
         status: CollectionStatus.PUBLISHED,
-        language: 'de',
+        language: CollectionLanguage.DE,
       });
       await createCollectionHelper(db, {
         title: 'fifth',
         author,
         status: CollectionStatus.PUBLISHED,
-        language: 'en',
+        language: CollectionLanguage.EN,
       });
 
       const { data } = await server.executeOperation({
@@ -308,7 +309,7 @@ describe('public queries: Collection', () => {
 
       const collections = data?.getCollections?.collections;
 
-      // only two published collections are in `en`
+      // only two published collections are in `EN`
       expect(collections.length).to.equal(2);
     });
 
@@ -317,38 +318,38 @@ describe('public queries: Collection', () => {
         title: 'first',
         author,
         status: CollectionStatus.PUBLISHED,
-        language: 'de',
+        language: CollectionLanguage.DE,
       });
       await createCollectionHelper(db, {
         title: 'second',
         author,
-        language: 'de',
+        language: CollectionLanguage.DE,
         status: CollectionStatus.DRAFT,
       });
       await createCollectionHelper(db, {
         title: 'third',
         author,
         status: CollectionStatus.ARCHIVED,
-        language: 'de',
+        language: CollectionLanguage.DE,
       });
       await createCollectionHelper(db, {
         title: 'fourth',
         author,
         status: CollectionStatus.PUBLISHED,
-        language: 'en',
+        language: CollectionLanguage.EN,
       });
       await createCollectionHelper(db, {
         title: 'fifth',
         author,
         status: CollectionStatus.PUBLISHED,
-        language: 'de',
+        language: CollectionLanguage.DE,
       });
 
       const { data } = await server.executeOperation({
         query: GET_COLLECTIONS,
         variables: {
           filters: {
-            language: 'de',
+            language: 'DE',
           },
         },
       });
@@ -358,42 +359,42 @@ describe('public queries: Collection', () => {
       expect(collections.length).to.equal(2);
     });
 
-    it('should get only published collections filtered by language in ALL CAPS', async () => {
+    it('should get only published collections filtered by language in lowercase', async () => {
       await createCollectionHelper(db, {
         title: 'first',
         author,
         status: CollectionStatus.PUBLISHED,
-        language: 'en',
+        language: CollectionLanguage.EN,
       });
       await createCollectionHelper(db, {
         title: 'second',
         author,
-        language: 'en',
+        language: CollectionLanguage.EN,
       });
       await createCollectionHelper(db, {
         title: 'third',
         author,
         status: CollectionStatus.ARCHIVED,
-        language: 'en',
+        language: CollectionLanguage.EN,
       });
       await createCollectionHelper(db, {
         title: 'fourth',
         author,
         status: CollectionStatus.PUBLISHED,
-        language: 'de',
+        language: CollectionLanguage.DE,
       });
       await createCollectionHelper(db, {
         title: 'fifth',
         author,
         status: CollectionStatus.PUBLISHED,
-        language: 'en',
+        language: CollectionLanguage.EN,
       });
 
       const { data } = await server.executeOperation({
         query: GET_COLLECTIONS,
         variables: {
           filters: {
-            language: 'EN',
+            language: 'en',
           },
         },
       });
@@ -403,35 +404,35 @@ describe('public queries: Collection', () => {
       expect(collections.length).to.equal(2);
     });
 
-    it('should get only `en` published collections if an unsupported language is provided', async () => {
+    it('should get only `EN` published collections if an unsupported language is provided', async () => {
       await createCollectionHelper(db, {
         title: 'first',
         author,
         status: CollectionStatus.PUBLISHED,
-        language: 'en',
+        language: CollectionLanguage.EN,
       });
       await createCollectionHelper(db, {
         title: 'second',
         author,
-        language: 'en',
+        language: CollectionLanguage.EN,
       });
       await createCollectionHelper(db, {
         title: 'third',
         author,
         status: CollectionStatus.ARCHIVED,
-        language: 'en',
+        language: CollectionLanguage.EN,
       });
       await createCollectionHelper(db, {
         title: 'fourth',
         author,
         status: CollectionStatus.PUBLISHED,
-        language: 'de',
+        language: CollectionLanguage.DE,
       });
       await createCollectionHelper(db, {
         title: 'fifth',
         author,
         status: CollectionStatus.PUBLISHED,
-        language: 'en',
+        language: CollectionLanguage.EN,
       });
 
       const { data } = await server.executeOperation({
@@ -446,7 +447,7 @@ describe('public queries: Collection', () => {
 
       const collections = data?.getCollections?.collections;
 
-      // there are two `en` language published collections above
+      // there are two `EN` language published collections above
       expect(collections.length).to.equal(2);
     });
 

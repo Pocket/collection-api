@@ -1,5 +1,5 @@
 import { CollectionStatus, Prisma } from '@prisma/client';
-import { CollectionsFilters } from './types';
+import { CollectionsFilters, CollectionLanguage } from './types';
 import config from '../config';
 
 /**
@@ -18,22 +18,15 @@ export function buildGetPublishedCollectionsWhere(
   };
 
   // if a specific language was requested, attempt to filter by it
-  if (filters?.language) {
-    // make sure we only filter by supported languages
-    if (isSupportedLanguage(filters.language.toLowerCase())) {
-      where.language = filters.language.toLowerCase();
-    } else {
-      // if an unsupported language was requested, fall back to the default
-      where.language = config.app.defaultLanguage;
-    }
+  if (
+    filters?.language &&
+    filters.language.toUpperCase() in CollectionLanguage
+  ) {
+    where.language = CollectionLanguage[filters.language.toUpperCase()];
   } else {
-    // if not, default to filtering en only
-    where.language = config.app.defaultLanguage;
+    // if not, default to filtering by the default language
+    where.language = CollectionLanguage[config.app.defaultLanguage];
   }
 
   return where;
-}
-
-export function isSupportedLanguage(language?: string): boolean {
-  return config.app.languages.includes(language);
 }
