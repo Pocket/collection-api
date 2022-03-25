@@ -40,7 +40,7 @@ export type CreateCollectionInput = {
   IABParentCategoryExternalId?: string;
   imageUrl?: string;
   intro?: string;
-  language: string;
+  language: CollectionLanguage;
   slug: string;
   status?: CollectionStatus;
   title: string;
@@ -55,7 +55,7 @@ export type UpdateCollectionInput = {
   IABParentCategoryExternalId?: string;
   imageUrl?: string;
   intro?: string;
-  language: string;
+  language: CollectionLanguage;
   publishedAt?: Date;
   slug: string;
   status?: CollectionStatus;
@@ -198,3 +198,8 @@ export type IABParentCategory = IABCategory & {
 export type CollectionsFilters = {
   language?: string;
 };
+
+export enum CollectionLanguage {
+  EN = 'EN',
+  DE = 'DE',
+}

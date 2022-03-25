@@ -1,4 +1,5 @@
 import {
+  CollectionLanguage,
   CollectionPartnerAssociation,
   IABParentCategory,
 } from '../../database/types';
@@ -148,11 +149,7 @@ export function getLanguages(parent, _, { db, authenticatedUser }): any {
     throw new Error(ACCESS_DENIED_ERROR);
   }
 
-  return config.app.languages.map((lang) => {
-    return {
-      code: lang,
-    };
-  });
+  return Object.values(CollectionLanguage);
 }
 
 /**

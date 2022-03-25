@@ -1,5 +1,6 @@
 import { Collection, CollectionStatus, PrismaClient } from '@prisma/client';
 import {
+  CollectionLanguage,
   CreateCollectionInput,
   UpdateCollectionImageUrlInput,
   UpdateCollectionInput,
@@ -53,7 +54,7 @@ describe('mutations: Collection', () => {
       // (which is created in the beforeEach one level up)
       minimumData = {
         authorExternalId: author.externalId,
-        language: 'en',
+        language: CollectionLanguage.EN,
         slug: 'walter-bowls',
         title: 'walter bowls',
       };
@@ -90,26 +91,13 @@ describe('mutations: Collection', () => {
       const data2: CreateCollectionInput = {
         authorExternalId: author.externalId,
         curationCategoryExternalId: curationCategory.externalId,
-        language: 'en',
+        language: CollectionLanguage.EN,
         slug: 'walter-bowls',
         title: 'walter bowls, again',
       };
 
       await expect(createCollection(db, data2)).rejects.toThrow(
         `A collection with the slug "${data2.slug}" already exists`
-      );
-    });
-
-    it('should fail on an unsupported language', async () => {
-      const data = {
-        ...minimumData,
-      };
-
-      // this language is not supported!
-      data.language = 'xx';
-
-      await expect(createCollection(db, data)).rejects.toThrow(
-        `xx is not a supported language`
       );
     });
 
@@ -192,7 +180,7 @@ describe('mutations: Collection', () => {
       const data: UpdateCollectionInput = {
         authorExternalId: newAuthor.externalId,
         externalId: initial.externalId,
-        language: 'de',
+        language: CollectionLanguage.DE,
         slug: initial.slug,
         title: 'second iteration',
       };
@@ -200,7 +188,7 @@ describe('mutations: Collection', () => {
       // should return the updated info
       const updated = await updateCollection(db, data);
       expect(updated.title).toEqual('second iteration');
-      expect(updated.language).toEqual('de');
+      expect(updated.language).toEqual('DE');
 
       // should return the updated author
       expect(updated.authors[0].name).toEqual(newAuthor.name);
@@ -228,7 +216,7 @@ describe('mutations: Collection', () => {
         authorExternalId: newAuthor.externalId,
         curationCategoryExternalId: newCurationCategory.externalId,
         externalId: initial.externalId,
-        language: 'en',
+        language: CollectionLanguage.EN,
         slug: initial.slug,
         title: 'second iteration',
       };
@@ -250,7 +238,7 @@ describe('mutations: Collection', () => {
       const data: UpdateCollectionInput = {
         authorExternalId: author.externalId,
         externalId: initial.externalId,
-        language: 'en',
+        language: CollectionLanguage.EN,
         slug: initial.slug,
         title: 'second iteration',
       };
@@ -271,7 +259,7 @@ describe('mutations: Collection', () => {
         IABParentCategoryExternalId: IABParentCategory.externalId,
         authorExternalId: author.externalId,
         externalId: initial.externalId,
-        language: 'en',
+        language: CollectionLanguage.EN,
         slug: initial.slug,
         title: 'second iteration',
       };
@@ -292,7 +280,7 @@ describe('mutations: Collection', () => {
         IABParentCategoryExternalId: IABParentCategory.externalId,
         authorExternalId: author.externalId,
         externalId: initial.externalId,
-        language: 'en',
+        language: CollectionLanguage.EN,
         slug: initial.slug,
         title: 'second iteration',
       };
@@ -314,7 +302,7 @@ describe('mutations: Collection', () => {
       const data: UpdateCollectionInput = {
         authorExternalId: author.externalId,
         externalId: initial.externalId,
-        language: 'de',
+        language: CollectionLanguage.DE,
         slug: initial.slug,
         title: 'second iteration',
       };
@@ -337,7 +325,7 @@ describe('mutations: Collection', () => {
         authorExternalId: author.externalId,
         curationCategoryExternalId: curationCategory.externalId,
         externalId: initial.externalId,
-        language: 'de',
+        language: CollectionLanguage.DE,
         slug: initial.slug,
         title: 'second iteration',
       };
@@ -366,7 +354,7 @@ describe('mutations: Collection', () => {
       const data: UpdateCollectionInput = {
         authorExternalId: author.externalId,
         externalId: initial.externalId,
-        language: 'de',
+        language: CollectionLanguage.DE,
         slug: initial.slug,
         title: 'second iteration',
       };
@@ -388,7 +376,7 @@ describe('mutations: Collection', () => {
       const data: UpdateCollectionInput = {
         authorExternalId: author.externalId,
         externalId: initial.externalId,
-        language: 'en',
+        language: CollectionLanguage.EN,
         slug: initial.slug,
         status: CollectionStatus.PUBLISHED,
         title: 'second iteration',
@@ -409,7 +397,7 @@ describe('mutations: Collection', () => {
       let data: UpdateCollectionInput = {
         authorExternalId: author.externalId,
         externalId: initial.externalId,
-        language: 'en',
+        language: CollectionLanguage.EN,
         slug: initial.slug,
         status: CollectionStatus.PUBLISHED,
         title: 'second iteration',
@@ -421,7 +409,7 @@ describe('mutations: Collection', () => {
       data = {
         authorExternalId: author.externalId,
         externalId: initial.externalId,
-        language: 'en',
+        language: CollectionLanguage.EN,
         slug: initial.slug,
         status: CollectionStatus.PUBLISHED,
         title: 'third iteration',
@@ -449,34 +437,13 @@ describe('mutations: Collection', () => {
       const data: UpdateCollectionInput = {
         authorExternalId: author.externalId,
         externalId: second.externalId,
-        language: 'es',
+        language: CollectionLanguage.EN,
         slug: first.slug,
         title: second.title,
       };
 
       await expect(updateCollection(db, data)).rejects.toThrow(
         `A collection with the slug "${first.slug}" already exists`
-      );
-    });
-
-    it('should fail on an unsupported language', async () => {
-      // this should create a slug of 'let-us-go-bowling'
-      const collection = await createCollectionHelper(db, {
-        title: 'let us go bowling',
-        author,
-      });
-
-      // try to update the second collection with an unsupported language
-      const data: UpdateCollectionInput = {
-        authorExternalId: author.externalId,
-        externalId: collection.externalId,
-        language: 'xx',
-        slug: collection.slug,
-        title: collection.title,
-      };
-
-      await expect(updateCollection(db, data)).rejects.toThrow(
-        `xx is not a supported language`
       );
     });
   });

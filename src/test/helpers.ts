@@ -12,6 +12,7 @@ import {
   PrismaClient,
 } from '@prisma/client';
 import {
+  CollectionLanguage,
   CollectionPartnerAssociation,
   CollectionStoryAuthor,
   CreateCollectionAuthorInput,
@@ -50,7 +51,7 @@ export interface createCollectionHelperOptionalInput {
   curationCategory?: CurationCategory;
   publishedAt?: Date;
   imageUrl?: string;
-  language?: string;
+  language?: CollectionLanguage;
   addStories?: boolean;
   IABParentCategory?: IABCategory;
   IABChildCategory?: IABCategory;
@@ -68,7 +69,7 @@ const createCollectionHelperDefaults: createCollectionHelperOptionalInput = {
   curationCategory: null,
   publishedAt: null,
   imageUrl: null,
-  language: 'en',
+  language: CollectionLanguage.EN,
   IABParentCategory: null,
   IABChildCategory: null,
 };

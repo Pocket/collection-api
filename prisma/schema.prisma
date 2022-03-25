@@ -8,6 +8,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum CollectionLanguage {
+  EN
+  DE
+}
+
 model IABCategory {
   id                Int           @id @default(autoincrement())
   externalId        String        @default(uuid()) @db.VarChar(255)
@@ -101,7 +106,7 @@ model Collection {
   excerpt             String?                @db.Text
   intro               String?                @db.Text
   imageUrl            String?                @db.VarChar(500)
-  language            String                 @default("en") @db.VarChar(2)
+  language            CollectionLanguage     @default(EN)
   publishedAt         DateTime?              @db.DateTime(0)
   createdAt           DateTime               @default(now()) @db.DateTime(0)
   updatedAt           DateTime               @updatedAt

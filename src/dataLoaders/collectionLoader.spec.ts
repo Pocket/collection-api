@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 
-import { CollectionComplete } from '../database/types';
+import { CollectionLanguage, CollectionComplete } from '../database/types';
 import { sortCollectionsByGivenSlugs } from './collectionLoader';
 
 const quickCollectionCompleteMaker = (slug: string): CollectionComplete => {
@@ -12,7 +12,7 @@ const quickCollectionCompleteMaker = (slug: string): CollectionComplete => {
     excerpt: null,
     intro: null,
     imageUrl: null,
-    language: 'en',
+    language: CollectionLanguage.EN,
     publishedAt: null,
     createdAt: new Date(),
     updatedAt: new Date(),

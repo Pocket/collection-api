@@ -72,9 +72,7 @@ export const GET_COLLECTION_PARTNER = gql`
 
 export const GET_LANGUAGES = gql`
   query getLanguages {
-    getLanguages {
-      code
-    }
+    getLanguages
   }
 `;
 

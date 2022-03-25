@@ -1,4 +1,3 @@
-import config from '../../../config';
 import { getServer } from '../index';
 import { getServerWithMockedHeaders } from '../../helpers';
 import { GET_LANGUAGES } from './queries.gql';
@@ -7,10 +6,11 @@ import {
   COLLECTION_CURATOR_FULL,
   READONLY,
 } from '../../../shared/constants';
+import { CollectionLanguage } from '../../../database/types';
 
 describe('queries: Language', () => {
   describe('getLanguages query', () => {
-    it('should get all available language codes', async () => {
+    it('should get all available languages', async () => {
       const headers = {
         name: 'Test User',
         username: 'test.user@test.com',
@@ -25,10 +25,10 @@ describe('queries: Language', () => {
         query: GET_LANGUAGES,
       });
 
-      // One day this may be a database-backed query, but for now
-      // all the supported languages are stored in a config variable
-      data.forEach((language, index) => {
-        expect(language.code).toEqual(config.app.languages[index]);
+      expect(data.length).toEqual(Object.values(CollectionLanguage).length);
+
+      data.forEach((language) => {
+        expect(language in CollectionLanguage).toBeTruthy();
       });
     });
 
