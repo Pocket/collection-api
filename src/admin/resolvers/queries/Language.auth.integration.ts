@@ -1,37 +1,10 @@
-import { getServer } from '../index';
-import { getServerWithMockedHeaders } from '../../helpers';
-import { GET_LANGUAGES } from './queries.gql';
-import {
-  ACCESS_DENIED_ERROR,
-  COLLECTION_CURATOR_FULL,
-  READONLY,
-} from '../../../shared/constants';
-import { CollectionLanguage } from '../../../database/types';
+import { getServer } from '../../../test/admin-server';
+import { getServerWithMockedHeaders } from '../../../test/helpers';
+import { GET_LANGUAGES } from './sample-queries.gql';
+import { ACCESS_DENIED_ERROR, READONLY } from '../../../shared/constants';
 
-describe('queries: Language', () => {
+describe('auth: Language', () => {
   describe('getLanguages query', () => {
-    it('should get all available languages', async () => {
-      const headers = {
-        name: 'Test User',
-        username: 'test.user@test.com',
-        groups: `group1,group2,${COLLECTION_CURATOR_FULL}`,
-      };
-
-      const server = getServerWithMockedHeaders(headers);
-
-      const {
-        data: { getLanguages: data },
-      } = await server.executeOperation({
-        query: GET_LANGUAGES,
-      });
-
-      expect(data.length).toEqual(Object.values(CollectionLanguage).length);
-
-      data.forEach((language) => {
-        expect(language in CollectionLanguage).toBeTruthy();
-      });
-    });
-
     it('should succeed if a user has only READONLY access', async () => {
       const headers = {
         name: 'Test User',

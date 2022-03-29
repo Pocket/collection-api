@@ -3,14 +3,16 @@ import { getCollectionStory } from './queries/CollectionStory';
 import {
   getCollectionAuthor,
   getCollectionAuthors,
+} from './queries/CollectionAuthor';
+import {
   getCollectionPartner,
   getCollectionPartnerAssociation,
   getCollectionPartners,
-  getCurationCategories,
-  getLanguages,
-  getIABCategories,
   getCollectionPartnerAssociationForCollection,
-} from './queries';
+} from './queries/CollectionPartner';
+import { getCurationCategories } from './queries/CurationCategory';
+import { getIABCategories } from './queries/IABCategory';
+import { getLanguages } from './queries/Language';
 import {
   collectionImageUpload,
   createCollection,
