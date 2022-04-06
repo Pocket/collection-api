@@ -1,9 +1,11 @@
+import { expect } from 'chai';
 import { faker } from '@faker-js/faker';
-import { CollectionPartner } from '@prisma/client';
+import { CollectionPartner, CollectionPartnershipType } from '@prisma/client';
 import config from '../../../config';
 import { db } from '../../../test/admin-server';
 import {
   clear as clearDb,
+  createCollectionPartnerAssociationHelper,
   createPartnerHelper,
   getServerWithMockedHeaders,
 } from '../../../test/helpers';
@@ -11,6 +13,7 @@ import { CreateCollectionPartnerInput } from '../../../database/types';
 import {
   GET_COLLECTION_PARTNER,
   GET_COLLECTION_PARTNERS,
+  GET_COLLECTION_PARTNER_ASSOCIATION,
 } from './sample-queries.gql';
 import { COLLECTION_CURATOR_FULL } from '../../../shared/constants';
 
@@ -51,10 +54,10 @@ describe('queries: CollectionPartner', () => {
         },
       });
 
-      expect(data.partners[0].name).toEqual('Free Range Voiceover');
-      expect(data.partners[1].name).toEqual('True Swag');
-      expect(data.partners[2].name).toEqual('Wearable Tools');
-      expect(data.partners[3].name).toEqual('Your Choice Wearables');
+      expect(data.partners[0].name).to.equal('Free Range Voiceover');
+      expect(data.partners[1].name).to.equal('True Swag');
+      expect(data.partners[2].name).to.equal('Wearable Tools');
+      expect(data.partners[3].name).to.equal('Your Choice Wearables');
     });
 
     it('should get all available properties of collection partners', async () => {
@@ -68,11 +71,11 @@ describe('queries: CollectionPartner', () => {
         },
       });
 
-      expect(data.partners[0].externalId).toBeTruthy();
-      expect(data.partners[0].name).toBeTruthy();
-      expect(data.partners[0].url).toBeTruthy();
-      expect(data.partners[0].imageUrl).toBeTruthy();
-      expect(data.partners[0].blurb).toBeTruthy();
+      expect(data.partners[0].externalId).not.to.be.null;
+      expect(data.partners[0].name).not.to.be.null;
+      expect(data.partners[0].url).not.to.be.null;
+      expect(data.partners[0].imageUrl).not.to.be.null;
+      expect(data.partners[0].blurb).not.to.be.null;
     });
 
     it('should respect pagination', async () => {
@@ -87,11 +90,11 @@ describe('queries: CollectionPartner', () => {
       });
 
       // We expect to get two results back
-      expect(data.partners.length).toEqual(2);
+      expect(data.partners.length).to.equal(2);
 
       // Starting from page 2 of results, that is, from Wearable Tools
-      expect(data.partners[0].name).toEqual('Wearable Tools');
-      expect(data.partners[1].name).toEqual('Your Choice Wearables');
+      expect(data.partners[0].name).to.equal('Wearable Tools');
+      expect(data.partners[1].name).to.equal('Your Choice Wearables');
     });
 
     it('should return a pagination object', async () => {
@@ -105,10 +108,10 @@ describe('queries: CollectionPartner', () => {
         },
       });
 
-      expect(data.pagination.currentPage).toEqual(2);
-      expect(data.pagination.totalPages).toEqual(2);
-      expect(data.pagination.totalResults).toEqual(4);
-      expect(data.pagination.perPage).toEqual(3);
+      expect(data.pagination.currentPage).to.equal(2);
+      expect(data.pagination.totalPages).to.equal(2);
+      expect(data.pagination.totalResults).to.equal(4);
+      expect(data.pagination.perPage).to.equal(3);
     });
 
     it('should return data if no variables are supplied', async () => {
@@ -119,11 +122,11 @@ describe('queries: CollectionPartner', () => {
       });
 
       // Expect to get all our authors back
-      expect(data.partners.length).toEqual(4);
+      expect(data.partners.length).to.equal(4);
 
       // Expect to see the app defaults for 'page' and 'perPage' variables
-      expect(data.pagination.currentPage).toEqual(1);
-      expect(data.pagination.perPage).toEqual(
+      expect(data.pagination.currentPage).to.equal(1);
+      expect(data.pagination.perPage).to.equal(
         config.app.pagination.partnersPerPage
       );
     });
@@ -151,11 +154,11 @@ describe('queries: CollectionPartner', () => {
         variables: { id: partner.externalId },
       });
 
-      expect(data.externalId).toBeTruthy();
-      expect(data.name).toBeTruthy();
-      expect(data.url).toBeTruthy();
-      expect(data.imageUrl).toBeTruthy();
-      expect(data.blurb).toBeTruthy();
+      expect(data.externalId).not.to.be.null;
+      expect(data.name).not.to.be.null;
+      expect(data.url).not.to.be.null;
+      expect(data.imageUrl).not.to.be.null;
+      expect(data.blurb).not.to.be.null;
     });
 
     it('should fail on an invalid partner id', async () => {
@@ -166,7 +169,41 @@ describe('queries: CollectionPartner', () => {
         variables: { id: 'invalid-id' },
       });
 
-      expect(data).toBeNull();
+      expect(data).to.be.null;
+    });
+  });
+
+  describe('getCollectionPartnerAssociation query', () => {
+    it('should get an association by its externalId', async () => {
+      const association = await createCollectionPartnerAssociationHelper(db, {
+        type: CollectionPartnershipType.PARTNERED,
+      });
+
+      const {
+        data: { getCollectionPartnerAssociation: data },
+      } = await server.executeOperation({
+        query: GET_COLLECTION_PARTNER_ASSOCIATION,
+        variables: { externalId: association.externalId },
+      });
+
+      expect(data).not.to.be.null;
+      expect(data.type).to.equal(CollectionPartnershipType.PARTNERED);
+      expect(data.partner).not.to.be.null;
+    });
+
+    it('should fail on an invalid externalId', async () => {
+      await createCollectionPartnerAssociationHelper(db, {
+        type: CollectionPartnershipType.PARTNERED,
+      });
+
+      const {
+        data: { getCollectionPartnerAssociation: data },
+      } = await server.executeOperation({
+        query: GET_COLLECTION_PARTNER_ASSOCIATION,
+        variables: { externalId: 'invalid-id' },
+      });
+
+      expect(data).to.be.null;
     });
   });
 });

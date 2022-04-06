@@ -16,6 +16,8 @@ export async function getCollectionPartnerAssociation(
   });
 
   if (!association) {
+    // TODO: this condition is never met, as association above is a promise.
+    // we should, uh, fix this.
     throw new Error(
       `Association with external ID: ${externalId} does not exist.`
     );

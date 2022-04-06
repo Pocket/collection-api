@@ -1,6 +1,7 @@
 import { gql } from 'apollo-server-express';
 import {
   CollectionData,
+  CollectionPartnerData,
   CollectionStoryData,
 } from '../../../shared/fragments.gql';
 
@@ -86,11 +87,7 @@ export const GET_COLLECTION_PARTNERS = gql`
   query getCollectionPartners($page: Int, $perPage: Int) {
     getCollectionPartners(page: $page, perPage: $perPage) {
       partners {
-        externalId
-        name
-        url
-        imageUrl
-        blurb
+        ...CollectionPartnerData
       }
       pagination {
         currentPage
@@ -100,6 +97,7 @@ export const GET_COLLECTION_PARTNERS = gql`
       }
     }
   }
+  ${CollectionPartnerData}
 `;
 
 export const GET_COLLECTION_PARTNER = gql`
@@ -112,6 +110,23 @@ export const GET_COLLECTION_PARTNER = gql`
       blurb
     }
   }
+`;
+
+export const GET_COLLECTION_PARTNER_ASSOCIATION = gql`
+  query getCollectionPartnerAssociation($externalId: String!) {
+    getCollectionPartnerAssociation(externalId: $externalId) {
+      externalId
+      type
+      partner {
+        ...CollectionPartnerData
+      }
+      name
+      url
+      imageUrl
+      blurb
+    }
+  }
+  ${CollectionPartnerData}
 `;
 
 export const GET_CURATION_CATEGORIES = gql`
