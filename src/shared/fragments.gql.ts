@@ -19,6 +19,16 @@ export const CollectionPartnershipData = gql`
   }
 `;
 
+export const CollectionPartnerData = gql`
+  fragment CollectionPartnerData on CollectionPartner {
+    externalId
+    name
+    url
+    imageUrl
+    blurb
+  }
+`;
+
 export const CollectionAuthorData = gql`
   fragment CollectionAuthorData on CollectionAuthor {
     externalId
