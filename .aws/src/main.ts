@@ -243,6 +243,12 @@ class CollectionAPI extends TerraformStack {
         useCodeDeploy: true,
         useCodePipeline: true,
         snsNotificationTopicArn: snsTopic.arn,
+        notifications: {
+          //only notify on failed deploys
+          notifyOnFailed: true,
+          notifyOnStarted: false,
+          notifyOnSucceeded: false,
+        },
       },
       exposedContainer: {
         name: 'app',
