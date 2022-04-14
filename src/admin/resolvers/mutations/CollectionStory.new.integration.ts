@@ -1,25 +1,35 @@
-import { PrismaClient } from '@prisma/client';
-import { getCollectionStory } from '../queries';
+import { expect } from 'chai';
+import { getCollectionStory } from '../../../database/queries';
 import {
   CreateCollectionStoryInput,
   UpdateCollectionStoryInput,
-} from '../types';
+} from '../../../database/types';
 import {
   clear as clearDb,
   createAuthorHelper,
   createCollectionHelper,
-} from '../../test/helpers';
+  getServerWithMockedHeaders,
+} from '../../../test/helpers';
+import { COLLECTION_CURATOR_FULL } from '../../../shared/constants';
+import { db } from '../../../test/admin-server';
 import {
-  createCollectionStory,
-  deleteCollectionStory,
-  updateCollectionStory,
-  updateCollectionStoryImageUrl,
-  updateCollectionStorySortOrder,
-} from './CollectionStory';
-
-const db = new PrismaClient();
+  CREATE_COLLECTION_STORY,
+  UPDATE_COLLECTION_STORY,
+  UPDATE_COLLECTION_STORY_SORT_ORDER,
+  UPDATE_COLLECTION_STORY_IMAGE_URL,
+  DELETE_COLLECTION_STORY,
+} from './sample-mutations.gql';
+import { createCollectionStory } from '../../../database/mutations/CollectionStory';
 
 describe('mutations: CollectionStory', () => {
+  const headers = {
+    name: 'Test User',
+    username: 'test.user@test.com',
+    groups: `group1,group2,${COLLECTION_CURATOR_FULL}`,
+  };
+
+  const server = getServerWithMockedHeaders(headers);
+
   let author;
   let collection;
 
@@ -39,10 +49,10 @@ describe('mutations: CollectionStory', () => {
   });
 
   describe('createCollectionStory', () => {
-    let data: CreateCollectionStoryInput;
+    let input: CreateCollectionStoryInput;
 
     beforeEach(async () => {
-      data = {
+      input = {
         collectionExternalId: collection.externalId,
         url: 'https://www.lebowskifest.com/',
         title: 'lebowski fest',
@@ -57,74 +67,110 @@ describe('mutations: CollectionStory', () => {
     });
 
     it('should create a collection story', async () => {
-      const story = await createCollectionStory(db, data);
+      const { data } = await server.executeOperation({
+        query: CREATE_COLLECTION_STORY,
+        variables: { data: input },
+      });
 
-      // it should be properly mapped to the collection
-      expect(story.collectionId).toEqual(collection.id);
+      const story = data.createCollectionStory;
+
+      expect(story.url).to.equal(input.url);
+      expect(story.title).to.equal(input.title);
+      expect(story.excerpt).to.equal(input.excerpt);
+      expect(story.imageUrl).to.equal(input.imageUrl);
+      expect(story.authors.length).to.equal(input.authors.length);
+      expect(story.publisher).to.equal(input.publisher);
 
       // default sort order of 0 should be there
-      expect(story.sortOrder).toEqual(0);
+      expect(data.createCollectionStory.sortOrder).to.equal(0);
     });
 
     it('should create a collection story with a default sort order', async () => {
-      const story = await createCollectionStory(db, data);
+      const { data } = await server.executeOperation({
+        query: CREATE_COLLECTION_STORY,
+        variables: { data: input },
+      });
 
       // default sort order of 0 should be there
-      expect(story.sortOrder).toEqual(0);
+      expect(data.createCollectionStory.sortOrder).to.equal(0);
     });
 
     it('should create a collection story with a default `fromPartner` value', async () => {
-      const story = await createCollectionStory(db, data);
+      const { data } = await server.executeOperation({
+        query: CREATE_COLLECTION_STORY,
+        variables: { data: input },
+      });
 
       // default 'fromPartner' value of 'false' should be present
-      expect(story.fromPartner).toEqual(false);
+      expect(data.createCollectionStory.fromPartner).to.equal(false);
     });
 
     it('should return story authors sorted correctly', async () => {
-      const story = await createCollectionStory(db, data);
+      const { data } = await server.executeOperation({
+        query: CREATE_COLLECTION_STORY,
+        variables: { data: input },
+      });
 
-      // it should have the specified authors
-      expect(story.authors.length).toBeGreaterThan(0);
+      const story = data.createCollectionStory;
 
       // (authors are returned sorted by sortOrder asc)
-      expect(story.authors[0].name).toEqual('donny');
-      expect(story.authors[1].name).toEqual('walter');
+      expect(story.authors[0].name).to.equal('donny');
+      expect(story.authors[1].name).to.equal('walter');
 
       // default sort order of 0 should be there
-      expect(story.sortOrder).toEqual(0);
+      expect(story.sortOrder).to.equal(0);
     });
 
     it('should create a collection story with a sort order', async () => {
-      data.sortOrder = 4;
+      input.sortOrder = 4;
 
-      const story = await createCollectionStory(db, data);
+      const { data } = await server.executeOperation({
+        query: CREATE_COLLECTION_STORY,
+        variables: { data: input },
+      });
 
-      expect(story.sortOrder).toEqual(4);
+      const story = data.createCollectionStory;
+
+      expect(story.sortOrder).to.equal(4);
     });
 
     it('should create a collection story with no authors', async () => {
-      data.authors = [];
+      input.authors = [];
 
-      const story = await createCollectionStory(db, data);
+      const { data } = await server.executeOperation({
+        query: CREATE_COLLECTION_STORY,
+        variables: { data: input },
+      });
 
-      expect(story).not.toBeNull();
-      expect(story.authors.length).toEqual(0);
+      const story = data.createCollectionStory;
+
+      expect(story).not.to.be.null;
+      expect(story.authors.length).to.equal(0);
     });
 
     it('should fail adding the same url to the same collection', async () => {
-      await createCollectionStory(db, data);
+      await server.executeOperation({
+        query: CREATE_COLLECTION_STORY,
+        variables: { data: input },
+      });
 
-      // put the externalId back (it's deleted in `createCollectionStory`)
-      data.collectionExternalId = collection.externalId;
+      const data = await server.executeOperation({
+        query: CREATE_COLLECTION_STORY,
+        variables: { data: input },
+      });
 
-      await expect(createCollectionStory(db, data)).rejects.toThrow(
-        `A story with the url "${data.url}" already exists in this collection`
+      expect(data.errors.length).to.equal(1);
+      expect(data.errors[0].message).to.equal(
+        `Error: A story with the url "${input.url}" already exists in this collection`
       );
     });
 
     it('should add a url that already exists in a different collection', async () => {
       // add the default story to the default collection
-      const story = await createCollectionStory(db, data);
+      const { data: dataStory1 } = await server.executeOperation({
+        query: CREATE_COLLECTION_STORY,
+        variables: { data: input },
+      });
 
       // create a second collection
       const collection2 = await createCollectionHelper(db, {
@@ -133,13 +179,18 @@ describe('mutations: CollectionStory', () => {
       });
 
       // update the collection in the create data to reference the second collection
-      data.collectionExternalId = collection2.externalId;
+      input.collectionExternalId = collection2.externalId;
 
       // add the same default story to the second collection
-      const story2 = await createCollectionStory(db, data);
+      const { data: dataStory2 } = await server.executeOperation({
+        query: CREATE_COLLECTION_STORY,
+        variables: { data: input },
+      });
 
       // the urls should be the same
-      expect(story2.url).toEqual(story.url);
+      expect(dataStory2.createCollectionStory.url).to.equal(
+        dataStory1.createCollectionStory.url
+      );
     });
   });
 
@@ -166,7 +217,7 @@ describe('mutations: CollectionStory', () => {
     });
 
     it('should update a collection story', async () => {
-      const updateData: UpdateCollectionStoryInput = {
+      const input: UpdateCollectionStoryInput = {
         externalId: story.externalId,
         url: story.url, // not updating the URL here
         title: 'a fest of lebowskis',
@@ -181,18 +232,23 @@ describe('mutations: CollectionStory', () => {
         fromPartner: true,
       };
 
-      const updated = await updateCollectionStory(db, updateData);
+      const { data } = await server.executeOperation({
+        query: UPDATE_COLLECTION_STORY,
+        variables: { data: input },
+      });
 
-      expect(updated.url).toEqual(story.url);
-      expect(updated.title).toEqual(updateData.title);
-      expect(updated.excerpt).toEqual(updateData.excerpt);
-      expect(updated.imageUrl).toEqual(updateData.imageUrl);
-      expect(updated.publisher).toEqual(updateData.publisher);
-      expect(updated.sortOrder).toEqual(updateData.sortOrder);
+      const updated = data.updateCollectionStory;
+
+      expect(updated.url).to.equal(story.url);
+      expect(updated.title).to.equal(input.title);
+      expect(updated.excerpt).to.equal(input.excerpt);
+      expect(updated.imageUrl).to.equal(input.imageUrl);
+      expect(updated.publisher).to.equal(input.publisher);
+      expect(updated.sortOrder).to.equal(input.sortOrder);
     });
 
     it('should update the collection story authors and return them properly sorted', async () => {
-      const updateData: UpdateCollectionStoryInput = {
+      const input: UpdateCollectionStoryInput = {
         externalId: story.externalId,
         url: 'https://www.lebowskifest.com/bowling',
         title: 'a fest of lebowskis',
@@ -208,17 +264,22 @@ describe('mutations: CollectionStory', () => {
         fromPartner: false,
       };
 
-      const updated = await updateCollectionStory(db, updateData);
+      const { data } = await server.executeOperation({
+        query: UPDATE_COLLECTION_STORY,
+        variables: { data: input },
+      });
 
-      expect(updated.authors.length).toEqual(3);
+      const updated = data.updateCollectionStory;
+
+      expect(updated.authors.length).to.equal(3);
       // (authors are returned sorted by sortOrder asc)
-      expect(updated.authors[0].name).toEqual('brandt');
-      expect(updated.authors[1].name).toEqual('karl');
-      expect(updated.authors[2].name).toEqual('maude');
+      expect(updated.authors[0].name).to.equal('brandt');
+      expect(updated.authors[1].name).to.equal('karl');
+      expect(updated.authors[2].name).to.equal('maude');
     });
 
     it('should update a collection story with no authors', async () => {
-      const updateData: UpdateCollectionStoryInput = {
+      const input: UpdateCollectionStoryInput = {
         externalId: story.externalId,
         url: 'https://www.lebowskifest.com/bowling',
         title: 'a fest of lebowskis',
@@ -230,13 +291,16 @@ describe('mutations: CollectionStory', () => {
         fromPartner: false,
       };
 
-      const updated = await updateCollectionStory(db, updateData);
+      const { data } = await server.executeOperation({
+        query: UPDATE_COLLECTION_STORY,
+        variables: { data: input },
+      });
 
-      expect(updated.authors.length).toEqual(0);
+      expect(data.updateCollectionStory.authors.length).to.equal(0);
     });
 
     it("should update a collection story URL as long as it doesn't already exist", async () => {
-      const updateData: UpdateCollectionStoryInput = {
+      const input: UpdateCollectionStoryInput = {
         externalId: story.externalId,
         url: 'https://openpuppies.com/',
         title: 'a fest of lebowskis',
@@ -251,9 +315,12 @@ describe('mutations: CollectionStory', () => {
         fromPartner: false,
       };
 
-      const updated = await updateCollectionStory(db, updateData);
+      const { data } = await server.executeOperation({
+        query: UPDATE_COLLECTION_STORY,
+        variables: { data: input },
+      });
 
-      expect(updated.url).toEqual(updateData.url);
+      expect(data.updateCollectionStory.url).to.equal(input.url);
     });
 
     it('should fail updating to a url that already exists in the same collection', async () => {
@@ -276,7 +343,7 @@ describe('mutations: CollectionStory', () => {
       await createCollectionStory(db, createData);
 
       // Update the test story with the newly added story's URL
-      const updateData: UpdateCollectionStoryInput = {
+      const input: UpdateCollectionStoryInput = {
         externalId: story.externalId,
         url: 'https://www.anything-goes.com/',
         title: 'a fest of lebowskis',
@@ -291,9 +358,14 @@ describe('mutations: CollectionStory', () => {
         fromPartner: false,
       };
 
-      // Return a custom error message instead of "Unique constraint failed..."
-      await expect(updateCollectionStory(db, updateData)).rejects.toThrow(
-        `A story with the url "${updateData.url}" already exists in this collection`
+      const data = await server.executeOperation({
+        query: UPDATE_COLLECTION_STORY,
+        variables: { data: input },
+      });
+
+      expect(data.errors.length).to.equal(1);
+      expect(data.errors[0].message).to.equal(
+        `Error: A story with the url "${input.url}" already exists in this collection`
       );
     });
 
@@ -323,7 +395,7 @@ describe('mutations: CollectionStory', () => {
       await createCollectionStory(db, createData);
 
       // Update the test story with the newly added story's URL
-      const updateData: UpdateCollectionStoryInput = {
+      const input: UpdateCollectionStoryInput = {
         externalId: story.externalId,
         url: 'https://www.anything-goes.com/',
         title: 'a fest of lebowskis',
@@ -338,13 +410,16 @@ describe('mutations: CollectionStory', () => {
         fromPartner: false,
       };
 
-      const updated = await updateCollectionStory(db, updateData);
+      const { data } = await server.executeOperation({
+        query: UPDATE_COLLECTION_STORY,
+        variables: { data: input },
+      });
 
-      expect(updated.url).toEqual(updateData.url);
+      expect(data.updateCollectionStory.url).to.equal(input.url);
     });
 
     it('should allow updates with optional fields omitted in input data', async () => {
-      const updateData: UpdateCollectionStoryInput = {
+      const input: UpdateCollectionStoryInput = {
         externalId: story.externalId,
         url: 'https://www.lebowskifest.com/bowling',
         title: 'a fest of lebowskis',
@@ -354,11 +429,16 @@ describe('mutations: CollectionStory', () => {
         publisher: 'the cast',
       };
 
-      const updated = await updateCollectionStory(db, updateData);
+      const { data } = await server.executeOperation({
+        query: UPDATE_COLLECTION_STORY,
+        variables: { data: input },
+      });
 
       // The two optional fields should stay as they are
-      expect(updated.sortOrder).toEqual(story.sortOrder);
-      expect(updated.fromPartner).toEqual(story.fromPartner);
+      expect(data.updateCollectionStory.sortOrder).to.equal(story.sortOrder);
+      expect(data.updateCollectionStory.fromPartner).to.equal(
+        story.fromPartner
+      );
     });
   });
 
@@ -385,26 +465,40 @@ describe('mutations: CollectionStory', () => {
     });
 
     it('should update the sortOrder of a collection story', async () => {
-      const updated = await updateCollectionStorySortOrder(db, {
-        externalId: story.externalId,
-        sortOrder: story.sortOrder + 1,
+      const { data } = await server.executeOperation({
+        query: UPDATE_COLLECTION_STORY_SORT_ORDER,
+        variables: {
+          data: {
+            externalId: story.externalId,
+            sortOrder: story.sortOrder + 1,
+          },
+        },
       });
 
-      expect(updated.sortOrder).toEqual(story.sortOrder + 1);
+      expect(data.updateCollectionStorySortOrder.sortOrder).to.equal(
+        story.sortOrder + 1
+      );
     });
 
     it('should not update any other properties when updating sortOrder', async () => {
-      const updated = await updateCollectionStorySortOrder(db, {
-        externalId: story.externalId,
-        sortOrder: 3,
+      const { data } = await server.executeOperation({
+        query: UPDATE_COLLECTION_STORY_SORT_ORDER,
+        variables: {
+          data: {
+            externalId: story.externalId,
+            sortOrder: story.sortOrder + 1,
+          },
+        },
       });
 
-      expect(updated.title).toEqual(story.title);
-      expect(updated.url).toEqual(story.url);
-      expect(updated.excerpt).toEqual(story.excerpt);
-      expect(updated.imageUrl).toEqual(story.imageUrl);
-      expect(updated.authors).toEqual(story.authors);
-      expect(updated.publisher).toEqual(story.publisher);
+      const updated = data.updateCollectionStorySortOrder;
+
+      expect(updated.title).to.equal(story.title);
+      expect(updated.url).to.equal(story.url);
+      expect(updated.excerpt).to.equal(story.excerpt);
+      expect(updated.imageUrl).to.equal(story.imageUrl);
+      expect(updated.authors.length).to.equal(story.authors.length);
+      expect(updated.publisher).to.equal(story.publisher);
     });
   });
 
@@ -432,26 +526,47 @@ describe('mutations: CollectionStory', () => {
 
     it('should update the imageUrl of a collection story', async () => {
       const randomKitten = 'https://placekitten.com/g/200/300';
-      const updated = await updateCollectionStoryImageUrl(db, {
-        externalId: story.externalId,
-        imageUrl: randomKitten,
+
+      const { data } = await server.executeOperation({
+        query: UPDATE_COLLECTION_STORY_IMAGE_URL,
+        variables: {
+          data: {
+            externalId: story.externalId,
+            imageUrl: randomKitten,
+          },
+        },
       });
 
-      expect(updated.imageUrl).toEqual(randomKitten);
+      expect(data.updateCollectionStoryImageUrl.imageUrl).to.equal(
+        randomKitten
+      );
     });
 
     it('should not update any other properties when updating sortOrder', async () => {
-      const updated = await updateCollectionStoryImageUrl(db, {
-        externalId: story.externalId,
-        imageUrl: 'https://placekitten.com/g/200/300',
+      const { data } = await server.executeOperation({
+        query: UPDATE_COLLECTION_STORY_IMAGE_URL,
+        variables: {
+          data: {
+            externalId: story.externalId,
+            imageUrl: 'https://placekitten.com/g/200/300',
+          },
+        },
       });
 
-      expect(updated.title).toEqual(story.title);
-      expect(updated.url).toEqual(story.url);
-      expect(updated.excerpt).toEqual(story.excerpt);
-      expect(updated.sortOrder).toEqual(story.sortOrder);
-      expect(updated.authors).toEqual(story.authors);
-      expect(updated.publisher).toEqual(story.publisher);
+      expect(data.updateCollectionStoryImageUrl.title).to.equal(story.title);
+      expect(data.updateCollectionStoryImageUrl.url).to.equal(story.url);
+      expect(data.updateCollectionStoryImageUrl.excerpt).to.equal(
+        story.excerpt
+      );
+      expect(data.updateCollectionStoryImageUrl.sortOrder).to.equal(
+        story.sortOrder
+      );
+      expect(data.updateCollectionStoryImageUrl.authors.length).to.equal(
+        story.authors.length
+      );
+      expect(data.updateCollectionStoryImageUrl.publisher).to.equal(
+        story.publisher
+      );
     });
   });
 
@@ -478,30 +593,45 @@ describe('mutations: CollectionStory', () => {
     });
 
     it('should delete a collection story and return the deleted data', async () => {
-      const result = await deleteCollectionStory(db, story.externalId);
+      const { data } = await server.executeOperation({
+        query: DELETE_COLLECTION_STORY,
+        variables: {
+          externalId: story.externalId,
+        },
+      });
 
       // should have direct model data
-      expect(result.title).toEqual(story.title);
+      expect(data.deleteCollectionStory.title).to.equal(story.title);
 
       // should have related author data
-      expect(result.authors.length).toBeGreaterThan(0);
+      expect(data.deleteCollectionStory.authors.length).to.be.greaterThan(0);
 
       // make sure the story is really gone
       const found = await getCollectionStory(db, story.externalId);
 
-      expect(found).toBeFalsy();
+      expect(found).to.be.null;
     });
 
     it('should delete a collection story and return the story authors sorted correctly', async () => {
-      const result = await deleteCollectionStory(db, story.externalId);
+      const { data } = await server.executeOperation({
+        query: DELETE_COLLECTION_STORY,
+        variables: {
+          externalId: story.externalId,
+        },
+      });
 
       // (authors are returned sorted by sortOrder asc)
-      expect(result.authors[0].name).toEqual('donny');
-      expect(result.authors[1].name).toEqual('walter');
+      expect(data.deleteCollectionStory.authors[0].name).to.equal('donny');
+      expect(data.deleteCollectionStory.authors[1].name).to.equal('walter');
     });
 
     it('should delete all related collection story authors', async () => {
-      await deleteCollectionStory(db, story.externalId);
+      await server.executeOperation({
+        query: DELETE_COLLECTION_STORY,
+        variables: {
+          externalId: story.externalId,
+        },
+      });
 
       const relatedAuthors = db.collectionStoryAuthor.findMany({
         where: {
@@ -509,13 +639,21 @@ describe('mutations: CollectionStory', () => {
         },
       });
 
-      expect((await relatedAuthors).length).toEqual(0);
+      expect((await relatedAuthors).length).to.equal(0);
     });
 
     it('should fail to delete a collection story if the externalId cannot be found', async () => {
-      await expect(
-        deleteCollectionStory(db, story.externalId + 'typo')
-      ).rejects.toThrow();
+      const data = await server.executeOperation({
+        query: DELETE_COLLECTION_STORY,
+        variables: {
+          externalId: story.externalId + 'typo',
+        },
+      });
+
+      expect(data.errors.length).to.equal(1);
+      expect(data.errors[0].message).to.equal(
+        `Cannot delete a collection story with external ID "${story.externalId}typo"`
+      );
     });
   });
 });

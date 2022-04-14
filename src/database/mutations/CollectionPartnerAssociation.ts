@@ -1,3 +1,4 @@
+import { UserInputError } from 'apollo-server';
 import { Prisma, PrismaClient } from '@prisma/client';
 
 import {
@@ -103,8 +104,15 @@ export async function deleteCollectionPartnerAssociation(
   if (!externalId) {
     throw new Error('externalId must be provided.');
   }
+
   // get the existing association for the internal id
   const association = await getCollectionPartnerAssociation(db, externalId);
+
+  if (!association) {
+    throw new UserInputError(
+      `Cannot delete a collection partner association with external ID "${externalId}"`
+    );
+  }
 
   await db.collectionPartnership.delete({
     where: {

@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { UserInputError } from 'apollo-server-errors';
 import { getCollectionStory, getCollection } from '../queries';
 
 import {
@@ -157,6 +158,12 @@ export async function deleteCollectionStory(
 ): Promise<CollectionStoryWithAuthors> {
   // get the existing story for the internal id
   const existingStory = await getCollectionStory(db, externalId);
+
+  if (!existingStory) {
+    throw new UserInputError(
+      `Cannot delete a collection story with external ID "${externalId}"`
+    );
+  }
 
   // delete all associated collection story authors
   await db.collectionStoryAuthor.deleteMany({
