@@ -191,7 +191,7 @@ describe('queries: CollectionPartner', () => {
       expect(data.partner).not.to.be.null;
     });
 
-    it('should fail on an invalid externalId', async () => {
+    it('should return null on an invalid externalId', async () => {
       await createCollectionPartnerAssociationHelper(db, {
         type: CollectionPartnershipType.PARTNERED,
       });

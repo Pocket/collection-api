@@ -158,6 +158,22 @@ describe('admin queries: Collection', () => {
       );
       expect(collection.partnership.type).to.equal(association.type);
     });
+
+    it('returns null if given an invalid externalId', async () => {
+      const created = await createCollectionHelper(db, {
+        title: 'test me',
+        author,
+      });
+
+      const { data } = await server.executeOperation({
+        query: GET_COLLECTION,
+        variables: {
+          externalId: created.externalId + 'type-o',
+        },
+      });
+
+      expect(data.getCollection).to.be.null;
+    });
   });
 
   describe('searchCollections', () => {

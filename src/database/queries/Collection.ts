@@ -36,12 +36,6 @@ export async function getCollection(
     },
   });
 
-  if (!collection) {
-    throw new Error(
-      `Collection with external ID: ${externalId} does not exist.`
-    );
-  }
-
   return collection;
 }
 
