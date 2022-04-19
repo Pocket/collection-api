@@ -34,7 +34,7 @@
     "apollo-server-types": "3.5.2",
     "aws-sdk": "2.1092.0",
     "aws-xray-sdk-core": "3.3.5",
-    "aws-xray-sdk-express": "3.3.4",
+    "aws-xray-sdk-express": "3.3.5",
     "graphql": "15.8.0",
     "graphql-upload": "13.0.0",
     "slugify": "1.6.5",
