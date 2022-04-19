@@ -26,7 +26,7 @@ describe('auth: Collection', () => {
         },
       });
 
-      expect(result.data.getCollection).to.be.null;
+      expect(result.data.getCollection).not.to.exist;
       expect(result.errors[0].message).to.equal(ACCESS_DENIED_ERROR);
     });
 
@@ -47,7 +47,7 @@ describe('auth: Collection', () => {
         },
       });
 
-      expect(result.data.getCollection).to.be.null;
+      expect(result.data.getCollection).not.to.exist;
       expect(result.errors[0].message).to.equal(ACCESS_DENIED_ERROR);
     });
 
@@ -67,8 +67,7 @@ describe('auth: Collection', () => {
         },
       });
 
-      expect(result.data.getCollection).not.to.be.undefined;
-      expect(result.errors).to.be.undefined;
+      expect(result.errors).not.to.exist;
     });
 
     it('should succeed if user has full access', async () => {
@@ -87,8 +86,7 @@ describe('auth: Collection', () => {
         },
       });
 
-      expect(result.data.getCollection).not.to.be.undefined;
-      expect(result.errors).to.be.undefined;
+      expect(result.errors).not.to.exist;
     });
   });
 
@@ -104,7 +102,7 @@ describe('auth: Collection', () => {
         },
       });
 
-      expect(result.data).to.be.null;
+      expect(result.data).not.to.exist;
       expect(result.errors[0].message).to.equal(ACCESS_DENIED_ERROR);
     });
 
@@ -127,7 +125,7 @@ describe('auth: Collection', () => {
         },
       });
 
-      expect(result.data).to.be.null;
+      expect(result.data).not.to.exist;
       expect(result.errors[0].message).to.equal(ACCESS_DENIED_ERROR);
     });
 
@@ -149,8 +147,8 @@ describe('auth: Collection', () => {
         },
       });
 
-      expect(result.data).not.to.be.undefined;
-      expect(result.errors).to.be.undefined;
+      expect(result.data).to.exist;
+      expect(result.errors).not.to.exist;
     });
 
     it('should succeed if user has full access', async () => {
@@ -171,8 +169,8 @@ describe('auth: Collection', () => {
         },
       });
 
-      expect(result.data).not.to.be.undefined;
-      expect(result.errors).to.be.undefined;
+      expect(result.data).to.exist;
+      expect(result.errors).not.to.exist;
     });
   });
 });

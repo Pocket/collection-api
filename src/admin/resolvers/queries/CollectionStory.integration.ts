@@ -92,7 +92,7 @@ describe('queries: CollectionStory', () => {
         },
       });
 
-      expect(data.getCollectionStory).to.be.null;
+      expect(data.getCollectionStory).not.to.exist;
     });
   });
 });

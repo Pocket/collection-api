@@ -1,3 +1,4 @@
+import { expect } from 'chai';
 import { db, getServer } from '../../../test/admin-server';
 import {
   clear as clearDb,
@@ -51,10 +52,10 @@ describe('auth: IABCategory', () => {
       });
 
       // we shouldn't have any errors
-      expect(result.errors).toBeFalsy();
+      expect(result.errors).not.to.exist;
 
       // and data should exist
-      expect(result.data).toBeTruthy();
+      expect(result.data).to.exist;
     });
 
     it('should fail if user does not have access', async () => {
@@ -72,10 +73,10 @@ describe('auth: IABCategory', () => {
       });
 
       // ...without success. There is no data
-      expect(result.data).toBeFalsy();
+      expect(result.data).not.to.exist;
 
       // And there is an access denied error
-      expect(result.errors[0].message).toMatch(ACCESS_DENIED_ERROR);
+      expect(result.errors[0].message).to.equal(ACCESS_DENIED_ERROR);
     });
 
     it('should fail if auth headers are empty', async () => {
@@ -86,10 +87,10 @@ describe('auth: IABCategory', () => {
       });
 
       // ...without success. There is no data
-      expect(result.data).toBeFalsy();
+      expect(result.data).not.to.exist;
 
       // And there is an access denied error
-      expect(result.errors[0].message).toMatch(ACCESS_DENIED_ERROR);
+      expect(result.errors[0].message).to.equal(ACCESS_DENIED_ERROR);
     });
   });
 });

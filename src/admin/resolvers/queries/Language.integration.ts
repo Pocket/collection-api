@@ -1,3 +1,4 @@
+import { expect } from 'chai';
 import { getServerWithMockedHeaders } from '../../../test/helpers';
 import { GET_LANGUAGES } from './sample-queries.gql';
 import { COLLECTION_CURATOR_FULL } from '../../../shared/constants';
@@ -20,10 +21,10 @@ describe('queries: Language', () => {
         query: GET_LANGUAGES,
       });
 
-      expect(data.length).toEqual(Object.values(CollectionLanguage).length);
+      expect(data.length).to.equal(Object.values(CollectionLanguage).length);
 
       data.forEach((language) => {
-        expect(language in CollectionLanguage).toBeTruthy();
+        expect(language in CollectionLanguage).to.be.true;
       });
     });
   });

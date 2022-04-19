@@ -71,11 +71,11 @@ describe('queries: CollectionPartner', () => {
         },
       });
 
-      expect(data.partners[0].externalId).not.to.be.null;
-      expect(data.partners[0].name).not.to.be.null;
-      expect(data.partners[0].url).not.to.be.null;
-      expect(data.partners[0].imageUrl).not.to.be.null;
-      expect(data.partners[0].blurb).not.to.be.null;
+      expect(data.partners[0].externalId).to.exist;
+      expect(data.partners[0].name).to.exist;
+      expect(data.partners[0].url).to.exist;
+      expect(data.partners[0].imageUrl).to.exist;
+      expect(data.partners[0].blurb).to.exist;
     });
 
     it('should respect pagination', async () => {
@@ -154,11 +154,11 @@ describe('queries: CollectionPartner', () => {
         variables: { id: partner.externalId },
       });
 
-      expect(data.externalId).not.to.be.null;
-      expect(data.name).not.to.be.null;
-      expect(data.url).not.to.be.null;
-      expect(data.imageUrl).not.to.be.null;
-      expect(data.blurb).not.to.be.null;
+      expect(data.externalId).to.exist;
+      expect(data.name).to.exist;
+      expect(data.url).to.exist;
+      expect(data.imageUrl).to.exist;
+      expect(data.blurb).to.exist;
     });
 
     it('should fail on an invalid partner id', async () => {
@@ -169,7 +169,7 @@ describe('queries: CollectionPartner', () => {
         variables: { id: 'invalid-id' },
       });
 
-      expect(data).to.be.null;
+      expect(data).not.to.exist;
     });
   });
 
@@ -186,12 +186,12 @@ describe('queries: CollectionPartner', () => {
         variables: { externalId: association.externalId },
       });
 
-      expect(data).not.to.be.null;
+      expect(data).to.exist;
       expect(data.type).to.equal(CollectionPartnershipType.PARTNERED);
-      expect(data.partner).not.to.be.null;
+      expect(data.partner).to.exist;
     });
 
-    it('should fail on an invalid externalId', async () => {
+    it('should return null on an invalid externalId', async () => {
       await createCollectionPartnerAssociationHelper(db, {
         type: CollectionPartnershipType.PARTNERED,
       });
@@ -203,7 +203,7 @@ describe('queries: CollectionPartner', () => {
         variables: { externalId: 'invalid-id' },
       });
 
-      expect(data).to.be.null;
+      expect(data).not.to.exist;
     });
   });
 });
