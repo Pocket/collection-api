@@ -76,7 +76,7 @@ describe('mutations: Collection', () => {
         variables: { data: minimumData },
       });
 
-      expect(data.createCollection).not.to.be.null;
+      expect(data.createCollection).to.exist;
       expect(data.createCollection.status).to.equal(CollectionStatus.DRAFT);
     });
 
@@ -86,7 +86,7 @@ describe('mutations: Collection', () => {
         variables: { data: minimumData },
       });
 
-      expect(data.createCollection.publishedAt).to.be.null;
+      expect(data.createCollection.publishedAt).not.to.exist;
     });
 
     it('should store the curation category when provided', async () => {
@@ -100,7 +100,7 @@ describe('mutations: Collection', () => {
         },
       });
 
-      expect(data.createCollection.curationCategory).not.to.be.null;
+      expect(data.createCollection.curationCategory).to.exist;
     });
 
     it('should fail on a duplicate slug', async () => {
@@ -115,7 +115,7 @@ describe('mutations: Collection', () => {
         variables: { data: minimumData },
       });
 
-      expect(data.data).to.be.null;
+      expect(data.data).not.to.exist;
       expect(data.errors.length).to.equal(1);
       expect(data.errors[0].message).to.equal(
         'Error: A collection with the slug "walter-bowls" already exists'
@@ -133,11 +133,11 @@ describe('mutations: Collection', () => {
         },
       });
 
-      expect(data.createCollection.authors).not.to.be.null;
+      expect(data.createCollection.authors).to.exist;
       expect(data.createCollection.curationCategory.externalId).to.equal(
         curationCategory.externalId
       );
-      expect(data.createCollection.stories).not.to.be.null;
+      expect(data.createCollection.stories).to.exist;
       // there will never be stories on a freshly created collection
       expect(data.createCollection.stories.length).to.equal(0);
     });
@@ -190,7 +190,7 @@ describe('mutations: Collection', () => {
         },
       });
 
-      expect(data.createCollection.IABChildCategory).to.be.null;
+      expect(data.createCollection.IABChildCategory).not.to.exist;
     });
 
     it('should not connect a partnership', async () => {
@@ -201,7 +201,7 @@ describe('mutations: Collection', () => {
         },
       });
 
-      expect(data.createCollection.partnership).to.be.null;
+      expect(data.createCollection.partnership).not.to.exist;
     });
   });
 
@@ -317,7 +317,7 @@ describe('mutations: Collection', () => {
       });
 
       // make sure a curation category was disconnected
-      expect(data.updateCollection.curationCategory).to.be.null;
+      expect(data.updateCollection.curationCategory).not.to.exist;
     });
 
     it('should update a collection with an IAB parent category', async () => {
@@ -398,8 +398,8 @@ describe('mutations: Collection', () => {
         },
       });
 
-      expect(data.updateCollection.IABParentCategory).to.be.null;
-      expect(data.updateCollection.IABChildCategory).to.be.null;
+      expect(data.updateCollection.IABParentCategory).not.to.exist;
+      expect(data.updateCollection.IABChildCategory).not.to.exist;
     });
 
     it('should return all associated data after updating - authors, curation category, IAB categories, stories, and story authors', async () => {
@@ -428,14 +428,14 @@ describe('mutations: Collection', () => {
       expect(data.updateCollection.stories.length).to.be.greaterThan(0);
 
       for (let i = 0; i < data.updateCollection.stories.length; i++) {
-        expect(data.updateCollection.stories[i].authors).not.to.be.null;
+        expect(data.updateCollection.stories[i].authors).to.exist;
         expect(
           data.updateCollection.stories[i].authors.length
         ).to.be.greaterThan(0);
       }
-      expect(data.updateCollection.curationCategory).not.to.be.null;
-      expect(data.updateCollection.IABParentCategory).not.to.be.null;
-      expect(data.updateCollection.IABChildCategory).not.to.be.null;
+      expect(data.updateCollection.curationCategory).to.exist;
+      expect(data.updateCollection.IABParentCategory).to.exist;
+      expect(data.updateCollection.IABChildCategory).to.exist;
     });
 
     it('should return story author sorted correctly', async () => {
@@ -481,7 +481,7 @@ describe('mutations: Collection', () => {
         },
       });
 
-      expect(data.updateCollection.publishedAt).not.to.be.null;
+      expect(data.updateCollection.publishedAt).to.exist;
     });
 
     it('should not update publishedAt when already published', async () => {
@@ -554,8 +554,8 @@ describe('mutations: Collection', () => {
         },
       });
 
-      expect(data.data).to.be.null;
-      expect(data.errors).not.to.be.null;
+      expect(data.data).not.to.exist;
+      expect(data.errors).to.exist;
       expect(data.errors[0].message).to.equal(
         'Error: A collection with the slug "first-iteration" already exists'
       );

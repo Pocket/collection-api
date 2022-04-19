@@ -1,3 +1,4 @@
+import { expect } from 'chai';
 import { faker } from '@faker-js/faker';
 
 import { CollectionLanguage, CollectionComplete } from '../database/types';
@@ -49,7 +50,7 @@ describe('collectionLoader', () => {
       const sorted = sortCollectionsByGivenSlugs(slugs, collections);
 
       for (let i = 0; i < slugs.length; i++) {
-        expect(sorted[i].slug).toEqual(slugs[i]);
+        expect(sorted[i].slug).to.equal(slugs[i]);
       }
     });
 
@@ -67,13 +68,13 @@ describe('collectionLoader', () => {
       const sorted = sortCollectionsByGivenSlugs(slugs, collections);
 
       // even though one slug wasn't found the arrays should be of equal length
-      expect(sorted.length).toEqual(slugs.length);
+      expect(sorted.length).to.equal(slugs.length);
 
       for (let i = 0; i < slugs.length; i++) {
         if (slugs[i] !== 'its-whisper-quiet') {
-          expect(sorted[i].slug).toEqual(slugs[i]);
+          expect(sorted[i].slug).to.equal(slugs[i]);
         } else {
-          expect(sorted[i]).toBeUndefined();
+          expect(sorted[i]).not.to.exist;
         }
       }
     });

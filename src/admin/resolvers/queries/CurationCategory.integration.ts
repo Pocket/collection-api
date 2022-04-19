@@ -54,9 +54,9 @@ describe('queries: CurationCategory', () => {
         query: GET_CURATION_CATEGORIES,
       });
 
-      expect(data[0].externalId).not.to.be.null;
-      expect(data[0].name).not.to.be.null;
-      expect(data[0].slug).not.to.be.null;
+      expect(data[0].externalId).to.exist;
+      expect(data[0].name).to.exist;
+      expect(data[0].slug).to.exist;
     });
   });
 });

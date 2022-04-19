@@ -144,7 +144,7 @@ describe('mutations: CollectionStory', () => {
 
       const story = data.createCollectionStory;
 
-      expect(story).not.to.be.null;
+      expect(story).to.exist;
       expect(story.authors.length).to.equal(0);
     });
 

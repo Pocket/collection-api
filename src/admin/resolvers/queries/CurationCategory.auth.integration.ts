@@ -41,10 +41,10 @@ describe('auth: CurationCategory', () => {
       });
 
       // we shouldn't have any errors
-      expect(result.errors).to.be.undefined;
+      expect(result.errors).not.to.exist;
 
       // and data should exist
-      expect(result.data).not.to.be.null;
+      expect(result.data).to.exist;
     });
 
     it('should fail if user does not have access', async () => {
@@ -62,7 +62,7 @@ describe('auth: CurationCategory', () => {
       });
 
       // ...without success. There is no data
-      expect(result.data).to.be.null;
+      expect(result.data).not.to.exist;
 
       // And there is an access denied error
       expect(result.errors[0].message).to.equal(ACCESS_DENIED_ERROR);
@@ -76,7 +76,7 @@ describe('auth: CurationCategory', () => {
       });
 
       // ...without success. There is no data
-      expect(result.data).to.be.null;
+      expect(result.data).not.to.exist;
 
       // And there is an access denied error
       expect(result.errors[0].message).to.equal(ACCESS_DENIED_ERROR);

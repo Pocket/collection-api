@@ -86,12 +86,12 @@ describe('queries: CollectionAuthor', () => {
         },
       });
 
-      expect(data.authors[0].externalId).not.to.be.null;
-      expect(data.authors[0].name).not.to.be.null;
-      expect(data.authors[0].slug).not.to.be.null;
-      expect(data.authors[0].bio).not.to.be.null;
-      expect(data.authors[0].imageUrl).not.to.be.null;
-      expect(data.authors[0].active).not.to.be.null;
+      expect(data.authors[0].externalId).to.exist;
+      expect(data.authors[0].name).to.exist;
+      expect(data.authors[0].slug).to.exist;
+      expect(data.authors[0].bio).to.exist;
+      expect(data.authors[0].imageUrl).to.exist;
+      expect(data.authors[0].active).to.exist;
     });
 
     it('should respect pagination', async () => {
@@ -171,12 +171,12 @@ describe('queries: CollectionAuthor', () => {
         variables: { id: author.externalId },
       });
 
-      expect(data.externalId).not.to.be.null;
-      expect(data.name).not.to.be.null;
-      expect(data.slug).not.to.be.null;
-      expect(data.bio).not.to.be.null;
-      expect(data.imageUrl).not.to.be.null;
-      expect(data.active).not.to.be.null;
+      expect(data.externalId).to.exist;
+      expect(data.name).to.exist;
+      expect(data.slug).to.exist;
+      expect(data.bio).to.exist;
+      expect(data.imageUrl).to.exist;
+      expect(data.active).to.exist;
     });
 
     it('should fail on an invalid author id', async () => {
@@ -187,7 +187,7 @@ describe('queries: CollectionAuthor', () => {
         variables: { id: 'invalid-id' },
       });
 
-      expect(data).to.be.null;
+      expect(data).not.to.exist;
     });
   });
 });

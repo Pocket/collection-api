@@ -172,7 +172,7 @@ describe('admin queries: Collection', () => {
         },
       });
 
-      expect(data.getCollection).to.be.null;
+      expect(data.getCollection).not.to.exist;
     });
   });
 

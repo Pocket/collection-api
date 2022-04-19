@@ -87,14 +87,14 @@ describe('queries: IABCategory', () => {
       });
 
       // all the props of the first parent IAB category
-      expect(data[0].externalId).not.to.be.null;
-      expect(data[0].name).not.to.be.null;
-      expect(data[0].slug).not.to.be.null;
+      expect(data[0].externalId).to.exist;
+      expect(data[0].name).to.exist;
+      expect(data[0].slug).to.exist;
 
       // and all the props of its first child category
-      expect(data[0].children[0].externalId).not.to.be.null;
-      expect(data[0].children[0].name).not.to.be.null;
-      expect(data[0].children[0].slug).not.to.be.null;
+      expect(data[0].children[0].externalId).to.exist;
+      expect(data[0].children[0].name).to.exist;
+      expect(data[0].children[0].slug).to.exist;
     });
   });
 });

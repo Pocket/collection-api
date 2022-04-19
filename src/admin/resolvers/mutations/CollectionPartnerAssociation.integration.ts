@@ -73,10 +73,10 @@ describe('mutations: CollectionPartnerAssociation', () => {
       });
 
       // All the optional fields should be empty
-      expect(data.createCollectionPartnerAssociation.name).to.be.null;
-      expect(data.createCollectionPartnerAssociation.url).to.be.null;
-      expect(data.createCollectionPartnerAssociation.blurb).to.be.null;
-      expect(data.createCollectionPartnerAssociation.imageUrl).to.be.null;
+      expect(data.createCollectionPartnerAssociation.name).not.to.exist;
+      expect(data.createCollectionPartnerAssociation.url).not.to.exist;
+      expect(data.createCollectionPartnerAssociation.blurb).not.to.exist;
+      expect(data.createCollectionPartnerAssociation.imageUrl).not.to.exist;
 
       // There should be a type set
       expect(data.createCollectionPartnerAssociation.type).to.equal(
@@ -283,7 +283,7 @@ describe('mutations: CollectionPartnerAssociation', () => {
         association.externalId
       );
 
-      expect(found).to.be.null;
+      expect(found).not.to.exist;
     });
 
     it('should fail to delete a collection partner association if the externalId cannot be found', async () => {

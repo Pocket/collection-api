@@ -25,7 +25,7 @@ describe('auth: CollectionStory', () => {
         },
       });
 
-      expect(result.data.getCollectionStory).to.be.null;
+      expect(result.data.getCollectionStory).not.to.exist;
       expect(result.errors[0].message).to.equal(ACCESS_DENIED_ERROR);
     });
 
@@ -46,7 +46,7 @@ describe('auth: CollectionStory', () => {
         },
       });
 
-      expect(result.data.getCollectionStory).to.be.null;
+      expect(result.data.getCollectionStory).not.to.exist;
       expect(result.errors[0].message).to.equal(ACCESS_DENIED_ERROR);
     });
 
@@ -66,8 +66,7 @@ describe('auth: CollectionStory', () => {
         },
       });
 
-      expect(result.data.getCollectionStory).not.to.be.undefined;
-      expect(result.errors).to.be.undefined;
+      expect(result.errors).not.to.exist;
     });
 
     it('should succeed if user has full access', async () => {
@@ -86,8 +85,7 @@ describe('auth: CollectionStory', () => {
         },
       });
 
-      expect(result.data.getCollectionStory).not.to.be.undefined;
-      expect(result.errors).to.be.undefined;
+      expect(result.errors).not.to.exist;
     });
   });
 });

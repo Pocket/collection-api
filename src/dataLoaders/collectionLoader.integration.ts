@@ -1,3 +1,4 @@
+import { expect } from 'chai';
 import { PrismaClient, CollectionStatus } from '@prisma/client';
 import { getCollectionsBySlugs } from '../database/queries/Collection';
 import {
@@ -50,19 +51,19 @@ describe('queries: Collection', () => {
         'test-me-2',
       ]);
 
-      expect(collections[0].title).toEqual('test me');
-      expect(collections[1].title).toEqual('test me 2');
-      expect(collections[0].authors).toBeTruthy();
-      expect(collections[1].authors).toBeTruthy();
-      expect(collections[0].stories).toBeTruthy();
-      expect(collections[0].stories[0].authors.length).toBeGreaterThan(0);
-      expect(collections[0].stories[0].authors[0]).toBeTruthy();
-      expect(collections[1].stories).toBeTruthy();
-      expect(collections[0].stories[1].authors.length).toBeGreaterThan(0);
-      expect(collections[1].IABParentCategory.name).toEqual(
+      expect(collections[0].title).to.equal('test me');
+      expect(collections[1].title).to.equal('test me 2');
+      expect(collections[0].authors).to.exist;
+      expect(collections[1].authors).to.exist;
+      expect(collections[0].stories).to.exist;
+      expect(collections[0].stories[0].authors.length).to.be.greaterThan(0);
+      expect(collections[0].stories[0].authors[0]).to.exist;
+      expect(collections[1].stories).to.exist;
+      expect(collections[0].stories[1].authors.length).to.be.greaterThan(0);
+      expect(collections[1].IABParentCategory.name).to.equal(
         IABParentCategory.name
       );
-      expect(collections[1].IABChildCategory.name).toEqual(
+      expect(collections[1].IABChildCategory.name).to.equal(
         IABChildCategory.name
       );
     });
@@ -93,8 +94,8 @@ describe('queries: Collection', () => {
         'i-am-le-draft',
       ]);
 
-      expect(collections.length).toEqual(1);
-      expect(collections[0].title).toEqual('published 1');
+      expect(collections.length).to.equal(1);
+      expect(collections[0].title).to.equal('published 1');
     });
 
     it('can get collections by slugs with story authors sorted correctly', async () => {
@@ -116,7 +117,7 @@ describe('queries: Collection', () => {
 
       // the default sort returned from prisma should match our expected
       // manual sort
-      expect(collections[0].stories[0].authors).toEqual(
+      expect(collections[0].stories[0].authors).to.equal(
         sortCollectionStoryAuthors(collections[0].stories[0].authors)
       );
     });
