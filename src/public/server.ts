@@ -4,7 +4,7 @@ import { typeDefsPublic } from '../typeDefs';
 import { resolvers as publicResolvers } from './resolvers';
 import responseCachePlugin from 'apollo-server-plugin-response-cache';
 import { GraphQLRequestContext } from 'apollo-server-types';
-import { sentryPlugin } from '@pocket-tools/apollo-utils';
+import { errorHandler, sentryPlugin } from '@pocket-tools/apollo-utils';
 import {
   ApolloServerPluginLandingPageDisabled,
   ApolloServerPluginLandingPageGraphQLPlayground,
@@ -39,4 +39,5 @@ export const server = new ApolloServer({
       collectionLoader,
     },
   },
+  formatError: errorHandler,
 });

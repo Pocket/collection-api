@@ -8,6 +8,7 @@ import {
 import { typeDefsPublic } from '../typeDefs';
 import { resolvers } from '../public/resolvers';
 import { client } from '../database/client';
+import { errorHandler } from '@pocket-tools/apollo-utils';
 
 // Export this separately so that it can be used in Apollo integration tests
 export const db = client();
@@ -27,5 +28,6 @@ export const getServer = () => {
       ApolloServerPluginInlineTraceDisabled(),
       ApolloServerPluginUsageReportingDisabled(),
     ],
+    formatError: errorHandler,
   });
 };

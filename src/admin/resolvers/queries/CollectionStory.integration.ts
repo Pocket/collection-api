@@ -84,15 +84,20 @@ describe('queries: CollectionStory', () => {
       );
     });
 
-    it('should fail to retrieve a collection story for an unknown externalID', async () => {
-      const { data } = await server.executeOperation({
+    it('should return NOT_FOUND for an unknown externalID', async () => {
+      const result = await server.executeOperation({
         query: GET_COLLECTION_STORY,
         variables: {
           externalId: story.externalId + 'typo',
         },
       });
 
-      expect(data.getCollectionStory).not.to.exist;
+      expect(result.errors.length).to.equal(1);
+      expect(result.errors[0].message).to.equal(
+        `Error - Not Found: ${story.externalId}typo`
+      );
+      expect(result.errors[0].extensions.code).to.equal('NOT_FOUND');
+      expect(result.data.getCollectionStory).not.to.exist;
     });
   });
 });

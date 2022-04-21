@@ -5,6 +5,7 @@ import {
   ApolloServerPluginLandingPageDisabled,
   ApolloServerPluginUsageReportingDisabled,
 } from 'apollo-server-core';
+import { errorHandler } from '@pocket-tools/apollo-utils';
 import { typeDefsAdmin } from '../../typeDefs';
 import { resolvers as adminResolvers } from '../../admin/resolvers';
 import { client } from '../../database/client';
@@ -43,5 +44,6 @@ export const getServer = (context?: ContextManager) => {
       ApolloServerPluginInlineTraceDisabled(),
       ApolloServerPluginUsageReportingDisabled(),
     ],
+    formatError: errorHandler,
   });
 };

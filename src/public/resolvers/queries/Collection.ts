@@ -1,3 +1,4 @@
+import { NotFoundError } from '@pocket-tools/apollo-utils';
 import { CollectionComplete } from '../../../database/types';
 import {
   countPublishedCollections,
@@ -18,7 +19,13 @@ export async function getCollectionBySlug(
   { slug },
   { db }
 ): Promise<CollectionComplete> {
-  return dbGetCollectionBySlug(db, slug);
+  const collection = await dbGetCollectionBySlug(db, slug);
+
+  if (!collection) {
+    throw new NotFoundError(slug);
+  }
+
+  return collection;
 }
 
 /**

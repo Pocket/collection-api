@@ -572,7 +572,7 @@ describe('public queries: Collection', () => {
       );
     });
 
-    it('should return no data for an invalid slug', async () => {
+    it('should return NOT_FOUND error for an invalid slug', async () => {
       const result = await server.executeOperation({
         query: GET_COLLECTION_BY_SLUG,
         variables: {
@@ -580,7 +580,12 @@ describe('public queries: Collection', () => {
         },
       });
 
-      expect(result.data?.getCollectionBySlug).to.be.null;
+      expect(result.data?.getCollectionBySlug).not.to.exist;
+      expect(result.errors.length).to.equal(1);
+      expect(result.errors[0].message).to.equal(
+        `Error - Not Found: this-is-just-good-timing`
+      );
+      expect(result.errors[0].extensions.code).to.equal('NOT_FOUND');
     });
   });
 });

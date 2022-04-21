@@ -1,3 +1,4 @@
+import { ForbiddenError } from 'apollo-server-errors';
 import { IABParentCategory } from '../../../database/types';
 import { getIABCategories as dbGetIABCategories } from '../../../database/queries';
 import { ACCESS_DENIED_ERROR } from '../../../shared/constants';
@@ -8,7 +9,7 @@ export async function getIABCategories(
   { db, authenticatedUser }
 ): Promise<IABParentCategory[]> {
   if (!authenticatedUser.canRead) {
-    throw new Error(ACCESS_DENIED_ERROR);
+    throw new ForbiddenError(ACCESS_DENIED_ERROR);
   }
 
   return await dbGetIABCategories(db);

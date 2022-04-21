@@ -1,6 +1,8 @@
+import { ForbiddenError } from 'apollo-server-errors';
 import { getCollectionStory as dbGetCollectionStory } from '../../../database/queries';
 import { CollectionStory } from '@prisma/client';
 import { ACCESS_DENIED_ERROR } from '../../../shared/constants';
+import { NotFoundError } from '@pocket-tools/apollo-utils';
 
 /**
  * @param parent
@@ -13,8 +15,14 @@ export async function getCollectionStory(
   { db, authenticatedUser }
 ): Promise<CollectionStory> {
   if (!authenticatedUser.canRead) {
-    throw new Error(ACCESS_DENIED_ERROR);
+    throw new ForbiddenError(ACCESS_DENIED_ERROR);
   }
 
-  return await dbGetCollectionStory(db, externalId);
+  const story = await dbGetCollectionStory(db, externalId);
+
+  if (!story) {
+    throw new NotFoundError(externalId);
+  }
+
+  return story;
 }

@@ -1,3 +1,4 @@
+import { ForbiddenError } from 'apollo-server-errors';
 import { CollectionPartnerAssociation } from '../../../database/types';
 import {
   getCollectionPartnerAssociation as dbGetCollectionPartnerAssociation,
@@ -11,6 +12,7 @@ import { CollectionPartnersResult } from '../../../typeDefs';
 import { getPagination } from '../../../utils';
 import { CollectionPartner } from '@prisma/client';
 import { ACCESS_DENIED_ERROR } from '../../../shared/constants';
+import { NotFoundError } from '@pocket-tools/apollo-utils';
 
 /**
  * @param parent
@@ -24,7 +26,7 @@ export async function getCollectionPartners(
   { db, authenticatedUser }
 ): Promise<CollectionPartnersResult> {
   if (!authenticatedUser.canRead) {
-    throw new Error(ACCESS_DENIED_ERROR);
+    throw new ForbiddenError(ACCESS_DENIED_ERROR);
   }
 
   const totalResults = await countPartners(db);
@@ -47,10 +49,16 @@ export async function getCollectionPartner(
   { db, authenticatedUser }
 ): Promise<CollectionPartner> {
   if (!authenticatedUser.canRead) {
-    throw new Error(ACCESS_DENIED_ERROR);
+    throw new ForbiddenError(ACCESS_DENIED_ERROR);
   }
 
-  return await getPartner(db, externalId);
+  const partner = await getPartner(db, externalId);
+
+  if (!partner) {
+    throw new NotFoundError(externalId);
+  }
+
+  return partner;
 }
 
 /**
@@ -64,10 +72,16 @@ export async function getCollectionPartnerAssociation(
   { db, authenticatedUser }
 ): Promise<CollectionPartnerAssociation> {
   if (!authenticatedUser.canRead) {
-    throw new Error(ACCESS_DENIED_ERROR);
+    throw new ForbiddenError(ACCESS_DENIED_ERROR);
   }
 
-  return await dbGetCollectionPartnerAssociation(db, externalId);
+  const cpAssociation = await dbGetCollectionPartnerAssociation(db, externalId);
+
+  if (!cpAssociation) {
+    throw new NotFoundError(externalId);
+  }
+
+  return cpAssociation;
 }
 
 /**
@@ -81,7 +95,7 @@ export async function getCollectionPartnerAssociationForCollection(
   { db, authenticatedUser }
 ): Promise<CollectionPartnerAssociation> {
   if (!authenticatedUser.canRead) {
-    throw new Error(ACCESS_DENIED_ERROR);
+    throw new ForbiddenError(ACCESS_DENIED_ERROR);
   }
 
   return await dbGetCollectionPartnerAssociationForCollection(db, externalId);

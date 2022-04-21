@@ -7,7 +7,6 @@ import {
   ImageEntityType,
   PrismaClient,
 } from '@prisma/client';
-import * as Sentry from '@sentry/node';
 import { AuthenticationError } from 'apollo-server-errors';
 import {
   CollectionPartnerAssociation,
@@ -68,29 +67,24 @@ export async function executeMutation<T, U>(
   callback: (db: PrismaClient, data: T) => Promise<U>,
   imageEntityType: ImageEntityType = undefined
 ): Promise<U> {
-  try {
-    const { db, authenticatedUser } = context;
+  const { db, authenticatedUser } = context;
 
-    if (!authenticatedUser.hasFullAccess) {
-      throw new AuthenticationError(ACCESS_DENIED_ERROR);
-    }
-
-    const entity = await callback(db, data);
-    // Associate the image with the entity if the image entity type is provided
-    // and a record for the image exists
-    if (imageEntityType) {
-      await associateImageWithEntity(
-        db,
-        entity as U & { id: number; imageUrl: string },
-        imageEntityType
-      );
-    }
-
-    return entity;
-  } catch (ex) {
-    Sentry.captureException(ex);
-    throw new Error(ex);
+  if (!authenticatedUser.hasFullAccess) {
+    throw new AuthenticationError(ACCESS_DENIED_ERROR);
   }
+
+  const entity = await callback(db, data);
+  // Associate the image with the entity if the image entity type is provided
+  // and a record for the image exists
+  if (imageEntityType) {
+    await associateImageWithEntity(
+      db,
+      entity as U & { id: number; imageUrl: string },
+      imageEntityType
+    );
+  }
+
+  return entity;
 }
 
 /**

@@ -17,7 +17,7 @@ export async function getCollection(
   db: PrismaClient,
   externalId: string
 ): Promise<CollectionComplete> {
-  const collection = db.collection.findUnique({
+  return await db.collection.findUnique({
     where: { externalId },
     include: {
       authors: true,
@@ -35,8 +35,6 @@ export async function getCollection(
       },
     },
   });
-
-  return collection;
 }
 
 /**

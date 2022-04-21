@@ -1,4 +1,4 @@
-import { UserInputError } from 'apollo-server';
+import { UserInputError } from 'apollo-server-errors';
 import { Prisma, PrismaClient } from '@prisma/client';
 
 import {
@@ -50,7 +50,7 @@ export async function updateCollectionPartnerAssociation(
   data: UpdateCollectionPartnerAssociationInput
 ): Promise<CollectionPartnerAssociation> {
   if (!data.externalId) {
-    throw new Error('externalId must be provided.');
+    throw new UserInputError('externalId must be provided.');
   }
 
   // this property doesn't exist on the Association type returned by this
@@ -81,7 +81,7 @@ export async function updateCollectionPartnerAssociationImageUrl(
   data: UpdateCollectionPartnerAssociationImageUrlInput
 ): Promise<CollectionPartnerAssociation> {
   if (!data.externalId) {
-    throw new Error('externalId must be provided.');
+    throw new UserInputError('externalId must be provided.');
   }
 
   return db.collectionPartnership.update({
@@ -102,7 +102,7 @@ export async function deleteCollectionPartnerAssociation(
   externalId: string
 ): Promise<CollectionPartnerAssociation> {
   if (!externalId) {
-    throw new Error('externalId must be provided.');
+    throw new UserInputError('externalId must be provided.');
   }
 
   // get the existing association for the internal id
