@@ -92,7 +92,7 @@ describe('mutations: CollectionAuthor', () => {
 
       expect(data.errors.length).to.equal(1);
       expect(data.errors[0].message).to.equal(
-        'Error: An author with the slug "his-dudeness" already exists'
+        'An author with the slug "his-dudeness" already exists'
       );
     });
   });
@@ -157,7 +157,7 @@ describe('mutations: CollectionAuthor', () => {
       // there's only one the dude
       expect(data.errors.length).to.equal(1);
       expect(data.errors[0].message).to.equal(
-        'Error: An author with the slug "the-dude" already exists'
+        'An author with the slug "the-dude" already exists'
       );
     });
   });

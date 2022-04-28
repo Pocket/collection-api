@@ -3,7 +3,7 @@ import { buildSubgraphSchema } from '@apollo/federation';
 import { Request } from 'express';
 import { typeDefsAdmin } from '../typeDefs';
 import { resolvers as adminResolvers } from './resolvers';
-import { sentryPlugin } from '@pocket-tools/apollo-utils';
+import { errorHandler, sentryPlugin } from '@pocket-tools/apollo-utils';
 import {
   ApolloServerPluginLandingPageDisabled,
   ApolloServerPluginLandingPageGraphQLPlayground,
@@ -36,6 +36,7 @@ export function getServer(contextFactory: ContextFactory): ApolloServer {
         : ApolloServerPluginLandingPageGraphQLPlayground(),
     ],
     context: ({ req }) => contextFactory(req),
+    formatError: errorHandler,
   });
 }
 

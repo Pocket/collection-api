@@ -159,20 +159,25 @@ describe('admin queries: Collection', () => {
       expect(collection.partnership.type).to.equal(association.type);
     });
 
-    it('returns null if given an invalid externalId', async () => {
+    it('returns no data and a NOT_FOUND error if given an invalid externalId', async () => {
       const created = await createCollectionHelper(db, {
         title: 'test me',
         author,
       });
 
-      const { data } = await server.executeOperation({
+      const result = await server.executeOperation({
         query: GET_COLLECTION,
         variables: {
           externalId: created.externalId + 'type-o',
         },
       });
 
-      expect(data.getCollection).not.to.exist;
+      expect(result.errors.length).to.equal(1);
+      expect(result.errors[0].message).to.equal(
+        `Error - Not Found: ${created.externalId}type-o`
+      );
+      expect(result.errors[0].extensions.code).to.equal('NOT_FOUND');
+      expect(result.data.getCollection).not.to.exist;
     });
   });
 

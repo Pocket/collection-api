@@ -27,7 +27,7 @@ export async function createCollectionStory(
   });
 
   if (storyExists) {
-    throw new Error(
+    throw new UserInputError(
       `A story with the url "${data.url}" already exists in this collection`
     );
   }
@@ -73,7 +73,7 @@ export async function updateCollectionStory(
     });
 
     if (storyExists) {
-      throw new Error(
+      throw new UserInputError(
         `A story with the url "${data.url}" already exists in this collection`
       );
     }

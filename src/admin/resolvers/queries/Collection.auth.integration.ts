@@ -28,6 +28,7 @@ describe('auth: Collection', () => {
 
       expect(result.data.getCollection).not.to.exist;
       expect(result.errors[0].message).to.equal(ACCESS_DENIED_ERROR);
+      expect(result.errors[0].extensions.code).to.equal('FORBIDDEN');
     });
 
     it('should fail if user does not have access', async () => {
@@ -49,6 +50,7 @@ describe('auth: Collection', () => {
 
       expect(result.data.getCollection).not.to.exist;
       expect(result.errors[0].message).to.equal(ACCESS_DENIED_ERROR);
+      expect(result.errors[0].extensions.code).to.equal('FORBIDDEN');
     });
 
     it('should succeed if user has read only access', async () => {
@@ -67,7 +69,9 @@ describe('auth: Collection', () => {
         },
       });
 
-      expect(result.errors).not.to.exist;
+      // we should get a not found error instead of a forbidden error
+      expect(result.errors.length).to.equal(1);
+      expect(result.errors[0].extensions.code).to.equal('NOT_FOUND');
     });
 
     it('should succeed if user has full access', async () => {
@@ -86,7 +90,9 @@ describe('auth: Collection', () => {
         },
       });
 
-      expect(result.errors).not.to.exist;
+      // we should get a not found error instead of a forbidden error
+      expect(result.errors.length).to.equal(1);
+      expect(result.errors[0].extensions.code).to.equal('NOT_FOUND');
     });
   });
 
@@ -104,6 +110,7 @@ describe('auth: Collection', () => {
 
       expect(result.data).not.to.exist;
       expect(result.errors[0].message).to.equal(ACCESS_DENIED_ERROR);
+      expect(result.errors[0].extensions.code).to.equal('FORBIDDEN');
     });
 
     it('should fail if user does not have access', async () => {
@@ -127,6 +134,7 @@ describe('auth: Collection', () => {
 
       expect(result.data).not.to.exist;
       expect(result.errors[0].message).to.equal(ACCESS_DENIED_ERROR);
+      expect(result.errors[0].extensions.code).to.equal('FORBIDDEN');
     });
 
     it('should succeed if user has read only access', async () => {

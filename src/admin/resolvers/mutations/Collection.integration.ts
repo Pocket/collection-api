@@ -118,7 +118,7 @@ describe('mutations: Collection', () => {
       expect(data.data).not.to.exist;
       expect(data.errors.length).to.equal(1);
       expect(data.errors[0].message).to.equal(
-        'Error: A collection with the slug "walter-bowls" already exists'
+        'A collection with the slug "walter-bowls" already exists'
       );
     });
 
@@ -557,7 +557,7 @@ describe('mutations: Collection', () => {
       expect(data.data).not.to.exist;
       expect(data.errors).to.exist;
       expect(data.errors[0].message).to.equal(
-        'Error: A collection with the slug "first-iteration" already exists'
+        'A collection with the slug "first-iteration" already exists'
       );
     });
   });

@@ -161,7 +161,7 @@ describe('mutations: CollectionStory', () => {
 
       expect(data.errors.length).to.equal(1);
       expect(data.errors[0].message).to.equal(
-        `Error: A story with the url "${input.url}" already exists in this collection`
+        `A story with the url "${input.url}" already exists in this collection`
       );
     });
 
@@ -365,7 +365,7 @@ describe('mutations: CollectionStory', () => {
 
       expect(data.errors.length).to.equal(1);
       expect(data.errors[0].message).to.equal(
-        `Error: A story with the url "${input.url}" already exists in this collection`
+        `A story with the url "${input.url}" already exists in this collection`
       );
     });
 

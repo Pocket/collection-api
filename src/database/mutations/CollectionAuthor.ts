@@ -1,3 +1,4 @@
+import { UserInputError } from 'apollo-server-errors';
 import { CollectionAuthor, PrismaClient } from '@prisma/client';
 import slugify from 'slugify';
 import config from '../../config';
@@ -23,7 +24,9 @@ export async function createCollectionAuthor(
   });
 
   if (slugExists) {
-    throw new Error(`An author with the slug "${data.slug}" already exists`);
+    throw new UserInputError(
+      `An author with the slug "${data.slug}" already exists`
+    );
   }
 
   return db.collectionAuthor.create({ data: { ...data } });
@@ -38,7 +41,7 @@ export async function updateCollectionAuthor(
   data: UpdateCollectionAuthorInput
 ): Promise<CollectionAuthor> {
   if (!data.externalId) {
-    throw new Error('externalId must be provided.');
+    throw new UserInputError('externalId must be provided.');
   }
 
   const slugExists = await db.collectionAuthor.count({
@@ -46,7 +49,9 @@ export async function updateCollectionAuthor(
   });
 
   if (slugExists) {
-    throw new Error(`An author with the slug "${data.slug}" already exists`);
+    throw new UserInputError(
+      `An author with the slug "${data.slug}" already exists`
+    );
   }
 
   return db.collectionAuthor.update({
@@ -64,7 +69,7 @@ export async function updateCollectionAuthorImageUrl(
   data: UpdateCollectionAuthorImageUrlInput
 ): Promise<CollectionAuthor> {
   if (!data.externalId) {
-    throw new Error('externalId must be provided.');
+    throw new UserInputError('externalId must be provided.');
   }
 
   return db.collectionAuthor.update({

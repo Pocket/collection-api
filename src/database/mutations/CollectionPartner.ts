@@ -1,3 +1,4 @@
+import { UserInputError } from 'apollo-server-errors';
 import { CollectionPartner, PrismaClient } from '@prisma/client';
 
 import {
@@ -26,7 +27,7 @@ export async function updateCollectionPartner(
   data: UpdateCollectionPartnerInput
 ): Promise<CollectionPartner> {
   if (!data.externalId) {
-    throw new Error('externalId must be provided.');
+    throw new UserInputError('externalId must be provided.');
   }
 
   return db.collectionPartner.update({
@@ -44,7 +45,7 @@ export async function updateCollectionPartnerImageUrl(
   data: UpdateCollectionPartnerImageUrlInput
 ): Promise<CollectionPartner> {
   if (!data.externalId) {
-    throw new Error('externalId must be provided.');
+    throw new UserInputError('externalId must be provided.');
   }
 
   return db.collectionPartner.update({

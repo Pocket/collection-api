@@ -1,3 +1,4 @@
+import { ForbiddenError } from 'apollo-server-errors';
 import { CollectionLanguage } from '../../../database/types';
 import { ACCESS_DENIED_ERROR } from '../../../shared/constants';
 
@@ -9,7 +10,7 @@ import { ACCESS_DENIED_ERROR } from '../../../shared/constants';
  */
 export function getLanguages(parent, _, { db, authenticatedUser }): any {
   if (!authenticatedUser.canRead) {
-    throw new Error(ACCESS_DENIED_ERROR);
+    throw new ForbiddenError(ACCESS_DENIED_ERROR);
   }
 
   return Object.values(CollectionLanguage);

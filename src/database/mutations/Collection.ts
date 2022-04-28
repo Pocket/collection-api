@@ -1,3 +1,4 @@
+import { UserInputError } from 'apollo-server-errors';
 import { CollectionStatus, PrismaClient } from '@prisma/client';
 import { getCollection } from '../queries';
 
@@ -7,6 +8,7 @@ import {
   UpdateCollectionImageUrlInput,
   UpdateCollectionInput,
 } from '../types';
+import { NotFoundError } from '@pocket-tools/apollo-utils';
 
 /**
  * @param db
@@ -21,7 +23,9 @@ export async function createCollection(
   });
 
   if (slugExists) {
-    throw new Error(`A collection with the slug "${data.slug}" already exists`);
+    throw new UserInputError(
+      `A collection with the slug "${data.slug}" already exists`
+    );
   }
 
   // We have to pull the authorExternalId property out of data
@@ -107,7 +111,7 @@ export async function updateCollection(
   const existingCollection = await getCollection(db, data.externalId);
 
   if (!existingCollection) {
-    throw new Error(`A collection by that ID could not be found`);
+    throw new NotFoundError(`A collection by that ID could not be found`);
   }
 
   // if the slug is changing, we have to make sure it's unique
@@ -124,7 +128,7 @@ export async function updateCollection(
 
     // if we found more than one collection with this slug, we have a problem
     if (sameSlugs > 0) {
-      throw new Error(
+      throw new UserInputError(
         `A collection with the slug "${data.slug}" already exists`
       );
     }
@@ -230,14 +234,14 @@ export async function updateCollectionImageUrl(
   data: UpdateCollectionImageUrlInput
 ): Promise<CollectionComplete> {
   if (!data.externalId) {
-    throw new Error('externalId must be provided.');
+    throw new UserInputError('externalId must be provided.');
   }
 
   // retrieve the current record, pre-update
   const existingCollection = await getCollection(db, data.externalId);
 
   if (!existingCollection) {
-    throw new Error(`A collection by that ID could not be found`);
+    throw new NotFoundError(`A collection by that ID could not be found`);
   }
 
   return db.collection.update({

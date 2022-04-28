@@ -1,9 +1,11 @@
+import { ForbiddenError } from 'apollo-server-errors';
 import { countAuthors, getAuthor, getAuthors } from '../../../database/queries';
 import config from '../../../config';
 import { CollectionAuthorsResult } from '../../../typeDefs';
 import { getPagination } from '../../../utils';
 import { CollectionAuthor } from '@prisma/client';
 import { ACCESS_DENIED_ERROR } from '../../../shared/constants';
+import { NotFoundError } from '@pocket-tools/apollo-utils';
 
 /**
  * @param parent
@@ -17,7 +19,7 @@ export async function getCollectionAuthors(
   { db, authenticatedUser }
 ): Promise<CollectionAuthorsResult> {
   if (!authenticatedUser.canRead) {
-    throw new Error(ACCESS_DENIED_ERROR);
+    throw new ForbiddenError(ACCESS_DENIED_ERROR);
   }
 
   const totalResults = await countAuthors(db);
@@ -40,8 +42,14 @@ export async function getCollectionAuthor(
   { db, authenticatedUser }
 ): Promise<CollectionAuthor> {
   if (!authenticatedUser.canRead) {
-    throw new Error(ACCESS_DENIED_ERROR);
+    throw new ForbiddenError(ACCESS_DENIED_ERROR);
   }
 
-  return await getAuthor(db, externalId);
+  const author = await getAuthor(db, externalId);
+
+  if (!author) {
+    throw new NotFoundError(externalId);
+  }
+
+  return author;
 }

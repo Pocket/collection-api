@@ -161,15 +161,18 @@ describe('queries: CollectionPartner', () => {
       expect(data.blurb).to.exist;
     });
 
-    it('should fail on an invalid partner id', async () => {
-      const {
-        data: { getCollectionPartner: data },
-      } = await server.executeOperation({
+    it('should return NOT_FOUND on an invalid partner id', async () => {
+      const result = await server.executeOperation({
         query: GET_COLLECTION_PARTNER,
         variables: { id: 'invalid-id' },
       });
 
-      expect(data).not.to.exist;
+      expect(result.errors.length).to.equal(1);
+      expect(result.errors[0].message).to.equal(
+        `Error - Not Found: invalid-id`
+      );
+      expect(result.errors[0].extensions.code).to.equal('NOT_FOUND');
+      expect(result.data.getCollectionPartner).not.to.exist;
     });
   });
 
@@ -191,19 +194,22 @@ describe('queries: CollectionPartner', () => {
       expect(data.partner).to.exist;
     });
 
-    it('should return null on an invalid externalId', async () => {
+    it('should return NOT_FOUND on an invalid externalId', async () => {
       await createCollectionPartnerAssociationHelper(db, {
         type: CollectionPartnershipType.PARTNERED,
       });
 
-      const {
-        data: { getCollectionPartnerAssociation: data },
-      } = await server.executeOperation({
+      const result = await server.executeOperation({
         query: GET_COLLECTION_PARTNER_ASSOCIATION,
         variables: { externalId: 'invalid-id' },
       });
 
-      expect(data).not.to.exist;
+      expect(result.errors.length).to.equal(1);
+      expect(result.errors[0].message).to.equal(
+        `Error - Not Found: invalid-id`
+      );
+      expect(result.errors[0].extensions.code).to.equal('NOT_FOUND');
+      expect(result.data.getCollectionPartnerAssociation).not.to.exist;
     });
   });
 });

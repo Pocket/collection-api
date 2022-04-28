@@ -60,6 +60,7 @@ describe('auth: Language', () => {
 
       // And there is an access denied error
       expect(result.errors[0].message).to.equal(ACCESS_DENIED_ERROR);
+      expect(result.errors[0].extensions.code).to.equal('FORBIDDEN');
     });
   });
 });

@@ -87,6 +87,7 @@ describe('auth: CollectionAuthor', () => {
 
       // And there is an access denied error
       expect(result.errors[0].message).to.equal(ACCESS_DENIED_ERROR);
+      expect(result.errors[0].extensions.code).to.equal('FORBIDDEN');
     });
 
     it('should fail if auth headers are empty', async () => {
@@ -101,6 +102,7 @@ describe('auth: CollectionAuthor', () => {
 
       // And there is an access denied error
       expect(result.errors[0].message).to.equal(ACCESS_DENIED_ERROR);
+      expect(result.errors[0].extensions.code).to.equal('FORBIDDEN');
     });
   });
 
@@ -161,6 +163,7 @@ describe('auth: CollectionAuthor', () => {
 
       // And there is an access denied error
       expect(result.errors[0].message).to.equal(ACCESS_DENIED_ERROR);
+      expect(result.errors[0].extensions.code).to.equal('FORBIDDEN');
     });
 
     it('should fail if auth headers are empty', async () => {
@@ -176,6 +179,7 @@ describe('auth: CollectionAuthor', () => {
 
       // And there is an access denied error
       expect(result.errors[0].message).to.equal(ACCESS_DENIED_ERROR);
+      expect(result.errors[0].extensions.code).to.equal('FORBIDDEN');
     });
   });
 });

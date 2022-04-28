@@ -1,3 +1,5 @@
+import { ForbiddenError, UserInputError } from 'apollo-server-errors';
+import { NotFoundError } from '@pocket-tools/apollo-utils';
 import { CollectionComplete } from '../../../database/types';
 import { CollectionsResult } from '../../../typeDefs';
 import {
@@ -19,10 +21,16 @@ export async function getCollection(
   { db, authenticatedUser }
 ): Promise<CollectionComplete> {
   if (!authenticatedUser.canRead) {
-    throw new Error(ACCESS_DENIED_ERROR);
+    throw new ForbiddenError(ACCESS_DENIED_ERROR);
   }
 
-  return await dbGetCollection(db, externalId);
+  const collection = await dbGetCollection(db, externalId);
+
+  if (!collection) {
+    throw new NotFoundError(externalId);
+  }
+
+  return collection;
 }
 
 /**
@@ -38,11 +46,11 @@ export async function searchCollections(
   { db, authenticatedUser }
 ): Promise<CollectionsResult> {
   if (!authenticatedUser.canRead) {
-    throw new Error(ACCESS_DENIED_ERROR);
+    throw new ForbiddenError(ACCESS_DENIED_ERROR);
   }
 
   if (!filters || (!filters.author && !filters.title && !filters.status)) {
-    throw new Error(
+    throw new UserInputError(
       `At least one filter('author', 'title', 'status') is required`
     );
   }
