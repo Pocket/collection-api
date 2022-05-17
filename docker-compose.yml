@@ -12,7 +12,7 @@ services:
       - TZ=UTC
 
   localstack:
-    image: localstack/localstack@sha256:693ed9f6e1d168c89309b103945466e93d58cd789ef233fcaa5dd1553ab9a9b0
+    image: localstack/localstack@sha256:a5e55f67644ecd567b3056cd1f57f5cc024d667b34259b8ac7e26d5ce7535ad5
     platform: linux/amd64
     env_file:
       - .docker/local.env
