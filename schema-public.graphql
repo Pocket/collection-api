@@ -14,8 +14,15 @@ type Query {
     perPage: Int
     filters: CollectionsFiltersInput
   ): CollectionsResult!
+
   """
   Retrieves a Collection by the given slug. The Collection must be published.
   """
   getCollectionBySlug(slug: String!): Collection
+    @deprecated(reason: "Use collectionBySlug instead")
+
+  """
+  Retrieves a {Collection} by the given slug. The {Collection} must be published.
+  """
+  collectionBySlug(slug: String!): Collection
 }

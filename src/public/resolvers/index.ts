@@ -8,6 +8,7 @@ import { collectionPartnershipFieldResolvers } from '../../shared/resolvers/type
 export const resolvers = {
   Query: {
     getCollectionBySlug,
+    collectionBySlug: getCollectionBySlug,
     getCollections,
   },
   Item: {

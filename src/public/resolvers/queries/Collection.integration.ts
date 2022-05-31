@@ -9,7 +9,11 @@ import {
   createIABCategoryHelper,
   sortCollectionStoryAuthors,
 } from '../../../test/helpers';
-import { GET_COLLECTIONS, GET_COLLECTION_BY_SLUG } from './sample-queries.gql';
+import {
+  COLLECTION_BY_SLUG,
+  GET_COLLECTIONS,
+  GET_COLLECTION_BY_SLUG,
+} from './sample-queries.gql';
 import {
   CollectionAuthor,
   CollectionStatus,
@@ -549,7 +553,7 @@ describe('public queries: Collection', () => {
       expect(data?.getCollectionBySlug).to.be.null;
     });
 
-    it('can get a collection by slug with story authors sorted correctly', async () => {
+    it('can get a collection by slug with getCollectionBySlug with story authors sorted correctly', async () => {
       await createCollectionHelper(db, {
         title: 'why february is sixty days long',
         author,
@@ -564,6 +568,29 @@ describe('public queries: Collection', () => {
       });
 
       const collection = data?.getCollectionBySlug;
+
+      // the default sort returned from prisma should match our expected
+      // manual sort
+      expect(collection.stories[0].authors).to.equal(
+        sortCollectionStoryAuthors(collection.stories[0].authors)
+      );
+    });
+
+    it('can get a collection by slug with collectionBySlug with story authors sorted correctly', async () => {
+      await createCollectionHelper(db, {
+        title: 'why february is sixty days long',
+        author,
+        status: CollectionStatus.PUBLISHED,
+      });
+
+      const { data } = await server.executeOperation({
+        query: COLLECTION_BY_SLUG,
+        variables: {
+          slug: 'why-february-is-sixty-days-long',
+        },
+      });
+
+      const collection = data?.collectionBySlug;
 
       // the default sort returned from prisma should match our expected
       // manual sort
