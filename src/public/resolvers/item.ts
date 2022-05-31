@@ -12,9 +12,8 @@ export async function collection(
   { dataLoaders }
 ): Promise<Collection> {
   // match only http(s)://getpocket.com/collections/<slug>
-  const matches = /^https?:\/\/(?:getpocket\.com)\/collections\/(.*)/i.exec(
-    givenUrl
-  );
+  const matches =
+    /^https?:\/\/(?:getpocket\.com)?(\/de)?\/collections\/(.*)/i.exec(givenUrl);
 
   // log it if there's no match
   if (!matches) {
