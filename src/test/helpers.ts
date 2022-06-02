@@ -24,6 +24,7 @@ import s3service from '../aws/s3';
 import { client } from '../database/client';
 import { ContextManager } from '../admin/context';
 import { getServer } from './admin-server';
+import { collectionUrlRegex } from '../shared/constants';
 
 const slugifyConfig = config.slugify;
 
@@ -341,4 +342,8 @@ export const getServerWithMockedHeaders = (headers: {
   });
 
   return getServer(contextManager);
+};
+
+export const isValidCollectionUrl = (url: string): boolean => {
+  return !!collectionUrlRegex.exec(url);
 };
