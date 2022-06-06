@@ -16,7 +16,7 @@ export async function collection(
     // match only http(s)://getpocket.com/collections/<slug>
     const slug = getCollectionUrlSlug(givenUrl);
 
-    return slug ? await dataLoaders.collectionLoader.load(slug) : null;
+    return await (slug ? dataLoaders.collectionLoader.load(slug) : null);
   } catch (err) {
     console.log(err);
     Sentry.captureException(err);
