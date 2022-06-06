@@ -349,7 +349,7 @@ export const getCollectionUrlSlug = (url: string): string | null => {
 
   const start = '^https?://(?:getpocket.com)';
   const end = '/collections/(.*)';
-  const languageMatchString = `(?:\/(?:${allowedLanguages}))?`;
+  const languageMatchString = `(?:/(?:${allowedLanguages}))?`;
 
   const regExpString = start.concat(languageMatchString, end);
 
