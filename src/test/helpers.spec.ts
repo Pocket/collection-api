@@ -1,5 +1,5 @@
 import { CollectionStoryAuthor } from '../database/types';
-import { sortCollectionStoryAuthors, isValidCollectionUrl } from './helpers';
+import { sortCollectionStoryAuthors, getCollectionUrlSlug } from './helpers';
 
 describe('test helpers', () => {
   describe('sortCollectionStoryAuthors', () => {
@@ -26,7 +26,7 @@ describe('test helpers', () => {
       expect(sorted[2].name).toEqual('the dude');
     });
   });
-  describe('isValidCollectionUrl', () => {
+  describe('getCollectionUrlSlug', () => {
     it('should return true for valid collection urls ', () => {
       const enCollection =
         'https://getpocket.com/collections/multiverse-reader';
@@ -34,8 +34,10 @@ describe('test helpers', () => {
       const deCollection =
         'https://getpocket.com/de/collections/cybersicherheit-kurz-und-bundig';
 
-      expect(isValidCollectionUrl(enCollection)).toEqual(true);
-      expect(isValidCollectionUrl(deCollection)).toEqual(true);
+      expect(getCollectionUrlSlug(enCollection)).toEqual('multiverse-reader');
+      expect(getCollectionUrlSlug(deCollection)).toEqual(
+        'cybersicherheit-kurz-und-bundig'
+      );
     });
 
     it('should return false for invalid collection urls ', () => {
@@ -44,8 +46,8 @@ describe('test helpers', () => {
       const frCollection =
         'https://getpocket.com/fr/collections/cybersicherheit-kurz-und-bundig';
 
-      expect(isValidCollectionUrl(invalidCollection)).toEqual(false);
-      expect(isValidCollectionUrl(frCollection)).toEqual(false);
+      expect(getCollectionUrlSlug(invalidCollection)).toBeNull;
+      expect(getCollectionUrlSlug(frCollection)).toBeNull;
     });
   });
 });

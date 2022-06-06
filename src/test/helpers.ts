@@ -24,7 +24,7 @@ import s3service from '../aws/s3';
 import { client } from '../database/client';
 import { ContextManager } from '../admin/context';
 import { getServer } from './admin-server';
-import { collectionUrlRegex } from '../shared/constants';
+import { collectionLanguages } from '../shared/constants';
 
 const slugifyConfig = config.slugify;
 
@@ -344,6 +344,22 @@ export const getServerWithMockedHeaders = (headers: {
   return getServer(contextManager);
 };
 
-export const isValidCollectionUrl = (url: string): boolean => {
-  return !!collectionUrlRegex.exec(url);
+export const getCollectionUrlSlug = (url: string): string | null => {
+  const allowedLanguages = Object.values(collectionLanguages).join('|');
+
+  const start = '^https?://(?:getpocket.com)';
+  const end = '/collections/(.*)';
+  const languageMatchString = `(?:\/(?:${allowedLanguages}))?`;
+
+  const regExpString = start.concat(languageMatchString, end);
+
+  const validCollectionUrlRegExp = new RegExp(regExpString, 'i');
+
+  const match = validCollectionUrlRegExp.exec(url);
+  if (!match) {
+    console.log(`${url} is not a valid collection`);
+    return null;
+  }
+
+  return match[1];
 };

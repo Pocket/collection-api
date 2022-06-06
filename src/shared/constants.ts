@@ -7,5 +7,6 @@ export const READONLY = 'team_pocket';
 export const ACCESS_DENIED_ERROR =
   'You do not have access to perform this action.';
 
-export const collectionUrlRegex =
-  /^https?:\/\/(?:getpocket\.com)?(\/de)?\/collections\/(.*)/i;
+export enum collectionLanguages {
+  DE = 'de',
+}
