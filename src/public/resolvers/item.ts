@@ -16,7 +16,11 @@ export async function collection(
     // match only http(s)://getpocket.com/collections/<slug>
     const slug = getCollectionUrlSlug(givenUrl);
 
-    return await (slug ? dataLoaders.collectionLoader.load(slug) : null);
+    if (slug) {
+      return await dataLoaders.collectionLoader.load(slug);
+    } else {
+      return null;
+    }
   } catch (err) {
     console.log(err);
     Sentry.captureException(err);
