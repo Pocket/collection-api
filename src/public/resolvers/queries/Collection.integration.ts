@@ -13,6 +13,7 @@ import {
   COLLECTION_BY_SLUG,
   GET_COLLECTIONS,
   GET_COLLECTION_BY_SLUG,
+  COLLECTION_ITEM_REFERENCE_RESOLVER,
 } from './sample-queries.gql';
 import {
   CollectionAuthor,
@@ -613,6 +614,28 @@ describe('public queries: Collection', () => {
         `Error - Not Found: this-is-just-good-timing`
       );
       expect(result.errors[0].extensions.code).to.equal('NOT_FOUND');
+    });
+  });
+
+  describe.only('resolve item collection', () => {
+    it('should resolve collection on an item', async () => {
+      const collectionItem = await createCollectionHelper(db, {
+        title: 'Collection one',
+        author,
+        language: CollectionLanguage.DE,
+      });
+
+      const result = await server.executeOperation({
+        query: COLLECTION_ITEM_REFERENCE_RESOLVER,
+        variables: {
+          url: `https://getpocket.com/de/collections/${collectionItem.slug}`,
+        },
+      });
+
+      console.log(result);
+
+      expect(result.errors).to.be.undefined;
+      // expect(result.data?.)
     });
   });
 });
