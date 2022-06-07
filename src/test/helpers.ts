@@ -24,7 +24,6 @@ import s3service from '../aws/s3';
 import { client } from '../database/client';
 import { ContextManager } from '../admin/context';
 import { getServer } from './admin-server';
-import { collectionLanguages } from '../shared/constants';
 
 const slugifyConfig = config.slugify;
 
@@ -344,15 +343,19 @@ export const getServerWithMockedHeaders = (headers: {
   return getServer(contextManager);
 };
 
+/**
+ * Determines if a url is a valid collection url and returns its slug.
+ * Returns null for invalid collection urls
+ * @param url
+ * @returns A collection's slug or null
+ */
 export const getCollectionUrlSlug = (url: string): string | null => {
-  const allowedLanguages = Object.values(collectionLanguages).join('|');
+  // get a string of allowed languages in this format "en|de|..."
+  const allowedLanguages = Object.values(CollectionLanguage).join('|');
 
-  const start = '^https?://(?:getpocket.com)';
-  const end = '/collections/(.*)';
-  const languageMatchString = `(?:/(?:${allowedLanguages}))?`;
+  const regExpString = `^https?://(?:getpocket.com)(?:/(?:${allowedLanguages}))?/collections/(.*)`;
 
-  const regExpString = start.concat(languageMatchString, end);
-
+  // create a regular expression from the string above and make it case-insensitive
   const validCollectionUrlRegExp = new RegExp(regExpString, 'i');
 
   const match = validCollectionUrlRegExp.exec(url);
@@ -361,5 +364,6 @@ export const getCollectionUrlSlug = (url: string): string | null => {
     return null;
   }
 
+  // return the slug that is captured as the second match group from the regex
   return match[1];
 };

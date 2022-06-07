@@ -617,8 +617,8 @@ describe('public queries: Collection', () => {
     });
   });
 
-  describe.only('resolve item collection', () => {
-    it('should resolve collection on an item', async () => {
+  describe('Item reference resolver', () => {
+    it('should resolve on a collection Item', async () => {
       const collectionItem = await createCollectionHelper(db, {
         title: 'Collection one',
         author,
@@ -626,17 +626,35 @@ describe('public queries: Collection', () => {
         status: CollectionStatus.PUBLISHED,
       });
 
+      const givenUrl = `https://getpocket.com/de/collections/${collectionItem.slug}`;
+
       const result = await server.executeOperation({
         query: COLLECTION_ITEM_REFERENCE_RESOLVER,
         variables: {
-          url: `https://getpocket.com/de/collections/${collectionItem.slug}`,
+          url: givenUrl,
         },
       });
 
-      console.log(result);
+      expect(result.errors).to.be.undefined;
+      expect(result.data._entities.length).to.equal(1);
+      expect(result.data._entities[0].givenUrl).to.equal(givenUrl);
+      expect(result.data._entities[0].collection.slug).to.equal(
+        collectionItem.slug
+      );
+    });
+
+    it('should not resolve when an Item is not a collection', async () => {
+      const givenUrl = `https://getpocket.com/random-test-slug`;
+
+      const result = await server.executeOperation({
+        query: COLLECTION_ITEM_REFERENCE_RESOLVER,
+        variables: {
+          url: givenUrl,
+        },
+      });
 
       expect(result.errors).to.be.undefined;
-      // expect(result.data?.)
+      expect(result.data._entities[0].collection).to.equal(null);
     });
   });
 });

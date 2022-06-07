@@ -13,7 +13,6 @@ export async function collection(
   { dataLoaders }
 ): Promise<Collection> {
   try {
-    // match only http(s)://getpocket.com/collections/<slug>
     const slug = getCollectionUrlSlug(givenUrl);
 
     if (slug) {
