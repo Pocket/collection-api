@@ -44,3 +44,16 @@ export const COLLECTION_BY_SLUG = gql`
   }
   ${CollectionData}
 `;
+
+export const COLLECTION_ITEM_REFERENCE_RESOLVER = gql`
+  query ($url: Url) {
+    _entities(representations: { givenUrl: $url, __typename: "Item" }) {
+      ... on Item {
+        givenUrl
+        collection {
+          slug
+        }
+      }
+    }
+  }
+`;

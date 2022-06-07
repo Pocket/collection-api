@@ -9,6 +9,7 @@ import { typeDefsPublic } from '../typeDefs';
 import { resolvers } from '../public/resolvers';
 import { client } from '../database/client';
 import { errorHandler } from '@pocket-tools/apollo-utils';
+import { collectionLoader } from '../dataLoaders/collectionLoader';
 
 // Export this separately so that it can be used in Apollo integration tests
 export const db = client();
@@ -18,6 +19,9 @@ export const getServer = () => {
     schema: buildSubgraphSchema([{ typeDefs: typeDefsPublic, resolvers }]),
     context: {
       db: client(),
+      dataLoaders: {
+        collectionLoader,
+      },
     },
     // Note the absence of the Sentry plugin - it emits
     // "Cannot read property 'headers' of undefined" errors in tests.

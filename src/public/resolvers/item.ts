@@ -1,5 +1,6 @@
 import { Collection } from '@prisma/client';
 import * as Sentry from '@sentry/node';
+import { getCollectionUrlSlug } from '../../test/helpers';
 
 /**
  * @param givenUrl
@@ -11,19 +12,14 @@ export async function collection(
   _,
   { dataLoaders }
 ): Promise<Collection> {
-  // match only http(s)://getpocket.com/collections/<slug>
-  const matches = /^https?:\/\/(?:getpocket\.com)\/collections\/(.*)/i.exec(
-    givenUrl
-  );
-
-  // log it if there's no match
-  if (!matches) {
-    console.log(`${givenUrl} is not a collection`);
-    return null;
-  }
-
   try {
-    return await dataLoaders.collectionLoader.load(matches[1]);
+    const slug = getCollectionUrlSlug(givenUrl);
+
+    if (slug) {
+      return await dataLoaders.collectionLoader.load(slug);
+    } else {
+      return null;
+    }
   } catch (err) {
     console.log(err);
     Sentry.captureException(err);
