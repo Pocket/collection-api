@@ -27,7 +27,7 @@ describe('test helpers', () => {
     });
   });
   describe('getCollectionUrlSlug', () => {
-    it('should return true for valid collection urls ', () => {
+    it('should return the slug for valid collection url ', () => {
       const enCollection =
         'https://getpocket.com/collections/multiverse-reader';
 
@@ -40,9 +40,10 @@ describe('test helpers', () => {
       );
     });
 
-    it('should return false for invalid collection urls ', () => {
+    it('should return null for invalid collection urls ', () => {
       const invalidCollection = 'https://getpocket.com/multiverse-reader';
 
+      //unsupported collection language
       const frCollection =
         'https://getpocket.com/fr/collections/cybersicherheit-kurz-und-bundig';
 
