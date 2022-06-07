@@ -623,6 +623,7 @@ describe('public queries: Collection', () => {
         title: 'Collection one',
         author,
         language: CollectionLanguage.DE,
+        status: CollectionStatus.PUBLISHED,
       });
 
       const result = await server.executeOperation({
