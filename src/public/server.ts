@@ -1,5 +1,5 @@
 import { ApolloServer } from 'apollo-server-express';
-import { buildSubgraphSchema } from '@apollo/federation';
+import { buildSubgraphSchema } from '@apollo/subgraph';
 import { typeDefsPublic } from '../typeDefs';
 import { resolvers as publicResolvers } from './resolvers';
 import responseCachePlugin from 'apollo-server-plugin-response-cache';
