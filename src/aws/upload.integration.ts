@@ -1,6 +1,5 @@
 import { uploadImage } from './upload';
 import s3service from './s3';
-import { FileUpload } from 'graphql-upload';
 import { createReadStream, unlinkSync, writeFileSync } from 'fs';
 import config from '../config';
 
@@ -16,7 +15,7 @@ describe('Upload', () => {
   });
 
   it('uploads an image to s3 using graphql FileUpload type', async () => {
-    const image: FileUpload = {
+    const image = {
       filename: 'test.jpeg',
       mimetype: 'image/jpeg',
       encoding: '7bit',

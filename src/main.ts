@@ -3,7 +3,8 @@ import AWSXRay from 'aws-xray-sdk-core';
 import xrayExpress from 'aws-xray-sdk-express';
 import express from 'express';
 import https from 'https';
-import { graphqlUploadExpress } from 'graphql-upload';
+//See https://github.com/jaydenseric/graphql-upload/issues/305#issuecomment-1135285811 on why we do this
+import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.js';
 
 import config from './config';
 import { startServer as startAdminServer } from './admin/server';
