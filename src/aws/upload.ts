@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import mime from 'mime-types';
 import { S3 } from 'aws-sdk';
 import config from '../config';
-import { FileUpload } from 'graphql-upload';
+import Upload from 'graphql-upload/Upload.js';
 
 export type ImageUploadResponse = {
   fileName: string;
@@ -16,7 +16,7 @@ export type ImageUploadResponse = {
  */
 export async function uploadImage(
   s3: S3,
-  image: FileUpload
+  image: Upload
 ): Promise<ImageUploadResponse> {
   const { mimetype, createReadStream } = image;
   const stream = createReadStream();
