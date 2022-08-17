@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@apollo/subgraph": "2.0.5",
-    "@pocket-tools/apollo-utils": "2.3.1",
+    "@pocket-tools/apollo-utils": "2.3.2",
     "@prisma/client": "3.10.0",
     "@sentry/node": "7.10.0",
     "@sentry/tracing": "7.10.0",
