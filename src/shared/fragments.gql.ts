@@ -15,6 +15,9 @@ export const CollectionPartnershipData = gql`
     name
     url
     imageUrl
+    image {
+      url
+    }
     blurb
   }
 `;
@@ -39,6 +42,9 @@ export const CollectionPartnerAssociationData = gql`
     name
     url
     imageUrl
+    image {
+      url
+    }
     blurb
   }
   ${CollectionPartnerData}
@@ -51,6 +57,9 @@ export const CollectionAuthorData = gql`
     slug
     bio
     imageUrl
+    image {
+      url
+    }
     active
   }
 `;
@@ -69,6 +78,9 @@ export const CollectionStoryData = gql`
     title
     excerpt
     imageUrl
+    image {
+      url
+    }
     authors {
       ...CollectionStoryAuthorData
     }
@@ -99,6 +111,9 @@ export const CollectionData = gql`
     }
     intro
     imageUrl
+    image {
+      url
+    }
     language
     partnership {
       ...CollectionPartnershipData

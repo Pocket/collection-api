@@ -35,6 +35,19 @@ export const collectionPartnershipFieldResolvers = {
     }
   },
 
+  async image(
+    parent: CollectionPartnership,
+    _,
+    { db }
+  ): Promise<{ url: string }> {
+    if (parent.imageUrl) {
+      return { url: parent.imageUrl };
+    } else {
+      const partner = await getPartnerById(db, parent.partnerId);
+      return { url: partner.imageUrl };
+    }
+  },
+
   async blurb(parent: CollectionPartnership, _, { db }): Promise<string> {
     if (parent.blurb) {
       return parent.blurb;
