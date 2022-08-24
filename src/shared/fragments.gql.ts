@@ -28,6 +28,9 @@ export const CollectionPartnerData = gql`
     name
     url
     imageUrl
+    image {
+      url
+    }
     blurb
   }
 `;
