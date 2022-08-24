@@ -177,6 +177,7 @@ describe('queries: CollectionAuthor', () => {
       expect(data.bio).to.exist;
       expect(data.imageUrl).to.exist;
       expect(data.active).to.exist;
+      expect(data.imageUrl).to.equal(data.image.url);
     });
 
     it('should return NOT_FOUND on an invalid author id', async () => {

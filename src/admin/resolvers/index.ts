@@ -34,7 +34,17 @@ import {
   updateCollectionStorySortOrder,
   updateCollectionStoryImageUrl,
 } from './mutations';
-import { collectionPartnershipFieldResolvers } from '../../shared/resolvers/types';
+import {
+  collectionPartnershipFieldResolvers,
+  Image,
+} from '../../shared/resolvers/types';
+import {
+  Collection,
+  CollectionAuthor,
+  CollectionPartner,
+  CollectionStory,
+} from '@prisma/client';
+import { CollectionPartnerAssociation } from '../../database/types';
 
 export const resolvers = {
   Mutation: {
@@ -73,4 +83,33 @@ export const resolvers = {
     getLanguages,
   },
   CollectionPartnership: collectionPartnershipFieldResolvers,
+  Collection: {
+    async image(parent: Collection, _, { db }): Promise<Image> {
+      return { url: parent.imageUrl };
+    },
+  },
+  CollectionStory: {
+    async image(parent: CollectionStory, _, { db }): Promise<Image> {
+      return { url: parent.imageUrl };
+    },
+  },
+  CollectionAuthor: {
+    async image(parent: CollectionAuthor, _, { db }): Promise<Image> {
+      return { url: parent.imageUrl };
+    },
+  },
+  CollectionPartnerAssociation: {
+    async image(
+      parent: CollectionPartnerAssociation,
+      _,
+      { db }
+    ): Promise<Image> {
+      return { url: parent.imageUrl };
+    },
+  },
+  CollectionPartner: {
+    async image(parent: CollectionPartner, _, { db }): Promise<Image> {
+      return { url: parent.imageUrl };
+    },
+  },
 };

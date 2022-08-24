@@ -20,6 +20,11 @@ directive @cacheControl(
   scope: CacheControlScope
 ) on FIELD_DEFINITION | OBJECT | INTERFACE
 
+extend type Image @key(fields: "url") {
+  "The url of the image"
+  url: Url! @external
+}
+
 extend type Item @key(fields: "givenUrl") {
   "key field to identify the Item entity in the Parser service"
   givenUrl: Url! @external
@@ -71,7 +76,8 @@ type CollectionPartnership {
   type: CollectionPartnershipType!
   name: String!
   url: Url!
-  imageUrl: Url!
+  imageUrl: Url! @deprecated(reason: "use the image object instead")
+  image: Image!
   blurb: Markdown!
 }
 
@@ -83,7 +89,8 @@ type Collection {
   status: CollectionStatus!
   curationCategory: CurationCategory
   intro: Markdown
-  imageUrl: Url
+  imageUrl: Url @deprecated(reason: "use the image object instead")
+  image: Image
   """
   note that language is *not* being used as locale - only to specify the
   language of the collection.
@@ -113,7 +120,8 @@ type CollectionAuthor {
   name: String!
   slug: String
   bio: Markdown
-  imageUrl: Url
+  imageUrl: Url @deprecated(reason: "use the image object instead")
+  image: Image
   active: Boolean!
 }
 
@@ -128,7 +136,8 @@ type CollectionStory @key(fields: "item { givenUrl }") {
   url: Url!
   title: String!
   excerpt: Markdown!
-  imageUrl: Url
+  imageUrl: Url @deprecated(reason: "use the image object instead")
+  image: Image
   authors: [CollectionStoryAuthor!]!
   publisher: String
   sortOrder: Int
