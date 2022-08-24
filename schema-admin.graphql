@@ -133,6 +133,7 @@ type CollectionPartner {
   name: String!
   url: Url!
   imageUrl: Url!
+  image: Image!
   blurb: Markdown!
 }
 
