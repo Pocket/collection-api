@@ -38,7 +38,12 @@ import {
   collectionPartnershipFieldResolvers,
   Image,
 } from '../../shared/resolvers/types';
-import { Collection, CollectionAuthor, CollectionStory } from '@prisma/client';
+import {
+  Collection,
+  CollectionAuthor,
+  CollectionPartner,
+  CollectionStory,
+} from '@prisma/client';
 import { CollectionPartnerAssociation } from '../../database/types';
 
 export const resolvers = {
@@ -99,6 +104,11 @@ export const resolvers = {
       _,
       { db }
     ): Promise<Image> {
+      return { url: parent.imageUrl };
+    },
+  },
+  CollectionPartner: {
+    async image(parent: CollectionPartner, _, { db }): Promise<Image> {
       return { url: parent.imageUrl };
     },
   },
