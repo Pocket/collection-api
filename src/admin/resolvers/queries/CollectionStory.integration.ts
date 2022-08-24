@@ -67,6 +67,19 @@ describe('queries: CollectionStory', () => {
       expect(retrieved.authors.length).to.be.greaterThan(0);
     });
 
+    it('should retrieve a collection story with image url', async () => {
+      const { data } = await server.executeOperation({
+        query: GET_COLLECTION_STORY,
+        variables: {
+          externalId: story.externalId,
+        },
+      });
+
+      const retrieved = data?.getCollectionStory;
+
+      expect(retrieved.imageUrl).to.equal(retrieved.image.url);
+    });
+
     it('should retrieve a collection story with authors sorted correctly', async () => {
       const { data } = await server.executeOperation({
         query: GET_COLLECTION_STORY,

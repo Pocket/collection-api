@@ -39,6 +39,7 @@ import {
   Image,
 } from '../../shared/resolvers/types';
 import { Collection, CollectionAuthor, CollectionStory } from '@prisma/client';
+import { CollectionPartnerAssociation } from '../../database/types';
 
 export const resolvers = {
   Mutation: {
@@ -89,6 +90,15 @@ export const resolvers = {
   },
   CollectionAuthor: {
     async image(parent: CollectionAuthor, _, { db }): Promise<Image> {
+      return { url: parent.imageUrl };
+    },
+  },
+  CollectionPartnerAssociation: {
+    async image(
+      parent: CollectionPartnerAssociation,
+      _,
+      { db }
+    ): Promise<Image> {
       return { url: parent.imageUrl };
     },
   },
