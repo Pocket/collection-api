@@ -194,7 +194,9 @@ describe('mutations: CollectionPartnerAssociation', () => {
 
       expect(data.updateCollectionPartnerAssociation.partner).to.deep.equal({
         ...newPartner,
-        image: { url: association.imageUrl },
+        image: {
+          url: data.updateCollectionPartnerAssociation.partner.imageUrl,
+        },
       });
     });
   });
