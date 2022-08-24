@@ -154,17 +154,12 @@ export type CollectionPartnerAssociation = Omit<
   partner: CollectionPartner;
 };
 
-export type Image = {
-  url: string;
-};
-
 export type CollectionPartnership = {
   externalId: string;
   type: CollectionPartnershipType;
   name: string;
   url: string;
   imageUrl: string;
-  image: Image;
   blurb: string;
 };
 
@@ -185,7 +180,6 @@ export type CollectionComplete = Collection & {
   IABChildCategory?: IABCategory;
   partnership?: CollectionPartnership;
   stories?: CollectionStoryWithAuthors[];
-  image: Image;
 };
 
 export type CreateImageInput = {

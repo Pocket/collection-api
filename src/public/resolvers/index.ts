@@ -1,8 +1,10 @@
 import { getCollectionBySlug, getCollections } from './queries/Collection';
 import { collection } from './item';
-import { collectionPartnershipFieldResolvers } from '../../shared/resolvers/types';
-import { Collection, CollectionAuthor } from '@prisma/client';
-import { getCollection } from '../../database/queries';
+import {
+  collectionPartnershipFieldResolvers,
+  Image,
+} from '../../shared/resolvers/types';
+import { Collection, CollectionAuthor, CollectionStory } from '@prisma/client';
 
 /**
  * Resolvers
@@ -18,13 +20,18 @@ export const resolvers = {
   },
   CollectionPartnership: collectionPartnershipFieldResolvers,
   Collection: {
-    async image(parent: Collection, _, { db }): Promise<{ url: string }> {
-      if (parent.imageUrl) {
-        return { url: parent.imageUrl };
-      } else {
-        const collection = await getCollection(db, parent.externalId);
-        return { url: collection.imageUrl };
-      }
+    async image(parent: Collection, _, { db }): Promise<Image> {
+      return { url: parent.imageUrl };
+    },
+  },
+  CollectionStory: {
+    async image(parent: CollectionStory, _, { db }): Promise<Image> {
+      return { url: parent.imageUrl };
+    },
+  },
+  CollectionAuthor: {
+    async image(parent: CollectionAuthor, _, { db }): Promise<Image> {
+      return { url: parent.imageUrl };
     },
   },
 };
