@@ -133,7 +133,6 @@ type CollectionPartner {
   name: String!
   url: Url!
   imageUrl: Url!
-  image: Image!
   blurb: Markdown!
 }
 
@@ -178,7 +177,6 @@ type CollectionPartnerAssociation {
   name: String
   url: Url
   imageUrl: Url
-  image: Image
   blurb: Markdown
 }
 

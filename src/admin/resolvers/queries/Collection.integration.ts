@@ -75,9 +75,6 @@ describe('admin queries: Collection', () => {
 
       // we should return an author
       expect(collection.authors.length).to.be.greaterThan(0);
-      expect(collection.authors[0].imageUrl).to.equal(
-        collection.authors[0].image.url
-      );
 
       // we should return a curation category
       expect(collection.curationCategory).not.to.be.undefined;
@@ -87,7 +84,6 @@ describe('admin queries: Collection', () => {
         IABParentCategory.name
       );
       expect(collection.IABChildCategory.name).to.equal(IABChildCategory.name);
-      expect(collection.imageUrl).to.equal(collection.image.url);
 
       // the array should be empty (bc we skipped creating stories above)
       expect(collection.stories.length).to.equal(0);

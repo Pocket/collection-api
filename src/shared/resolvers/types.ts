@@ -6,11 +6,6 @@ import { PrismaClient } from '@prisma/client';
  * Even though it appears that we're querying the partner up to four times
  * to retrieve the information for the four fields below, Prisma is actually
  * batching the queries behind the scenes and there is no performance hit.
- *
- * All these fields are seperate here, because each collection can
- * override the individual field of a collection partnership we need to check each
- * one to see if the collection resolver returned an overriden value and if not we
- * need to get the shared partner.
  */
 export const collectionPartnershipFieldResolvers = {
   async name(parent: CollectionPartnership, _, { db }): Promise<string> {
@@ -40,15 +35,6 @@ export const collectionPartnershipFieldResolvers = {
     }
   },
 
-  async image(parent: CollectionPartnership, _, { db }): Promise<Image> {
-    if (parent.imageUrl) {
-      return { url: parent.imageUrl };
-    } else {
-      const partner = await getPartnerById(db, parent.partnerId);
-      return { url: partner.imageUrl };
-    }
-  },
-
   async blurb(parent: CollectionPartnership, _, { db }): Promise<string> {
     if (parent.blurb) {
       return parent.blurb;
@@ -72,8 +58,4 @@ const getPartnerById = async (
   return await db.collectionPartner.findUnique({
     where: { id },
   });
-};
-
-export type Image = {
-  url: string;
 };

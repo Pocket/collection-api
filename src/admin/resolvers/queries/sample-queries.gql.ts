@@ -58,9 +58,6 @@ export const GET_COLLECTION_AUTHORS = gql`
         slug
         bio
         imageUrl
-        image {
-          url
-        }
         active
       }
       pagination {
@@ -81,9 +78,6 @@ export const GET_COLLECTION_AUTHOR = gql`
       slug
       bio
       imageUrl
-      image {
-        url
-      }
       active
     }
   }
@@ -113,9 +107,6 @@ export const GET_COLLECTION_PARTNER = gql`
       name
       url
       imageUrl
-      image {
-        url
-      }
       blurb
     }
   }
@@ -132,9 +123,6 @@ export const GET_COLLECTION_PARTNER_ASSOCIATION = gql`
       name
       url
       imageUrl
-      image {
-        url
-      }
       blurb
     }
   }
