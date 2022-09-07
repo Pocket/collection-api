@@ -58,7 +58,6 @@ describe('public queries: Collection', () => {
 
   describe('getCollections', () => {
     it('should get collections and all associated data', async () => {
-      const imageUrl = 'http://never-gonna-give-you-up.jpg';
       await createCollectionHelper(db, {
         title: 'ways in which my back hurts',
         author,
@@ -67,7 +66,6 @@ describe('public queries: Collection', () => {
         IABParentCategory,
         IABChildCategory,
         status: CollectionStatus.PUBLISHED,
-        imageUrl,
       });
 
       await createCollectionHelper(db, {
@@ -78,7 +76,6 @@ describe('public queries: Collection', () => {
         IABParentCategory,
         IABChildCategory,
         status: CollectionStatus.PUBLISHED,
-        imageUrl,
       });
 
       const { data } = await server.executeOperation({
@@ -92,9 +89,6 @@ describe('public queries: Collection', () => {
       for (let i = 0; i < collections.length; i++) {
         expect(collections[i].title).not.to.be.empty;
         expect(collections[i].authors.length).to.equal(1);
-        expect(collections[i].authors[0].imageUrl).to.equal(
-          collections[i].authors[0].image.url
-        );
         expect(collections[i].stories.length).to.be.greaterThan(0);
         expect(collections[i].curationCategory.name).to.equal(
           curationCategory.name
@@ -106,8 +100,6 @@ describe('public queries: Collection', () => {
         expect(collections[i].IABChildCategory.name).to.equal(
           IABChildCategory.name
         );
-        expect(collections[i].image.url).to.equal(imageUrl);
-        expect(collections[i].imageUrl).to.equal(collections[i].image.url);
       }
       // ensure we are getting all client data
     });

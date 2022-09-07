@@ -192,12 +192,9 @@ describe('mutations: CollectionPartnerAssociation', () => {
       // the internal id is not returned via the API
       delete newPartner.id;
 
-      expect(data.updateCollectionPartnerAssociation.partner).to.deep.equal({
-        ...newPartner,
-        image: {
-          url: data.updateCollectionPartnerAssociation.partner.imageUrl,
-        },
-      });
+      expect(data.updateCollectionPartnerAssociation.partner).to.deep.equal(
+        newPartner
+      );
     });
   });
 
