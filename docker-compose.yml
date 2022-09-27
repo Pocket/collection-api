@@ -33,7 +33,7 @@ services:
       - HOSTNAME_EXTERNAL=localstack
 
   app:
-    image: node:16@sha256:ebc73648091fc45d7f250089c27280551057e41bcbe060b3c0443e5529c60dd6
+    image: node:16@sha256:5968f50bda8ea8bdc65fd4208de287bbb25ca3ba81649494b1b6cf4b9203695e
     platform: linux/amd64
     working_dir: /app
     ports:
