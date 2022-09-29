@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+#can add integration test and other commands based on the need
+echo "running lint-check in: $(pwd)"
+npm run lint-fix
+echo "lint check successful ✅"
+cd .aws
+echo "running lint-check in: $(pwd)"
+npm run lint-fix
+echo "lint check successful ✅"
