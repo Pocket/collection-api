@@ -75,6 +75,9 @@ type CollectionPartnership {
   blurb: Markdown!
 }
 
+"""
+Label type - this is used to assign certain labels to collections
+"""
 type Label {
   externalId: ID!
   name: String!
