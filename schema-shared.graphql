@@ -75,6 +75,14 @@ type CollectionPartnership {
   blurb: Markdown!
 }
 
+"""
+Label Type: this is used to specify certain labels for an entity (i.e. collection)
+"""
+type Label {
+  externalId: ID!
+  name: String!
+}
+
 type Collection {
   externalId: ID!
   slug: String!
@@ -84,6 +92,7 @@ type Collection {
   curationCategory: CurationCategory
   intro: Markdown
   imageUrl: Url
+  labels: [Label]
   """
   note that language is *not* being used as locale - only to specify the
   language of the collection.
