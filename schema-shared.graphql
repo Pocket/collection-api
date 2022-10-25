@@ -76,7 +76,7 @@ type CollectionPartnership {
 }
 
 """
-Label type - this is used to assign certain labels to collections
+Label type - this is used to assign certain labels to collections (for now)
 """
 type Label {
   externalId: ID!
