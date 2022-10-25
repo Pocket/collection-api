@@ -76,8 +76,8 @@ type CollectionPartnership {
 }
 
 type Label {
-  id: ID!
-  name: String!
+  labelExternalId: ID!
+  labelName: String!
 }
 
 type Collection {
