@@ -76,7 +76,7 @@ type CollectionPartnership {
 }
 
 """
-Label Type: this is used to specify certain labels for an entity (i.e. collection)
+A label used to mark and categorize an Entity (e.g. Collection).
 """
 type Label {
   externalId: ID!
