@@ -98,6 +98,16 @@ model CollectionAuthor {
   @@index([name])
 }
 
+model Label {
+  id          Int     @id @default(autoincrement())
+  externalId  String  @default(uuid()) @db.VarChar(255)
+  name        String  @unique @db.VarChar(255)
+
+  @@unique([externalId])
+  @@index([id])
+  @@index([name])
+
+}
 model Collection {
   id                  Int                    @id @default(autoincrement())
   externalId          String                 @default(uuid()) @db.VarChar(255)
@@ -131,8 +141,8 @@ model CurationCategory {
   externalId String @default(uuid()) @db.VarChar(255)
   slug       String @unique @db.VarChar(300)
   name       String @db.VarChar(255)
-
   collections Collection[]
+  
   @@unique([externalId])
 }
 
