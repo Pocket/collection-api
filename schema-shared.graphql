@@ -75,6 +75,14 @@ type CollectionPartnership {
   blurb: Markdown!
 }
 
+"""
+A label used to mark and categorize an Entity (e.g. Collection).
+"""
+type Label {
+  externalId: ID!
+  name: String!
+}
+
 type Collection {
   externalId: ID!
   slug: String!
@@ -84,6 +92,7 @@ type Collection {
   curationCategory: CurationCategory
   intro: Markdown
   imageUrl: Url
+  labels: [Label]
   """
   note that language is *not* being used as locale - only to specify the
   language of the collection.
