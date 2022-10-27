@@ -25,14 +25,9 @@ async function main() {
   const nina = await createAuthorHelper(prisma, 'Nina');
 
   //create Label
-  await createLabelHelper(
-    prisma,
-    'East Africa',
-    'kchinnappan'
-    );
-  await createLabelHelper(
-    prisma
-    );
+  await createLabelHelper(prisma, 'East Africa', 'kchinnappan');
+
+  await createLabelHelper(prisma);
 
   const curationCategory1 = await createCurationCategoryHelper(
     prisma,
