@@ -32,6 +32,11 @@ export type UpdateCollectionAuthorImageUrlInput = {
   imageUrl: string;
 };
 
+export type CreateLabelInput = {
+  name: string;
+  createdBy: string;
+}
+
 export type CreateCollectionInput = {
   authorExternalId: string;
   curationCategoryExternalId?: string;

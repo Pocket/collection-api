@@ -99,9 +99,13 @@ model CollectionAuthor {
 }
 
 model Label {
-  id          Int     @id @default(autoincrement())
-  externalId  String  @default(uuid()) @db.VarChar(255)
-  name        String  @unique @db.VarChar(255)
+  id          Int       @id @default(autoincrement())
+  externalId  String    @default(uuid()) @db.VarChar(255)
+  name        String    @unique @db.VarChar(255)
+  createdAt   DateTime  @default(now()) @db.DateTime(0)
+  createdBy   String    @db.VarChar(255)
+  updatedAt   DateTime  @updatedAt
+  updatedBy   String?   @db.VarChar(255)
 
   @@unique([externalId])
   @@index([id])

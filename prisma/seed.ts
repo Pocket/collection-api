@@ -9,6 +9,7 @@ import {
   createCollectionHelper,
   createCollectionPartnerAssociationHelper,
   createCurationCategoryHelper,
+  createLabelHelper,
   createIABCategoryHelper,
   createPartnerHelper,
 } from '../src/test/helpers';
@@ -22,6 +23,16 @@ async function main() {
   const mathijs = await createAuthorHelper(prisma, 'Mathijs');
   const daniel = await createAuthorHelper(prisma, 'Daniel');
   const nina = await createAuthorHelper(prisma, 'Nina');
+
+  //create Label
+  await createLabelHelper(
+    prisma,
+    "East Africa",
+    "kchinnappan"
+    );
+  await createLabelHelper(
+    prisma,
+    );
 
   const curationCategory1 = await createCurationCategoryHelper(
     prisma,

@@ -8,6 +8,7 @@ import {
   CollectionStory,
   CurationCategory,
   IABCategory,
+  Label,
   Prisma,
   PrismaClient,
 } from '@prisma/client';
@@ -16,6 +17,7 @@ import {
   CollectionPartnerAssociation,
   CollectionStoryAuthor,
   CreateCollectionAuthorInput,
+  CreateLabelInput,
   CreateCollectionStoryInput,
 } from '../database/types';
 import { faker } from '@faker-js/faker';
@@ -37,6 +39,19 @@ export async function createAuthorHelper(
   const data: CreateCollectionAuthorInput = { name, slug, imageUrl };
 
   return await prisma.collectionAuthor.create({ data });
+}
+
+// information required to create a Label
+export async function createLabelHelper(
+  prisma: PrismaClient,
+  name?: string,
+  createdBy?: string,
+): Promise<Label> {
+  name = name || faker.internet.userName();
+  createdBy = createdBy || faker.lorem.slug();
+  const data: CreateLabelInput = { name, createdBy };
+
+  return await prisma.label.create({ data });
 }
 
 // the minimum information required to create a collection
