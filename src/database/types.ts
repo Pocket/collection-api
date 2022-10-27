@@ -35,7 +35,7 @@ export type UpdateCollectionAuthorImageUrlInput = {
 export type CreateLabelInput = {
   name: string;
   createdBy: string;
-}
+};
 
 export type CreateCollectionInput = {
   authorExternalId: string;
