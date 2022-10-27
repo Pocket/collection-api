@@ -45,7 +45,7 @@ export async function createAuthorHelper(
 export async function createLabelHelper(
   prisma: PrismaClient,
   name?: string,
-  createdBy?: string,
+  createdBy?: string
 ): Promise<Label> {
   name = name || faker.internet.userName();
   createdBy = createdBy || faker.lorem.slug();

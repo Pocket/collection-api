@@ -31,7 +31,7 @@ async function main() {
     "kchinnappan"
     );
   await createLabelHelper(
-    prisma,
+    prisma
     );
 
   const curationCategory1 = await createCurationCategoryHelper(
