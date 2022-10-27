@@ -47,8 +47,8 @@ export async function createLabelHelper(
   name?: string,
   createdBy?: string
 ): Promise<Label> {
-  name = name || faker.internet.userName();
-  createdBy = createdBy || faker.lorem.slug();
+  name = name || faker.lorem.slug();
+  createdBy = createdBy || faker.internet.userName();
   const data: CreateLabelInput = { name, createdBy };
 
   return await prisma.label.create({ data });

@@ -27,7 +27,7 @@ async function main() {
   //create Label
   await createLabelHelper(
     prisma,
-    'East Africa'
+    'East Africa',
     'kchinnappan'
     );
   await createLabelHelper(
