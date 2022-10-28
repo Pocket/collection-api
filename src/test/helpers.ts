@@ -2,6 +2,7 @@ import slugify from 'slugify';
 import {
   Collection,
   CollectionAuthor,
+  CollectionLabel,
   CollectionPartner,
   CollectionPartnershipType,
   CollectionStatus,
@@ -17,6 +18,7 @@ import {
   CollectionPartnerAssociation,
   CollectionStoryAuthor,
   CreateCollectionAuthorInput,
+  CreateCollectionLabelInput,
   CreateLabelInput,
   CreateCollectionStoryInput,
 } from '../database/types';
@@ -52,6 +54,17 @@ export async function createLabelHelper(
   const data: CreateLabelInput = { name, createdBy };
 
   return await prisma.label.create({ data });
+}
+
+// information required to create a Collection - Label association
+export async function createCollectionLabelHelper(
+  prisma: PrismaClient,
+  collectionExternalId: string,
+  labelExternalId: string,
+): Promise<CollectionLabel> {
+  const data: CreateCollectionLabelInput = { collectionExternalId, labelExternalId };
+
+  return await prisma.collectionLabel.create({ data });
 }
 
 // the minimum information required to create a collection

@@ -112,6 +112,20 @@ model Label {
   @@index([name])
 
 }
+
+model CollectionLabel {
+  id                    Int @id @default(autoincrement())
+  externalId            String @default(uuid()) @db.VarChar(255)
+  labelExternalId       String @default(uuid()) @db.VarChar(255)
+  collectionExternalId  String @default(uuid()) @db.VarChar(255)
+
+  @@unique([externalId])
+  @@index([externalId])
+  @@index([labelExternalId])
+  @@index([collectionExternalId])
+
+}
+
 model Collection {
   id                  Int                    @id @default(autoincrement())
   externalId          String                 @default(uuid()) @db.VarChar(255)

@@ -7,6 +7,7 @@ import { CollectionLanguage } from '../src/database/types';
 import {
   createAuthorHelper,
   createCollectionHelper,
+  createCollectionLabelHelper,
   createCollectionPartnerAssociationHelper,
   createCurationCategoryHelper,
   createLabelHelper,
@@ -23,9 +24,10 @@ async function main() {
   const mathijs = await createAuthorHelper(prisma, 'Mathijs');
   const daniel = await createAuthorHelper(prisma, 'Daniel');
   const nina = await createAuthorHelper(prisma, 'Nina');
+  const katerina = await createAuthorHelper(prisma, 'Katerina');
 
   //create Label with label name and creator
-  await createLabelHelper(prisma, 'region-east-africa', 'kchinnappan');
+  const katerinaLabel = await createLabelHelper(prisma, 'region-east-africa', 'kchinnappan');
 
   // create Label with default values
   await createLabelHelper(prisma);
@@ -34,6 +36,18 @@ async function main() {
     prisma,
     'Lorem Ipsum'
   );
+
+  // create Collection - Label association
+  // first create a collection
+  const katerinaCollection = await createCollectionHelper(prisma, {
+    title: `Katerina's first collection`,
+    author: katerina,
+    curationCategory: curationCategory1,
+  });
+  // create collection - label association
+  await createCollectionLabelHelper(prisma, katerinaCollection.externalId, katerinaLabel.externalId);
+
+
 
   const curationCategory2 = await createCurationCategoryHelper(
     prisma,
