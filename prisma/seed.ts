@@ -27,7 +27,11 @@ async function main() {
   const katerina = await createAuthorHelper(prisma, 'Katerina');
 
   //create Label with label name and creator
-  const katerinaLabel = await createLabelHelper(prisma, 'region-east-africa', 'kchinnappan');
+  const katerinaLabel = await createLabelHelper(
+    prisma,
+    'region-east-africa',
+    'kchinnappan'
+  );
 
   // create Label with default values
   await createLabelHelper(prisma);
@@ -48,9 +52,11 @@ async function main() {
     curationCategory: curationCategory1,
   });
   // create collection - label association
-  await createCollectionLabelHelper(prisma, katerinaCollection.externalId, katerinaLabel.externalId);
-
-
+  await createCollectionLabelHelper(
+    prisma,
+    katerinaCollection.externalId,
+    katerinaLabel.externalId
+  );
 
   const curationCategory2 = await createCurationCategoryHelper(
     prisma,

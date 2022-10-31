@@ -60,9 +60,12 @@ export async function createLabelHelper(
 export async function createCollectionLabelHelper(
   prisma: PrismaClient,
   collectionExternalId: string,
-  labelExternalId: string,
+  labelExternalId: string
 ): Promise<CollectionLabel> {
-  const data: CreateCollectionLabelInput = { collectionExternalId, labelExternalId };
+  const data: CreateCollectionLabelInput = {
+    collectionExternalId,
+    labelExternalId,
+  };
 
   return await prisma.collectionLabel.create({ data });
 }
