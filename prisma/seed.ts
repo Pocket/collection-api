@@ -32,6 +32,9 @@ async function main() {
   // create Label with default values
   await createLabelHelper(prisma);
 
+  // create Label with default values
+  await createLabelHelper(prisma);
+
   const curationCategory1 = await createCurationCategoryHelper(
     prisma,
     'Lorem Ipsum'
