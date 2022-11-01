@@ -3,7 +3,10 @@ import {
   CollectionPartnershipType,
   PrismaClient,
 } from '@prisma/client';
-import { CollectionLanguage } from '../src/database/types';
+import {
+  CollectionLanguage,
+  CreateCollectionLabelInput,
+} from '../src/database/types';
 import {
   createAuthorHelper,
   createCollectionHelper,
@@ -51,12 +54,17 @@ async function main() {
     author: katerina,
     curationCategory: curationCategory1,
   });
+
+  // CollectionLabel table input data
+  const collectionLabelInputData: CreateCollectionLabelInput = {
+    collectionId: katerinaCollection.id,
+    labelId: katerinaLabel.id,
+    createdAt: new Date(),
+    createdBy: 'kchinnappan',
+  };
+
   // create collection - label association
-  await createCollectionLabelHelper(
-    prisma,
-    katerinaCollection.externalId,
-    katerinaLabel.externalId
-  );
+  await createCollectionLabelHelper(prisma, collectionLabelInputData);
 
   const curationCategory2 = await createCurationCategoryHelper(
     prisma,

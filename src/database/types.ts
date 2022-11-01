@@ -38,8 +38,10 @@ export type CreateLabelInput = {
 };
 
 export type CreateCollectionLabelInput = {
-  collectionExternalId: string;
-  labelExternalId: string;
+  collectionId: number;
+  labelId: number;
+  createdAt: Date;
+  createdBy: string;
 };
 
 export type CreateCollectionInput = {

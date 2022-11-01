@@ -59,14 +59,8 @@ export async function createLabelHelper(
 // information required to create a Collection - Label association
 export async function createCollectionLabelHelper(
   prisma: PrismaClient,
-  collectionExternalId: string,
-  labelExternalId: string
+  data: CreateCollectionLabelInput
 ): Promise<CollectionLabel> {
-  const data: CreateCollectionLabelInput = {
-    collectionExternalId,
-    labelExternalId,
-  };
-
   return await prisma.collectionLabel.create({ data });
 }
 
