@@ -99,31 +99,32 @@ model CollectionAuthor {
 }
 
 model Label {
-  id          Int       @id @default(autoincrement())
-  externalId  String    @default(uuid()) @db.VarChar(255)
-  name        String    @unique @db.VarChar(255)
-  createdAt   DateTime  @default(now()) @db.DateTime(0)
-  createdBy   String    @db.VarChar(255)
-  updatedAt   DateTime  @updatedAt
-  updatedBy   String?   @db.VarChar(255)
+  id          Int               @id @default(autoincrement())
+  externalId  String            @default(uuid()) @db.VarChar(255)
+  name        String            @unique @db.VarChar(255)
+  createdAt   DateTime          @default(now()) @db.DateTime(0)
+  createdBy   String            @db.VarChar(255)
+  updatedAt   DateTime          @updatedAt
+  updatedBy   String?           @db.VarChar(255)
+  collections CollectionLabel[]
+
 
   @@unique([externalId])
   @@index([id])
   @@index([name])
-
 }
 
 model CollectionLabel {
-  id                    Int @id @default(autoincrement())
-  externalId            String @default(uuid()) @db.VarChar(255)
-  labelExternalId       String @default(uuid()) @db.VarChar(255)
-  collectionExternalId  String @default(uuid()) @db.VarChar(255)
+  labelId      Int
+  collectionId Int
+  createdAt    DateTime @default(now()) @db.DateTime(0)
+  createdBy    String   @db.VarChar(255)
 
-  @@unique([externalId])
-  @@index([externalId])
-  @@index([labelExternalId])
-  @@index([collectionExternalId])
 
+  label      Label      @relation(fields: [labelId], references: [id])
+  collection Collection @relation(fields: [collectionId], references: [id])
+
+  @@id([labelId, collectionId])
 }
 
 model Collection {
@@ -148,6 +149,7 @@ model Collection {
   IABParentCategory   IABCategory?           @relation("CollectionIABParentCategory", fields: [IABParentCategoryId], references: [id])
   IABChildCategory    IABCategory?           @relation("CollectionIABChildCategory", fields: [IABChildCategoryId], references: [id])
   partnership         CollectionPartnership?
+  labels              CollectionLabel[]
 
   @@unique([externalId])
   @@index([slug])
@@ -155,12 +157,12 @@ model Collection {
 }
 
 model CurationCategory {
-  id         Int    @id @default(autoincrement())
-  externalId String @default(uuid()) @db.VarChar(255)
-  slug       String @unique @db.VarChar(300)
-  name       String @db.VarChar(255)
+  id          Int          @id @default(autoincrement())
+  externalId  String       @default(uuid()) @db.VarChar(255)
+  slug        String       @unique @db.VarChar(300)
+  name        String       @db.VarChar(255)
   collections Collection[]
-  
+
   @@unique([externalId])
 }
 
