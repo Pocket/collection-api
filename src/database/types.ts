@@ -37,6 +37,11 @@ export type CreateLabelInput = {
   createdBy: string;
 };
 
+export type CreateCollectionLabelInput = {
+  collectionExternalId: string;
+  labelExternalId: string;
+};
+
 export type CreateCollectionInput = {
   authorExternalId: string;
   curationCategoryExternalId?: string;
