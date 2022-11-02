@@ -110,7 +110,6 @@ model Label {
 
 
   @@unique([externalId])
-  @@index([id])
   @@index([name])
 }
 
