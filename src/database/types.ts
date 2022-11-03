@@ -215,3 +215,8 @@ export enum CollectionLanguage {
   EN = 'EN',
   DE = 'DE',
 }
+
+export type Label = {
+  externalId: string;
+  name: string;
+};

@@ -313,6 +313,10 @@ export async function clear(prisma: PrismaClient): Promise<void> {
   await prisma.collectionPartnership.deleteMany({});
   await prisma.collectionPartner.deleteMany({});
 
+  // labels
+  await prisma.collectionLabel.deleteMany({});
+  await prisma.label.deleteMany({});
+
   // collection stories
   await prisma.collectionStoryAuthor.deleteMany({});
   await prisma.collectionStory.deleteMany({});

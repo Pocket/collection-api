@@ -264,6 +264,11 @@ type Query {
   getCollectionPartnerAssociationForCollection(
     externalId: String!
   ): CollectionPartnerAssociation
+
+  """
+  Retrieves all available Labels
+  """
+  labels: [Label!]!
 }
 
 type Mutation {
