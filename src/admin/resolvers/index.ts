@@ -35,6 +35,7 @@ import {
   updateCollectionStoryImageUrl,
 } from './mutations';
 import { collectionPartnershipFieldResolvers } from '../../shared/resolvers/types';
+import { labels } from './queries/Label';
 
 export const resolvers = {
   Mutation: {
@@ -71,6 +72,7 @@ export const resolvers = {
     getCurationCategories,
     getIABCategories,
     getLanguages,
+    labels,
   },
   CollectionPartnership: collectionPartnershipFieldResolvers,
 };

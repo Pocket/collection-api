@@ -159,3 +159,12 @@ export const GET_LANGUAGES = gql`
     getLanguages
   }
 `;
+
+export const LABELS = gql`
+  query labels {
+    labels {
+      externalId
+      name
+    }
+  }
+`;
