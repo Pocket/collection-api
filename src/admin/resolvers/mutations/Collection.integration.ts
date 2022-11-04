@@ -11,6 +11,7 @@ import {
   createCurationCategoryHelper,
   createIABCategoryHelper,
   sortCollectionStoryAuthors,
+  createLabelHelper,
 } from '../../../test/helpers';
 import {
   CollectionLanguage,
@@ -30,6 +31,8 @@ describe('mutations: Collection', () => {
   let curationCategory;
   let IABParentCategory;
   let IABChildCategory;
+  let label1;
+  let label2;
   let minimumData;
 
   const headers = {
@@ -59,6 +62,9 @@ describe('mutations: Collection', () => {
       'Bowling',
       IABParentCategory
     );
+
+    label1 = await createLabelHelper(db, 'most-read');
+    label2 = await createLabelHelper(db, 'best-of-2022');
 
     // re-create the minimum data necessary to create a collection
     minimumData = {
@@ -177,6 +183,37 @@ describe('mutations: Collection', () => {
       expect(data.createCollection.IABChildCategory.externalId).to.equal(
         IABChildCategory.externalId
       );
+    });
+
+    it('should create a collection with a label', async () => {
+      const { data } = await server.executeOperation({
+        query: CREATE_COLLECTION,
+        variables: {
+          data: {
+            ...minimumData,
+            labelExternalIds: [label1.externalId],
+          },
+        },
+      });
+
+      expect(data.createCollection.labels[0].externalId).to.equal(
+        label1.externalId
+      );
+      expect(data.createCollection.labels[0].name).to.equal(label1.name);
+    });
+
+    it('should create a collection with multiple labels', async () => {
+      const { data } = await server.executeOperation({
+        query: CREATE_COLLECTION,
+        variables: {
+          data: {
+            ...minimumData,
+            labelExternalIds: [label1.externalId, label2.externalId],
+          },
+        },
+      });
+
+      expect(data.createCollection.labels).to.have.length(2);
     });
 
     it('should not connect an IAB child category if an IAB parent category is not set', async () => {
