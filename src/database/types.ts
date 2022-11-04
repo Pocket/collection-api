@@ -192,6 +192,7 @@ export type CollectionComplete = Collection & {
   IABChildCategory?: IABCategory;
   partnership?: CollectionPartnership;
   stories?: CollectionStoryWithAuthors[];
+  labels?: Label[];
 };
 
 export type CreateImageInput = {
@@ -209,6 +210,7 @@ export type IABParentCategory = IABCategory & {
 
 export type CollectionsFilters = {
   language?: string;
+  labels?: string[];
 };
 
 export enum CollectionLanguage {
