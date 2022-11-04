@@ -34,7 +34,10 @@ import {
   updateCollectionStorySortOrder,
   updateCollectionStoryImageUrl,
 } from './mutations';
-import { collectionPartnershipFieldResolvers } from '../../shared/resolvers/types';
+import {
+  collectionLabelsFieldResolvers,
+  collectionPartnershipFieldResolvers,
+} from '../../shared/resolvers/types';
 import { labels } from './queries/Label';
 
 export const resolvers = {
@@ -75,4 +78,5 @@ export const resolvers = {
     labels,
   },
   CollectionPartnership: collectionPartnershipFieldResolvers,
+  Label: collectionLabelsFieldResolvers,
 };

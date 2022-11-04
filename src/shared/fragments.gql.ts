@@ -116,6 +116,10 @@ export const CollectionData = gql`
     IABChildCategory {
       ...IABCategoryData
     }
+    labels {
+      externalId
+      name
+    }
   }
   ${CurationCategoryData}, ${CollectionPartnershipData}, ${CollectionAuthorData}, ${CollectionStoryData}, ${IABCategoryData}
 `;
