@@ -49,9 +49,15 @@ export async function searchCollections(
     throw new ForbiddenError(ACCESS_DENIED_ERROR);
   }
 
-  if (!filters || (!filters.author && !filters.title && !filters.status)) {
+  if (
+    !filters ||
+    (!filters.author &&
+      !filters.title &&
+      !filters.status &&
+      !filters.labelExternalIds)
+  ) {
     throw new UserInputError(
-      `At least one filter('author', 'title', 'status') is required`
+      `At least one filter('author', 'title', 'status', 'labelExternalIds') is required`
     );
   }
 

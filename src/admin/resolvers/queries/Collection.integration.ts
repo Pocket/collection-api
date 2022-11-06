@@ -8,11 +8,15 @@ import {
   createCollectionPartnerAssociationHelper,
   createCurationCategoryHelper,
   createIABCategoryHelper,
+  createLabelHelper,
+  createCollectionLabelHelper,
   sortCollectionStoryAuthors,
   getServerWithMockedHeaders,
 } from '../../../test/helpers';
+import { CreateCollectionLabelInput } from '../../../database/types';
 import { COLLECTION_CURATOR_FULL } from '../../../shared/constants';
 import { GET_COLLECTION, SEARCH_COLLECTIONS } from './sample-queries.gql';
+import { v4 as uuidv4 } from 'uuid';
 
 describe('admin queries: Collection', () => {
   const headers = {
@@ -183,6 +187,7 @@ describe('admin queries: Collection', () => {
 
   describe('searchCollections', () => {
     let author2;
+    let fakeLabel;
 
     beforeEach(async () => {
       // create a second author for variety
@@ -210,11 +215,40 @@ describe('admin queries: Collection', () => {
         author,
         status: CollectionStatus.PUBLISHED,
       });
-      await createCollectionHelper(db, {
+      const fakeCollection = await createCollectionHelper(db, {
         title: 'the dude abides man',
         author,
         status: CollectionStatus.PUBLISHED,
       });
+
+      // create label and collection-label association
+      fakeLabel = await createLabelHelper(db, 'region-east-africa', 'fakeUser');
+      const collectionLabelInputData: CreateCollectionLabelInput = {
+        collectionId: fakeCollection.id,
+        labelId: fakeLabel.id,
+        createdAt: new Date(),
+        createdBy: 'fakeUser',
+      };
+      await createCollectionLabelHelper(db, collectionLabelInputData);
+    });
+
+    it('should search by labelExternalIds', async () => {
+      const { data } = await server.executeOperation({
+        query: SEARCH_COLLECTIONS,
+        variables: {
+          filters: {
+            labelExternalIds: [fakeLabel.externalId],
+          },
+        },
+      });
+
+      const collections = data?.searchCollections?.collections;
+
+      expect(collections.length).to.equal(1);
+      expect(collections[0].title).to.equal('the dude abides man');
+      expect(collections[0].labels[0].externalId).to.equal(
+        fakeLabel.externalId
+      );
     });
 
     it('should search by status', async () => {

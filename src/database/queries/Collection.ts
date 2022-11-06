@@ -4,7 +4,10 @@ import {
   CollectionComplete,
   CollectionsFilters,
 } from '../types';
-import { buildGetPublishedCollectionsWhere } from '../utils';
+import {
+  buildGetPublishedCollectionsWhere,
+  buildSearchCollectionsWhereClause,
+} from '../utils';
 
 /**
  * this is primarily an admin query, which is why we don't return any author
@@ -165,17 +168,14 @@ export async function searchCollections(
   perPage: number = undefined
 ): Promise<CollectionComplete[]> {
   let queryParams: any = {
-    where: {
-      status: filters.status,
-      title: { contains: filters.title },
-      authors: { every: { name: { contains: filters.author } } },
-    },
+    where: buildSearchCollectionsWhereClause(filters),
     orderBy: { updatedAt: 'desc' },
     include: {
       authors: true,
       curationCategory: true,
       IABParentCategory: true,
       IABChildCategory: true,
+      labels: true,
       partnership: true,
       stories: {
         include: {
