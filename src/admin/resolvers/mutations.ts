@@ -5,7 +5,6 @@ import {
   CollectionStory,
   Image,
   ImageEntityType,
-  PrismaClient,
 } from '@prisma/client';
 import { AuthenticationError } from 'apollo-server-errors';
 import {
@@ -52,7 +51,7 @@ import {
 } from '../../database/mutations';
 import { uploadImage } from '../../aws/upload';
 import { ACCESS_DENIED_ERROR } from '../../shared/constants';
-import { IContext } from '../context';
+import { AdminAPIUser, IContext } from '../context';
 
 /**
  * Executes a mutation, catches exceptions and records to sentry and console
@@ -64,7 +63,7 @@ import { IContext } from '../context';
 export async function executeMutation<T, U>(
   context: IContext,
   data: T,
-  callback: (db: PrismaClient, data: T) => Promise<U>,
+  callback: (db, data: T, authenticatedUser?: AdminAPIUser) => Promise<U>,
   imageEntityType: ImageEntityType = undefined
 ): Promise<U> {
   const { db, authenticatedUser } = context;
@@ -73,7 +72,7 @@ export async function executeMutation<T, U>(
     throw new AuthenticationError(ACCESS_DENIED_ERROR);
   }
 
-  const entity = await callback(db, data);
+  const entity = await callback(db, data, authenticatedUser);
   // Associate the image with the entity if the image entity type is provided
   // and a record for the image exists
   if (imageEntityType) {

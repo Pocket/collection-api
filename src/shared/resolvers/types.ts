@@ -1,4 +1,9 @@
-import { CollectionPartner, CollectionPartnership } from '@prisma/client';
+import {
+  CollectionLabel,
+  CollectionPartner,
+  CollectionPartnership,
+  Label,
+} from '@prisma/client';
 import { PrismaClient } from '@prisma/client';
 /**
  * Field-level resolvers for the public CollectionPartnership type.
@@ -46,6 +51,52 @@ export const collectionPartnershipFieldResolvers = {
 };
 
 /**
+ * Field-level resolvers for the Label type.
+ *
+ * Just like with the CollectionPartnership resolvers above, querying two fields
+ * on the label entity doesn't result in two separate queries.
+ *
+ * In both cases, for a query that returns labels directly from the database
+ * (e.g. `labels`), use the existing value from the Label table.
+ *
+ * For a query that goes through the CollectionLabel relationship table first,
+ * look up the values for the corresponding label in its own table.
+ */
+export const collectionLabelsFieldResolvers = {
+  async externalId(
+    parent: Label | CollectionLabel,
+    _,
+    { db }
+  ): Promise<string> {
+    // TypeScript is unhappy while running integration tests without these checks in place
+    if ('externalId' in parent) {
+      return parent.externalId;
+    }
+
+    if ('labelId' in parent) {
+      const label = await getLabelById(db, parent.labelId);
+      return label.externalId;
+    }
+
+    return null;
+  },
+
+  async name(parent: Label | CollectionLabel, _, { db }): Promise<string> {
+    // TypeScript is unhappy while running integration tests without these checks in place
+    if ('name' in parent) {
+      return parent.name;
+    }
+
+    if ('labelId' in parent) {
+      const label = await getLabelById(db, parent.labelId);
+      return label.name;
+    }
+
+    return null;
+  },
+};
+
+/**
  * Look up the collection partner via its primary key.
  *
  * @param db
@@ -56,6 +107,18 @@ const getPartnerById = async (
   id: number
 ): Promise<CollectionPartner> => {
   return await db.collectionPartner.findUnique({
+    where: { id },
+  });
+};
+
+/**
+ * Look up the collection label via its primary key.
+ *
+ * @param db
+ * @param id
+ */
+const getLabelById = async (db: PrismaClient, id: number): Promise<Label> => {
+  return await db.label.findUnique({
     where: { id },
   });
 };

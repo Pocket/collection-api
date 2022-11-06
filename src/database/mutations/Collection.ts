@@ -9,6 +9,7 @@ import {
   UpdateCollectionInput,
 } from '../types';
 import { NotFoundError } from '@pocket-tools/apollo-utils';
+import { AdminAPIUser } from '../../admin/context';
 
 /**
  * @param db
@@ -16,7 +17,8 @@ import { NotFoundError } from '@pocket-tools/apollo-utils';
  */
 export async function createCollection(
   db: PrismaClient,
-  data: CreateCollectionInput
+  data: CreateCollectionInput,
+  authenticatedUser: AdminAPIUser
 ): Promise<CollectionComplete> {
   const slugExists = await db.collection.count({
     where: { slug: data.slug },
@@ -47,6 +49,10 @@ export async function createCollection(
   delete data.IABParentCategoryExternalId;
   delete data.IABChildCategoryExternalId;
 
+  // One more time with external IDs for labels
+  const labelExternalIds = data.labelExternalIds;
+  delete data.labelExternalIds;
+
   // we need to build dbData conditionally, as some entity connections may or
   // may not need to be created
   const dbData: any = {
@@ -74,6 +80,20 @@ export async function createCollection(
     }
   }
 
+  // if a collection has any labels, set up a connection to labels, too
+  if (labelExternalIds) {
+    const connectIds = [];
+
+    for (const id of labelExternalIds) {
+      connectIds.push({
+        label: { connect: { externalId: id } },
+        createdBy: authenticatedUser.username,
+      });
+    }
+
+    dbData.labels = { create: connectIds };
+  }
+
   return db.collection.create({
     data: dbData,
     include: {
@@ -81,6 +101,7 @@ export async function createCollection(
       curationCategory: true,
       IABParentCategory: true,
       IABChildCategory: true,
+      labels: true,
       // Note that partnership is included to conform to the return type - there
       // will never be a partnership set up at the time a collection is created.
       partnership: true,

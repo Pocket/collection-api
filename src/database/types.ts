@@ -52,6 +52,7 @@ export type CreateCollectionInput = {
   IABParentCategoryExternalId?: string;
   imageUrl?: string;
   intro?: string;
+  labelExternalIds?: string[];
   language: CollectionLanguage;
   slug: string;
   status?: CollectionStatus;
