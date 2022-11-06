@@ -8,6 +8,7 @@ import {
   CollectionStory,
   CurationCategory,
   IABCategory,
+  CollectionLabel,
 } from '@prisma/client';
 
 export type CreateCollectionAuthorInput = {
@@ -193,7 +194,7 @@ export type CollectionComplete = Collection & {
   IABChildCategory?: IABCategory;
   partnership?: CollectionPartnership;
   stories?: CollectionStoryWithAuthors[];
-  labels?: Label[];
+  labels?: CollectionLabel[];
 };
 
 export type CreateImageInput = {

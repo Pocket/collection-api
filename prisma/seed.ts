@@ -36,6 +36,12 @@ async function main() {
     'kchinnappan'
   );
 
+  const herrajLabel = await createLabelHelper(
+    prisma,
+    'region-east-europe',
+    'hluhano'
+  );
+
   // create Label with default values
   await createLabelHelper(prisma);
 
@@ -65,6 +71,12 @@ async function main() {
 
   // create collection - label association
   await createCollectionLabelHelper(prisma, collectionLabelInputData);
+
+  await createCollectionLabelHelper(prisma, {
+    ...collectionLabelInputData,
+    labelId: herrajLabel.id,
+    createdBy: 'hluhano',
+  });
 
   const curationCategory2 = await createCurationCategoryHelper(
     prisma,
