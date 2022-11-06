@@ -29,7 +29,7 @@ export function buildGetPublishedCollectionsWhere(
   }
 
   // if labels are provided on the filter, update the WHERE clause
-  if (filters.labels) {
+  if (filters?.labels && filters?.labels.length != 0) {
     where.labels = {
       some: { label: { name: { in: filters.labels } } },
     };
