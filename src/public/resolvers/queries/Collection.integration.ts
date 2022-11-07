@@ -1,6 +1,9 @@
 import { expect } from 'chai';
 import { db, getServer } from '../../../test/public-server';
-import { CollectionLanguage } from '../../../database/types';
+import {
+  CollectionLanguage,
+  CreateCollectionLabelInput,
+} from '../../../database/types';
 import {
   clear as clearDb,
   createAuthorHelper,
@@ -9,7 +12,7 @@ import {
   createIABCategoryHelper,
   sortCollectionStoryAuthors,
   createLabelHelper,
-  //createCollectionLabelHelper,
+  createCollectionLabelHelper,
 } from '../../../test/helpers';
 import {
   COLLECTION_BY_SLUG,
@@ -22,7 +25,7 @@ import {
   CollectionStatus,
   CurationCategory,
   IABCategory,
-  //Label,
+  Label,
 } from '@prisma/client';
 
 describe('public queries: Collection', () => {
@@ -32,6 +35,7 @@ describe('public queries: Collection', () => {
   let curationCategory: CurationCategory;
   let IABParentCategory: IABCategory;
   let IABChildCategory: IABCategory;
+  const labels: Label[] = [];
 
   beforeAll(async () => {
     await clearDb(db);
@@ -53,8 +57,9 @@ describe('public queries: Collection', () => {
       IABParentCategory
     );
 
-    await createLabelHelper(db, 'test-label-one');
-    await createLabelHelper(db, 'test-label-two');
+    // create two test labels
+    labels.push(await createLabelHelper(db, 'test-label-one'));
+    labels.push(await createLabelHelper(db, 'test-label-two'));
   });
 
   afterAll(async () => {
@@ -487,28 +492,183 @@ describe('public queries: Collection', () => {
       );
     });
 
-    xit('should get collection with the specified label', async () => {
-      await createCollectionHelper(db, {
-        title: 'first',
+    it('should get collection with the specified label filter', async () => {
+      const testCollection = await createCollectionHelper(db, {
+        title: 'label-test-collection',
         author,
         status: CollectionStatus.PUBLISHED,
         language: CollectionLanguage.EN,
       });
 
+      // create Collection-Label association
+      const collectionLabelInput: CreateCollectionLabelInput = {
+        collectionId: testCollection.id,
+        createdAt: new Date(),
+        createdBy: 'hluhano',
+        labelId: labels[0].id,
+      };
+
+      // assign the above Collection-Label association
+      await createCollectionLabelHelper(db, collectionLabelInput);
+
+      // request collections with the only one label provided in the filters
       const { data } = await server.executeOperation({
         query: GET_COLLECTIONS,
         variables: {
           filters: {
-            // XX is not a language code we support
-            language: 'XX',
+            labels: [`${labels[0].name}`],
           },
         },
       });
 
       const collections = data?.getCollections?.collections;
 
-      // there are two `EN` language published collections above
-      expect(collections.length).to.equal(2);
+      // we should get only one collection back
+      expect(collections.length).to.equal(1);
+      // returned collection should only have one label
+      expect(collections[0].labels.length).to.equal(1);
+      expect(collections[0].labels[0].name).to.equal(labels[0].name);
+    });
+
+    it('should get collection when only one of its assigned labels is provided in filters', async () => {
+      const testCollection = await createCollectionHelper(db, {
+        title: 'label-test-collection',
+        author,
+        status: CollectionStatus.PUBLISHED,
+        language: CollectionLanguage.EN,
+      });
+
+      // create Collection-Label association
+      const collectionLabelInput: CreateCollectionLabelInput = {
+        collectionId: testCollection.id,
+        createdAt: new Date(),
+        createdBy: 'hluhano',
+        labelId: labels[0].id,
+      };
+
+      // assign the above Collection-Label association
+      await createCollectionLabelHelper(db, collectionLabelInput);
+      // assign another Collection-Label association
+      await createCollectionLabelHelper(db, {
+        ...collectionLabelInput,
+        labelId: labels[1].id,
+      });
+
+      // request collections with only one of the assigned labels
+      const { data } = await server.executeOperation({
+        query: GET_COLLECTIONS,
+        variables: {
+          filters: {
+            labels: [`${labels[0].name}`],
+          },
+        },
+      });
+
+      const collections = data?.getCollections?.collections;
+
+      // we should get only one collection back
+      expect(collections.length).to.equal(1);
+      expect(collections[0].externalId).to.equal(testCollection.externalId);
+      // returned collection should have two labels
+      expect(collections[0].labels.length).to.equal(2);
+      expect(collections[0].labels[0].name).to.equal(labels[0].name);
+      expect(collections[0].labels[1].name).to.equal(labels[1].name);
+    });
+
+    it('should get only one collection when the label provided is only assigned to one', async () => {
+      const testCollection = await createCollectionHelper(db, {
+        title: 'label-test-collection',
+        author,
+        status: CollectionStatus.PUBLISHED,
+        language: CollectionLanguage.EN,
+      });
+
+      // create second collcection
+      await createCollectionHelper(db, {
+        title: 'label-test-collection-second',
+        author,
+        status: CollectionStatus.PUBLISHED,
+        language: CollectionLanguage.EN,
+      });
+
+      // create Collection-Label association just for the first collection
+      const collectionLabelInput: CreateCollectionLabelInput = {
+        collectionId: testCollection.id,
+        createdAt: new Date(),
+        createdBy: 'hluhano',
+        labelId: labels[0].id,
+      };
+
+      // assign the above Collection-Label association just to the first collection
+      await createCollectionLabelHelper(db, collectionLabelInput);
+
+      // request collections with only one of the assigned labels
+      const { data } = await server.executeOperation({
+        query: GET_COLLECTIONS,
+        variables: {
+          filters: {
+            labels: [`${labels[0].name}`],
+          },
+        },
+      });
+
+      const collections = data?.getCollections?.collections;
+
+      // we should get only one collection back
+      expect(collections.length).to.equal(1);
+      expect(collections[0].externalId).to.equal(testCollection.externalId);
+      // returned collection should only one label
+      expect(collections[0].labels.length).to.equal(1);
+      expect(collections[0].labels[0].name).to.equal(labels[0].name);
+    });
+
+    it('should get no collections the labels provided are not assigned to any one', async () => {
+      const testCollection = await createCollectionHelper(db, {
+        title: 'label-test-collection',
+        author,
+        status: CollectionStatus.PUBLISHED,
+        language: CollectionLanguage.EN,
+      });
+
+      // create second collcection
+      const testCollectionSecond = await createCollectionHelper(db, {
+        title: 'label-test-collection-second',
+        author,
+        status: CollectionStatus.PUBLISHED,
+        language: CollectionLanguage.EN,
+      });
+
+      // create Collection-Label association for the first collection
+      const collectionLabelInput: CreateCollectionLabelInput = {
+        collectionId: testCollection.id,
+        createdAt: new Date(),
+        createdBy: 'hluhano',
+        labelId: labels[0].id,
+      };
+
+      // assign the above Collection-Label association to the first collection
+      await createCollectionLabelHelper(db, collectionLabelInput);
+
+      // assign the above Collection-Label association to the second collection
+      await createCollectionLabelHelper(db, {
+        ...collectionLabelInput,
+        collectionId: testCollectionSecond.id,
+      });
+
+      // request collections with the label which is not assigned any collection
+      const { data } = await server.executeOperation({
+        query: GET_COLLECTIONS,
+        variables: {
+          filters: {
+            labels: [`${labels[1].name}`],
+          },
+        },
+      });
+
+      const collections = data?.getCollections?.collections;
+
+      // we should get no collections back
+      expect(collections.length).to.equal(0);
     });
   });
 
