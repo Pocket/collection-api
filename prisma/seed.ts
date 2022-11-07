@@ -28,6 +28,7 @@ async function main() {
   const daniel = await createAuthorHelper(prisma, 'Daniel');
   const nina = await createAuthorHelper(prisma, 'Nina');
   const katerina = await createAuthorHelper(prisma, 'Katerina');
+  const herraj = await createAuthorHelper(prisma, 'Herraj');
 
   //create Label with label name and creator
   const katerinaLabel = await createLabelHelper(
@@ -72,10 +73,25 @@ async function main() {
   // create collection - label association
   await createCollectionLabelHelper(prisma, collectionLabelInputData);
 
-  await createCollectionLabelHelper(prisma, {
-    ...collectionLabelInputData,
+  const herrajCollection = await createCollectionHelper(prisma, {
+    title: `Herraj's first collection`,
+    author: herraj,
+    status: CollectionStatus.PUBLISHED,
+    curationCategory: curationCategory1,
+  });
+
+  const herrajcollectionLabelInputData: CreateCollectionLabelInput = {
+    collectionId: herrajCollection.id,
     labelId: herrajLabel.id,
+    createdAt: new Date(),
     createdBy: 'hluhano',
+  };
+
+  await createCollectionLabelHelper(prisma, herrajcollectionLabelInputData);
+  await createCollectionLabelHelper(prisma, {
+    ...herrajcollectionLabelInputData,
+    labelId: katerinaLabel.id,
+    createdBy: 'kchinnappan',
   });
 
   const curationCategory2 = await createCurationCategoryHelper(
