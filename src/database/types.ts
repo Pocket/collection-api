@@ -179,6 +179,7 @@ export type CollectionPartnership = {
 
 export type SearchCollectionsFilters = {
   author?: string;
+  labelExternalIds?: string[];
   title?: string;
   status?: CollectionStatus;
 };
