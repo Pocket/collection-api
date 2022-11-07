@@ -68,6 +68,7 @@ export type UpdateCollectionInput = {
   IABParentCategoryExternalId?: string;
   imageUrl?: string;
   intro?: string;
+  labelExternalIds?: string[];
   language: CollectionLanguage;
   publishedAt?: Date;
   slug: string;

@@ -70,6 +70,7 @@ input UpdateCollectionInput {
   curationCategoryExternalId: String
   IABParentCategoryExternalId: String
   IABChildCategoryExternalId: String
+  labelExternalIds: [String]
 }
 
 input UpdateCollectionImageUrlInput {

@@ -291,10 +291,19 @@ describe('mutations: Collection', () => {
         status: CollectionStatus.DRAFT,
       };
 
+      // We need to mock an API user to call a DB resolver directly in this test
+      const adminApiUser = {
+        name: 'Test User',
+        groups: ['any-group'],
+        username: 'test-user-ldap-something',
+        hasFullAccess: true,
+        canRead: true,
+      };
+
       // updatedAt is not a part of our API schema, but it's important to
       // test that this value is being updated, as it's used in sorting
       // results sent back to public clients
-      const updated = await updateCollection(db, input);
+      const updated = await updateCollection(db, input, adminApiUser);
 
       // should have updated the updatedAt field
       expect(updated.updatedAt.getTime()).to.be.greaterThan(
@@ -439,13 +448,131 @@ describe('mutations: Collection', () => {
       expect(data.updateCollection.IABChildCategory).not.to.exist;
     });
 
-    it('should return all associated data after updating - authors, curation category, IAB categories, stories, and story authors', async () => {
+    it('should add labels to a collection that has not had any previously', async () => {
+      const input: UpdateCollectionInput = {
+        authorExternalId: author.externalId,
+        externalId: initial.externalId,
+        language: CollectionLanguage.DE,
+        slug: initial.slug,
+        title: 'second iteration',
+        excerpt: 'once upon a time, the internet...',
+        status: CollectionStatus.DRAFT,
+        labelExternalIds: [label1.externalId, label2.externalId],
+      };
+
+      const { data } = await server.executeOperation({
+        query: UPDATE_COLLECTION,
+        variables: {
+          data: input,
+        },
+      });
+
+      // make sure there are no errors before running other expect() statements
+      expect(data.errors).to.be.undefined;
+
+      // expect to see two new labels
+      expect(data.updateCollection.labels).to.have.length(2);
+    });
+
+    it('should remove existing labels on a collection if no new labels are provided', async () => {
+      // first, let's create a collection with a label
+      const { data: initial } = await server.executeOperation({
+        query: CREATE_COLLECTION,
+        variables: {
+          data: {
+            ...minimumData,
+            labelExternalIds: [label1.externalId, label2.externalId],
+          },
+        },
+      });
+
+      // provide a mock input that lacks any labels
+      const input: UpdateCollectionInput = {
+        authorExternalId: author.externalId,
+        externalId: initial.createCollection.externalId,
+        language: CollectionLanguage.DE,
+        slug: initial.createCollection.slug,
+        title: 'second iteration',
+        excerpt: 'once upon a time, the internet...',
+        status: CollectionStatus.DRAFT,
+      };
+
+      // run the update query on the server
+      const { data } = await server.executeOperation({
+        query: UPDATE_COLLECTION,
+        variables: {
+          data: input,
+        },
+      });
+
+      // make sure there are no errors before running other expect() statements
+      expect(data.errors).to.be.undefined;
+
+      // expect to see no labels whatsoever after the update
+      expect(data.updateCollection.labels).to.have.length(0);
+    });
+
+    it('should replace labels if a new set of labels was provided', async () => {
+      // first, let's create a collection with a label or two
+      const { data: initial } = await server.executeOperation({
+        query: CREATE_COLLECTION,
+        variables: {
+          data: {
+            ...minimumData,
+            labelExternalIds: [label1.externalId, label2.externalId],
+          },
+        },
+      });
+
+      // create two new labels
+      const label3 = await createLabelHelper(db, 'flying-is-overrated');
+      const label4 = await createLabelHelper(db, 'trains-are-the-best');
+
+      // provide a mock input with two different labels
+      const input: UpdateCollectionInput = {
+        authorExternalId: author.externalId,
+        externalId: initial.createCollection.externalId,
+        language: CollectionLanguage.DE,
+        labelExternalIds: [label3.externalId, label4.externalId],
+        slug: initial.createCollection.slug,
+        title: 'second iteration',
+        excerpt: 'once upon a time, the internet...',
+        status: CollectionStatus.DRAFT,
+      };
+
+      // run the update query on the server
+      const { data } = await server.executeOperation({
+        query: UPDATE_COLLECTION,
+        variables: {
+          data: input,
+        },
+      });
+
+      // make sure there are no errors before running other expect() statements
+      expect(data.errors).to.be.undefined;
+
+      // expect to see two labels
+      expect(data.updateCollection.labels).to.have.length(2);
+
+      // make sure it's the two new labels we provided in the update variables
+      expect(data.updateCollection.labels[0].name).to.equal(label3.name);
+      expect(data.updateCollection.labels[0].externalId).to.equal(
+        label3.externalId
+      );
+      expect(data.updateCollection.labels[1].name).to.equal(label4.name);
+      expect(data.updateCollection.labels[1].externalId).to.equal(
+        label4.externalId
+      );
+    });
+
+    it('should return all associated data after updating - authors, curation category, IAB categories, stories, labels and story authors', async () => {
       const input: UpdateCollectionInput = {
         IABChildCategoryExternalId: IABChildCategory.externalId,
         IABParentCategoryExternalId: IABParentCategory.externalId,
         authorExternalId: author.externalId,
         curationCategoryExternalId: curationCategory.externalId,
         externalId: initial.externalId,
+        labelExternalIds: [label1.externalId, label2.externalId],
         language: CollectionLanguage.DE,
         slug: initial.slug,
         title: 'second iteration',
@@ -473,6 +600,7 @@ describe('mutations: Collection', () => {
       expect(data.updateCollection.curationCategory).to.exist;
       expect(data.updateCollection.IABParentCategory).to.exist;
       expect(data.updateCollection.IABChildCategory).to.exist;
+      expect(data.updateCollection.labels).to.have.lengthOf(2);
     });
 
     it('should return story author sorted correctly', async () => {

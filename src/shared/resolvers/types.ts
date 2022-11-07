@@ -68,11 +68,17 @@ export const collectionLabelsFieldResolvers = {
     _,
     { db }
   ): Promise<string> {
-    // TypeScript is unhappy while running integration tests without these checks in place
+    // TypeScript is unhappy while running integration tests without these specific
+    // checks in place - if('externalId' in parent) rather than if(parent.externalId).
+
+    // The 'externalId' prop is present only on the Label entity, so if that exists,
+    // we can just return the value as is
     if ('externalId' in parent) {
       return parent.externalId;
     }
 
+    // The 'labelId' is present only on the CollectionLabel entity, so we need to
+    // query the linked Label entity to get the external ID of the label
     if ('labelId' in parent) {
       const label = await getLabelById(db, parent.labelId);
       return label.externalId;
@@ -82,11 +88,17 @@ export const collectionLabelsFieldResolvers = {
   },
 
   async name(parent: Label | CollectionLabel, _, { db }): Promise<string> {
-    // TypeScript is unhappy while running integration tests without these checks in place
+    // TypeScript is unhappy while running integration tests without these specific
+    // checks in place - if('name' in parent) rather than if(parent.name).
+
+    // The 'name' prop is present only on the Label entity, so if that exists, we can just
+    // return the value as is
     if ('name' in parent) {
       return parent.name;
     }
 
+    // The 'labelId' is present only on the CollectionLabel entity, so we need to
+    // query the linked Label entity to get the name of the label
     if ('labelId' in parent) {
       const label = await getLabelById(db, parent.labelId);
       return label.name;
