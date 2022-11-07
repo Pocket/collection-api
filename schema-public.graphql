@@ -3,6 +3,11 @@ input CollectionsFiltersInput {
   if not provided, or if an unsupported language is requested, defaults to `en`
   """
   language: String
+
+  """
+  if provided, will return collections that match at least one of the labels.
+  """
+  labels: [String]
 }
 
 type Query {

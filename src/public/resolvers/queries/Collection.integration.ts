@@ -8,6 +8,8 @@ import {
   createCurationCategoryHelper,
   createIABCategoryHelper,
   sortCollectionStoryAuthors,
+  createLabelHelper,
+  //createCollectionLabelHelper,
 } from '../../../test/helpers';
 import {
   COLLECTION_BY_SLUG,
@@ -20,6 +22,7 @@ import {
   CollectionStatus,
   CurationCategory,
   IABCategory,
+  //Label,
 } from '@prisma/client';
 
 describe('public queries: Collection', () => {
@@ -49,6 +52,9 @@ describe('public queries: Collection', () => {
       'Bowling',
       IABParentCategory
     );
+
+    await createLabelHelper(db, 'test-label-one');
+    await createLabelHelper(db, 'test-label-two');
   });
 
   afterAll(async () => {
@@ -479,6 +485,30 @@ describe('public queries: Collection', () => {
       expect(collections[0].stories[0].authors).to.equal(
         sortCollectionStoryAuthors(collections[0].stories[0].authors)
       );
+    });
+
+    xit('should get collection with the specified label', async () => {
+      await createCollectionHelper(db, {
+        title: 'first',
+        author,
+        status: CollectionStatus.PUBLISHED,
+        language: CollectionLanguage.EN,
+      });
+
+      const { data } = await server.executeOperation({
+        query: GET_COLLECTIONS,
+        variables: {
+          filters: {
+            // XX is not a language code we support
+            language: 'XX',
+          },
+        },
+      });
+
+      const collections = data?.getCollections?.collections;
+
+      // there are two `EN` language published collections above
+      expect(collections.length).to.equal(2);
     });
   });
 
