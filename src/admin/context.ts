@@ -10,7 +10,7 @@ export interface AdminAPIUser {
   name: string;
   groups: string[];
   username: string;
-  // access to collections is failry basic - you can either do everything or only read
+  // access to collections is fairly basic - you can either do everything or only read
   hasFullAccess: boolean;
   canRead: boolean;
 }
