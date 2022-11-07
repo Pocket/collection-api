@@ -470,7 +470,7 @@ describe('mutations: Collection', () => {
       // make sure there are no errors before running other expect() statements
       expect(data.errors).to.be.undefined;
 
-      // expect to see no labels whatsoever after the update
+      // expect to see two new labels
       expect(data.updateCollection.labels).to.have.length(2);
     });
 
