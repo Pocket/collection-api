@@ -1,4 +1,4 @@
-import { ForbiddenError, UserInputError } from 'apollo-server-errors';
+import { ForbiddenError } from 'apollo-server-errors';
 import { NotFoundError } from '@pocket-tools/apollo-utils';
 import { CollectionComplete } from '../../../database/types';
 import { CollectionsResult } from '../../../typeDefs';
@@ -7,7 +7,7 @@ import {
   searchCollections as dbSearchCollections,
 } from '../../../database/queries';
 import config from '../../../config';
-import { getPagination } from '../../../utils';
+import { collectionFilterValidation, getPagination } from '../../../utils';
 import { ACCESS_DENIED_ERROR } from '../../../shared/constants';
 
 /**
@@ -48,18 +48,10 @@ export async function searchCollections(
   if (!authenticatedUser.canRead) {
     throw new ForbiddenError(ACCESS_DENIED_ERROR);
   }
-
-  if (
-    !filters ||
-    (!filters.author &&
-      !filters.title &&
-      !filters.status &&
-      !filters.labelExternalIds)
-  ) {
-    throw new UserInputError(
-      `At least one filter('author', 'title', 'status', 'labelExternalIds') is required`
-    );
-  }
+  collectionFilterValidation(
+    filters,
+    'author, title, status, labelExternalIds'
+  );
 
   const totalResults = (await dbSearchCollections(db, filters)).length;
   const collections = await dbSearchCollections(db, filters, page, perPage);

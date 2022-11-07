@@ -1,4 +1,5 @@
 import { Pagination } from './typeDefs';
+import { UserInputError } from 'apollo-server-errors';
 
 /**
  * Returns the pagination response object
@@ -6,7 +7,6 @@ import { Pagination } from './typeDefs';
  * @param page
  * @param perPage
  */
-
 export function getPagination(
   totalResults: number,
   page: number,
@@ -18,4 +18,17 @@ export function getPagination(
     totalResults,
     perPage,
   };
+}
+
+/**
+ * validates if at least one filter is present
+ * @param filters
+ * @param properties
+ */
+export function collectionFilterValidation(filters: any, properties: string) {
+  if (!Object.keys(filters).length) {
+    throw new UserInputError(
+      `At least one filter ` + properties + ` is required`
+    );
+  }
 }

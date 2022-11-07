@@ -16,7 +16,6 @@ import {
 import { CreateCollectionLabelInput } from '../../../database/types';
 import { COLLECTION_CURATOR_FULL } from '../../../shared/constants';
 import { GET_COLLECTION, SEARCH_COLLECTIONS } from './sample-queries.gql';
-import { v4 as uuidv4 } from 'uuid';
 
 describe('admin queries: Collection', () => {
   const headers = {
@@ -188,6 +187,8 @@ describe('admin queries: Collection', () => {
   describe('searchCollections', () => {
     let author2;
     let fakeLabel;
+    let fakeLabel2;
+    let fakeLabel3;
 
     beforeEach(async () => {
       // create a second author for variety
@@ -210,7 +211,7 @@ describe('admin queries: Collection', () => {
         author: author2,
         status: CollectionStatus.PUBLISHED,
       });
-      await createCollectionHelper(db, {
+      const fakeCollection1 = await createCollectionHelper(db, {
         title: 'finishing my coffee',
         author,
         status: CollectionStatus.PUBLISHED,
@@ -223,16 +224,83 @@ describe('admin queries: Collection', () => {
 
       // create label and collection-label association
       fakeLabel = await createLabelHelper(db, 'region-east-africa', 'fakeUser');
+      fakeLabel2 = await createLabelHelper(
+        db,
+        'region-south-africa',
+        'fakeUser'
+      );
+      fakeLabel3 = await createLabelHelper(
+        db,
+        'region-west-africa',
+        'fakeUser'
+      );
       const collectionLabelInputData: CreateCollectionLabelInput = {
         collectionId: fakeCollection.id,
         labelId: fakeLabel.id,
         createdAt: new Date(),
         createdBy: 'fakeUser',
       };
+      const collectionLabelInputData2: CreateCollectionLabelInput = {
+        collectionId: fakeCollection.id,
+        labelId: fakeLabel2.id,
+        createdAt: new Date(),
+        createdBy: 'fakeUser',
+      };
+      const collectionLabelInputData3: CreateCollectionLabelInput = {
+        collectionId: fakeCollection1.id,
+        labelId: fakeLabel3.id,
+        createdAt: new Date(),
+        createdBy: 'fakeUser',
+      };
       await createCollectionLabelHelper(db, collectionLabelInputData);
+      await createCollectionLabelHelper(db, collectionLabelInputData2);
+      await createCollectionLabelHelper(db, collectionLabelInputData3);
     });
 
-    it('should search by labelExternalIds', async () => {
+    it('should search by multiple labelExternalIds in a collection', async () => {
+      const { data } = await server.executeOperation({
+        query: SEARCH_COLLECTIONS,
+        variables: {
+          filters: {
+            labelExternalIds: [fakeLabel.externalId, fakeLabel2.externalId],
+          },
+        },
+      });
+
+      const collections = data?.searchCollections?.collections;
+
+      expect(collections.length).to.equal(1);
+      expect(collections[0].title).to.equal('the dude abides man');
+      expect(collections[0].labels.length).to.equal(2);
+      expect(collections[0].labels[0].externalId).to.equal(
+        fakeLabel.externalId
+      );
+      expect(collections[0].labels[1].externalId).to.equal(
+        fakeLabel2.externalId
+      );
+    });
+
+    it('should search by multiple labelExternalId & return a collection with only one of the searched labels', async () => {
+      const { data } = await server.executeOperation({
+        query: SEARCH_COLLECTIONS,
+        variables: {
+          filters: {
+            labelExternalIds: ['fake-uuid', fakeLabel3.externalId],
+          },
+        },
+      });
+
+      const collections = data?.searchCollections?.collections;
+
+      expect(collections.length).to.equal(1);
+      expect(collections[0].title).to.equal('finishing my coffee');
+      expect(collections[0].labels.length).to.equal(1);
+      expect(collections[0].labels[0].externalId).to.equal(
+        fakeLabel3.externalId
+      );
+    });
+
+    it('should search by one labelExternalId in collection(s) with more than 1 label', async () => {
       const { data } = await server.executeOperation({
         query: SEARCH_COLLECTIONS,
         variables: {
@@ -246,9 +314,28 @@ describe('admin queries: Collection', () => {
 
       expect(collections.length).to.equal(1);
       expect(collections[0].title).to.equal('the dude abides man');
+      expect(collections[0].labels.length).to.equal(2);
       expect(collections[0].labels[0].externalId).to.equal(
         fakeLabel.externalId
       );
+      expect(collections[0].labels[1].externalId).to.equal(
+        fakeLabel2.externalId
+      );
+    });
+
+    it('should return no labels when searching by a non-existent label', async () => {
+      const { data } = await server.executeOperation({
+        query: SEARCH_COLLECTIONS,
+        variables: {
+          filters: {
+            labelExternalIds: ['fake-uuid'],
+          },
+        },
+      });
+
+      const collections = data?.searchCollections?.collections;
+
+      expect(collections.length).to.equal(0);
     });
 
     it('should search by status', async () => {
