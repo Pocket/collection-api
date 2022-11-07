@@ -14,6 +14,7 @@ import { AdminAPIUser } from '../../admin/context';
 /**
  * @param db
  * @param data
+ * @param authenticatedUser
  */
 export async function createCollection(
   db: PrismaClient,
@@ -123,10 +124,12 @@ export async function createCollection(
 /**
  * @param db
  * @param data
+ * @param authenticatedUser
  */
 export async function updateCollection(
   db: PrismaClient,
-  data: UpdateCollectionInput
+  data: UpdateCollectionInput,
+  authenticatedUser: AdminAPIUser
 ): Promise<CollectionComplete> {
   // retrieve the current record, pre-update
   const existingCollection = await getCollection(db, data.externalId);
@@ -174,6 +177,10 @@ export async function updateCollection(
   const IABChildCategoryExternalId = data.IABChildCategoryExternalId;
   delete data.IABParentCategoryExternalId;
   delete data.IABChildCategoryExternalId;
+
+  // One more time with external IDs for labels
+  const labelExternalIds = data.labelExternalIds;
+  delete data.labelExternalIds;
 
   // if the collection is going from unpublished to published, we update its
   // `publishedAt` time
@@ -229,6 +236,40 @@ export async function updateCollection(
     };
   }
 
+  /**
+   *   Remove any previous labels attached to this collection.
+   *
+   *   Doing this in a canonical way, either with `disconnect` or `set`,
+   *   results in the "The change you are trying to make would violate the required relation
+   *   'CollectionToCollectionLabel' between the `Collection` and `CollectionLabel`" error.
+   *
+   *   This is most likely due to the many-to-many relationship here and the need for
+   *   a linking table - other entities' relationships to Collection entity are either set up
+   *   differently, or, in the case of CollectionPartnership, we never attempt to remove the link
+   *   between Collection and CollectionPartner in a single throw-the-kitchen-sink-at-it update
+   *   statement like the one we're constructing at the end of this method.
+   */
+  await db.collectionLabel.deleteMany({
+    where: {
+      collectionId: existingCollection.id,
+    },
+  });
+
+  // If a collection has any labels, set up a connection to labels, too
+  if (labelExternalIds) {
+    const connectIds = [];
+
+    for (const id of labelExternalIds) {
+      connectIds.push({
+        label: { connect: { externalId: id } },
+        createdBy: authenticatedUser.username,
+      });
+    }
+
+    // First, unset links to any previous labels; then attach new labels.
+    dbData.labels = { set: [], create: connectIds };
+  }
+
   return db.collection.update({
     where: { externalId: data.externalId },
     data: dbData,
@@ -238,6 +279,7 @@ export async function updateCollection(
       IABChildCategory: true,
       IABParentCategory: true,
       partnership: true,
+      labels: true,
       stories: {
         orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
         include: {

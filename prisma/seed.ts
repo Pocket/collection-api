@@ -33,7 +33,7 @@ async function main() {
   //create Label with label name and creator
   const katerinaLabel = await createLabelHelper(
     prisma,
-    'region-east-africa',
+    'region-west-africa',
     'kchinnappan'
   );
 
