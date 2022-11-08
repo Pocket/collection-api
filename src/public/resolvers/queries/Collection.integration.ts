@@ -35,7 +35,6 @@ describe('public queries: Collection', () => {
   let curationCategory: CurationCategory;
   let IABParentCategory: IABCategory;
   let IABChildCategory: IABCategory;
-  const labels: Label[] = [];
 
   beforeAll(async () => {
     await clearDb(db);
@@ -56,15 +55,10 @@ describe('public queries: Collection', () => {
       'Bowling',
       IABParentCategory
     );
-
-    // create two test labels
-    labels.push(await createLabelHelper(db, 'test-label-one'));
-    labels.push(await createLabelHelper(db, 'test-label-two'));
   });
 
   afterAll(async () => {
     await db.$disconnect();
-    await server.stop();
   });
 
   describe('getCollections', () => {
@@ -500,12 +494,14 @@ describe('public queries: Collection', () => {
         language: CollectionLanguage.EN,
       });
 
+      const label = await createLabelHelper(db, 'test-label-one');
+
       // create Collection-Label association
       const collectionLabelInput: CreateCollectionLabelInput = {
         collectionId: testCollection.id,
         createdAt: new Date(),
         createdBy: 'hluhano',
-        labelId: labels[0].id,
+        labelId: label.id,
       };
 
       // assign the above Collection-Label association
@@ -516,7 +512,7 @@ describe('public queries: Collection', () => {
         query: GET_COLLECTIONS,
         variables: {
           filters: {
-            labels: [`${labels[0].name}`],
+            labels: [`${label.name}`],
           },
         },
       });
@@ -527,7 +523,7 @@ describe('public queries: Collection', () => {
       expect(collections.length).to.equal(1);
       // returned collection should only have one label
       expect(collections[0].labels.length).to.equal(1);
-      expect(collections[0].labels[0].name).to.equal(labels[0].name);
+      expect(collections[0].labels[0].name).to.equal(label.name);
     });
 
     it('should get collection when only one of its assigned labels is provided in filters', async () => {
@@ -537,6 +533,11 @@ describe('public queries: Collection', () => {
         status: CollectionStatus.PUBLISHED,
         language: CollectionLanguage.EN,
       });
+
+      const labels: Label[] = [];
+      // create two test labels
+      labels.push(await createLabelHelper(db, 'test-label-one'));
+      labels.push(await createLabelHelper(db, 'test-label-two'));
 
       // create Collection-Label association
       const collectionLabelInput: CreateCollectionLabelInput = {
@@ -591,12 +592,14 @@ describe('public queries: Collection', () => {
         language: CollectionLanguage.EN,
       });
 
+      const label = await createLabelHelper(db, 'test-label-one');
+
       // create Collection-Label association just for the first collection
       const collectionLabelInput: CreateCollectionLabelInput = {
         collectionId: testCollection.id,
         createdAt: new Date(),
         createdBy: 'hluhano',
-        labelId: labels[0].id,
+        labelId: label.id,
       };
 
       // assign the above Collection-Label association just to the first collection
@@ -607,7 +610,7 @@ describe('public queries: Collection', () => {
         query: GET_COLLECTIONS,
         variables: {
           filters: {
-            labels: [`${labels[0].name}`],
+            labels: [`${label.name}`],
           },
         },
       });
@@ -619,10 +622,12 @@ describe('public queries: Collection', () => {
       expect(collections[0].externalId).to.equal(testCollection.externalId);
       // returned collection should only one label
       expect(collections[0].labels.length).to.equal(1);
-      expect(collections[0].labels[0].name).to.equal(labels[0].name);
+      expect(collections[0].labels[0].name).to.equal(label.name);
+
+      clearDb(db);
     });
 
-    it('should get no collections the labels provided are not assigned to any one', async () => {
+    it('should get no collections if the labels provided are not assigned to any one', async () => {
       const testCollection = await createCollectionHelper(db, {
         title: 'label-test-collection',
         author,
@@ -637,6 +642,12 @@ describe('public queries: Collection', () => {
         status: CollectionStatus.PUBLISHED,
         language: CollectionLanguage.EN,
       });
+
+      const labels: Label[] = [];
+
+      // create two test labels
+      labels.push(await createLabelHelper(db, 'test-label-one'));
+      labels.push(await createLabelHelper(db, 'test-label-two'));
 
       // create Collection-Label association for the first collection
       const collectionLabelInput: CreateCollectionLabelInput = {
