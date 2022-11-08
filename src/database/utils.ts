@@ -1,5 +1,9 @@
 import { CollectionStatus, Prisma } from '@prisma/client';
-import { CollectionsFilters, CollectionLanguage } from './types';
+import {
+  CollectionsFilters,
+  CollectionLanguage,
+  SearchCollectionsFilters,
+} from './types';
 import config from '../config';
 
 /**
@@ -33,6 +37,34 @@ export function buildGetPublishedCollectionsWhere(
     where.labels = {
       some: { label: { name: { in: filters.labels } } },
     };
+  }
+
+  return where;
+}
+
+/**
+ * Builds the `where` object for filtering searchCollections based on
+ * supplied filters
+ * @param filters
+ * @returns Prisma.CollectionWhereInput
+ */
+export function buildSearchCollectionsWhereClause(
+  filters: SearchCollectionsFilters = null
+): Prisma.CollectionWhereInput {
+  const where: Prisma.CollectionWhereInput = {};
+  if (filters.labelExternalIds) {
+    where.labels = {
+      some: { label: { externalId: { in: filters.labelExternalIds } } },
+    };
+  }
+  if (filters.status) {
+    where.status = filters.status;
+  }
+  if (filters.title) {
+    where.title = { contains: filters.title };
+  }
+  if (filters.author) {
+    where.authors = { every: { name: { contains: filters.author } } };
   }
 
   return where;

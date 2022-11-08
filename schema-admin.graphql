@@ -10,6 +10,7 @@ available filters for searching collections
 """
 input SearchCollectionsFilters {
   author: String
+  labelExternalIds: [String]
   title: String
   status: CollectionStatus
 }
