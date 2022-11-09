@@ -127,6 +127,7 @@ export async function getPublishedCollections(
       IABChildCategory: true,
       IABParentCategory: true,
       partnership: true,
+      labels: true,
       stories: {
         include: {
           authors: {

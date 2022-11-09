@@ -36,6 +36,21 @@ describe('test utils', () => {
       expect(result.status).toEqual(CollectionStatus.PUBLISHED);
       expect(result.language).toEqual('DE');
     });
+
+    it('should add a label clause when supplied in filters', () => {
+      const result = buildGetPublishedCollectionsWhere({
+        labels: ['test-label'],
+      });
+
+      const labelWhereClause = {
+        some: { label: { name: { in: ['test-label'] } } },
+      };
+
+      expect(result.status).toEqual(CollectionStatus.PUBLISHED);
+      // language should be defaulted to EN when no language
+      expect(result.language).toEqual('EN');
+      expect(result.labels).toMatchObject(labelWhereClause);
+    });
   });
 
   describe('buildSearchCollectionsWhereClause', () => {

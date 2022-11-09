@@ -32,6 +32,13 @@ export function buildGetPublishedCollectionsWhere(
     where.language = CollectionLanguage[config.app.defaultLanguage];
   }
 
+  // if labels are provided on the filter, update the WHERE clause
+  if (filters?.labels && filters?.labels.length != 0) {
+    where.labels = {
+      some: { label: { name: { in: filters.labels } } },
+    };
+  }
+
   return where;
 }
 
