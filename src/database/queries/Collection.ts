@@ -27,6 +27,7 @@ export async function getCollection(
       curationCategory: true,
       IABChildCategory: true,
       IABParentCategory: true,
+      labels: true,
       partnership: true,
       stories: {
         include: {
@@ -66,6 +67,7 @@ export async function getCollectionBySlug(
       curationCategory: true,
       IABParentCategory: true,
       IABChildCategory: true,
+      labels: true,
       partnership: true,
       stories: {
         include: {
@@ -94,6 +96,7 @@ export async function getCollectionsBySlugs(
       curationCategory: true,
       IABChildCategory: true,
       IABParentCategory: true,
+      labels: true,
       partnership: true,
       stories: {
         include: {
