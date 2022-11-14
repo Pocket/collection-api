@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { CollectionStatus } from '@prisma/client';
+import { CollectionStatus, Label } from '@prisma/client';
 import { db } from '../../../test/admin-server';
 import {
   clear as clearDb,
@@ -55,7 +55,7 @@ describe('admin queries: Collection', () => {
   });
 
   describe('getCollection', () => {
-    it('can get a collection with no stories by external id', async () => {
+    it('should get a collection with no stories', async () => {
       const created = await createCollectionHelper(db, {
         title: 'test me',
         author,
@@ -93,9 +93,10 @@ describe('admin queries: Collection', () => {
 
       // there should be no partnership (we didn't set one up)
       expect(collection.partnership).to.be.null;
+      expect(collection.labels.length).to.equal(0);
     });
 
-    it('can get a collection with stories with authors by external id', async () => {
+    it('should get a collection with stories with authors', async () => {
       const created = await createCollectionHelper(db, {
         title: 'test me',
         author,
@@ -115,7 +116,7 @@ describe('admin queries: Collection', () => {
       expect(collection.stories[0].authors[0]).not.to.be.undefined;
     });
 
-    it('can get a collection with story authors sorted correctly', async () => {
+    it('should get a collection with story authors sorted correctly', async () => {
       const created = await createCollectionHelper(db, {
         title: 'test me',
         author,
@@ -137,7 +138,7 @@ describe('admin queries: Collection', () => {
       );
     });
 
-    it('can get consolidated partnership information for a collection', async () => {
+    it('should get consolidated partnership information for a collection', async () => {
       const created = await createCollectionHelper(db, {
         title: 'test me',
         author,
@@ -162,7 +163,47 @@ describe('admin queries: Collection', () => {
       expect(collection.partnership.type).to.equal(association.type);
     });
 
-    it('returns no data and a NOT_FOUND error if given an invalid externalId', async () => {
+    it('should get a collection with labels', async () => {
+      const testCollection = await createCollectionHelper(db, {
+        title: 'test me',
+        author,
+      });
+
+      // create a label
+      const testLabel: Label = await createLabelHelper(
+        db,
+        'test-label',
+        'test-user'
+      );
+
+      const testCollectionLabelInputData: CreateCollectionLabelInput = {
+        collectionId: testCollection.id,
+        labelId: testLabel.id,
+        createdAt: new Date(),
+        createdBy: 'test-user',
+      };
+
+      // assign that label to the above collection
+      await createCollectionLabelHelper(db, testCollectionLabelInputData);
+
+      const { data } = await server.executeOperation({
+        query: GET_COLLECTION,
+        variables: {
+          externalId: testCollection.externalId,
+        },
+      });
+
+      const collection = data?.getCollection;
+
+      // stories should have authors
+      expect(collection.labels.length).to.be.greaterThan(0);
+      expect(collection.labels[0]).to.deep.equal({
+        externalId: testLabel.externalId,
+        name: testLabel.name,
+      });
+    });
+
+    it('should return no data and a NOT_FOUND error if given an invalid externalId', async () => {
       const created = await createCollectionHelper(db, {
         title: 'test me',
         author,
@@ -412,7 +453,25 @@ describe('admin queries: Collection', () => {
       expect(collections[0].title).to.equal('finishing my coffee');
     });
 
-    it('should return all associated data - authors, stories, and story authors', async () => {
+    it('should return no collections when other filters match but label filters do not match', async () => {
+      const { data } = await server.executeOperation({
+        query: SEARCH_COLLECTIONS,
+        variables: {
+          filters: {
+            status: CollectionStatus.PUBLISHED,
+            author: author.name,
+            title: 'coffee',
+            labelExternalIds: ['no-such-label'],
+          },
+        },
+      });
+
+      const collections = data?.searchCollections?.collections;
+
+      expect(collections.length).to.equal(0);
+    });
+
+    it('should return all associated data - authors, stories, and story authors, labels', async () => {
       const { data } = await server.executeOperation({
         query: SEARCH_COLLECTIONS,
         variables: {
@@ -423,6 +482,7 @@ describe('admin queries: Collection', () => {
       });
 
       const collections = data?.searchCollections?.collections;
+      let collectionsWithLabels = 0;
 
       for (let i = 0; i < collections.length; i++) {
         expect(collections[i].authors.length).to.be.greaterThan(0);
@@ -431,7 +491,14 @@ describe('admin queries: Collection', () => {
         for (let j = 0; j < collections[i].stories.length; j++) {
           expect(collections[i].stories[j].authors.length).to.be.greaterThan(0);
         }
+
+        if (collections[i].labels.length > 0) {
+          collectionsWithLabels++;
+        }
       }
+
+      // in the before each block we are only creating two collections with labels
+      expect(collectionsWithLabels).to.equal(2);
     });
 
     it('should respect pagination', async () => {
@@ -457,7 +524,7 @@ describe('admin queries: Collection', () => {
       expect(collections[0].title).to.equal('finishing my coffee');
     });
 
-    it('can get published collections with story authors sorted correctly', async () => {
+    it('should get published collections with story authors sorted correctly', async () => {
       const { data } = await server.executeOperation({
         query: SEARCH_COLLECTIONS,
         variables: {

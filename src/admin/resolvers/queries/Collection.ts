@@ -14,6 +14,7 @@ import { ACCESS_DENIED_ERROR } from '../../../shared/constants';
  * @param parent
  * @param externalId
  * @param db
+ * @param authenticatedUser
  */
 export async function getCollection(
   parent,
@@ -39,6 +40,7 @@ export async function getCollection(
  * @param page
  * @param perPage
  * @param db
+ * @param authenticatedUser
  */
 export async function searchCollections(
   parent,
