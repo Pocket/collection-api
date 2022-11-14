@@ -1,13 +1,16 @@
 import { expect } from 'chai';
-import { PrismaClient, CollectionStatus } from '@prisma/client';
+import { PrismaClient, CollectionStatus, Label } from '@prisma/client';
 import { getCollectionsBySlugs } from '../database/queries/Collection';
 import {
   clear as clearDb,
   createAuthorHelper,
   createCollectionHelper,
+  createCollectionLabelHelper,
   createIABCategoryHelper,
+  createLabelHelper,
   sortCollectionStoryAuthors,
 } from '../test/helpers';
+import { CreateCollectionLabelInput } from '../database/types';
 
 const db = new PrismaClient();
 
@@ -15,6 +18,7 @@ describe('queries: Collection', () => {
   let author;
   let IABParentCategory;
   let IABChildCategory;
+  let label: Label;
 
   beforeEach(async () => {
     await clearDb(db);
@@ -25,6 +29,7 @@ describe('queries: Collection', () => {
       'Bowling',
       IABParentCategory
     );
+    label = await createLabelHelper(db, 'test-label', 'test-user');
   });
 
   afterAll(async () => {
@@ -38,13 +43,23 @@ describe('queries: Collection', () => {
         author,
         status: CollectionStatus.PUBLISHED,
       });
-      await createCollectionHelper(db, {
+
+      const collection2 = await createCollectionHelper(db, {
         title: 'test me 2',
         author,
         status: CollectionStatus.PUBLISHED,
         IABParentCategory,
         IABChildCategory,
       });
+
+      // add a label to the second test collection
+      const collection2LabelInput: CreateCollectionLabelInput = {
+        collectionId: collection2.id,
+        labelId: label.id,
+        createdAt: new Date(),
+        createdBy: 'test-user',
+      };
+      await createCollectionLabelHelper(db, collection2LabelInput);
 
       const collections = await getCollectionsBySlugs(db, [
         'test-me',
@@ -66,6 +81,15 @@ describe('queries: Collection', () => {
       expect(collections[1].IABChildCategory.name).to.equal(
         IABChildCategory.name
       );
+
+      // Not much to go on given we're testing a database resolver here
+      expect(collections[1].labels).to.have.lengthOf(1);
+
+      // It's a database-level resolver so there's not much to go on.
+      // Let's make sure it connects to the right label - the GraphQL-level
+      // resolvers will do the rest.
+      expect(collections[1].labels[0].labelId).to.equal(label.id);
+      expect(collections[1].labels[0].collectionId).to.equal(collection2.id);
     });
 
     it('gets only published collections', async () => {

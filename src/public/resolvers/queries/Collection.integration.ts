@@ -35,6 +35,7 @@ describe('public queries: Collection', () => {
   let curationCategory: CurationCategory;
   let IABParentCategory: IABCategory;
   let IABChildCategory: IABCategory;
+  let label: Label;
 
   beforeAll(async () => {
     await clearDb(db);
@@ -55,6 +56,7 @@ describe('public queries: Collection', () => {
       'Bowling',
       IABParentCategory
     );
+    label = await createLabelHelper(db, 'test-label', 'test-user');
   });
 
   afterAll(async () => {
@@ -63,7 +65,7 @@ describe('public queries: Collection', () => {
 
   describe('getCollections', () => {
     it('should get collections and all associated data', async () => {
-      await createCollectionHelper(db, {
+      const collection1 = await createCollectionHelper(db, {
         title: 'ways in which my back hurts',
         author,
         addStories: true,
@@ -73,7 +75,7 @@ describe('public queries: Collection', () => {
         status: CollectionStatus.PUBLISHED,
       });
 
-      await createCollectionHelper(db, {
+      const collection2 = await createCollectionHelper(db, {
         title: 'best songs of 2006',
         author,
         addStories: true,
@@ -83,6 +85,25 @@ describe('public queries: Collection', () => {
         status: CollectionStatus.PUBLISHED,
       });
 
+      // add a label to the first collection
+      const collection1LabelInput: CreateCollectionLabelInput = {
+        collectionId: collection1.id,
+        labelId: label.id,
+        createdAt: new Date(),
+        createdBy: 'test-user',
+      };
+      await createCollectionLabelHelper(db, collection1LabelInput);
+
+      // do the same for the second collection
+      const collection2LabelInput: CreateCollectionLabelInput = {
+        collectionId: collection2.id,
+        labelId: label.id,
+        createdAt: new Date(),
+        createdBy: 'test-user',
+      };
+      await createCollectionLabelHelper(db, collection2LabelInput);
+
+      // run the query we're testing
       const { data } = await server.executeOperation({
         query: GET_COLLECTIONS,
       });
@@ -91,6 +112,7 @@ describe('public queries: Collection', () => {
 
       expect(collections.length).to.equal(2);
 
+      // ensure we are getting all client data
       for (let i = 0; i < collections.length; i++) {
         expect(collections[i].title).not.to.be.empty;
         expect(collections[i].authors.length).to.equal(1);
@@ -105,8 +127,9 @@ describe('public queries: Collection', () => {
         expect(collections[i].IABChildCategory.name).to.equal(
           IABChildCategory.name
         );
+        expect(collections[i].labels[0].externalId).to.equal(label.externalId);
+        expect(collections[i].labels[0].name).to.equal(label.name);
       }
-      // ensure we are getting all client data
     });
 
     it('should get only published collections', async () => {
@@ -714,6 +737,44 @@ describe('public queries: Collection', () => {
         IABParentCategory.name
       );
       expect(collection.IABChildCategory.name).to.equal(IABChildCategory.name);
+
+      // ensure no label data appears as this collection doesn't have one
+      expect(collection.labels).to.have.lengthOf(0);
+    });
+
+    it('happy path: can get a collection with label data', async () => {
+      const testCollection = await createCollectionHelper(db, {
+        title: 'ultra suede is a miracle',
+        author,
+        addStories: true,
+        curationCategory,
+        IABParentCategory,
+        IABChildCategory,
+        status: CollectionStatus.PUBLISHED,
+      });
+
+      // do the same for the second collection
+      const collectionLabelInput: CreateCollectionLabelInput = {
+        collectionId: testCollection.id,
+        labelId: label.id,
+        createdAt: new Date(),
+        createdBy: 'test-user',
+      };
+      await createCollectionLabelHelper(db, collectionLabelInput);
+
+      const { data } = await server.executeOperation({
+        query: GET_COLLECTION_BY_SLUG,
+        variables: {
+          slug: 'ultra-suede-is-a-miracle',
+        },
+      });
+
+      const collection = data?.getCollectionBySlug;
+
+      // ensure we are getting label data back
+      expect(collection.labels).to.have.lengthOf(1);
+      expect(collection.labels[0].externalId).to.equal(label.externalId);
+      expect(collection.labels[0].name).to.equal(label.name);
     });
 
     it('should get a collection that is in REVIEW status', async () => {

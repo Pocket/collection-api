@@ -55,7 +55,7 @@ describe('admin queries: Collection', () => {
   });
 
   describe('getCollection', () => {
-    it('can get a collection with no stories by external id', async () => {
+    it('should get a collection with no stories', async () => {
       const created = await createCollectionHelper(db, {
         title: 'test me',
         author,
@@ -96,7 +96,7 @@ describe('admin queries: Collection', () => {
       expect(collection.labels.length).to.equal(0);
     });
 
-    it('can get a collection with stories with authors by external id', async () => {
+    it('should get a collection with stories with authors', async () => {
       const created = await createCollectionHelper(db, {
         title: 'test me',
         author,
@@ -116,7 +116,7 @@ describe('admin queries: Collection', () => {
       expect(collection.stories[0].authors[0]).not.to.be.undefined;
     });
 
-    it('can get a collection with story authors sorted correctly', async () => {
+    it('should get a collection with story authors sorted correctly', async () => {
       const created = await createCollectionHelper(db, {
         title: 'test me',
         author,
@@ -138,7 +138,7 @@ describe('admin queries: Collection', () => {
       );
     });
 
-    it('can get consolidated partnership information for a collection', async () => {
+    it('should get consolidated partnership information for a collection', async () => {
       const created = await createCollectionHelper(db, {
         title: 'test me',
         author,
@@ -163,7 +163,7 @@ describe('admin queries: Collection', () => {
       expect(collection.partnership.type).to.equal(association.type);
     });
 
-    it('should get a collection with labels when a collection with labels is requested via externalId', async () => {
+    it('should get a collection with labels', async () => {
       const testCollection = await createCollectionHelper(db, {
         title: 'test me',
         author,
@@ -203,7 +203,7 @@ describe('admin queries: Collection', () => {
       });
     });
 
-    it('returns no data and a NOT_FOUND error if given an invalid externalId', async () => {
+    it('should return no data and a NOT_FOUND error if given an invalid externalId', async () => {
       const created = await createCollectionHelper(db, {
         title: 'test me',
         author,
@@ -524,7 +524,7 @@ describe('admin queries: Collection', () => {
       expect(collections[0].title).to.equal('finishing my coffee');
     });
 
-    it('can get published collections with story authors sorted correctly', async () => {
+    it('should get published collections with story authors sorted correctly', async () => {
       const { data } = await server.executeOperation({
         query: SEARCH_COLLECTIONS,
         variables: {
