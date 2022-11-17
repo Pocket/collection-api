@@ -33,7 +33,7 @@ describe('queries: Label', () => {
       await createLabelHelper(db, 'john-bon-jovi');
     });
 
-    it('should get clabels in alphabetical order', async () => {
+    it('should get labels in alphabetical order', async () => {
       const {
         data: { labels: data },
       } = await server.executeOperation({
