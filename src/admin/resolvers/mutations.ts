@@ -5,6 +5,7 @@ import {
   CollectionStory,
   Image,
   ImageEntityType,
+  Label,
 } from '@prisma/client';
 import { AuthenticationError } from 'apollo-server-errors';
 import {
@@ -35,6 +36,7 @@ import {
   createCollectionPartnerAssociation as dbCreateCollectionPartnerAssociation,
   createCollectionStory as dbCreateCollectionStory,
   createImage,
+  createLabel as dbCreateLabel,
   deleteCollectionStory as dbDeleteCollectionStory,
   deleteCollectionPartnerAssociation as dbDeleteCollectionPartnerAssociation,
   updateCollectionAuthor as dbUpdateCollectionAuthor,
@@ -451,4 +453,12 @@ export async function collectionImageUpload(
   );
 
   return { url: upload.path };
+}
+
+export async function createLabel(
+  parent,
+  { name },
+  context: IContext
+): Promise<Label> {
+  return await executeMutation<string, Label>(context, name, dbCreateLabel);
 }

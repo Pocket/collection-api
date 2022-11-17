@@ -378,4 +378,8 @@ type Mutation {
   deleteCollectionPartnerAssociation(
     externalId: String!
   ): CollectionPartnerAssociation!
+  """
+  Creates a Label.
+  """
+  createLabel(name: String!): Label!
 }

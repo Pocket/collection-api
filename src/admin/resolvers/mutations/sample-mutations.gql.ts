@@ -182,3 +182,12 @@ export const DELETE_COLLECTION_STORY = gql`
   }
   ${CollectionStoryData}
 `;
+
+export const CREATE_LABEL = gql`
+  mutation createLabel($name: String!) {
+    createLabel(name: $name) {
+      name
+      externalId
+    }
+  }
+`;

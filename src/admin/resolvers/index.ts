@@ -33,6 +33,7 @@ import {
   updateCollectionStory,
   updateCollectionStorySortOrder,
   updateCollectionStoryImageUrl,
+  createLabel,
 } from './mutations';
 import {
   collectionLabelsFieldResolvers,
@@ -61,6 +62,7 @@ export const resolvers = {
     collectionImageUpload,
     updateCollectionStorySortOrder,
     updateCollectionStoryImageUrl,
+    createLabel,
   },
   Query: {
     getCollection,
