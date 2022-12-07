@@ -1,7 +1,7 @@
 version: '3.1'
 services:
   mysql:
-    image: mysql:5.7@sha256:4149a92977a54d27cbd6f81cca3817e6278a844d566b45f9ff1908bb2714b1ca
+    image: mysql:5.7@sha256:6306f106a056e24b3a2582a59a4c84cd199907f826eff27df36406f227cd9a7d
     platform: linux/amd64
     env_file:
       - ./.docker/local.env
