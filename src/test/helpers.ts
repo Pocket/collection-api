@@ -24,10 +24,6 @@ import {
 } from '../database/types';
 import { faker } from '@faker-js/faker';
 import config from '../config';
-import s3service from '../aws/s3';
-import { client } from '../database/client';
-import { ContextManager } from '../admin/context';
-import { getServer } from './admin-server';
 
 const slugifyConfig = config.slugify;
 
@@ -344,33 +340,6 @@ export function sortCollectionStoryAuthors(
     return a.sortOrder - b.sortOrder;
   });
 }
-
-const sharedConfigContext = {
-  request: { headers: {} },
-  db: client(),
-  s3service,
-};
-
-/**
- * Pass custom mocked headers to Apollo Server to test access control checks
- * within resolvers.
- *
- * @param headers
- */
-export const getServerWithMockedHeaders = (headers: {
-  name: string;
-  username: string;
-  groups: string;
-}) => {
-  const contextManager = new ContextManager({
-    ...sharedConfigContext,
-    request: {
-      headers,
-    },
-  });
-
-  return getServer(contextManager);
-};
 
 /**
  * Determines if a url is a valid collection url and returns its slug.

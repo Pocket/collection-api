@@ -1,4 +1,4 @@
-import { ForbiddenError } from 'apollo-server-errors';
+import { ForbiddenError } from '@pocket-tools/apollo-utils';
 import { CollectionLanguage } from '../../../database/types';
 import { ACCESS_DENIED_ERROR } from '../../../shared/constants';
 
