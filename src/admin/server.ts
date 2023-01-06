@@ -54,7 +54,7 @@ export function getAdminServer(
 
 /**
  * Create and start the apollo server. Required to await server.start()
- * before applying middleware per apollo-server 3 migration.
+ * before applying middleware.
  */
 export async function startAdminServer(
   httpServer: Server

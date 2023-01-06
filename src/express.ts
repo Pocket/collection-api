@@ -27,7 +27,7 @@ export async function startServer(port: number): Promise<{
 }> {
   Sentry.init({
     ...config.sentry,
-    debug: config.sentry.environment == 'development',
+    debug: config.sentry.environment === 'development',
   });
 
   // initialize express with exposed httpServer so that it may be
