@@ -27,7 +27,7 @@ type Query {
     @deprecated(reason: "Use collectionBySlug instead")
 
   """
-  Retrieves a {Collection} by the given slug. The {Collection} must be published.
+  Retrieves a Collection by the given slug. The Collection must be published.
   """
   collectionBySlug(slug: String!): Collection
 }
