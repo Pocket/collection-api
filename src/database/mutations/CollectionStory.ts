@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { UserInputError } from 'apollo-server-errors';
+import { UserInputError } from '@pocket-tools/apollo-utils';
 import { getCollectionStory, getCollection } from '../queries';
 
 import {

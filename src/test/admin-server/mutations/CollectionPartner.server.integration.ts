@@ -1,10 +1,11 @@
+import { print } from 'graphql';
+import request from 'supertest';
+import { ApolloServer } from '@apollo/server';
+import { PrismaClient } from '@prisma/client';
+import { client } from '../../../database/client';
+
 import { faker } from '@faker-js/faker';
-import { db, getServer } from '../';
-import {
-  clear as clearDb,
-  createPartnerHelper,
-  getServerWithMockedHeaders,
-} from '../../helpers';
+import { clear as clearDb, createPartnerHelper } from '../../helpers';
 import {
   CreateCollectionPartnerInput,
   UpdateCollectionPartnerInput,
@@ -16,8 +17,15 @@ import {
   UPDATE_COLLECTION_PARTNER_IMAGE_URL,
 } from './mutations.gql';
 import { COLLECTION_CURATOR_FULL } from '../../../shared/constants';
+import { startServer } from '../../../express';
+import { IAdminContext } from '../../../admin/context';
 
 describe('mutations: CollectionPartner', () => {
+  let app: Express.Application;
+  let server: ApolloServer<IAdminContext>;
+  let graphQLUrl: string;
+  let db: PrismaClient;
+
   const createData: CreateCollectionPartnerInput = {
     name: faker.company.companyName(),
     url: faker.internet.url(),
@@ -31,10 +39,10 @@ describe('mutations: CollectionPartner', () => {
     groups: `group1,group2,${COLLECTION_CURATOR_FULL}`,
   };
 
-  const server = getServerWithMockedHeaders(headers);
-
   beforeAll(async () => {
-    await server.start();
+    // port 0 tells express to dynamically assign an available port
+    ({ app, adminServer: server, adminUrl: graphQLUrl } = await startServer(0));
+    db = client();
   });
 
   afterAll(async () => {
@@ -48,12 +56,16 @@ describe('mutations: CollectionPartner', () => {
 
   describe('createCollectionPartner mutation', () => {
     it('creates a partner with all required variables supplied', async () => {
-      const {
-        data: { createCollectionPartner: partner },
-      } = await server.executeOperation({
-        query: CREATE_COLLECTION_PARTNER,
-        variables: createData,
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_COLLECTION_PARTNER),
+          variables: createData,
+        });
+      expect(result.body.errors).toBeFalsy();
+      expect(result.body?.data?.createCollectionPartner).toBeTruthy();
+      const partner = result.body?.data?.createCollectionPartner;
 
       expect(partner.externalId).toBeTruthy();
       expect(partner.name).toEqual(createData.name);
@@ -64,16 +76,17 @@ describe('mutations: CollectionPartner', () => {
 
     it('fails when no data is supplied', async () => {
       // Attempt to create a partner with no input data...
-      const result = await server.executeOperation({
-        query: CREATE_COLLECTION_PARTNER,
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({ query: print(CREATE_COLLECTION_PARTNER) });
 
       // ...without success. There is no data
-      expect(result.data).toBeFalsy();
+      expect(result.body.data).toBeFalsy();
 
       // And the server responds with an error about the first variable in the input
       // that is missing
-      expect(result.errors[0].message).toMatch(
+      expect(result.body.errors[0].message).toMatch(
         'Variable "$name" of required type "String!" was not provided.'
       );
     });
@@ -85,43 +98,38 @@ describe('mutations: CollectionPartner', () => {
         groups: `group1,group2,no-access-for-you`,
       };
 
-      const server = getServerWithMockedHeaders(headers);
-      await server.start();
-
-      const result = await server.executeOperation({
-        query: CREATE_COLLECTION_PARTNER,
-        variables: createData,
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_COLLECTION_PARTNER),
+          variables: createData,
+        });
 
       // ...without success. There is no data
-      expect(result.data).toBeFalsy();
+      expect(result.body.data).toBeFalsy();
 
       // And there is an access denied error
-      expect(result.errors[0].message).toMatch(
+      expect(result.body.errors[0].message).toMatch(
         `You do not have access to perform this action.`
       );
-
-      await server.stop();
     });
 
     it('should fail if request headers are undefined', async () => {
-      const server = getServer();
-      await server.start();
-
-      const result = await server.executeOperation({
-        query: CREATE_COLLECTION_PARTNER,
-        variables: createData,
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .send({
+          query: print(CREATE_COLLECTION_PARTNER),
+          variables: createData,
+        });
 
       // ...without success. There is no data
-      expect(result.data).toBeFalsy();
+      expect(result.body.data).toBeFalsy();
 
       // And there is an access denied error
-      expect(result.errors[0].message).toMatch(
+      expect(result.body.errors[0].message).toMatch(
         `You do not have access to perform this action.`
       );
-
-      await server.stop();
     });
   });
 
@@ -140,12 +148,13 @@ describe('mutations: CollectionPartner', () => {
         imageUrl: faker.image.imageUrl(),
       };
 
-      const {
-        data: { updateCollectionPartner: updatedPartner },
-      } = await server.executeOperation({
-        query: UPDATE_COLLECTION_PARTNER,
-        variables: input,
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({ query: print(UPDATE_COLLECTION_PARTNER), variables: input });
+      expect(result.body.errors).toBeFalsy();
+      expect(result.body?.data?.updateCollectionPartner).toBeTruthy();
+      const updatedPartner = result.body.data.updateCollectionPartner;
 
       expect(updatedPartner.name).toEqual(input.name);
       expect(updatedPartner.url).toEqual(input.url);
@@ -163,12 +172,13 @@ describe('mutations: CollectionPartner', () => {
         blurb: faker.lorem.sentences(2),
       };
 
-      const {
-        data: { updateCollectionPartner: updatedPartner },
-      } = await server.executeOperation({
-        query: UPDATE_COLLECTION_PARTNER,
-        variables: input,
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({ query: print(UPDATE_COLLECTION_PARTNER), variables: input });
+      expect(result.body.errors).toBeFalsy();
+      expect(result.body?.data?.updateCollectionPartner).toBeTruthy();
+      const updatedPartner = result.body.data.updateCollectionPartner;
 
       // Expect the values supplied to be updated
       expect(updatedPartner.name).toEqual(input.name);
@@ -186,9 +196,6 @@ describe('mutations: CollectionPartner', () => {
         groups: `group1,group2,no-access-for-you`,
       };
 
-      const server = getServerWithMockedHeaders(headers);
-      await server.start();
-
       const partner = await createPartnerHelper(
         db,
         faker.company.companyName()
@@ -202,26 +209,21 @@ describe('mutations: CollectionPartner', () => {
         imageUrl: faker.image.imageUrl(),
       };
 
-      const result = await server.executeOperation({
-        query: UPDATE_COLLECTION_PARTNER,
-        variables: input,
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({ query: print(UPDATE_COLLECTION_PARTNER), variables: input });
 
       // ...without success. There is no data
-      expect(result.data).toBeFalsy();
+      expect(result.body.data).toBeFalsy();
 
       // And there is an access denied error
-      expect(result.errors[0].message).toMatch(
+      expect(result.body.errors[0].message).toMatch(
         `You do not have access to perform this action.`
       );
-
-      await server.stop();
     });
 
     it('should fail if request headers are undefined', async () => {
-      const server = getServer();
-      await server.start();
-
       const partner = await createPartnerHelper(
         db,
         faker.company.companyName()
@@ -235,20 +237,17 @@ describe('mutations: CollectionPartner', () => {
         imageUrl: faker.image.imageUrl(),
       };
 
-      const result = await server.executeOperation({
-        query: UPDATE_COLLECTION_PARTNER,
-        variables: input,
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .send({ query: print(UPDATE_COLLECTION_PARTNER), variables: input });
 
       // ...without success. There is no data
-      expect(result.data).toBeFalsy();
+      expect(result.body.data).toBeFalsy();
 
       // And there is an access denied error
-      expect(result.errors[0].message).toMatch(
+      expect(result.body.errors[0].message).toMatch(
         `You do not have access to perform this action.`
       );
-
-      await server.stop();
     });
   });
 
@@ -265,12 +264,16 @@ describe('mutations: CollectionPartner', () => {
         imageUrl: newImageUrl,
       };
 
-      const {
-        data: { updateCollectionPartnerImageUrl: updatedPartner },
-      } = await server.executeOperation({
-        query: UPDATE_COLLECTION_PARTNER_IMAGE_URL,
-        variables: input,
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(UPDATE_COLLECTION_PARTNER_IMAGE_URL),
+          variables: input,
+        });
+      expect(result.body.errors).toBeFalsy();
+      expect(result.body?.data?.updateCollectionPartnerImageUrl).toBeTruthy();
+      const updatedPartner = result.body.data.updateCollectionPartnerImageUrl;
 
       // The image URL should be updated
       expect(updatedPartner.imageUrl).toEqual(input.imageUrl);
@@ -288,9 +291,6 @@ describe('mutations: CollectionPartner', () => {
         groups: `group1,group2,no-access-for-you`,
       };
 
-      const server = getServerWithMockedHeaders(headers);
-      await server.start();
-
       const partner = await createPartnerHelper(
         db,
         faker.company.companyName()
@@ -302,26 +302,24 @@ describe('mutations: CollectionPartner', () => {
         imageUrl: newImageUrl,
       };
 
-      const result = await server.executeOperation({
-        query: UPDATE_COLLECTION_PARTNER_IMAGE_URL,
-        variables: input,
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(UPDATE_COLLECTION_PARTNER_IMAGE_URL),
+          variables: input,
+        });
 
       // ...without success. There is no data
-      expect(result.data).toBeFalsy();
+      expect(result.body.data).toBeFalsy();
 
       // And there is an access denied error
-      expect(result.errors[0].message).toMatch(
+      expect(result.body.errors[0].message).toMatch(
         `You do not have access to perform this action.`
       );
-
-      await server.stop();
     });
 
     it('should fail if request headers are undefined', async () => {
-      const server = getServer();
-      await server.start();
-
       const partner = await createPartnerHelper(
         db,
         faker.company.companyName()
@@ -333,20 +331,20 @@ describe('mutations: CollectionPartner', () => {
         imageUrl: newImageUrl,
       };
 
-      const result = await server.executeOperation({
-        query: UPDATE_COLLECTION_PARTNER_IMAGE_URL,
-        variables: input,
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .send({
+          query: print(UPDATE_COLLECTION_PARTNER_IMAGE_URL),
+          variables: input,
+        });
 
       // ...without success. There is no data
-      expect(result.data).toBeFalsy();
+      expect(result.body.data).toBeFalsy();
 
       // And there is an access denied error
-      expect(result.errors[0].message).toMatch(
+      expect(result.body.errors[0].message).toMatch(
         `You do not have access to perform this action.`
       );
-
-      await server.stop();
     });
   });
 });

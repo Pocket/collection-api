@@ -1,6 +1,6 @@
 import path from 'path';
 import fs from 'fs';
-import { gql } from 'apollo-server-express';
+import { gql } from 'graphql-tag';
 
 import { CollectionAuthor, CollectionPartner } from '@prisma/client';
 import { CollectionComplete } from './database/types';

@@ -1,29 +1,39 @@
 import { expect } from 'chai';
-import { db } from '../../../test/admin-server';
-import {
-  clear as clearDb,
-  createLabelHelper,
-  getServerWithMockedHeaders,
-} from '../../../test/helpers';
+import { print } from 'graphql';
+import request from 'supertest';
+import { ApolloServer } from '@apollo/server';
+import { PrismaClient } from '@prisma/client';
+import { client } from '../../../database/client';
+
+import { clear as clearDb, createLabelHelper } from '../../../test/helpers';
 import { LABELS } from './sample-queries.gql';
 import { COLLECTION_CURATOR_FULL } from '../../../shared/constants';
+import { startServer } from '../../../express';
+import { IAdminContext } from '../../context';
 
 describe('queries: Label', () => {
-  const headers = {
-    name: 'Test User',
-    username: 'test.user@test.com',
-    groups: `group1,group2,${COLLECTION_CURATOR_FULL}`,
-  };
-
-  const server = getServerWithMockedHeaders(headers);
+  let app: Express.Application;
+  let server: ApolloServer<IAdminContext>;
+  let graphQLUrl: string;
+  let db: PrismaClient;
 
   beforeAll(async () => {
+    // port 0 tells express to dynamically assign an available port
+    ({ app, adminServer: server, adminUrl: graphQLUrl } = await startServer(0));
+    db = client();
     await clearDb(db);
   });
 
   afterAll(async () => {
     await db.$disconnect();
+    await server.stop();
   });
+
+  const headers = {
+    name: 'Test User',
+    username: 'test.user@test.com',
+    groups: `group1,group2,${COLLECTION_CURATOR_FULL}`,
+  };
 
   describe('labels query', () => {
     beforeAll(async () => {
@@ -34,11 +44,11 @@ describe('queries: Label', () => {
     });
 
     it('should get labels in alphabetical order', async () => {
-      const {
-        data: { labels: data },
-      } = await server.executeOperation({
-        query: LABELS,
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({ query: print(LABELS) });
+      const data = result.body.data.labels;
 
       expect(data[0].name).to.equal('john-bon-jovi');
       expect(data[1].name).to.equal('leonard-cohen');
@@ -46,11 +56,11 @@ describe('queries: Label', () => {
     });
 
     it('should get all publicly available properties of labels', async () => {
-      const {
-        data: { labels: data },
-      } = await server.executeOperation({
-        query: LABELS,
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({ query: print(LABELS) });
+      const data = result.body.data.labels;
 
       expect(data[0].externalId).to.exist;
       expect(data[0].name).to.exist;
