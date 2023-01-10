@@ -78,6 +78,7 @@ export async function startServer(port: number): Promise<{
     })
   );
 
+  app.options('*', cors());
   //Make sure the express app has the xray close segment handler
   app.use(xrayExpress.closeSegment());
 
