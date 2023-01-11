@@ -1,6 +1,11 @@
 import { expect } from 'chai';
+import { print } from 'graphql';
+import request from 'supertest';
+import { ApolloServer } from '@apollo/server';
+import { PrismaClient } from '@prisma/client';
+import { client } from '../../../database/client';
+
 import { CollectionStatus, Label } from '@prisma/client';
-import { db } from '../../../test/admin-server';
 import {
   clear as clearDb,
   createAuthorHelper,
@@ -11,13 +16,19 @@ import {
   createLabelHelper,
   createCollectionLabelHelper,
   sortCollectionStoryAuthors,
-  getServerWithMockedHeaders,
 } from '../../../test/helpers';
 import { CreateCollectionLabelInput } from '../../../database/types';
 import { COLLECTION_CURATOR_FULL } from '../../../shared/constants';
 import { GET_COLLECTION, SEARCH_COLLECTIONS } from './sample-queries.gql';
+import { startServer } from '../../../express';
+import { IAdminContext } from '../../context';
 
 describe('admin queries: Collection', () => {
+  let app: Express.Application;
+  let server: ApolloServer<IAdminContext>;
+  let graphQLUrl: string;
+  let db: PrismaClient;
+
   const headers = {
     name: 'Test User',
     username: 'test.user@test.com',
@@ -25,17 +36,20 @@ describe('admin queries: Collection', () => {
     groups: `group1,group2,${COLLECTION_CURATOR_FULL}`,
   };
 
-  // note that calling `executeOperation` on this server does not require
-  // calling `server.start()`
-  const server = getServerWithMockedHeaders(headers);
-
   let author;
   let curationCategory;
   let IABParentCategory;
   let IABChildCategory;
 
   beforeAll(async () => {
-    await clearDb(db);
+    // port 0 tells express to dynamically assign an available port
+    ({ app, adminServer: server, adminUrl: graphQLUrl } = await startServer(0));
+    db = client();
+  });
+
+  afterAll(async () => {
+    await db.$disconnect();
+    await server.stop();
   });
 
   beforeEach(async () => {
@@ -50,10 +64,6 @@ describe('admin queries: Collection', () => {
     );
   });
 
-  afterAll(async () => {
-    await db.$disconnect();
-  });
-
   describe('getCollection', () => {
     it('should get a collection with no stories', async () => {
       const created = await createCollectionHelper(db, {
@@ -65,14 +75,17 @@ describe('admin queries: Collection', () => {
         IABChildCategory,
       });
 
-      const { data } = await server.executeOperation({
-        query: GET_COLLECTION,
-        variables: {
-          externalId: created.externalId,
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_COLLECTION),
+          variables: {
+            externalId: created.externalId,
+          },
+        });
 
-      const collection = data?.getCollection;
+      const collection = result.body.data.getCollection;
 
       expect(collection.title).to.equal('test me');
 
@@ -102,14 +115,17 @@ describe('admin queries: Collection', () => {
         author,
       });
 
-      const { data } = await server.executeOperation({
-        query: GET_COLLECTION,
-        variables: {
-          externalId: created.externalId,
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_COLLECTION),
+          variables: {
+            externalId: created.externalId,
+          },
+        });
 
-      const collection = data?.getCollection;
+      const collection = result.body.data.getCollection;
 
       // stories should have authors
       expect(collection.stories[0].authors.length).to.be.greaterThan(0);
@@ -122,14 +138,17 @@ describe('admin queries: Collection', () => {
         author,
       });
 
-      const { data } = await server.executeOperation({
-        query: GET_COLLECTION,
-        variables: {
-          externalId: created.externalId,
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_COLLECTION),
+          variables: {
+            externalId: created.externalId,
+          },
+        });
 
-      const collection = data?.getCollection;
+      const collection = result.body.data.getCollection;
 
       // the default sort returned from prisma should match our expected
       // manual sort
@@ -148,14 +167,17 @@ describe('admin queries: Collection', () => {
         collection: created,
       });
 
-      const { data } = await server.executeOperation({
-        query: GET_COLLECTION,
-        variables: {
-          externalId: created.externalId,
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_COLLECTION),
+          variables: {
+            externalId: created.externalId,
+          },
+        });
 
-      const collection = data?.getCollection;
+      const collection = result.body.data.getCollection;
 
       expect(collection.partnership.externalId).to.equal(
         association.externalId
@@ -186,14 +208,17 @@ describe('admin queries: Collection', () => {
       // assign that label to the above collection
       await createCollectionLabelHelper(db, testCollectionLabelInputData);
 
-      const { data } = await server.executeOperation({
-        query: GET_COLLECTION,
-        variables: {
-          externalId: testCollection.externalId,
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_COLLECTION),
+          variables: {
+            externalId: testCollection.externalId,
+          },
+        });
 
-      const collection = data?.getCollection;
+      const collection = result.body.data.getCollection;
 
       // stories should have authors
       expect(collection.labels.length).to.be.greaterThan(0);
@@ -209,19 +234,22 @@ describe('admin queries: Collection', () => {
         author,
       });
 
-      const result = await server.executeOperation({
-        query: GET_COLLECTION,
-        variables: {
-          externalId: created.externalId + 'type-o',
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_COLLECTION),
+          variables: {
+            externalId: created.externalId + 'type-o',
+          },
+        });
 
-      expect(result.errors.length).to.equal(1);
-      expect(result.errors[0].message).to.equal(
+      expect(result.body.errors.length).to.equal(1);
+      expect(result.body.errors[0].message).to.equal(
         `Error - Not Found: ${created.externalId}type-o`
       );
-      expect(result.errors[0].extensions.code).to.equal('NOT_FOUND');
-      expect(result.data.getCollection).not.to.exist;
+      expect(result.body.errors[0].extensions.code).to.equal('NOT_FOUND');
+      expect(result.body.data.getCollection).not.to.exist;
     });
   });
 
@@ -299,16 +327,19 @@ describe('admin queries: Collection', () => {
     });
 
     it('should search by multiple labelExternalIds in a collection', async () => {
-      const { data } = await server.executeOperation({
-        query: SEARCH_COLLECTIONS,
-        variables: {
-          filters: {
-            labelExternalIds: [fakeLabel.externalId, fakeLabel2.externalId],
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(SEARCH_COLLECTIONS),
+          variables: {
+            filters: {
+              labelExternalIds: [fakeLabel.externalId, fakeLabel2.externalId],
+            },
           },
-        },
-      });
+        });
 
-      const collections = data?.searchCollections?.collections;
+      const collections = result.body.data.searchCollections?.collections;
 
       expect(collections.length).to.equal(1);
       expect(collections[0].title).to.equal('the dude abides man');
@@ -322,16 +353,19 @@ describe('admin queries: Collection', () => {
     });
 
     it('should search by multiple labelExternalId & return a collection with only one of the searched labels', async () => {
-      const { data } = await server.executeOperation({
-        query: SEARCH_COLLECTIONS,
-        variables: {
-          filters: {
-            labelExternalIds: ['fake-uuid', fakeLabel3.externalId],
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(SEARCH_COLLECTIONS),
+          variables: {
+            filters: {
+              labelExternalIds: ['fake-uuid', fakeLabel3.externalId],
+            },
           },
-        },
-      });
+        });
 
-      const collections = data?.searchCollections?.collections;
+      const collections = result.body.data.searchCollections?.collections;
 
       expect(collections.length).to.equal(1);
       expect(collections[0].title).to.equal('finishing my coffee');
@@ -342,16 +376,19 @@ describe('admin queries: Collection', () => {
     });
 
     it('should search by one labelExternalId in collection(s) with more than 1 label', async () => {
-      const { data } = await server.executeOperation({
-        query: SEARCH_COLLECTIONS,
-        variables: {
-          filters: {
-            labelExternalIds: [fakeLabel.externalId],
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(SEARCH_COLLECTIONS),
+          variables: {
+            filters: {
+              labelExternalIds: [fakeLabel.externalId],
+            },
           },
-        },
-      });
+        });
 
-      const collections = data?.searchCollections?.collections;
+      const collections = result.body.data.searchCollections?.collections;
 
       expect(collections.length).to.equal(1);
       expect(collections[0].title).to.equal('the dude abides man');
@@ -365,31 +402,37 @@ describe('admin queries: Collection', () => {
     });
 
     it('should return no labels when searching by a non-existent label', async () => {
-      const { data } = await server.executeOperation({
-        query: SEARCH_COLLECTIONS,
-        variables: {
-          filters: {
-            labelExternalIds: ['fake-uuid'],
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(SEARCH_COLLECTIONS),
+          variables: {
+            filters: {
+              labelExternalIds: ['fake-uuid'],
+            },
           },
-        },
-      });
+        });
 
-      const collections = data?.searchCollections?.collections;
+      const collections = result.body.data.searchCollections?.collections;
 
       expect(collections.length).to.equal(0);
     });
 
     it('should search by status', async () => {
-      const { data } = await server.executeOperation({
-        query: SEARCH_COLLECTIONS,
-        variables: {
-          filters: {
-            status: CollectionStatus.ARCHIVED,
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(SEARCH_COLLECTIONS),
+          variables: {
+            filters: {
+              status: CollectionStatus.ARCHIVED,
+            },
           },
-        },
-      });
+        });
 
-      const collections = data?.searchCollections?.collections;
+      const collections = result.body.data.searchCollections?.collections;
 
       expect(collections.length).to.equal(1);
       expect(collections[0].title).to.equal('does the dude abide?');
@@ -397,16 +440,19 @@ describe('admin queries: Collection', () => {
     });
 
     it('should search by author', async () => {
-      const { data } = await server.executeOperation({
-        query: SEARCH_COLLECTIONS,
-        variables: {
-          filters: {
-            author: 'the dude',
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(SEARCH_COLLECTIONS),
+          variables: {
+            filters: {
+              author: 'the dude',
+            },
           },
-        },
-      });
+        });
 
-      const collections = data?.searchCollections?.collections;
+      const collections = result.body.data.searchCollections?.collections;
 
       expect(collections.length).to.equal(2);
 
@@ -416,16 +462,19 @@ describe('admin queries: Collection', () => {
     });
 
     it('should search by title', async () => {
-      const { data } = await server.executeOperation({
-        query: SEARCH_COLLECTIONS,
-        variables: {
-          filters: {
-            title: 'dude',
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(SEARCH_COLLECTIONS),
+          variables: {
+            filters: {
+              title: 'dude',
+            },
           },
-        },
-      });
+        });
 
-      const collections = data?.searchCollections?.collections;
+      const collections = result.body.data.searchCollections?.collections;
 
       expect(collections.length).to.equal(3);
 
@@ -436,52 +485,61 @@ describe('admin queries: Collection', () => {
     });
 
     it('should search by multiple filters', async () => {
-      const { data } = await server.executeOperation({
-        query: SEARCH_COLLECTIONS,
-        variables: {
-          filters: {
-            status: CollectionStatus.PUBLISHED,
-            author: author.name,
-            title: 'coffee',
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(SEARCH_COLLECTIONS),
+          variables: {
+            filters: {
+              status: CollectionStatus.PUBLISHED,
+              author: author.name,
+              title: 'coffee',
+            },
           },
-        },
-      });
+        });
 
-      const collections = data?.searchCollections?.collections;
+      const collections = result.body.data.searchCollections?.collections;
 
       expect(collections.length).to.equal(1);
       expect(collections[0].title).to.equal('finishing my coffee');
     });
 
     it('should return no collections when other filters match but label filters do not match', async () => {
-      const { data } = await server.executeOperation({
-        query: SEARCH_COLLECTIONS,
-        variables: {
-          filters: {
-            status: CollectionStatus.PUBLISHED,
-            author: author.name,
-            title: 'coffee',
-            labelExternalIds: ['no-such-label'],
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(SEARCH_COLLECTIONS),
+          variables: {
+            filters: {
+              status: CollectionStatus.PUBLISHED,
+              author: author.name,
+              title: 'coffee',
+              labelExternalIds: ['no-such-label'],
+            },
           },
-        },
-      });
+        });
 
-      const collections = data?.searchCollections?.collections;
+      const collections = result.body.data.searchCollections?.collections;
 
       expect(collections.length).to.equal(0);
     });
 
     it('should return all associated data - authors, stories, and story authors, labels', async () => {
-      const { data } = await server.executeOperation({
-        query: SEARCH_COLLECTIONS,
-        variables: {
-          filters: {
-            status: CollectionStatus.PUBLISHED,
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(SEARCH_COLLECTIONS),
+          variables: {
+            filters: {
+              status: CollectionStatus.PUBLISHED,
+            },
           },
-        },
-      });
+        });
 
-      const collections = data?.searchCollections?.collections;
+      const collections = result.body.data.searchCollections?.collections;
       let collectionsWithLabels = 0;
 
       for (let i = 0; i < collections.length; i++) {
@@ -504,18 +562,21 @@ describe('admin queries: Collection', () => {
     it('should respect pagination', async () => {
       // get 1 per page, get page 2 of the results
       // this should result in 3 matches
-      const { data } = await server.executeOperation({
-        query: SEARCH_COLLECTIONS,
-        variables: {
-          filters: {
-            status: CollectionStatus.PUBLISHED,
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(SEARCH_COLLECTIONS),
+          variables: {
+            filters: {
+              status: CollectionStatus.PUBLISHED,
+            },
+            page: 2,
+            perPage: 1,
           },
-          page: 2,
-          perPage: 1,
-        },
-      });
+        });
 
-      const collections = data?.searchCollections?.collections;
+      const collections = result.body.data.searchCollections?.collections;
 
       // ensure our perPage is respected
       expect(collections.length).to.equal(1);
@@ -525,16 +586,19 @@ describe('admin queries: Collection', () => {
     });
 
     it('should get published collections with story authors sorted correctly', async () => {
-      const { data } = await server.executeOperation({
-        query: SEARCH_COLLECTIONS,
-        variables: {
-          filters: {
-            status: CollectionStatus.PUBLISHED,
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(SEARCH_COLLECTIONS),
+          variables: {
+            filters: {
+              status: CollectionStatus.PUBLISHED,
+            },
           },
-        },
-      });
+        });
 
-      const collections = data?.searchCollections?.collections;
+      const collections = result.body.data.searchCollections?.collections;
 
       // the default sort returned from prisma should match our expected
       // manual sort

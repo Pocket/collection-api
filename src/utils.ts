@@ -1,5 +1,5 @@
 import { Pagination } from './typeDefs';
-import { UserInputError } from 'apollo-server-errors';
+import { UserInputError } from '@pocket-tools/apollo-utils';
 
 /**
  * Returns the pagination response object

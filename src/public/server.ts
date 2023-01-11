@@ -1,43 +1,67 @@
-import { ApolloServer } from 'apollo-server-express';
+import { ApolloServer, GraphQLRequestContext } from '@apollo/server';
+import { Server } from 'http';
 import { buildSubgraphSchema } from '@apollo/subgraph';
 import { typeDefsPublic } from '../typeDefs';
 import { resolvers as publicResolvers } from './resolvers';
-import responseCachePlugin from 'apollo-server-plugin-response-cache';
-import { GraphQLRequestContext } from 'apollo-server-types';
 import { errorHandler, sentryPlugin } from '@pocket-tools/apollo-utils';
+import responseCachePlugin from '@apollo/server-plugin-response-cache';
+import { ApolloServerPluginLandingPageGraphQLPlayground } from '@apollo/server-plugin-landing-page-graphql-playground';
 import {
   ApolloServerPluginLandingPageDisabled,
-  ApolloServerPluginLandingPageGraphQLPlayground,
-} from 'apollo-server-core';
-import { client } from '../database/client';
-import { collectionLoader } from '../dataLoaders/collectionLoader';
+  ApolloServerPluginInlineTraceDisabled,
+  ApolloServerPluginUsageReportingDisabled,
+} from '@apollo/server/plugin/disabled';
+import { ApolloServerPluginInlineTrace } from '@apollo/server/plugin/inlineTrace';
+import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
+import { IPublicContext } from './context';
 
-export const server = new ApolloServer({
-  schema: buildSubgraphSchema([
-    { typeDefs: typeDefsPublic, resolvers: publicResolvers },
-  ]),
-  plugins: [
+// export const server = new ApolloServer({
+export function getPublicServer(
+  httpServer: Server
+): ApolloServer<IPublicContext> {
+  const defaultPlugins = [
+    sentryPlugin,
     //Copied from Apollo docs, the sessionID signifies if we should seperate out caches by user.
     responseCachePlugin({
       //https://www.apollographql.com/docs/apollo-server/performance/caching/#saving-full-responses-to-a-cache
       //The user id is added to the request header by the apollo gateway (client api)
-      sessionId: (requestContext: GraphQLRequestContext) =>
+      sessionId: async (
+        requestContext: GraphQLRequestContext<IPublicContext>
+      ) =>
         requestContext.request.http.headers.has('userId')
           ? requestContext.request.http.headers.get('userId')
           : null,
     }),
-    sentryPlugin,
-    // Keep the settings we had when using v.2:
-    // no landing page on production + playground in other environments
+    ApolloServerPluginDrainHttpServer({ httpServer }),
+  ];
+  const prodPlugins = [
+    ApolloServerPluginLandingPageDisabled(),
+    ApolloServerPluginInlineTrace(),
+  ];
+  const nonProdPlugins = [
+    ApolloServerPluginLandingPageGraphQLPlayground(),
+    ApolloServerPluginInlineTraceDisabled(),
+    // Usage reporting is enabled by default if you have APOLLO_KEY in your environment
+    ApolloServerPluginUsageReportingDisabled(),
+  ];
+
+  const plugins =
     process.env.NODE_ENV === 'production'
-      ? ApolloServerPluginLandingPageDisabled()
-      : ApolloServerPluginLandingPageGraphQLPlayground(),
-  ],
-  context: {
-    db: client(),
-    dataLoaders: {
-      collectionLoader,
-    },
-  },
-  formatError: errorHandler,
-});
+      ? defaultPlugins.concat(prodPlugins)
+      : defaultPlugins.concat(nonProdPlugins);
+  return new ApolloServer<IPublicContext>({
+    schema: buildSubgraphSchema([
+      { typeDefs: typeDefsPublic, resolvers: publicResolvers },
+    ]),
+    plugins,
+    formatError: errorHandler,
+  });
+}
+
+export async function startPublicServer(
+  httpServer: Server
+): Promise<ApolloServer<IPublicContext>> {
+  const server = getPublicServer(httpServer);
+  await server.start();
+  return server;
+}

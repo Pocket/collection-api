@@ -1,13 +1,17 @@
 import { expect } from 'chai';
+import { print } from 'graphql';
+import request from 'supertest';
+import { ApolloServer } from '@apollo/server';
+import { PrismaClient } from '@prisma/client';
+import { client } from '../../../database/client';
+
 import { faker } from '@faker-js/faker';
 import { CollectionPartner, CollectionPartnershipType } from '@prisma/client';
 import config from '../../../config';
-import { db } from '../../../test/admin-server';
 import {
   clear as clearDb,
   createCollectionPartnerAssociationHelper,
   createPartnerHelper,
-  getServerWithMockedHeaders,
 } from '../../../test/helpers';
 import { CreateCollectionPartnerInput } from '../../../database/types';
 import {
@@ -16,22 +20,31 @@ import {
   GET_COLLECTION_PARTNER_ASSOCIATION,
 } from './sample-queries.gql';
 import { COLLECTION_CURATOR_FULL } from '../../../shared/constants';
+import { startServer } from '../../../express';
+import { IAdminContext } from '../../context';
 
 describe('queries: CollectionPartner', () => {
+  let app: Express.Application;
+  let server: ApolloServer<IAdminContext>;
+  let graphQLUrl: string;
+  let db: PrismaClient;
+
   const headers = {
     name: 'Test User',
     username: 'test.user@test.com',
     groups: `group1,group2,${COLLECTION_CURATOR_FULL}`,
   };
 
-  const server = getServerWithMockedHeaders(headers);
-
   beforeAll(async () => {
+    // port 0 tells express to dynamically assign an available port
+    ({ app, adminServer: server, adminUrl: graphQLUrl } = await startServer(0));
+    db = client();
     await clearDb(db);
   });
 
   afterAll(async () => {
     await db.$disconnect();
+    await server.stop();
   });
 
   describe('getCollectionPartners query', () => {
@@ -44,15 +57,18 @@ describe('queries: CollectionPartner', () => {
     });
 
     it('should get partners in alphabetical order', async () => {
-      const {
-        data: { getCollectionPartners: data },
-      } = await server.executeOperation({
-        query: GET_COLLECTION_PARTNERS,
-        variables: {
-          page: 1,
-          perPage: 10,
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_COLLECTION_PARTNERS),
+          variables: {
+            page: 1,
+            perPage: 10,
+          },
+        });
+
+      const data = result.body.data.getCollectionPartners;
 
       expect(data.partners[0].name).to.equal('Free Range Voiceover');
       expect(data.partners[1].name).to.equal('True Swag');
@@ -61,15 +77,18 @@ describe('queries: CollectionPartner', () => {
     });
 
     it('should get all available properties of collection partners', async () => {
-      const {
-        data: { getCollectionPartners: data },
-      } = await server.executeOperation({
-        query: GET_COLLECTION_PARTNERS,
-        variables: {
-          page: 1,
-          perPage: 1,
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_COLLECTION_PARTNERS),
+          variables: {
+            page: 1,
+            perPage: 1,
+          },
+        });
+
+      const data = result.body.data.getCollectionPartners;
 
       expect(data.partners[0].externalId).to.exist;
       expect(data.partners[0].name).to.exist;
@@ -79,15 +98,18 @@ describe('queries: CollectionPartner', () => {
     });
 
     it('should respect pagination', async () => {
-      const {
-        data: { getCollectionPartners: data },
-      } = await server.executeOperation({
-        query: GET_COLLECTION_PARTNERS,
-        variables: {
-          page: 2,
-          perPage: 2,
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_COLLECTION_PARTNERS),
+          variables: {
+            page: 2,
+            perPage: 2,
+          },
+        });
+
+      const data = result.body.data.getCollectionPartners;
 
       // We expect to get two results back
       expect(data.partners.length).to.equal(2);
@@ -98,15 +120,18 @@ describe('queries: CollectionPartner', () => {
     });
 
     it('should return a pagination object', async () => {
-      const {
-        data: { getCollectionPartners: data },
-      } = await server.executeOperation({
-        query: GET_COLLECTION_PARTNERS,
-        variables: {
-          page: 2,
-          perPage: 3,
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_COLLECTION_PARTNERS),
+          variables: {
+            page: 2,
+            perPage: 3,
+          },
+        });
+
+      const data = result.body.data.getCollectionPartners;
 
       expect(data.pagination.currentPage).to.equal(2);
       expect(data.pagination.totalPages).to.equal(2);
@@ -115,11 +140,12 @@ describe('queries: CollectionPartner', () => {
     });
 
     it('should return data if no variables are supplied', async () => {
-      const {
-        data: { getCollectionPartners: data },
-      } = await server.executeOperation({
-        query: GET_COLLECTION_PARTNERS,
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({ query: print(GET_COLLECTION_PARTNERS) });
+
+      const data = result.body.data.getCollectionPartners;
 
       // Expect to get all our authors back
       expect(data.partners.length).to.equal(4);
@@ -147,12 +173,15 @@ describe('queries: CollectionPartner', () => {
     });
 
     it('should find a partner record by externalId and return all its properties', async () => {
-      const {
-        data: { getCollectionPartner: data },
-      } = await server.executeOperation({
-        query: GET_COLLECTION_PARTNER,
-        variables: { id: partner.externalId },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_COLLECTION_PARTNER),
+          variables: { id: partner.externalId },
+        });
+
+      const data = result.body.data.getCollectionPartner;
 
       expect(data.externalId).to.exist;
       expect(data.name).to.exist;
@@ -162,17 +191,20 @@ describe('queries: CollectionPartner', () => {
     });
 
     it('should return NOT_FOUND on an invalid partner id', async () => {
-      const result = await server.executeOperation({
-        query: GET_COLLECTION_PARTNER,
-        variables: { id: 'invalid-id' },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_COLLECTION_PARTNER),
+          variables: { id: 'invalid-id' },
+        });
 
-      expect(result.errors.length).to.equal(1);
-      expect(result.errors[0].message).to.equal(
+      expect(result.body.errors.length).to.equal(1);
+      expect(result.body.errors[0].message).to.equal(
         `Error - Not Found: invalid-id`
       );
-      expect(result.errors[0].extensions.code).to.equal('NOT_FOUND');
-      expect(result.data.getCollectionPartner).not.to.exist;
+      expect(result.body.errors[0].extensions.code).to.equal('NOT_FOUND');
+      expect(result.body.data.getCollectionPartner).not.to.exist;
     });
   });
 
@@ -182,12 +214,15 @@ describe('queries: CollectionPartner', () => {
         type: CollectionPartnershipType.PARTNERED,
       });
 
-      const {
-        data: { getCollectionPartnerAssociation: data },
-      } = await server.executeOperation({
-        query: GET_COLLECTION_PARTNER_ASSOCIATION,
-        variables: { externalId: association.externalId },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_COLLECTION_PARTNER_ASSOCIATION),
+          variables: { externalId: association.externalId },
+        });
+
+      const data = result.body.data.getCollectionPartnerAssociation;
 
       expect(data).to.exist;
       expect(data.type).to.equal(CollectionPartnershipType.PARTNERED);
@@ -199,17 +234,20 @@ describe('queries: CollectionPartner', () => {
         type: CollectionPartnershipType.PARTNERED,
       });
 
-      const result = await server.executeOperation({
-        query: GET_COLLECTION_PARTNER_ASSOCIATION,
-        variables: { externalId: 'invalid-id' },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_COLLECTION_PARTNER_ASSOCIATION),
+          variables: { externalId: 'invalid-id' },
+        });
 
-      expect(result.errors.length).to.equal(1);
-      expect(result.errors[0].message).to.equal(
+      expect(result.body.errors.length).to.equal(1);
+      expect(result.body.errors[0].message).to.equal(
         `Error - Not Found: invalid-id`
       );
-      expect(result.errors[0].extensions.code).to.equal('NOT_FOUND');
-      expect(result.data.getCollectionPartnerAssociation).not.to.exist;
+      expect(result.body.errors[0].extensions.code).to.equal('NOT_FOUND');
+      expect(result.body.data.getCollectionPartnerAssociation).not.to.exist;
     });
   });
 });

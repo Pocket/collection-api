@@ -1,29 +1,42 @@
 import { expect } from 'chai';
-import { db } from '../../../test/admin-server';
+import { print } from 'graphql';
+import request from 'supertest';
+import { ApolloServer } from '@apollo/server';
+import { PrismaClient } from '@prisma/client';
+import { client } from '../../../database/client';
+
 import {
   clear as clearDb,
   createIABCategoryHelper,
-  getServerWithMockedHeaders,
 } from '../../../test/helpers';
 import { GET_IAB_CATEGORIES } from './sample-queries.gql';
 import { COLLECTION_CURATOR_FULL } from '../../../shared/constants';
+import { startServer } from '../../../express';
+import { IAdminContext } from '../../context';
 
 describe('queries: IABCategory', () => {
-  const headers = {
-    name: 'Test User',
-    username: 'test.user@test.com',
-    groups: `group1,group2,${COLLECTION_CURATOR_FULL}`,
-  };
-
-  const server = getServerWithMockedHeaders(headers);
+  let app: Express.Application;
+  let server: ApolloServer<IAdminContext>;
+  let graphQLUrl: string;
+  let db: PrismaClient;
 
   beforeAll(async () => {
+    // port 0 tells express to dynamically assign an available port
+    ({ app, adminServer: server, adminUrl: graphQLUrl } = await startServer(0));
+    db = client();
     await clearDb(db);
   });
 
   afterAll(async () => {
     await db.$disconnect();
+    await server.stop();
   });
+
+  const headers = {
+    name: 'Test User',
+    username: 'test.user@test.com',
+    groups: `group1,group2,${COLLECTION_CURATOR_FULL}`,
+  };
 
   describe('getCurationCategories query', () => {
     beforeAll(async () => {
@@ -46,11 +59,11 @@ describe('queries: IABCategory', () => {
     });
 
     it('should get IAB categories in alphabetical order', async () => {
-      const {
-        data: { getIABCategories: data },
-      } = await server.executeOperation({
-        query: GET_IAB_CATEGORIES,
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({ query: print(GET_IAB_CATEGORIES) });
+      const data = result.body.data.getIABCategories;
 
       // Even though we've created several IAB categories, we should only
       // receive the three parent ones back
@@ -80,11 +93,11 @@ describe('queries: IABCategory', () => {
     });
 
     it('should get all available properties of IAB categories', async () => {
-      const {
-        data: { getIABCategories: data },
-      } = await server.executeOperation({
-        query: GET_IAB_CATEGORIES,
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({ query: print(GET_IAB_CATEGORIES) });
+      const data = result.body.data.getIABCategories;
 
       // all the props of the first parent IAB category
       expect(data[0].externalId).to.exist;
