@@ -1,13 +1,9 @@
 import { PrismaClient } from '@prisma/client';
 import { S3 } from 'aws-sdk';
-import Express from 'express';
+import { Request } from 'express';
 import { client } from '../database/client';
 import s3service from '../aws/s3';
 import { COLLECTION_CURATOR_FULL, READONLY } from '../shared/constants';
-
-/**
- * Context components specifically for the admin graph.
- */
 
 // Custom properties we get from Admin API for the authenticated user
 export interface AdminAPIUser {
@@ -19,26 +15,27 @@ export interface AdminAPIUser {
   canRead: boolean;
 }
 
-export interface IAdminContext {
+// Context interface
+export interface IContext {
   db: PrismaClient;
   s3service: S3;
   authenticatedUser: AdminAPIUser;
 }
 
-export class AdminContextManager implements IAdminContext {
+export class ContextManager implements IContext {
   constructor(
     private config: {
-      request: Express.Request;
+      request: any;
       db: PrismaClient;
       s3service: S3;
     }
   ) {}
 
-  get db(): IAdminContext['db'] {
+  get db(): IContext['db'] {
     return this.config.db;
   }
 
-  get s3service(): IAdminContext['s3service'] {
+  get s3service(): IContext['s3service'] {
     return this.config.s3service;
   }
 
@@ -65,14 +62,10 @@ export class AdminContextManager implements IAdminContext {
  * Context factory function. Creates a new context upon every request.
  * @param req server request
  *
- * @returns AdminContextManager
+ * @returns ContextManager
  */
-export async function getAdminContext({
-  req,
-}: {
-  req: Express.Request;
-}): Promise<AdminContextManager> {
-  return new AdminContextManager({
+export function getContext(req: Request): ContextManager {
+  return new ContextManager({
     request: req,
     db: client(),
     s3service,

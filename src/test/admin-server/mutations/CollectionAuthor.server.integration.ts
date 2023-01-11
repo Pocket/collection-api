@@ -1,13 +1,12 @@
-import { print } from 'graphql';
-import request from 'supertest';
-import { ApolloServer } from '@apollo/server';
-import { PrismaClient } from '@prisma/client';
-import { client } from '../../../database/client';
-
 import { faker } from '@faker-js/faker';
 import slugify from 'slugify';
+import { db, getServer } from '../';
 import config from '../../../config';
-import { clear as clearDb, createAuthorHelper } from '../../helpers';
+import {
+  clear as clearDb,
+  createAuthorHelper,
+  getServerWithMockedHeaders,
+} from '../../helpers';
 import {
   CreateCollectionAuthorInput,
   UpdateCollectionAuthorImageUrlInput,
@@ -22,15 +21,8 @@ import {
   ACCESS_DENIED_ERROR,
   COLLECTION_CURATOR_FULL,
 } from '../../../shared/constants';
-import { startServer } from '../../../express';
-import { IAdminContext } from '../../../admin/context';
 
 describe('mutations: CollectionAuthor', () => {
-  let app: Express.Application;
-  let server: ApolloServer<IAdminContext>;
-  let graphQLUrl: string;
-  let db: PrismaClient;
-
   const createData: CreateCollectionAuthorInput = {
     name: 'Agatha Christie',
     slug: 'agatha-christie',
@@ -45,10 +37,10 @@ describe('mutations: CollectionAuthor', () => {
     groups: `group1,group2,${COLLECTION_CURATOR_FULL}`,
   };
 
+  const server = getServerWithMockedHeaders(headers);
+
   beforeAll(async () => {
-    // port 0 tells express to dynamically assign an available port
-    ({ app, adminServer: server, adminUrl: graphQLUrl } = await startServer(0));
-    db = client();
+    await server.start();
   });
 
   afterAll(async () => {
@@ -64,16 +56,12 @@ describe('mutations: CollectionAuthor', () => {
     it('creates an author with just the name supplied', async () => {
       const name = 'Ian Fleming';
 
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(CREATE_COLLECTION_AUTHOR),
-          variables: { name },
-        });
-      expect(result.body.errors).toBeFalsy();
-      expect(result.body?.data?.createCollectionAuthor).toBeTruthy();
-      const author = result.body.data.createCollectionAuthor;
+      const {
+        data: { createCollectionAuthor: author },
+      } = await server.executeOperation({
+        query: CREATE_COLLECTION_AUTHOR,
+        variables: { name },
+      });
 
       expect(author.externalId).toBeTruthy();
       expect(author.name).toEqual(name);
@@ -81,16 +69,12 @@ describe('mutations: CollectionAuthor', () => {
     });
 
     it('creates an author with all props supplied', async () => {
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(CREATE_COLLECTION_AUTHOR),
-          variables: createData,
-        });
-      expect(result.body.errors).toBeFalsy();
-      expect(result.body?.data?.createCollectionAuthor).toBeTruthy();
-      const author = result.body.data.createCollectionAuthor;
+      const {
+        data: { createCollectionAuthor: author },
+      } = await server.executeOperation({
+        query: CREATE_COLLECTION_AUTHOR,
+        variables: createData,
+      });
 
       expect(author.externalId).toBeTruthy();
       expect(author.name).toEqual(createData.name);
@@ -107,45 +91,38 @@ describe('mutations: CollectionAuthor', () => {
       };
 
       // Create one author
-      await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(CREATE_COLLECTION_AUTHOR),
-          variables,
-        });
+      await server.executeOperation({
+        query: CREATE_COLLECTION_AUTHOR,
+        variables,
+      });
 
       // Attempt to use the same slug one more time...
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(CREATE_COLLECTION_AUTHOR),
-          variables,
-        });
+      const result = await server.executeOperation({
+        query: CREATE_COLLECTION_AUTHOR,
+        variables,
+      });
 
       // ...without success. There is no data
-      expect(result.body.data).toBeFalsy();
+      expect(result.data).toBeFalsy();
 
       // And there is the correct error from the resolvers
-      expect(result.body.errors[0].message).toMatch(
+      expect(result.errors[0].message).toMatch(
         `An author with the slug "${variables.slug}" already exists`
       );
     });
 
     it('fails when no data is supplied', async () => {
       // Attempt to create an author with no input data...
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({ query: print(CREATE_COLLECTION_AUTHOR) });
+      const result = await server.executeOperation({
+        query: CREATE_COLLECTION_AUTHOR,
+      });
 
       // ...without success. There is no data
-      expect(result.body.data).toBeFalsy();
+      expect(result.data).toBeFalsy();
 
       // And the server responds with an error about the first variable in the input
       // that is missing
-      expect(result.body.errors[0].message).toMatch(
+      expect(result.errors[0].message).toMatch(
         'Variable "$name" of required type "String!" was not provided.'
       );
     });
@@ -157,46 +134,51 @@ describe('mutations: CollectionAuthor', () => {
         groups: `group1,group2,no-access-for-you`,
       };
 
+      const server = getServerWithMockedHeaders(headers);
+      await server.start();
+
       const variables: CreateCollectionAuthorInput = {
         name: 'James Bond',
         slug: 'james-bond',
       };
 
       // Attempt to create an author
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(CREATE_COLLECTION_AUTHOR),
-          variables,
-        });
+      const result = await server.executeOperation({
+        query: CREATE_COLLECTION_AUTHOR,
+        variables,
+      });
 
       // ...without success. There is no data
-      expect(result.body.data).toBeFalsy();
+      expect(result.data).toBeFalsy();
 
       // And there is an access denied error
-      expect(result.body.errors[0].message).toMatch(ACCESS_DENIED_ERROR);
+      expect(result.errors[0].message).toMatch(ACCESS_DENIED_ERROR);
+
+      await server.stop();
     });
 
     it('should fail if request headers are undefined', async () => {
+      const server = getServer();
+      await server.start();
+
       const variables: CreateCollectionAuthorInput = {
         name: 'James Bond',
         slug: 'james-bond',
       };
 
       // Attempt to create an author
-      const result = await request(app)
-        .post(graphQLUrl)
-        .send({
-          query: print(CREATE_COLLECTION_AUTHOR),
-          variables,
-        });
+      const result = await server.executeOperation({
+        query: CREATE_COLLECTION_AUTHOR,
+        variables,
+      });
 
       // ...without success. There is no data
-      expect(result.body.data).toBeFalsy();
+      expect(result.data).toBeFalsy();
 
       // And there is an access denied error
-      expect(result.body.errors[0].message).toMatch(ACCESS_DENIED_ERROR);
+      expect(result.errors[0].message).toMatch(ACCESS_DENIED_ERROR);
+
+      await server.stop();
     });
   });
 
@@ -213,16 +195,12 @@ describe('mutations: CollectionAuthor', () => {
         active: false,
       };
 
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(UPDATE_COLLECTION_AUTHOR),
-          variables: input,
-        });
-      expect(result.body.errors).toBeFalsy();
-      expect(result.body?.data?.updateCollectionAuthor).toBeTruthy();
-      const updatedAuthor = result.body.data.updateCollectionAuthor;
+      const {
+        data: { updateCollectionAuthor: updatedAuthor },
+      } = await server.executeOperation({
+        query: UPDATE_COLLECTION_AUTHOR,
+        variables: input,
+      });
 
       expect(updatedAuthor.name).toEqual(input.name);
       expect(updatedAuthor.slug).toEqual(input.slug);
@@ -240,16 +218,12 @@ describe('mutations: CollectionAuthor', () => {
         slug: 'mark-twain',
       };
 
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(UPDATE_COLLECTION_AUTHOR),
-          variables: input,
-        });
-      expect(result.body.errors).toBeFalsy();
-      expect(result.body?.data?.updateCollectionAuthor).toBeTruthy();
-      const updatedAuthor = result.body.data.updateCollectionAuthor;
+      const {
+        data: { updateCollectionAuthor: updatedAuthor },
+      } = await server.executeOperation({
+        query: UPDATE_COLLECTION_AUTHOR,
+        variables: input,
+      });
 
       // Expect the values supplied to be updated
       expect(updatedAuthor.name).toEqual(input.name);
@@ -274,19 +248,16 @@ describe('mutations: CollectionAuthor', () => {
       };
 
       // Attempt to use the same slug one more time...
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(UPDATE_COLLECTION_AUTHOR),
-          variables: input,
-        });
+      const result = await server.executeOperation({
+        query: UPDATE_COLLECTION_AUTHOR,
+        variables: input,
+      });
 
       // ...without success. There is no data
-      expect(result.body.data).toBeFalsy();
+      expect(result.data).toBeFalsy();
 
       // And there is the correct error from the resolvers
-      expect(result.body.errors[0].message).toMatch(
+      expect(result.errors[0].message).toMatch(
         `An author with the slug "${input.slug}" already exists`
       );
     });
@@ -298,6 +269,9 @@ describe('mutations: CollectionAuthor', () => {
         groups: `group1,group2,no-access-for-you`,
       };
 
+      const server = getServerWithMockedHeaders(headers);
+      await server.start();
+
       const author = await createAuthorHelper(db, 'Ian Fleming');
 
       const input: UpdateCollectionAuthorInput = {
@@ -309,22 +283,24 @@ describe('mutations: CollectionAuthor', () => {
         active: false,
       };
 
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(UPDATE_COLLECTION_AUTHOR),
-          variables: input,
-        });
+      const result = await server.executeOperation({
+        query: UPDATE_COLLECTION_AUTHOR,
+        variables: input,
+      });
 
       // ...without success. There is no data
-      expect(result.body.data).toBeFalsy();
+      expect(result.data).toBeFalsy();
 
       // And there is an access denied error
-      expect(result.body.errors[0].message).toMatch(ACCESS_DENIED_ERROR);
+      expect(result.errors[0].message).toMatch(ACCESS_DENIED_ERROR);
+
+      await server.stop();
     });
 
     it('should fail if request headers are undefined', async () => {
+      const server = getServer();
+      await server.start();
+
       const author = await createAuthorHelper(db, 'Ian Fleming');
 
       const input: UpdateCollectionAuthorInput = {
@@ -336,18 +312,18 @@ describe('mutations: CollectionAuthor', () => {
         active: false,
       };
 
-      const result = await request(app)
-        .post(graphQLUrl)
-        .send({
-          query: print(UPDATE_COLLECTION_AUTHOR),
-          variables: input,
-        });
+      const result = await server.executeOperation({
+        query: UPDATE_COLLECTION_AUTHOR,
+        variables: input,
+      });
 
       // ...without success. There is no data
-      expect(result.body.data).toBeFalsy();
+      expect(result.data).toBeFalsy();
 
       // And there is an access denied error
-      expect(result.body.errors[0].message).toMatch(ACCESS_DENIED_ERROR);
+      expect(result.errors[0].message).toMatch(ACCESS_DENIED_ERROR);
+
+      await server.stop();
     });
   });
 
@@ -361,16 +337,12 @@ describe('mutations: CollectionAuthor', () => {
         imageUrl: newImageUrl,
       };
 
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(UPDATE_COLLECTION_AUTHOR_IMAGE_URL),
-          variables: input,
-        });
-      expect(result.body.errors).toBeFalsy();
-      expect(result.body?.data?.updateCollectionAuthorImageUrl).toBeTruthy();
-      const updatedAuthor = result.body.data.updateCollectionAuthorImageUrl;
+      const {
+        data: { updateCollectionAuthorImageUrl: updatedAuthor },
+      } = await server.executeOperation({
+        query: UPDATE_COLLECTION_AUTHOR_IMAGE_URL,
+        variables: input,
+      });
 
       // The image URL should be updated
       expect(updatedAuthor.imageUrl).toEqual(input.imageUrl);
@@ -389,6 +361,9 @@ describe('mutations: CollectionAuthor', () => {
         groups: `group1,group2,no-access-for-you`,
       };
 
+      const server = getServerWithMockedHeaders(headers);
+      await server.start();
+
       const author = await createAuthorHelper(db, 'Ian Fleming');
       const newImageUrl = 'https://www.example.com/ian-fleming.jpg';
 
@@ -397,23 +372,24 @@ describe('mutations: CollectionAuthor', () => {
         imageUrl: newImageUrl,
       };
 
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(UPDATE_COLLECTION_AUTHOR_IMAGE_URL),
-
-          variables: input,
-        });
+      const result = await server.executeOperation({
+        query: UPDATE_COLLECTION_AUTHOR_IMAGE_URL,
+        variables: input,
+      });
 
       // ...without success. There is no data
-      expect(result.body.data).toBeFalsy();
+      expect(result.data).toBeFalsy();
 
       // And there is an access denied error
-      expect(result.body.errors[0].message).toMatch(ACCESS_DENIED_ERROR);
+      expect(result.errors[0].message).toMatch(ACCESS_DENIED_ERROR);
+
+      await server.stop();
     });
 
     it('should fail if request headers are undefined', async () => {
+      const server = getServer();
+      await server.start();
+
       const author = await createAuthorHelper(db, 'Ian Fleming');
       const newImageUrl = 'https://www.example.com/ian-fleming.jpg';
 
@@ -422,18 +398,18 @@ describe('mutations: CollectionAuthor', () => {
         imageUrl: newImageUrl,
       };
 
-      const result = await request(app)
-        .post(graphQLUrl)
-        .send({
-          query: print(UPDATE_COLLECTION_AUTHOR_IMAGE_URL),
-          variables: input,
-        });
+      const result = await server.executeOperation({
+        query: UPDATE_COLLECTION_AUTHOR_IMAGE_URL,
+        variables: input,
+      });
 
       // ...without success. There is no data
-      expect(result.body.data).toBeFalsy();
+      expect(result.data).toBeFalsy();
 
       // And there is an access denied error
-      expect(result.body.errors[0].message).toMatch(ACCESS_DENIED_ERROR);
+      expect(result.errors[0].message).toMatch(ACCESS_DENIED_ERROR);
+
+      await server.stop();
     });
   });
 });

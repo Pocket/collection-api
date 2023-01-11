@@ -7,7 +7,7 @@ import {
   ImageEntityType,
   Label,
 } from '@prisma/client';
-import { AuthenticationError } from '@pocket-tools/apollo-utils';
+import { AuthenticationError } from 'apollo-server-errors';
 import {
   CollectionPartnerAssociation,
   CreateCollectionAuthorInput,
@@ -53,7 +53,7 @@ import {
 } from '../../database/mutations';
 import { uploadImage } from '../../aws/upload';
 import { ACCESS_DENIED_ERROR } from '../../shared/constants';
-import { AdminAPIUser, IAdminContext } from '../context';
+import { AdminAPIUser, IContext } from '../context';
 
 /**
  * Executes a mutation, catches exceptions and records to sentry and console
@@ -63,7 +63,7 @@ import { AdminAPIUser, IAdminContext } from '../context';
  * @param imageEntityType
  */
 export async function executeMutation<T, U>(
-  context: IAdminContext,
+  context: IContext,
   data: T,
   callback: (db, data: T, authenticatedUser?: AdminAPIUser) => Promise<U>,
   imageEntityType: ImageEntityType = undefined
@@ -96,7 +96,7 @@ export async function executeMutation<T, U>(
 export async function createCollectionAuthor(
   parent,
   { data },
-  context: IAdminContext
+  context: IContext
 ): Promise<CollectionAuthor> {
   return await executeMutation<CreateCollectionAuthorInput, CollectionAuthor>(
     context,
@@ -114,7 +114,7 @@ export async function createCollectionAuthor(
 export async function updateCollectionAuthor(
   parent,
   { data },
-  context: IAdminContext
+  context: IContext
 ): Promise<CollectionAuthor> {
   return await executeMutation<UpdateCollectionAuthorInput, CollectionAuthor>(
     context,
@@ -132,7 +132,7 @@ export async function updateCollectionAuthor(
 export async function updateCollectionAuthorImageUrl(
   parent,
   { data },
-  context: IAdminContext
+  context: IContext
 ): Promise<CollectionAuthor> {
   return await executeMutation<
     UpdateCollectionAuthorImageUrlInput,
@@ -153,7 +153,7 @@ export async function updateCollectionAuthorImageUrl(
 export async function createCollection(
   parent,
   { data },
-  context: IAdminContext
+  context: IContext
 ): Promise<Collection> {
   return await executeMutation<CreateCollectionInput, Collection>(
     context,
@@ -171,7 +171,7 @@ export async function createCollection(
 export async function updateCollection(
   parent,
   { data },
-  context: IAdminContext
+  context: IContext
 ): Promise<Collection> {
   return await executeMutation<UpdateCollectionInput, Collection>(
     context,
@@ -189,7 +189,7 @@ export async function updateCollection(
 export async function updateCollectionImageUrl(
   parent,
   { data },
-  context: IAdminContext
+  context: IContext
 ): Promise<Collection> {
   return await executeMutation<UpdateCollectionImageUrlInput, Collection>(
     context,
@@ -207,7 +207,7 @@ export async function updateCollectionImageUrl(
 export async function createCollectionPartner(
   parent,
   { data },
-  context: IAdminContext
+  context: IContext
 ): Promise<CollectionPartner> {
   return await executeMutation<CreateCollectionPartnerInput, CollectionPartner>(
     context,
@@ -225,7 +225,7 @@ export async function createCollectionPartner(
 export async function updateCollectionPartner(
   parent,
   { data },
-  context: IAdminContext
+  context: IContext
 ): Promise<CollectionPartner> {
   return await executeMutation<UpdateCollectionPartnerInput, CollectionPartner>(
     context,
@@ -243,7 +243,7 @@ export async function updateCollectionPartner(
 export async function updateCollectionPartnerImageUrl(
   parent,
   { data },
-  context: IAdminContext
+  context: IContext
 ): Promise<CollectionPartner> {
   return await executeMutation<
     UpdateCollectionPartnerImageUrlInput,
@@ -264,7 +264,7 @@ export async function updateCollectionPartnerImageUrl(
 export async function createCollectionPartnerAssociation(
   parent,
   { data },
-  context: IAdminContext
+  context: IContext
 ): Promise<CollectionPartnerAssociation> {
   return await executeMutation<
     CreateCollectionPartnerAssociationInput,
@@ -285,7 +285,7 @@ export async function createCollectionPartnerAssociation(
 export async function updateCollectionPartnerAssociation(
   parent,
   { data },
-  context: IAdminContext
+  context: IContext
 ): Promise<CollectionPartnerAssociation> {
   return await executeMutation<
     UpdateCollectionPartnerAssociationInput,
@@ -306,7 +306,7 @@ export async function updateCollectionPartnerAssociation(
 export async function updateCollectionPartnerAssociationImageUrl(
   parent,
   { data },
-  context: IAdminContext
+  context: IContext
 ): Promise<CollectionPartnerAssociation> {
   return await executeMutation<
     UpdateCollectionPartnerAssociationImageUrlInput,
@@ -327,7 +327,7 @@ export async function updateCollectionPartnerAssociationImageUrl(
 export async function deleteCollectionPartnerAssociation(
   parent,
   { externalId },
-  context: IAdminContext
+  context: IContext
 ): Promise<CollectionPartnerAssociation> {
   return await executeMutation<string, CollectionPartnerAssociation>(
     context,
@@ -344,7 +344,7 @@ export async function deleteCollectionPartnerAssociation(
 export async function createCollectionStory(
   parent,
   { data },
-  context: IAdminContext
+  context: IContext
 ): Promise<CollectionStory> {
   return await executeMutation<CreateCollectionStoryInput, CollectionStory>(
     context,
@@ -362,7 +362,7 @@ export async function createCollectionStory(
 export async function updateCollectionStory(
   parent,
   { data },
-  context: IAdminContext
+  context: IContext
 ): Promise<CollectionStory> {
   return await executeMutation<UpdateCollectionStoryInput, CollectionStory>(
     context,
@@ -380,7 +380,7 @@ export async function updateCollectionStory(
 export async function updateCollectionStorySortOrder(
   parent,
   { data },
-  context: IAdminContext
+  context: IContext
 ): Promise<CollectionStory> {
   return await executeMutation<
     UpdateCollectionStorySortOrderInput,
@@ -401,7 +401,7 @@ export async function updateCollectionStorySortOrder(
 export async function updateCollectionStoryImageUrl(
   parent,
   { data },
-  context: IAdminContext
+  context: IContext
 ): Promise<CollectionStory> {
   return await executeMutation<
     UpdateCollectionStoryImageUrlInput,
@@ -422,7 +422,7 @@ export async function updateCollectionStoryImageUrl(
 export async function deleteCollectionStory(
   parent,
   { externalId },
-  context: IAdminContext
+  context: IContext
 ): Promise<CollectionStory> {
   return await executeMutation<string, CollectionStory>(
     context,
@@ -439,7 +439,7 @@ export async function deleteCollectionStory(
 export async function collectionImageUpload(
   parent,
   { data },
-  context: IAdminContext
+  context: IContext
 ) {
   const { s3service } = context;
   const { image, ...imageData } = data;
@@ -458,7 +458,7 @@ export async function collectionImageUpload(
 export async function createLabel(
   parent,
   { name },
-  context: IAdminContext
+  context: IContext
 ): Promise<Label> {
   return await executeMutation<string, Label>(context, name, dbCreateLabel);
 }

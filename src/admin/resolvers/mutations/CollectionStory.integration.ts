@@ -1,10 +1,4 @@
 import { expect } from 'chai';
-import { print } from 'graphql';
-import request from 'supertest';
-import { ApolloServer } from '@apollo/server';
-import { PrismaClient } from '@prisma/client';
-import { client } from '../../../database/client';
-
 import { getCollectionStory } from '../../../database/queries';
 import {
   CreateCollectionStoryInput,
@@ -14,8 +8,10 @@ import {
   clear as clearDb,
   createAuthorHelper,
   createCollectionHelper,
+  getServerWithMockedHeaders,
 } from '../../../test/helpers';
 import { COLLECTION_CURATOR_FULL } from '../../../shared/constants';
+import { db } from '../../../test/admin-server';
 import {
   CREATE_COLLECTION_STORY,
   UPDATE_COLLECTION_STORY,
@@ -24,34 +20,18 @@ import {
   DELETE_COLLECTION_STORY,
 } from './sample-mutations.gql';
 import { createCollectionStory } from '../../../database/mutations/CollectionStory';
-import { startServer } from '../../../express';
-import { IAdminContext } from '../../context';
 
 describe('mutations: CollectionStory', () => {
-  let app: Express.Application;
-  let server: ApolloServer<IAdminContext>;
-  let graphQLUrl: string;
-  let db: PrismaClient;
-
   const headers = {
     name: 'Test User',
     username: 'test.user@test.com',
     groups: `group1,group2,${COLLECTION_CURATOR_FULL}`,
   };
 
+  const server = getServerWithMockedHeaders(headers);
+
   let author;
   let collection;
-
-  beforeAll(async () => {
-    // port 0 tells express to dynamically assign an available port
-    ({ app, adminServer: server, adminUrl: graphQLUrl } = await startServer(0));
-    db = client();
-  });
-
-  afterAll(async () => {
-    await db.$disconnect();
-    await server.stop();
-  });
 
   beforeEach(async () => {
     await clearDb(db);
@@ -62,6 +42,10 @@ describe('mutations: CollectionStory', () => {
       title: 'a collection: by maude',
       author,
     });
+  });
+
+  afterAll(async () => {
+    await db.$disconnect();
   });
 
   describe('createCollectionStory', () => {
@@ -83,15 +67,12 @@ describe('mutations: CollectionStory', () => {
     });
 
     it('should create a collection story', async () => {
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(CREATE_COLLECTION_STORY),
-          variables: { data: input },
-        });
+      const { data } = await server.executeOperation({
+        query: CREATE_COLLECTION_STORY,
+        variables: { data: input },
+      });
 
-      const story = result.body.data.createCollectionStory;
+      const story = data.createCollectionStory;
 
       expect(story.url).to.equal(input.url);
       expect(story.title).to.equal(input.title);
@@ -101,47 +82,36 @@ describe('mutations: CollectionStory', () => {
       expect(story.publisher).to.equal(input.publisher);
 
       // default sort order of 0 should be there
-      expect(result.body.data.createCollectionStory.sortOrder).to.equal(0);
+      expect(data.createCollectionStory.sortOrder).to.equal(0);
     });
 
     it('should create a collection story with a default sort order', async () => {
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(CREATE_COLLECTION_STORY),
-          variables: { data: input },
-        });
+      const { data } = await server.executeOperation({
+        query: CREATE_COLLECTION_STORY,
+        variables: { data: input },
+      });
 
       // default sort order of 0 should be there
-      expect(result.body.data.createCollectionStory.sortOrder).to.equal(0);
+      expect(data.createCollectionStory.sortOrder).to.equal(0);
     });
 
     it('should create a collection story with a default `fromPartner` value', async () => {
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(CREATE_COLLECTION_STORY),
-          variables: { data: input },
-        });
+      const { data } = await server.executeOperation({
+        query: CREATE_COLLECTION_STORY,
+        variables: { data: input },
+      });
 
       // default 'fromPartner' value of 'false' should be present
-      expect(result.body.data.createCollectionStory.fromPartner).to.equal(
-        false
-      );
+      expect(data.createCollectionStory.fromPartner).to.equal(false);
     });
 
     it('should return story authors sorted correctly', async () => {
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(CREATE_COLLECTION_STORY),
-          variables: { data: input },
-        });
+      const { data } = await server.executeOperation({
+        query: CREATE_COLLECTION_STORY,
+        variables: { data: input },
+      });
 
-      const story = result.body.data.createCollectionStory;
+      const story = data.createCollectionStory;
 
       // (authors are returned sorted by sortOrder asc)
       expect(story.authors[0].name).to.equal('donny');
@@ -154,15 +124,12 @@ describe('mutations: CollectionStory', () => {
     it('should create a collection story with a sort order', async () => {
       input.sortOrder = 4;
 
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(CREATE_COLLECTION_STORY),
-          variables: { data: input },
-        });
+      const { data } = await server.executeOperation({
+        query: CREATE_COLLECTION_STORY,
+        variables: { data: input },
+      });
 
-      const story = result.body.data.createCollectionStory;
+      const story = data.createCollectionStory;
 
       expect(story.sortOrder).to.equal(4);
     });
@@ -170,53 +137,40 @@ describe('mutations: CollectionStory', () => {
     it('should create a collection story with no authors', async () => {
       input.authors = [];
 
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(CREATE_COLLECTION_STORY),
-          variables: { data: input },
-        });
+      const { data } = await server.executeOperation({
+        query: CREATE_COLLECTION_STORY,
+        variables: { data: input },
+      });
 
-      const story = result.body.data.createCollectionStory;
+      const story = data.createCollectionStory;
 
       expect(story).to.exist;
       expect(story.authors.length).to.equal(0);
     });
 
     it('should fail adding the same url to the same collection', async () => {
-      await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(CREATE_COLLECTION_STORY),
-          variables: { data: input },
-        });
+      await server.executeOperation({
+        query: CREATE_COLLECTION_STORY,
+        variables: { data: input },
+      });
 
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(CREATE_COLLECTION_STORY),
-          variables: { data: input },
-        });
+      const data = await server.executeOperation({
+        query: CREATE_COLLECTION_STORY,
+        variables: { data: input },
+      });
 
-      expect(result.body.errors.length).to.equal(1);
-      expect(result.body.errors[0].message).to.equal(
+      expect(data.errors.length).to.equal(1);
+      expect(data.errors[0].message).to.equal(
         `A story with the url "${input.url}" already exists in this collection`
       );
     });
 
     it('should add a url that already exists in a different collection', async () => {
       // add the default story to the default collection
-      const result1 = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(CREATE_COLLECTION_STORY),
-          variables: { data: input },
-        });
-      const dataStory1 = result1.body.data;
+      const { data: dataStory1 } = await server.executeOperation({
+        query: CREATE_COLLECTION_STORY,
+        variables: { data: input },
+      });
 
       // create a second collection
       const collection2 = await createCollectionHelper(db, {
@@ -228,14 +182,10 @@ describe('mutations: CollectionStory', () => {
       input.collectionExternalId = collection2.externalId;
 
       // add the same default story to the second collection
-      const result2 = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(CREATE_COLLECTION_STORY),
-          variables: { data: input },
-        });
-      const dataStory2 = result2.body.data;
+      const { data: dataStory2 } = await server.executeOperation({
+        query: CREATE_COLLECTION_STORY,
+        variables: { data: input },
+      });
 
       // the urls should be the same
       expect(dataStory2.createCollectionStory.url).to.equal(
@@ -282,15 +232,12 @@ describe('mutations: CollectionStory', () => {
         fromPartner: true,
       };
 
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(UPDATE_COLLECTION_STORY),
-          variables: { data: input },
-        });
+      const { data } = await server.executeOperation({
+        query: UPDATE_COLLECTION_STORY,
+        variables: { data: input },
+      });
 
-      const updated = result.body.data.updateCollectionStory;
+      const updated = data.updateCollectionStory;
 
       expect(updated.url).to.equal(story.url);
       expect(updated.title).to.equal(input.title);
@@ -317,15 +264,12 @@ describe('mutations: CollectionStory', () => {
         fromPartner: false,
       };
 
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(UPDATE_COLLECTION_STORY),
-          variables: { data: input },
-        });
+      const { data } = await server.executeOperation({
+        query: UPDATE_COLLECTION_STORY,
+        variables: { data: input },
+      });
 
-      const updated = result.body.data.updateCollectionStory;
+      const updated = data.updateCollectionStory;
 
       expect(updated.authors.length).to.equal(3);
       // (authors are returned sorted by sortOrder asc)
@@ -347,15 +291,12 @@ describe('mutations: CollectionStory', () => {
         fromPartner: false,
       };
 
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(UPDATE_COLLECTION_STORY),
-          variables: { data: input },
-        });
+      const { data } = await server.executeOperation({
+        query: UPDATE_COLLECTION_STORY,
+        variables: { data: input },
+      });
 
-      expect(result.body.data.updateCollectionStory.authors.length).to.equal(0);
+      expect(data.updateCollectionStory.authors.length).to.equal(0);
     });
 
     it("should update a collection story URL as long as it doesn't already exist", async () => {
@@ -374,15 +315,12 @@ describe('mutations: CollectionStory', () => {
         fromPartner: false,
       };
 
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(UPDATE_COLLECTION_STORY),
-          variables: { data: input },
-        });
+      const { data } = await server.executeOperation({
+        query: UPDATE_COLLECTION_STORY,
+        variables: { data: input },
+      });
 
-      expect(result.body.data.updateCollectionStory.url).to.equal(input.url);
+      expect(data.updateCollectionStory.url).to.equal(input.url);
     });
 
     it('should fail updating to a url that already exists in the same collection', async () => {
@@ -420,16 +358,13 @@ describe('mutations: CollectionStory', () => {
         fromPartner: false,
       };
 
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(UPDATE_COLLECTION_STORY),
-          variables: { data: input },
-        });
+      const data = await server.executeOperation({
+        query: UPDATE_COLLECTION_STORY,
+        variables: { data: input },
+      });
 
-      expect(result.body.errors.length).to.equal(1);
-      expect(result.body.errors[0].message).to.equal(
+      expect(data.errors.length).to.equal(1);
+      expect(data.errors[0].message).to.equal(
         `A story with the url "${input.url}" already exists in this collection`
       );
     });
@@ -475,15 +410,12 @@ describe('mutations: CollectionStory', () => {
         fromPartner: false,
       };
 
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(UPDATE_COLLECTION_STORY),
-          variables: { data: input },
-        });
+      const { data } = await server.executeOperation({
+        query: UPDATE_COLLECTION_STORY,
+        variables: { data: input },
+      });
 
-      expect(result.body.data.updateCollectionStory.url).to.equal(input.url);
+      expect(data.updateCollectionStory.url).to.equal(input.url);
     });
 
     it('should allow updates with optional fields omitted in input data', async () => {
@@ -497,19 +429,14 @@ describe('mutations: CollectionStory', () => {
         publisher: 'the cast',
       };
 
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(UPDATE_COLLECTION_STORY),
-          variables: { data: input },
-        });
+      const { data } = await server.executeOperation({
+        query: UPDATE_COLLECTION_STORY,
+        variables: { data: input },
+      });
 
       // The two optional fields should stay as they are
-      expect(result.body.data.updateCollectionStory.sortOrder).to.equal(
-        story.sortOrder
-      );
-      expect(result.body.data.updateCollectionStory.fromPartner).to.equal(
+      expect(data.updateCollectionStory.sortOrder).to.equal(story.sortOrder);
+      expect(data.updateCollectionStory.fromPartner).to.equal(
         story.fromPartner
       );
     });
@@ -538,39 +465,33 @@ describe('mutations: CollectionStory', () => {
     });
 
     it('should update the sortOrder of a collection story', async () => {
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(UPDATE_COLLECTION_STORY_SORT_ORDER),
-          variables: {
-            data: {
-              externalId: story.externalId,
-              sortOrder: story.sortOrder + 1,
-            },
+      const { data } = await server.executeOperation({
+        query: UPDATE_COLLECTION_STORY_SORT_ORDER,
+        variables: {
+          data: {
+            externalId: story.externalId,
+            sortOrder: story.sortOrder + 1,
           },
-        });
+        },
+      });
 
-      expect(
-        result.body.data.updateCollectionStorySortOrder.sortOrder
-      ).to.equal(story.sortOrder + 1);
+      expect(data.updateCollectionStorySortOrder.sortOrder).to.equal(
+        story.sortOrder + 1
+      );
     });
 
     it('should not update any other properties when updating sortOrder', async () => {
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(UPDATE_COLLECTION_STORY_SORT_ORDER),
-          variables: {
-            data: {
-              externalId: story.externalId,
-              sortOrder: story.sortOrder + 1,
-            },
+      const { data } = await server.executeOperation({
+        query: UPDATE_COLLECTION_STORY_SORT_ORDER,
+        variables: {
+          data: {
+            externalId: story.externalId,
+            sortOrder: story.sortOrder + 1,
           },
-        });
+        },
+      });
 
-      const updated = result.body.data.updateCollectionStorySortOrder;
+      const updated = data.updateCollectionStorySortOrder;
 
       expect(updated.title).to.equal(story.title);
       expect(updated.url).to.equal(story.url);
@@ -606,54 +527,44 @@ describe('mutations: CollectionStory', () => {
     it('should update the imageUrl of a collection story', async () => {
       const randomKitten = 'https://placekitten.com/g/200/300';
 
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(UPDATE_COLLECTION_STORY_IMAGE_URL),
-          variables: {
-            data: {
-              externalId: story.externalId,
-              imageUrl: randomKitten,
-            },
+      const { data } = await server.executeOperation({
+        query: UPDATE_COLLECTION_STORY_IMAGE_URL,
+        variables: {
+          data: {
+            externalId: story.externalId,
+            imageUrl: randomKitten,
           },
-        });
+        },
+      });
 
-      expect(result.body.data.updateCollectionStoryImageUrl.imageUrl).to.equal(
+      expect(data.updateCollectionStoryImageUrl.imageUrl).to.equal(
         randomKitten
       );
     });
 
     it('should not update any other properties when updating sortOrder', async () => {
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(UPDATE_COLLECTION_STORY_IMAGE_URL),
-          variables: {
-            data: {
-              externalId: story.externalId,
-              imageUrl: 'https://placekitten.com/g/200/300',
-            },
+      const { data } = await server.executeOperation({
+        query: UPDATE_COLLECTION_STORY_IMAGE_URL,
+        variables: {
+          data: {
+            externalId: story.externalId,
+            imageUrl: 'https://placekitten.com/g/200/300',
           },
-        });
+        },
+      });
 
-      expect(result.body.data.updateCollectionStoryImageUrl.title).to.equal(
-        story.title
-      );
-      expect(result.body.data.updateCollectionStoryImageUrl.url).to.equal(
-        story.url
-      );
-      expect(result.body.data.updateCollectionStoryImageUrl.excerpt).to.equal(
+      expect(data.updateCollectionStoryImageUrl.title).to.equal(story.title);
+      expect(data.updateCollectionStoryImageUrl.url).to.equal(story.url);
+      expect(data.updateCollectionStoryImageUrl.excerpt).to.equal(
         story.excerpt
       );
-      expect(result.body.data.updateCollectionStoryImageUrl.sortOrder).to.equal(
+      expect(data.updateCollectionStoryImageUrl.sortOrder).to.equal(
         story.sortOrder
       );
-      expect(
-        result.body.data.updateCollectionStoryImageUrl.authors.length
-      ).to.equal(story.authors.length);
-      expect(result.body.data.updateCollectionStoryImageUrl.publisher).to.equal(
+      expect(data.updateCollectionStoryImageUrl.authors.length).to.equal(
+        story.authors.length
+      );
+      expect(data.updateCollectionStoryImageUrl.publisher).to.equal(
         story.publisher
       );
     });
@@ -682,25 +593,18 @@ describe('mutations: CollectionStory', () => {
     });
 
     it('should delete a collection story and return the deleted data', async () => {
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(DELETE_COLLECTION_STORY),
-          variables: {
-            externalId: story.externalId,
-          },
-        });
+      const { data } = await server.executeOperation({
+        query: DELETE_COLLECTION_STORY,
+        variables: {
+          externalId: story.externalId,
+        },
+      });
 
       // should have direct model data
-      expect(result.body.data.deleteCollectionStory.title).to.equal(
-        story.title
-      );
+      expect(data.deleteCollectionStory.title).to.equal(story.title);
 
       // should have related author data
-      expect(
-        result.body.data.deleteCollectionStory.authors.length
-      ).to.be.greaterThan(0);
+      expect(data.deleteCollectionStory.authors.length).to.be.greaterThan(0);
 
       // make sure the story is really gone
       const found = await getCollectionStory(db, story.externalId);
@@ -709,35 +613,25 @@ describe('mutations: CollectionStory', () => {
     });
 
     it('should delete a collection story and return the story authors sorted correctly', async () => {
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(DELETE_COLLECTION_STORY),
-          variables: {
-            externalId: story.externalId,
-          },
-        });
+      const { data } = await server.executeOperation({
+        query: DELETE_COLLECTION_STORY,
+        variables: {
+          externalId: story.externalId,
+        },
+      });
 
       // (authors are returned sorted by sortOrder asc)
-      expect(result.body.data.deleteCollectionStory.authors[0].name).to.equal(
-        'donny'
-      );
-      expect(result.body.data.deleteCollectionStory.authors[1].name).to.equal(
-        'walter'
-      );
+      expect(data.deleteCollectionStory.authors[0].name).to.equal('donny');
+      expect(data.deleteCollectionStory.authors[1].name).to.equal('walter');
     });
 
     it('should delete all related collection story authors', async () => {
-      await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(DELETE_COLLECTION_STORY),
-          variables: {
-            externalId: story.externalId,
-          },
-        });
+      await server.executeOperation({
+        query: DELETE_COLLECTION_STORY,
+        variables: {
+          externalId: story.externalId,
+        },
+      });
 
       const relatedAuthors = db.collectionStoryAuthor.findMany({
         where: {
@@ -749,18 +643,15 @@ describe('mutations: CollectionStory', () => {
     });
 
     it('should fail to delete a collection story if the externalId cannot be found', async () => {
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(DELETE_COLLECTION_STORY),
-          variables: {
-            externalId: story.externalId + 'typo',
-          },
-        });
+      const data = await server.executeOperation({
+        query: DELETE_COLLECTION_STORY,
+        variables: {
+          externalId: story.externalId + 'typo',
+        },
+      });
 
-      expect(result.body.errors.length).to.equal(1);
-      expect(result.body.errors[0].message).to.equal(
+      expect(data.errors.length).to.equal(1);
+      expect(data.errors[0].message).to.equal(
         `Cannot delete a collection story with external ID "${story.externalId}typo"`
       );
     });

@@ -1,40 +1,28 @@
 import { expect } from 'chai';
-import { print } from 'graphql';
-import request from 'supertest';
-import { ApolloServer } from '@apollo/server';
-import { PrismaClient } from '@prisma/client';
-import { client } from '../../../database/client';
-
 import slugify from 'slugify';
 import { faker } from '@faker-js/faker';
 import { CollectionAuthor } from '@prisma/client';
 import config from '../../../config';
-import { clear as clearDb, createAuthorHelper } from '../../../test/helpers';
+import { db, getServer } from '../../../test/admin-server';
+import {
+  clear as clearDb,
+  createAuthorHelper,
+  getServerWithMockedHeaders,
+} from '../../../test/helpers';
 import { CreateCollectionAuthorInput } from '../../../database/types';
 import {
   GET_COLLECTION_AUTHOR,
   GET_COLLECTION_AUTHORS,
 } from './sample-queries.gql';
 import { ACCESS_DENIED_ERROR, READONLY } from '../../../shared/constants';
-import { startServer } from '../../../express';
-import { IAdminContext } from '../../context';
 
 describe('auth: CollectionAuthor', () => {
-  let app: Express.Application;
-  let server: ApolloServer<IAdminContext>;
-  let graphQLUrl: string;
-  let db: PrismaClient;
-
   beforeAll(async () => {
-    // port 0 tells express to dynamically assign an available port
-    ({ app, adminServer: server, adminUrl: graphQLUrl } = await startServer(0));
-    db = client();
     await clearDb(db);
   });
 
   afterAll(async () => {
     await db.$disconnect();
-    await server.stop();
   });
 
   describe('getCollectionAuthors query', () => {
@@ -67,15 +55,17 @@ describe('auth: CollectionAuthor', () => {
         groups: `group1,group2,${READONLY}`,
       };
 
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({ query: print(GET_COLLECTION_AUTHORS) });
+      const server = getServerWithMockedHeaders(headers);
+
+      const result = await server.executeOperation({
+        query: GET_COLLECTION_AUTHORS,
+      });
+
       // we shouldn't have any errors
-      expect(result.body.errors).not.to.exist;
+      expect(result.errors).not.to.exist;
 
       // and data should exist
-      expect(result.body.data).to.exist;
+      expect(result.data).to.exist;
     });
 
     it('should fail if user does not have access', async () => {
@@ -86,28 +76,33 @@ describe('auth: CollectionAuthor', () => {
         groups: `group1,group2`,
       };
 
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({ query: print(GET_COLLECTION_AUTHORS) });
+      const server = getServerWithMockedHeaders(headers);
+
+      const result = await server.executeOperation({
+        query: GET_COLLECTION_AUTHORS,
+      });
+
       // ...without success. There is no data
-      expect(result.body.data).not.to.exist;
+      expect(result.data).not.to.exist;
 
       // And there is an access denied error
-      expect(result.body.errors[0].message).to.equal(ACCESS_DENIED_ERROR);
-      expect(result.body.errors[0].extensions.code).to.equal('FORBIDDEN');
+      expect(result.errors[0].message).to.equal(ACCESS_DENIED_ERROR);
+      expect(result.errors[0].extensions.code).to.equal('FORBIDDEN');
     });
 
     it('should fail if auth headers are empty', async () => {
-      const result = await request(app)
-        .post(graphQLUrl)
-        .send({ query: print(GET_COLLECTION_AUTHORS) });
+      const server = getServer();
+
+      const result = await server.executeOperation({
+        query: GET_COLLECTION_AUTHORS,
+      });
+
       // ...without success. There is no data
-      expect(result.body.data).not.to.exist;
+      expect(result.data).not.to.exist;
 
       // And there is an access denied error
-      expect(result.body.errors[0].message).to.equal(ACCESS_DENIED_ERROR);
-      expect(result.body.errors[0].extensions.code).to.equal('FORBIDDEN');
+      expect(result.errors[0].message).to.equal(ACCESS_DENIED_ERROR);
+      expect(result.errors[0].extensions.code).to.equal('FORBIDDEN');
     });
   });
 
@@ -134,19 +129,18 @@ describe('auth: CollectionAuthor', () => {
         groups: `group1,group2,${READONLY}`,
       };
 
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(GET_COLLECTION_AUTHOR),
-          variables: { id: author.externalId },
-        });
+      const server = getServerWithMockedHeaders(headers);
+
+      const result = await server.executeOperation({
+        query: GET_COLLECTION_AUTHOR,
+        variables: { id: author.externalId },
+      });
 
       // we shouldn't have any errors
-      expect(result.body.errors).not.to.exist;
+      expect(result.errors).not.to.exist;
 
       // and data should exist
-      expect(result.body.data.getCollectionAuthor).to.exist;
+      expect(result.data.getCollectionAuthor).to.exist;
     });
 
     it('should fail if user does not have access', async () => {
@@ -157,36 +151,35 @@ describe('auth: CollectionAuthor', () => {
         groups: `group1,group2`,
       };
 
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(GET_COLLECTION_AUTHOR),
-          variables: { id: author.externalId },
-        });
+      const server = getServerWithMockedHeaders(headers);
+
+      const result = await server.executeOperation({
+        query: GET_COLLECTION_AUTHOR,
+        variables: { id: author.externalId },
+      });
 
       // ...without success. There is no data
-      expect(result.body.data.getCollectionAuthor).not.to.exist;
+      expect(result.data.getCollectionAuthor).not.to.exist;
 
       // And there is an access denied error
-      expect(result.body.errors[0].message).to.equal(ACCESS_DENIED_ERROR);
-      expect(result.body.errors[0].extensions.code).to.equal('FORBIDDEN');
+      expect(result.errors[0].message).to.equal(ACCESS_DENIED_ERROR);
+      expect(result.errors[0].extensions.code).to.equal('FORBIDDEN');
     });
 
     it('should fail if auth headers are empty', async () => {
-      const result = await request(app)
-        .post(graphQLUrl)
-        .send({
-          query: print(GET_COLLECTION_AUTHOR),
-          variables: { id: author.externalId },
-        });
+      const server = getServer();
+
+      const result = await server.executeOperation({
+        query: GET_COLLECTION_AUTHOR,
+        variables: { id: author.externalId },
+      });
 
       // ...without success. There is no data
-      expect(result.body.data.getCollectionAuthor).not.to.exist;
+      expect(result.data.getCollectionAuthor).not.to.exist;
 
       // And there is an access denied error
-      expect(result.body.errors[0].message).to.equal(ACCESS_DENIED_ERROR);
-      expect(result.body.errors[0].extensions.code).to.equal('FORBIDDEN');
+      expect(result.errors[0].message).to.equal(ACCESS_DENIED_ERROR);
+      expect(result.errors[0].extensions.code).to.equal('FORBIDDEN');
     });
   });
 });

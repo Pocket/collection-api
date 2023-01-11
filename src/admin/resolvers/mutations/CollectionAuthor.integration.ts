@@ -1,50 +1,37 @@
 import { expect } from 'chai';
-import { print } from 'graphql';
-import request from 'supertest';
-import { ApolloServer } from '@apollo/server';
-import { PrismaClient } from '@prisma/client';
-import { client } from '../../../database/client';
-
 import {
   CreateCollectionAuthorInput,
   UpdateCollectionAuthorImageUrlInput,
   UpdateCollectionAuthorInput,
 } from '../../../database/types';
 import { COLLECTION_CURATOR_FULL } from '../../../shared/constants';
-import { clear as clearDb, createAuthorHelper } from '../../../test/helpers';
+import { db } from '../../../test/admin-server';
+import {
+  clear as clearDb,
+  createAuthorHelper,
+  getServerWithMockedHeaders,
+} from '../../../test/helpers';
 import {
   CREATE_COLLECTION_AUTHOR,
   UPDATE_COLLECTION_AUTHOR,
   UPDATE_COLLECTION_AUTHOR_IMAGE_URL,
 } from './sample-mutations.gql';
-import { startServer } from '../../../express';
-import { IAdminContext } from '../../context';
 
 describe('mutations: CollectionAuthor', () => {
-  let app: Express.Application;
-  let server: ApolloServer<IAdminContext>;
-  let graphQLUrl: string;
-  let db: PrismaClient;
-
   const headers = {
     name: 'Test User',
     username: 'test.user@test.com',
     groups: `group1,group2,${COLLECTION_CURATOR_FULL}`,
   };
 
-  beforeAll(async () => {
-    // port 0 tells express to dynamically assign an available port
-    ({ app, adminServer: server, adminUrl: graphQLUrl } = await startServer(0));
-    db = client();
+  const server = getServerWithMockedHeaders(headers);
+
+  beforeEach(async () => {
+    await clearDb(db);
   });
 
   afterAll(async () => {
     await db.$disconnect();
-    await server.stop();
-  });
-
-  beforeEach(async () => {
-    await clearDb(db);
   });
 
   describe('createAuthor', () => {
@@ -53,16 +40,13 @@ describe('mutations: CollectionAuthor', () => {
         name: 'the dude',
       };
 
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(CREATE_COLLECTION_AUTHOR),
-          variables: { data: input },
-        });
+      const { data } = await server.executeOperation({
+        query: CREATE_COLLECTION_AUTHOR,
+        variables: { data: input },
+      });
 
-      expect(result.body.data.createCollectionAuthor.name).to.equal('the dude');
-      expect(result.body.data.createCollectionAuthor.slug).to.equal('the-dude');
+      expect(data.createCollectionAuthor.name).to.equal('the dude');
+      expect(data.createCollectionAuthor.slug).to.equal('the-dude');
     });
 
     it('should create a collection author with all fields specified', async () => {
@@ -73,22 +57,15 @@ describe('mutations: CollectionAuthor', () => {
         imageUrl: 'https://i.imgur.com/YeydXfW.gif',
       };
 
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(CREATE_COLLECTION_AUTHOR),
-          variables: { data: input },
-        });
+      const { data } = await server.executeOperation({
+        query: CREATE_COLLECTION_AUTHOR,
+        variables: { data: input },
+      });
 
-      expect(result.body.data.createCollectionAuthor.name).to.equal('the dude');
-      expect(result.body.data.createCollectionAuthor.slug).to.equal(
-        'his-dudeness'
-      );
-      expect(result.body.data.createCollectionAuthor.bio).to.equal(
-        'the dude abides'
-      );
-      expect(result.body.data.createCollectionAuthor.imageUrl).to.equal(
+      expect(data.createCollectionAuthor.name).to.equal('the dude');
+      expect(data.createCollectionAuthor.slug).to.equal('his-dudeness');
+      expect(data.createCollectionAuthor.bio).to.equal('the dude abides');
+      expect(data.createCollectionAuthor.imageUrl).to.equal(
         'https://i.imgur.com/YeydXfW.gif'
       );
     });
@@ -99,28 +76,22 @@ describe('mutations: CollectionAuthor', () => {
         slug: 'his-dudeness',
       };
 
-      await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(CREATE_COLLECTION_AUTHOR),
-          variables: { data: input },
-        });
+      await server.executeOperation({
+        query: CREATE_COLLECTION_AUTHOR,
+        variables: { data: input },
+      });
 
       // change the name just because
       input.name = 'walter sobchak';
 
       // should fail trying to create an author with the same slug
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(CREATE_COLLECTION_AUTHOR),
-          variables: { data: input },
-        });
+      const data = await server.executeOperation({
+        query: CREATE_COLLECTION_AUTHOR,
+        variables: { data: input },
+      });
 
-      expect(result.body.errors.length).to.equal(1);
-      expect(result.body.errors[0].message).to.equal(
+      expect(data.errors.length).to.equal(1);
+      expect(data.errors[0].message).to.equal(
         'An author with the slug "his-dudeness" already exists'
       );
     });
@@ -137,16 +108,13 @@ describe('mutations: CollectionAuthor', () => {
         bio: 'he abides, man',
       };
 
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(UPDATE_COLLECTION_AUTHOR),
-          variables: { data: input },
-        });
+      const { data } = await server.executeOperation({
+        query: UPDATE_COLLECTION_AUTHOR,
+        variables: { data: input },
+      });
 
-      expect(result.body.data.updateCollectionAuthor.name).to.equal(input.name);
-      expect(result.body.data.updateCollectionAuthor.bio).to.equal(input.bio);
+      expect(data.updateCollectionAuthor.name).to.equal(input.name);
+      expect(data.updateCollectionAuthor.bio).to.equal(input.bio);
     });
 
     it('should update to a specified collection author slug', async () => {
@@ -158,15 +126,12 @@ describe('mutations: CollectionAuthor', () => {
         slug: 'his-dudeness',
       };
 
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(UPDATE_COLLECTION_AUTHOR),
-          variables: { data: input },
-        });
+      const { data } = await server.executeOperation({
+        query: UPDATE_COLLECTION_AUTHOR,
+        variables: { data: input },
+      });
 
-      expect(result.body.data.updateCollectionAuthor.slug).to.equal(input.slug);
+      expect(data.updateCollectionAuthor.slug).to.equal(input.slug);
     });
 
     it('should fail to update a collection author slug if another author has that slug', async () => {
@@ -183,18 +148,15 @@ describe('mutations: CollectionAuthor', () => {
         slug: 'the-dude',
       };
 
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(UPDATE_COLLECTION_AUTHOR),
-          variables: { data: input },
-        });
+      const data = await server.executeOperation({
+        query: UPDATE_COLLECTION_AUTHOR,
+        variables: { data: input },
+      });
 
       // should fail trying to make walter's slug 'the dude'
       // there's only one the dude
-      expect(result.body.errors.length).to.equal(1);
-      expect(result.body.errors[0].message).to.equal(
+      expect(data.errors.length).to.equal(1);
+      expect(data.errors[0].message).to.equal(
         'An author with the slug "the-dude" already exists'
       );
     });
@@ -210,15 +172,12 @@ describe('mutations: CollectionAuthor', () => {
         imageUrl: randomKitten,
       };
 
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(UPDATE_COLLECTION_AUTHOR_IMAGE_URL),
-          variables: { data: input },
-        });
+      const { data } = await server.executeOperation({
+        query: UPDATE_COLLECTION_AUTHOR_IMAGE_URL,
+        variables: { data: input },
+      });
 
-      expect(result.body.data.updateCollectionAuthorImageUrl.imageUrl).to.equal(
+      expect(data.updateCollectionAuthorImageUrl.imageUrl).to.equal(
         input.imageUrl
       );
     });
@@ -232,24 +191,15 @@ describe('mutations: CollectionAuthor', () => {
         imageUrl: randomKitten,
       };
 
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(UPDATE_COLLECTION_AUTHOR_IMAGE_URL),
-          variables: { data: input },
-        });
+      const { data } = await server.executeOperation({
+        query: UPDATE_COLLECTION_AUTHOR_IMAGE_URL,
+        variables: { data: input },
+      });
 
-      expect(result.body.data.updateCollectionAuthorImageUrl.name).to.equal(
-        author.name
-      );
-      expect(result.body.data.updateCollectionAuthorImageUrl.slug).to.equal(
-        author.slug
-      );
-      expect(result.body.data.updateCollectionAuthorImageUrl.bio).to.equal(
-        author.bio
-      );
-      expect(result.body.data.updateCollectionAuthorImageUrl.active).to.equal(
+      expect(data.updateCollectionAuthorImageUrl.name).to.equal(author.name);
+      expect(data.updateCollectionAuthorImageUrl.slug).to.equal(author.slug);
+      expect(data.updateCollectionAuthorImageUrl.bio).to.equal(author.bio);
+      expect(data.updateCollectionAuthorImageUrl.active).to.equal(
         author.active
       );
     });
