@@ -1,28 +1,17 @@
 import { expect } from 'chai';
-import { print } from 'graphql';
-import request from 'supertest';
-import { ApolloServer } from '@apollo/server';
-import { PrismaClient } from '@prisma/client';
-import { client } from '../../../database/client';
-
 import {
   clear as clearDb,
   createAuthorHelper,
   createCollectionHelper,
   createCollectionStoryHelper,
   sortCollectionStoryAuthors,
+  getServerWithMockedHeaders,
 } from '../../../test/helpers';
+import { db } from '../../../test/admin-server';
 import { COLLECTION_CURATOR_FULL } from '../../../shared/constants';
 import { GET_COLLECTION_STORY } from './sample-queries.gql';
-import { startServer } from '../../../express';
-import { IAdminContext } from '../../context';
 
 describe('queries: CollectionStory', () => {
-  let app: Express.Application;
-  let server: ApolloServer<IAdminContext>;
-  let graphQLUrl: string;
-  let db: PrismaClient;
-
   const headers = {
     name: 'Test User',
     username: 'test.user@test.com',
@@ -30,19 +19,16 @@ describe('queries: CollectionStory', () => {
     groups: `group1,group2,${COLLECTION_CURATOR_FULL}`,
   };
 
-  beforeAll(async () => {
-    // port 0 tells express to dynamically assign an available port
-    ({ app, adminServer: server, adminUrl: graphQLUrl } = await startServer(0));
-    db = client();
+  // note that calling `executeOperation` on this server does not require
+  // calling `server.start()`
+  const server = getServerWithMockedHeaders(headers);
+
+  beforeEach(async () => {
+    await clearDb(db);
   });
 
   afterAll(async () => {
     await db.$disconnect();
-    await server.stop();
-  });
-
-  beforeEach(async () => {
-    await clearDb(db);
   });
 
   describe('getCollectionStory', () => {
@@ -68,34 +54,28 @@ describe('queries: CollectionStory', () => {
     });
 
     it('should retrieve a collection story with authors', async () => {
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(GET_COLLECTION_STORY),
-          variables: {
-            externalId: story.externalId,
-          },
-        });
+      const { data } = await server.executeOperation({
+        query: GET_COLLECTION_STORY,
+        variables: {
+          externalId: story.externalId,
+        },
+      });
 
-      const retrieved = result.body.data?.getCollectionStory;
+      const retrieved = data?.getCollectionStory;
 
       expect(retrieved.title).to.equal('a story');
       expect(retrieved.authors.length).to.be.greaterThan(0);
     });
 
     it('should retrieve a collection story with authors sorted correctly', async () => {
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(GET_COLLECTION_STORY),
-          variables: {
-            externalId: story.externalId,
-          },
-        });
+      const { data } = await server.executeOperation({
+        query: GET_COLLECTION_STORY,
+        variables: {
+          externalId: story.externalId,
+        },
+      });
 
-      const retrieved = result.body.data?.getCollectionStory;
+      const retrieved = data?.getCollectionStory;
 
       // the default sort returned from prisma should match our expected
       // manual sort
@@ -105,22 +85,19 @@ describe('queries: CollectionStory', () => {
     });
 
     it('should return NOT_FOUND for an unknown externalID', async () => {
-      const result = await request(app)
-        .post(graphQLUrl)
-        .set(headers)
-        .send({
-          query: print(GET_COLLECTION_STORY),
-          variables: {
-            externalId: story.externalId + 'typo',
-          },
-        });
+      const result = await server.executeOperation({
+        query: GET_COLLECTION_STORY,
+        variables: {
+          externalId: story.externalId + 'typo',
+        },
+      });
 
-      expect(result.body.errors.length).to.equal(1);
-      expect(result.body.errors[0].message).to.equal(
+      expect(result.errors.length).to.equal(1);
+      expect(result.errors[0].message).to.equal(
         `Error - Not Found: ${story.externalId}typo`
       );
-      expect(result.body.errors[0].extensions.code).to.equal('NOT_FOUND');
-      expect(result.body.data.getCollectionStory).not.to.exist;
+      expect(result.errors[0].extensions.code).to.equal('NOT_FOUND');
+      expect(result.data.getCollectionStory).not.to.exist;
     });
   });
 });

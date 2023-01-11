@@ -1,4 +1,5 @@
-import { ForbiddenError, NotFoundError } from '@pocket-tools/apollo-utils';
+import { ForbiddenError } from 'apollo-server-errors';
+import { NotFoundError } from '@pocket-tools/apollo-utils';
 import { CollectionComplete } from '../../../database/types';
 import { CollectionsResult } from '../../../typeDefs';
 import {

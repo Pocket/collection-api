@@ -1,4 +1,4 @@
-import { ForbiddenError } from '@pocket-tools/apollo-utils';
+import { ForbiddenError } from 'apollo-server-errors';
 import { IABParentCategory } from '../../../database/types';
 import { getIABCategories as dbGetIABCategories } from '../../../database/queries';
 import { ACCESS_DENIED_ERROR } from '../../../shared/constants';
