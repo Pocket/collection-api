@@ -1,5 +1,10 @@
 import { expect } from 'chai';
-import { db, getServer } from '../../../test/public-server';
+import { print } from 'graphql';
+import request from 'supertest';
+import { ApolloServer } from '@apollo/server';
+import { PrismaClient } from '@prisma/client';
+import { client } from '../../../database/client';
+
 import {
   CollectionLanguage,
   CreateCollectionLabelInput,
@@ -27,20 +32,35 @@ import {
   IABCategory,
   Label,
 } from '@prisma/client';
+import { startServer } from '../../../express';
+import { IPublicContext } from '../../context';
 
 describe('public queries: Collection', () => {
-  const server = getServer();
+  let app: Express.Application;
+  let server: ApolloServer<IPublicContext>;
+  let graphQLUrl: string;
+  let db: PrismaClient;
+
+  beforeAll(async () => {
+    // port 0 tells express to dynamically assign an available port
+    ({
+      app,
+      publicServer: server,
+      publicUrl: graphQLUrl,
+    } = await startServer(0));
+    db = client();
+  });
+
+  afterAll(async () => {
+    await db.$disconnect();
+    await server.stop();
+  });
 
   let author: CollectionAuthor;
   let curationCategory: CurationCategory;
   let IABParentCategory: IABCategory;
   let IABChildCategory: IABCategory;
   let label: Label;
-
-  beforeAll(async () => {
-    await clearDb(db);
-    await server.start();
-  });
 
   beforeEach(async () => {
     await clearDb(db);
@@ -57,10 +77,6 @@ describe('public queries: Collection', () => {
       IABParentCategory
     );
     label = await createLabelHelper(db, 'test-label', 'test-user');
-  });
-
-  afterAll(async () => {
-    await db.$disconnect();
   });
 
   describe('getCollections', () => {
@@ -104,11 +120,11 @@ describe('public queries: Collection', () => {
       await createCollectionLabelHelper(db, collection2LabelInput);
 
       // run the query we're testing
-      const { data } = await server.executeOperation({
-        query: GET_COLLECTIONS,
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .send({ query: print(GET_COLLECTIONS) });
 
-      const collections = data?.getCollections?.collections;
+      const collections = result.body.data?.getCollections?.collections;
 
       expect(collections.length).to.equal(2);
 
@@ -160,9 +176,10 @@ describe('public queries: Collection', () => {
         addStories: true,
       });
 
-      const { data } = await server.executeOperation({
-        query: GET_COLLECTIONS,
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .send({ query: print(GET_COLLECTIONS) });
+      const data = result.body.data;
 
       // only two collections above are published
       expect(data?.getCollections.collections.length).to.equal(2);
@@ -204,22 +221,24 @@ describe('public queries: Collection', () => {
 
       // we are getting two collections per page, and are requesting page 2
       // page 1 should be 5 and 4. page 2 should be 3 and 2, page 3 should be 1
-      const { data } = await server.executeOperation({
-        query: GET_COLLECTIONS,
-        variables: {
-          perPage: 2,
-          page: 2,
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .send({
+          query: print(GET_COLLECTIONS),
+          variables: {
+            perPage: 2,
+            page: 2,
+          },
+        });
 
-      const collections = data?.getCollections?.collections;
+      const collections = result.body.data?.getCollections?.collections;
 
       expect(collections.length).to.equal(2);
       expect(collections[0].title).to.equal('3');
       expect(collections[1].title).to.equal('2');
 
       // verify pagination
-      const pagination = data?.getCollections?.pagination;
+      const pagination = result.body.data?.getCollections?.pagination;
 
       // there are 5 total published collections
       expect(pagination.totalResults).to.equal(5);
@@ -276,25 +295,27 @@ describe('public queries: Collection', () => {
 
       // we are getting two collections per page, and are requesting page 2
       // page 1 should be 6 and 4. page 2 should be 3 and 2, page 3 should be 1
-      const { data } = await server.executeOperation({
-        query: GET_COLLECTIONS,
-        variables: {
-          filters: {
-            language: 'DE',
+      const result = await request(app)
+        .post(graphQLUrl)
+        .send({
+          query: print(GET_COLLECTIONS),
+          variables: {
+            filters: {
+              language: 'DE',
+            },
+            page: 2,
+            perPage: 2,
           },
-          page: 2,
-          perPage: 2,
-        },
-      });
+        });
 
-      const collections = data?.getCollections?.collections;
+      const collections = result.body.data?.getCollections?.collections;
 
       expect(collections.length).to.equal(2);
       expect(collections[0].title).to.equal('3');
       expect(collections[1].title).to.equal('2');
 
       // verify pagination
-      const pagination = data?.getCollections?.pagination;
+      const pagination = result.body.data?.getCollections?.pagination;
 
       // there are 5 total published collections
       expect(pagination.totalResults).to.equal(5);
@@ -336,11 +357,11 @@ describe('public queries: Collection', () => {
         language: CollectionLanguage.EN,
       });
 
-      const { data } = await server.executeOperation({
-        query: GET_COLLECTIONS,
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .send({ query: print(GET_COLLECTIONS) });
 
-      const collections = data?.getCollections?.collections;
+      const collections = result.body.data?.getCollections?.collections;
 
       // only two published collections are in `EN`
       expect(collections.length).to.equal(2);
@@ -378,16 +399,18 @@ describe('public queries: Collection', () => {
         language: CollectionLanguage.DE,
       });
 
-      const { data } = await server.executeOperation({
-        query: GET_COLLECTIONS,
-        variables: {
-          filters: {
-            language: 'DE',
+      const result = await request(app)
+        .post(graphQLUrl)
+        .send({
+          query: print(GET_COLLECTIONS),
+          variables: {
+            filters: {
+              language: 'DE',
+            },
           },
-        },
-      });
+        });
 
-      const collections = data?.getCollections?.collections;
+      const collections = result.body.data?.getCollections?.collections;
 
       expect(collections.length).to.equal(2);
     });
@@ -423,16 +446,18 @@ describe('public queries: Collection', () => {
         language: CollectionLanguage.EN,
       });
 
-      const { data } = await server.executeOperation({
-        query: GET_COLLECTIONS,
-        variables: {
-          filters: {
-            language: 'en',
+      const result = await request(app)
+        .post(graphQLUrl)
+        .send({
+          query: print(GET_COLLECTIONS),
+          variables: {
+            filters: {
+              language: 'en',
+            },
           },
-        },
-      });
+        });
 
-      const collections = data?.getCollections?.collections;
+      const collections = result.body.data?.getCollections?.collections;
 
       expect(collections.length).to.equal(2);
     });
@@ -468,17 +493,19 @@ describe('public queries: Collection', () => {
         language: CollectionLanguage.EN,
       });
 
-      const { data } = await server.executeOperation({
-        query: GET_COLLECTIONS,
-        variables: {
-          filters: {
-            // XX is not a language code we support
-            language: 'XX',
+      const result = await request(app)
+        .post(graphQLUrl)
+        .send({
+          query: print(GET_COLLECTIONS),
+          variables: {
+            filters: {
+              // XX is not a language code we support
+              language: 'XX',
+            },
           },
-        },
-      });
+        });
 
-      const collections = data?.getCollections?.collections;
+      const collections = result.body.data?.getCollections?.collections;
 
       // there are two `EN` language published collections above
       expect(collections.length).to.equal(2);
@@ -496,11 +523,11 @@ describe('public queries: Collection', () => {
         status: CollectionStatus.PUBLISHED,
       });
 
-      const { data } = await server.executeOperation({
-        query: GET_COLLECTIONS,
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .send({ query: print(GET_COLLECTIONS) });
 
-      const collections = data?.getCollections?.collections;
+      const collections = result.body.data?.getCollections?.collections;
 
       // the default sort returned from prisma should match our expected
       // manual sort
@@ -531,16 +558,18 @@ describe('public queries: Collection', () => {
       await createCollectionLabelHelper(db, collectionLabelInput);
 
       // request collections with the only one label provided in the filters
-      const { data } = await server.executeOperation({
-        query: GET_COLLECTIONS,
-        variables: {
-          filters: {
-            labels: [`${label.name}`],
+      const result = await request(app)
+        .post(graphQLUrl)
+        .send({
+          query: print(GET_COLLECTIONS),
+          variables: {
+            filters: {
+              labels: [`${label.name}`],
+            },
           },
-        },
-      });
+        });
 
-      const collections = data?.getCollections?.collections;
+      const collections = result.body.data?.getCollections?.collections;
 
       // we should get only one collection back
       expect(collections.length).to.equal(1);
@@ -579,16 +608,18 @@ describe('public queries: Collection', () => {
       });
 
       // request collections with only one of the assigned labels
-      const { data } = await server.executeOperation({
-        query: GET_COLLECTIONS,
-        variables: {
-          filters: {
-            labels: [`${labels[0].name}`],
+      const result = await request(app)
+        .post(graphQLUrl)
+        .send({
+          query: print(GET_COLLECTIONS),
+          variables: {
+            filters: {
+              labels: [`${labels[0].name}`],
+            },
           },
-        },
-      });
+        });
 
-      const collections = data?.getCollections?.collections;
+      const collections = result.body.data?.getCollections?.collections;
 
       // we should get only one collection back
       expect(collections.length).to.equal(1);
@@ -629,16 +660,18 @@ describe('public queries: Collection', () => {
       await createCollectionLabelHelper(db, collectionLabelInput);
 
       // request collections with only one of the assigned labels
-      const { data } = await server.executeOperation({
-        query: GET_COLLECTIONS,
-        variables: {
-          filters: {
-            labels: [`${label.name}`],
+      const result = await request(app)
+        .post(graphQLUrl)
+        .send({
+          query: print(GET_COLLECTIONS),
+          variables: {
+            filters: {
+              labels: [`${label.name}`],
+            },
           },
-        },
-      });
+        });
 
-      const collections = data?.getCollections?.collections;
+      const collections = result.body.data?.getCollections?.collections;
 
       // we should get only one collection back
       expect(collections.length).to.equal(1);
@@ -690,16 +723,18 @@ describe('public queries: Collection', () => {
       });
 
       // request collections with the label which is not assigned any collection
-      const { data } = await server.executeOperation({
-        query: GET_COLLECTIONS,
-        variables: {
-          filters: {
-            labels: [`${labels[1].name}`],
+      const result = await request(app)
+        .post(graphQLUrl)
+        .send({
+          query: print(GET_COLLECTIONS),
+          variables: {
+            filters: {
+              labels: [`${labels[1].name}`],
+            },
           },
-        },
-      });
+        });
 
-      const collections = data?.getCollections?.collections;
+      const collections = result.body.data?.getCollections?.collections;
 
       // we should get no collections back
       expect(collections.length).to.equal(0);
@@ -718,14 +753,16 @@ describe('public queries: Collection', () => {
         status: CollectionStatus.PUBLISHED,
       });
 
-      const { data } = await server.executeOperation({
-        query: GET_COLLECTION_BY_SLUG,
-        variables: {
-          slug: 'ultra-suede-is-a-miracle',
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .send({
+          query: print(GET_COLLECTION_BY_SLUG),
+          variables: {
+            slug: 'ultra-suede-is-a-miracle',
+          },
+        });
 
-      const collection = data?.getCollectionBySlug;
+      const collection = result.body.data?.getCollectionBySlug;
 
       // ensure we are getting all client data
       expect(collection.title).to.equal('ultra suede is a miracle');
@@ -762,14 +799,16 @@ describe('public queries: Collection', () => {
       };
       await createCollectionLabelHelper(db, collectionLabelInput);
 
-      const { data } = await server.executeOperation({
-        query: GET_COLLECTION_BY_SLUG,
-        variables: {
-          slug: 'ultra-suede-is-a-miracle',
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .send({
+          query: print(GET_COLLECTION_BY_SLUG),
+          variables: {
+            slug: 'ultra-suede-is-a-miracle',
+          },
+        });
 
-      const collection = data?.getCollectionBySlug;
+      const collection = result.body.data?.getCollectionBySlug;
 
       // ensure we are getting label data back
       expect(collection.labels).to.have.lengthOf(1);
@@ -787,14 +826,16 @@ describe('public queries: Collection', () => {
         IABChildCategory,
       });
 
-      const { data } = await server.executeOperation({
-        query: GET_COLLECTION_BY_SLUG,
-        variables: {
-          slug: 'i-am-under-review',
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .send({
+          query: print(GET_COLLECTION_BY_SLUG),
+          variables: {
+            slug: 'i-am-under-review',
+          },
+        });
 
-      const collection = data?.getCollectionBySlug;
+      const collection = result.body.data?.getCollectionBySlug;
 
       expect(collection.title).to.equal('I am under review');
     });
@@ -806,14 +847,16 @@ describe('public queries: Collection', () => {
         status: CollectionStatus.DRAFT,
       });
 
-      const { data } = await server.executeOperation({
-        query: GET_COLLECTION_BY_SLUG,
-        variables: {
-          slug: 'writers-block',
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .send({
+          query: print(GET_COLLECTION_BY_SLUG),
+          variables: {
+            slug: 'writers-block',
+          },
+        });
 
-      expect(data?.getCollectionBySlug).to.be.null;
+      expect(result.body.data?.getCollectionBySlug).to.be.null;
     });
 
     it('can get a collection by slug with getCollectionBySlug with story authors sorted correctly', async () => {
@@ -823,14 +866,16 @@ describe('public queries: Collection', () => {
         status: CollectionStatus.PUBLISHED,
       });
 
-      const { data } = await server.executeOperation({
-        query: GET_COLLECTION_BY_SLUG,
-        variables: {
-          slug: 'why-february-is-sixty-days-long',
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .send({
+          query: print(GET_COLLECTION_BY_SLUG),
+          variables: {
+            slug: 'why-february-is-sixty-days-long',
+          },
+        });
 
-      const collection = data?.getCollectionBySlug;
+      const collection = result.body.data?.getCollectionBySlug;
 
       // the default sort returned from prisma should match our expected
       // manual sort
@@ -846,14 +891,16 @@ describe('public queries: Collection', () => {
         status: CollectionStatus.PUBLISHED,
       });
 
-      const { data } = await server.executeOperation({
-        query: COLLECTION_BY_SLUG,
-        variables: {
-          slug: 'why-february-is-sixty-days-long',
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .send({
+          query: print(COLLECTION_BY_SLUG),
+          variables: {
+            slug: 'why-february-is-sixty-days-long',
+          },
+        });
 
-      const collection = data?.collectionBySlug;
+      const collection = result.body.data?.collectionBySlug;
 
       // the default sort returned from prisma should match our expected
       // manual sort
@@ -863,19 +910,21 @@ describe('public queries: Collection', () => {
     });
 
     it('should return NOT_FOUND error for an invalid slug', async () => {
-      const result = await server.executeOperation({
-        query: GET_COLLECTION_BY_SLUG,
-        variables: {
-          slug: 'this-is-just-good-timing',
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .send({
+          query: print(GET_COLLECTION_BY_SLUG),
+          variables: {
+            slug: 'this-is-just-good-timing',
+          },
+        });
 
-      expect(result.data?.getCollectionBySlug).not.to.exist;
-      expect(result.errors.length).to.equal(1);
-      expect(result.errors[0].message).to.equal(
+      expect(result.body.data?.getCollectionBySlug).not.to.exist;
+      expect(result.body.errors.length).to.equal(1);
+      expect(result.body.errors[0].message).to.equal(
         `Error - Not Found: this-is-just-good-timing`
       );
-      expect(result.errors[0].extensions.code).to.equal('NOT_FOUND');
+      expect(result.body.errors[0].extensions.code).to.equal('NOT_FOUND');
     });
   });
 
@@ -890,17 +939,19 @@ describe('public queries: Collection', () => {
 
       const givenUrl = `https://getpocket.com/de/collections/${collectionItem.slug}`;
 
-      const result = await server.executeOperation({
-        query: COLLECTION_ITEM_REFERENCE_RESOLVER,
-        variables: {
-          url: givenUrl,
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .send({
+          query: print(COLLECTION_ITEM_REFERENCE_RESOLVER),
+          variables: {
+            url: givenUrl,
+          },
+        });
 
-      expect(result.errors).to.be.undefined;
-      expect(result.data._entities.length).to.equal(1);
-      expect(result.data._entities[0].givenUrl).to.equal(givenUrl);
-      expect(result.data._entities[0].collection.slug).to.equal(
+      expect(result.body.errors).to.be.undefined;
+      expect(result.body.data._entities.length).to.equal(1);
+      expect(result.body.data._entities[0].givenUrl).to.equal(givenUrl);
+      expect(result.body.data._entities[0].collection.slug).to.equal(
         collectionItem.slug
       );
     });
@@ -908,15 +959,17 @@ describe('public queries: Collection', () => {
     it('should not resolve when an Item is not a collection', async () => {
       const givenUrl = `https://getpocket.com/random-test-slug`;
 
-      const result = await server.executeOperation({
-        query: COLLECTION_ITEM_REFERENCE_RESOLVER,
-        variables: {
-          url: givenUrl,
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .send({
+          query: print(COLLECTION_ITEM_REFERENCE_RESOLVER),
+          variables: {
+            url: givenUrl,
+          },
+        });
 
-      expect(result.errors).to.be.undefined;
-      expect(result.data._entities[0].collection).to.equal(null);
+      expect(result.body.errors).to.be.undefined;
+      expect(result.body.data._entities[0].collection).to.equal(null);
     });
   });
 });

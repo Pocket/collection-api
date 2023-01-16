@@ -1,4 +1,4 @@
-import { UserInputError } from 'apollo-server-errors';
+import { UserInputError } from '@pocket-tools/apollo-utils';
 import { Prisma, PrismaClient } from '@prisma/client';
 
 import {

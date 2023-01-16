@@ -1,6 +1,6 @@
 import { Label, PrismaClient } from '@prisma/client';
 import { AdminAPIUser } from '../../admin/context';
-import { UserInputError } from 'apollo-server-errors';
+import { UserInputError } from '@pocket-tools/apollo-utils';
 
 /**
  * @param db

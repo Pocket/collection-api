@@ -1,11 +1,13 @@
 import { expect } from 'chai';
+import { print } from 'graphql';
+import request from 'supertest';
 
-import { Collection, CollectionStatus } from '@prisma/client';
+import { ApolloServer } from '@apollo/server';
+import { Collection, CollectionStatus, PrismaClient } from '@prisma/client';
 
-import { db } from '../../../test/admin-server';
+import { client } from '../../../database/client';
 import {
   clear as clearDb,
-  getServerWithMockedHeaders,
   createAuthorHelper,
   createCollectionHelper,
   createCurationCategoryHelper,
@@ -25,8 +27,14 @@ import {
   UPDATE_COLLECTION_IMAGE_URL,
 } from './sample-mutations.gql';
 import { updateCollection } from '../../../database/mutations/Collection';
+import { startServer } from '../../../express';
+import { IAdminContext } from '../../context';
 
 describe('mutations: Collection', () => {
+  let app: Express.Application;
+  let server: ApolloServer<IAdminContext>;
+  let graphQLUrl: string;
+  let db: PrismaClient;
   let author;
   let curationCategory;
   let IABParentCategory;
@@ -41,10 +49,15 @@ describe('mutations: Collection', () => {
     groups: `group1,group2,${COLLECTION_CURATOR_FULL}`,
   };
 
-  const server = getServerWithMockedHeaders(headers);
+  beforeAll(async () => {
+    // port 0 tells express to dynamically assign an available port
+    ({ app, adminServer: server, adminUrl: graphQLUrl } = await startServer(0));
+    db = client();
+  });
 
   afterAll(async () => {
     await db.$disconnect();
+    await server.stop();
   });
 
   beforeEach(async () => {
@@ -77,36 +90,47 @@ describe('mutations: Collection', () => {
 
   describe('createCollection', () => {
     it('should create a collection with a default status of `draft`', async () => {
-      const { data } = await server.executeOperation({
-        query: CREATE_COLLECTION,
-        variables: { data: minimumData },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_COLLECTION),
+          variables: { data: minimumData },
+        });
 
-      expect(data.createCollection).to.exist;
-      expect(data.createCollection.status).to.equal(CollectionStatus.DRAFT);
+      expect(result.body.data.createCollection).to.exist;
+      expect(result.body.data.createCollection.status).to.equal(
+        CollectionStatus.DRAFT
+      );
     });
 
     it('should create a collection with a null publishedAt', async () => {
-      const { data } = await server.executeOperation({
-        query: CREATE_COLLECTION,
-        variables: { data: minimumData },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_COLLECTION),
+          variables: { data: minimumData },
+        });
 
-      expect(data.createCollection.publishedAt).not.to.exist;
+      expect(result.body.data.createCollection.publishedAt).not.to.exist;
     });
 
     it('should store the curation category when provided', async () => {
-      const { data } = await server.executeOperation({
-        query: CREATE_COLLECTION,
-        variables: {
-          data: {
-            ...minimumData,
-            curationCategoryExternalId: curationCategory.externalId,
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_COLLECTION),
+          variables: {
+            data: {
+              ...minimumData,
+              curationCategoryExternalId: curationCategory.externalId,
+            },
           },
-        },
-      });
+        });
 
-      expect(data.createCollection.curationCategory).to.exist;
+      expect(result.body.data.createCollection.curationCategory).to.exist;
     });
 
     it('should fail on a duplicate slug', async () => {
@@ -116,129 +140,155 @@ describe('mutations: Collection', () => {
       });
 
       // create our second collection, trying to use the same slug
-      const data = await server.executeOperation({
-        query: CREATE_COLLECTION,
-        variables: { data: minimumData },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_COLLECTION),
+          variables: { data: minimumData },
+        });
 
-      expect(data.data).not.to.exist;
-      expect(data.errors.length).to.equal(1);
-      expect(data.errors[0].message).to.equal(
+      expect(result.body.data).not.to.exist;
+      expect(result.body.errors.length).to.equal(1);
+      expect(result.body.errors[0].message).to.equal(
         'A collection with the slug "walter-bowls" already exists'
       );
     });
 
     it('should return authors, stories and curation category when a collection is created', async () => {
-      const { data } = await server.executeOperation({
-        query: CREATE_COLLECTION,
-        variables: {
-          data: {
-            ...minimumData,
-            curationCategoryExternalId: curationCategory.externalId,
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_COLLECTION),
+          variables: {
+            data: {
+              ...minimumData,
+              curationCategoryExternalId: curationCategory.externalId,
+            },
           },
-        },
-      });
+        });
 
-      expect(data.createCollection.authors).to.exist;
-      expect(data.createCollection.curationCategory.externalId).to.equal(
-        curationCategory.externalId
-      );
-      expect(data.createCollection.stories).to.exist;
+      expect(result.body.data.createCollection.authors).to.exist;
+      expect(
+        result.body.data.createCollection.curationCategory.externalId
+      ).to.equal(curationCategory.externalId);
+      expect(result.body.data.createCollection.stories).to.exist;
       // there will never be stories on a freshly created collection
-      expect(data.createCollection.stories.length).to.equal(0);
+      expect(result.body.data.createCollection.stories.length).to.equal(0);
     });
 
     it('should create a collection with an IAB parent category', async () => {
-      const { data } = await server.executeOperation({
-        query: CREATE_COLLECTION,
-        variables: {
-          data: {
-            ...minimumData,
-            IABParentCategoryExternalId: IABParentCategory.externalId,
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_COLLECTION),
+          variables: {
+            data: {
+              ...minimumData,
+              IABParentCategoryExternalId: IABParentCategory.externalId,
+            },
           },
-        },
-      });
+        });
 
-      expect(data.createCollection.IABParentCategory.externalId).to.equal(
-        IABParentCategory.externalId
-      );
+      expect(
+        result.body.data.createCollection.IABParentCategory.externalId
+      ).to.equal(IABParentCategory.externalId);
     });
 
     it('should create a collection with IAB parent and child categories', async () => {
-      const { data } = await server.executeOperation({
-        query: CREATE_COLLECTION,
-        variables: {
-          data: {
-            ...minimumData,
-            IABParentCategoryExternalId: IABParentCategory.externalId,
-            IABChildCategoryExternalId: IABChildCategory.externalId,
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_COLLECTION),
+          variables: {
+            data: {
+              ...minimumData,
+              IABParentCategoryExternalId: IABParentCategory.externalId,
+              IABChildCategoryExternalId: IABChildCategory.externalId,
+            },
           },
-        },
-      });
+        });
 
-      expect(data.createCollection.IABParentCategory.externalId).to.equal(
-        IABParentCategory.externalId
-      );
+      expect(
+        result.body.data.createCollection.IABParentCategory.externalId
+      ).to.equal(IABParentCategory.externalId);
 
-      expect(data.createCollection.IABChildCategory.externalId).to.equal(
-        IABChildCategory.externalId
-      );
+      expect(
+        result.body.data.createCollection.IABChildCategory.externalId
+      ).to.equal(IABChildCategory.externalId);
     });
 
     it('should create a collection with a label', async () => {
-      const { data } = await server.executeOperation({
-        query: CREATE_COLLECTION,
-        variables: {
-          data: {
-            ...minimumData,
-            labelExternalIds: [label1.externalId],
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_COLLECTION),
+          variables: {
+            data: {
+              ...minimumData,
+              labelExternalIds: [label1.externalId],
+            },
           },
-        },
-      });
+        });
 
-      expect(data.createCollection.labels[0].externalId).to.equal(
+      expect(result.body.data.createCollection.labels[0].externalId).to.equal(
         label1.externalId
       );
-      expect(data.createCollection.labels[0].name).to.equal(label1.name);
+      expect(result.body.data.createCollection.labels[0].name).to.equal(
+        label1.name
+      );
     });
 
     it('should create a collection with multiple labels', async () => {
-      const { data } = await server.executeOperation({
-        query: CREATE_COLLECTION,
-        variables: {
-          data: {
-            ...minimumData,
-            labelExternalIds: [label1.externalId, label2.externalId],
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_COLLECTION),
+          variables: {
+            data: {
+              ...minimumData,
+              labelExternalIds: [label1.externalId, label2.externalId],
+            },
           },
-        },
-      });
+        });
 
-      expect(data.createCollection.labels).to.have.length(2);
+      expect(result.body.data.createCollection.labels).to.have.length(2);
     });
 
     it('should not connect an IAB child category if an IAB parent category is not set', async () => {
-      const { data } = await server.executeOperation({
-        query: CREATE_COLLECTION,
-        variables: {
-          data: {
-            ...minimumData,
-            IABChildCategoryExternalId: IABChildCategory.externalId,
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_COLLECTION),
+          variables: {
+            data: {
+              ...minimumData,
+              IABChildCategoryExternalId: IABChildCategory.externalId,
+            },
           },
-        },
-      });
+        });
 
-      expect(data.createCollection.IABChildCategory).not.to.exist;
+      expect(result.body.data.createCollection.IABChildCategory).not.to.exist;
     });
 
     it('should not connect a partnership', async () => {
-      const { data } = await server.executeOperation({
-        query: CREATE_COLLECTION,
-        variables: {
-          data: minimumData,
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_COLLECTION),
+          variables: {
+            data: minimumData,
+          },
+        });
 
-      expect(data.createCollection.partnership).not.to.exist;
+      expect(result.body.data.createCollection.partnership).not.to.exist;
     });
   });
 
@@ -265,19 +315,26 @@ describe('mutations: Collection', () => {
         status: CollectionStatus.DRAFT,
       };
 
-      const { data } = await server.executeOperation({
-        query: UPDATE_COLLECTION,
-        variables: {
-          data: input,
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(UPDATE_COLLECTION),
+          variables: {
+            data: input,
+          },
+        });
 
       // should return the updated info
-      expect(data.updateCollection.title).to.equal('second iteration');
-      expect(data.updateCollection.language).to.equal('DE');
+      expect(result.body.data.updateCollection.title).to.equal(
+        'second iteration'
+      );
+      expect(result.body.data.updateCollection.language).to.equal('DE');
 
       // should return the updated author
-      expect(data.updateCollection.authors[0].name).to.equal(newAuthor.name);
+      expect(result.body.data.updateCollection.authors[0].name).to.equal(
+        newAuthor.name
+      );
     });
 
     it('should update the updatedAt value', async () => {
@@ -330,16 +387,19 @@ describe('mutations: Collection', () => {
         status: CollectionStatus.DRAFT,
       };
 
-      const { data } = await server.executeOperation({
-        query: UPDATE_COLLECTION,
-        variables: {
-          data: input,
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(UPDATE_COLLECTION),
+          variables: {
+            data: input,
+          },
+        });
 
       // make sure a curation category was connected
       // should return the updated curation category
-      expect(data.updateCollection.curationCategory.name).to.equal(
+      expect(result.body.data.updateCollection.curationCategory.name).to.equal(
         newCurationCategory.name
       );
     });
@@ -355,15 +415,18 @@ describe('mutations: Collection', () => {
         status: CollectionStatus.DRAFT,
       };
 
-      const { data } = await server.executeOperation({
-        query: UPDATE_COLLECTION,
-        variables: {
-          data: input,
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(UPDATE_COLLECTION),
+          variables: {
+            data: input,
+          },
+        });
 
       // make sure a curation category was disconnected
-      expect(data.updateCollection.curationCategory).not.to.exist;
+      expect(result.body.data.updateCollection.curationCategory).not.to.exist;
     });
 
     it('should update a collection with an IAB parent category', async () => {
@@ -378,14 +441,17 @@ describe('mutations: Collection', () => {
         status: CollectionStatus.DRAFT,
       };
 
-      const { data } = await server.executeOperation({
-        query: UPDATE_COLLECTION,
-        variables: {
-          data: input,
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(UPDATE_COLLECTION),
+          variables: {
+            data: input,
+          },
+        });
 
-      expect(data.updateCollection.IABParentCategory.name).to.equal(
+      expect(result.body.data.updateCollection.IABParentCategory.name).to.equal(
         IABParentCategory.name
       );
     });
@@ -403,17 +469,20 @@ describe('mutations: Collection', () => {
         status: CollectionStatus.DRAFT,
       };
 
-      const { data } = await server.executeOperation({
-        query: UPDATE_COLLECTION,
-        variables: {
-          data: input,
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(UPDATE_COLLECTION),
+          variables: {
+            data: input,
+          },
+        });
 
-      expect(data.updateCollection.IABParentCategory.name).to.equal(
+      expect(result.body.data.updateCollection.IABParentCategory.name).to.equal(
         IABParentCategory.name
       );
-      expect(data.updateCollection.IABChildCategory.name).to.equal(
+      expect(result.body.data.updateCollection.IABChildCategory.name).to.equal(
         IABChildCategory.name
       );
     });
@@ -437,15 +506,18 @@ describe('mutations: Collection', () => {
         status: CollectionStatus.DRAFT,
       };
 
-      const { data } = await server.executeOperation({
-        query: UPDATE_COLLECTION,
-        variables: {
-          data: input,
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(UPDATE_COLLECTION),
+          variables: {
+            data: input,
+          },
+        });
 
-      expect(data.updateCollection.IABParentCategory).not.to.exist;
-      expect(data.updateCollection.IABChildCategory).not.to.exist;
+      expect(result.body.data.updateCollection.IABParentCategory).not.to.exist;
+      expect(result.body.data.updateCollection.IABChildCategory).not.to.exist;
     });
 
     it('should add labels to a collection that has not had any previously', async () => {
@@ -460,69 +532,81 @@ describe('mutations: Collection', () => {
         labelExternalIds: [label1.externalId, label2.externalId],
       };
 
-      const { data } = await server.executeOperation({
-        query: UPDATE_COLLECTION,
-        variables: {
-          data: input,
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(UPDATE_COLLECTION),
+          variables: {
+            data: input,
+          },
+        });
 
       // make sure there are no errors before running other expect() statements
-      expect(data.errors).to.be.undefined;
+      expect(result.body.data.errors).to.be.undefined;
 
       // expect to see two new labels
-      expect(data.updateCollection.labels).to.have.length(2);
+      expect(result.body.data.updateCollection.labels).to.have.length(2);
     });
 
     it('should remove existing labels on a collection if no new labels are provided', async () => {
       // first, let's create a collection with a label
-      const { data: initial } = await server.executeOperation({
-        query: CREATE_COLLECTION,
-        variables: {
-          data: {
-            ...minimumData,
-            labelExternalIds: [label1.externalId, label2.externalId],
+      const initialResult = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_COLLECTION),
+          variables: {
+            data: {
+              ...minimumData,
+              labelExternalIds: [label1.externalId, label2.externalId],
+            },
           },
-        },
-      });
+        });
 
       // provide a mock input that lacks any labels
       const input: UpdateCollectionInput = {
         authorExternalId: author.externalId,
-        externalId: initial.createCollection.externalId,
+        externalId: initialResult.body.data.createCollection.externalId,
         language: CollectionLanguage.DE,
-        slug: initial.createCollection.slug,
+        slug: initialResult.body.data.createCollection.slug,
         title: 'second iteration',
         excerpt: 'once upon a time, the internet...',
         status: CollectionStatus.DRAFT,
       };
 
       // run the update query on the server
-      const { data } = await server.executeOperation({
-        query: UPDATE_COLLECTION,
-        variables: {
-          data: input,
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(UPDATE_COLLECTION),
+          variables: {
+            data: input,
+          },
+        });
 
       // make sure there are no errors before running other expect() statements
-      expect(data.errors).to.be.undefined;
+      expect(result.body.data.errors).to.be.undefined;
 
       // expect to see no labels whatsoever after the update
-      expect(data.updateCollection.labels).to.have.length(0);
+      expect(result.body.data.updateCollection.labels).to.have.length(0);
     });
 
     it('should replace labels if a new set of labels was provided', async () => {
       // first, let's create a collection with a label or two
-      const { data: initial } = await server.executeOperation({
-        query: CREATE_COLLECTION,
-        variables: {
-          data: {
-            ...minimumData,
-            labelExternalIds: [label1.externalId, label2.externalId],
+      const initialResult = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_COLLECTION),
+          variables: {
+            data: {
+              ...minimumData,
+              labelExternalIds: [label1.externalId, label2.externalId],
+            },
           },
-        },
-      });
+        });
 
       // create two new labels
       const label3 = await createLabelHelper(db, 'flying-is-overrated');
@@ -531,36 +615,43 @@ describe('mutations: Collection', () => {
       // provide a mock input with two different labels
       const input: UpdateCollectionInput = {
         authorExternalId: author.externalId,
-        externalId: initial.createCollection.externalId,
+        externalId: initialResult.body.data.createCollection.externalId,
         language: CollectionLanguage.DE,
         labelExternalIds: [label3.externalId, label4.externalId],
-        slug: initial.createCollection.slug,
+        slug: initialResult.body.data.createCollection.slug,
         title: 'second iteration',
         excerpt: 'once upon a time, the internet...',
         status: CollectionStatus.DRAFT,
       };
 
       // run the update query on the server
-      const { data } = await server.executeOperation({
-        query: UPDATE_COLLECTION,
-        variables: {
-          data: input,
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(UPDATE_COLLECTION),
+          variables: {
+            data: input,
+          },
+        });
 
       // make sure there are no errors before running other expect() statements
-      expect(data.errors).to.be.undefined;
+      expect(result.body.errors).to.be.undefined;
 
       // expect to see two labels
-      expect(data.updateCollection.labels).to.have.length(2);
+      expect(result.body.data.updateCollection.labels).to.have.length(2);
 
       // make sure it's the two new labels we provided in the update variables
-      expect(data.updateCollection.labels[0].name).to.equal(label3.name);
-      expect(data.updateCollection.labels[0].externalId).to.equal(
+      expect(result.body.data.updateCollection.labels[0].name).to.equal(
+        label3.name
+      );
+      expect(result.body.data.updateCollection.labels[0].externalId).to.equal(
         label3.externalId
       );
-      expect(data.updateCollection.labels[1].name).to.equal(label4.name);
-      expect(data.updateCollection.labels[1].externalId).to.equal(
+      expect(result.body.data.updateCollection.labels[1].name).to.equal(
+        label4.name
+      );
+      expect(result.body.data.updateCollection.labels[1].externalId).to.equal(
         label4.externalId
       );
     });
@@ -581,26 +672,37 @@ describe('mutations: Collection', () => {
       };
 
       // should return the updated info
-      const { data } = await server.executeOperation({
-        query: UPDATE_COLLECTION,
-        variables: {
-          data: input,
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(UPDATE_COLLECTION),
+          variables: {
+            data: input,
+          },
+        });
 
-      expect(data.updateCollection.authors.length).to.be.greaterThan(0);
-      expect(data.updateCollection.stories.length).to.be.greaterThan(0);
+      expect(
+        result.body.data.updateCollection.authors.length
+      ).to.be.greaterThan(0);
+      expect(
+        result.body.data.updateCollection.stories.length
+      ).to.be.greaterThan(0);
 
-      for (let i = 0; i < data.updateCollection.stories.length; i++) {
-        expect(data.updateCollection.stories[i].authors).to.exist;
+      for (
+        let i = 0;
+        i < result.body.data.updateCollection.stories.length;
+        i++
+      ) {
+        expect(result.body.data.updateCollection.stories[i].authors).to.exist;
         expect(
-          data.updateCollection.stories[i].authors.length
+          result.body.data.updateCollection.stories[i].authors.length
         ).to.be.greaterThan(0);
       }
-      expect(data.updateCollection.curationCategory).to.exist;
-      expect(data.updateCollection.IABParentCategory).to.exist;
-      expect(data.updateCollection.IABChildCategory).to.exist;
-      expect(data.updateCollection.labels).to.have.lengthOf(2);
+      expect(result.body.data.updateCollection.curationCategory).to.exist;
+      expect(result.body.data.updateCollection.IABParentCategory).to.exist;
+      expect(result.body.data.updateCollection.IABChildCategory).to.exist;
+      expect(result.body.data.updateCollection.labels).to.have.lengthOf(2);
     });
 
     it('should return story author sorted correctly', async () => {
@@ -615,15 +717,20 @@ describe('mutations: Collection', () => {
       };
 
       // should return the updated info
-      const { data } = await server.executeOperation({
-        query: UPDATE_COLLECTION,
-        variables: {
-          data: input,
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(UPDATE_COLLECTION),
+          variables: {
+            data: input,
+          },
+        });
 
-      expect(data.updateCollection.stories[0].authors).to.equal(
-        sortCollectionStoryAuthors(data.updateCollection.stories[0].authors)
+      expect(result.body.data.updateCollection.stories[0].authors).to.equal(
+        sortCollectionStoryAuthors(
+          result.body.data.updateCollection.stories[0].authors
+        )
       );
     });
 
@@ -639,14 +746,17 @@ describe('mutations: Collection', () => {
       };
 
       // publishedAt should have a value
-      const { data } = await server.executeOperation({
-        query: UPDATE_COLLECTION,
-        variables: {
-          data: input,
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(UPDATE_COLLECTION),
+          variables: {
+            data: input,
+          },
+        });
 
-      expect(data.updateCollection.publishedAt).to.exist;
+      expect(result.body.data.updateCollection.publishedAt).to.exist;
     });
 
     it('should not update publishedAt when already published', async () => {
@@ -661,14 +771,17 @@ describe('mutations: Collection', () => {
         excerpt: 'once upon a time, the internet...',
       };
 
-      const { data: dataPublished } = await server.executeOperation({
-        query: UPDATE_COLLECTION,
-        variables: {
-          data: input,
-        },
-      });
+      const publishedResult = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(UPDATE_COLLECTION),
+          variables: {
+            data: input,
+          },
+        });
 
-      const published = dataPublished.updateCollection;
+      const published = publishedResult.body.data.updateCollection;
 
       // update the collection title (leaving all other fields the same)
       input = {
@@ -681,16 +794,19 @@ describe('mutations: Collection', () => {
         excerpt: 'once upon a time, the internet...',
       };
 
-      const { data: dataUpdated } = await server.executeOperation({
-        query: UPDATE_COLLECTION,
-        variables: {
-          data: input,
-        },
-      });
+      const updatedResult = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(UPDATE_COLLECTION),
+          variables: {
+            data: input,
+          },
+        });
 
       // make sure the publishedAt value hasn't changed
       expect(published.publishedAt).to.deep.equal(
-        dataUpdated.updateCollection.publishedAt
+        updatedResult.body.data.updateCollection.publishedAt
       );
     });
 
@@ -712,16 +828,19 @@ describe('mutations: Collection', () => {
         status: CollectionStatus.DRAFT,
       };
 
-      const data = await server.executeOperation({
-        query: UPDATE_COLLECTION,
-        variables: {
-          data: input,
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(UPDATE_COLLECTION),
+          variables: {
+            data: input,
+          },
+        });
 
-      expect(data.data).not.to.exist;
-      expect(data.errors).to.exist;
-      expect(data.errors[0].message).to.equal(
+      expect(result.body.data).not.to.exist;
+      expect(result.body.errors).to.exist;
+      expect(result.body.errors[0].message).to.equal(
         'A collection with the slug "first-iteration" already exists'
       );
     });
@@ -745,22 +864,37 @@ describe('mutations: Collection', () => {
         imageUrl: randomKitten,
       };
 
-      const { data } = await server.executeOperation({
-        query: UPDATE_COLLECTION_IMAGE_URL,
-        variables: {
-          data: input,
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(UPDATE_COLLECTION_IMAGE_URL),
+          variables: {
+            data: input,
+          },
+        });
 
       // we should have a new image url
-      expect(data.updateCollectionImageUrl.imageUrl).to.equal(randomKitten);
+      expect(result.body.data.updateCollectionImageUrl.imageUrl).to.equal(
+        randomKitten
+      );
 
       // other data should be as it was previously
-      expect(data.updateCollectionImageUrl.title).to.equal(initial.title);
-      expect(data.updateCollectionImageUrl.slug).to.equal(initial.slug);
-      expect(data.updateCollectionImageUrl.excerpt).to.equal(initial.excerpt);
-      expect(data.updateCollectionImageUrl.intro).to.equal(initial.intro);
-      expect(data.updateCollectionImageUrl.status).to.equal(initial.status);
+      expect(result.body.data.updateCollectionImageUrl.title).to.equal(
+        initial.title
+      );
+      expect(result.body.data.updateCollectionImageUrl.slug).to.equal(
+        initial.slug
+      );
+      expect(result.body.data.updateCollectionImageUrl.excerpt).to.equal(
+        initial.excerpt
+      );
+      expect(result.body.data.updateCollectionImageUrl.intro).to.equal(
+        initial.intro
+      );
+      expect(result.body.data.updateCollectionImageUrl.status).to.equal(
+        initial.status
+      );
     });
   });
 });

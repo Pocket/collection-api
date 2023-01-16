@@ -1,4 +1,4 @@
-import { ForbiddenError } from 'apollo-server-errors';
+import { ForbiddenError } from '@pocket-tools/apollo-utils';
 import { ACCESS_DENIED_ERROR } from '../../../shared/constants';
 import { getLabels } from '../../../database/queries/Label';
 import { Label } from '../../../database/types';

@@ -1,4 +1,4 @@
-import { ForbiddenError } from 'apollo-server-errors';
+import { ForbiddenError } from '@pocket-tools/apollo-utils';
 import { getCurationCategories as dbGetCurationCategories } from '../../../database/queries';
 import { CurationCategory } from '@prisma/client';
 import { ACCESS_DENIED_ERROR } from '../../../shared/constants';
