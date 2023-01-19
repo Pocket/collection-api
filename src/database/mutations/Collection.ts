@@ -8,6 +8,7 @@ import {
   UpdateCollectionImageUrlInput,
   UpdateCollectionInput,
 } from '../types';
+import { checkCollectionLabelLimit } from '../utils';
 import { NotFoundError } from '@pocket-tools/apollo-utils';
 import { AdminAPIUser } from '../../admin/context';
 
@@ -82,7 +83,11 @@ export async function createCollection(
   }
 
   // if a collection has any labels, set up a connection to labels, too
+  // first check if collection-label limit is not exceeded
   if (labelExternalIds) {
+    // if exceeded, throw error
+    checkCollectionLabelLimit(labelExternalIds);
+
     const connectIds = [];
 
     for (const id of labelExternalIds) {
@@ -256,7 +261,11 @@ export async function updateCollection(
   });
 
   // If a collection has any labels, set up a connection to labels, too
+  // first check if collection-label limit is not exceeded
   if (labelExternalIds) {
+    // if exceeded, throw error
+    checkCollectionLabelLimit(labelExternalIds);
+
     const connectIds = [];
 
     for (const id of labelExternalIds) {

@@ -29,6 +29,8 @@ import {
 import { updateCollection } from '../../../database/mutations/Collection';
 import { startServer } from '../../../express';
 import { IAdminContext } from '../../context';
+import { faker } from '@faker-js/faker';
+import config from '../../../config';
 
 describe('mutations: Collection', () => {
   let app: Express.Application;
@@ -41,6 +43,8 @@ describe('mutations: Collection', () => {
   let IABChildCategory;
   let label1;
   let label2;
+  let labelList;
+  let labelListIds;
   let minimumData;
 
   const headers = {
@@ -78,6 +82,19 @@ describe('mutations: Collection', () => {
 
     label1 = await createLabelHelper(db, 'most-read');
     label2 = await createLabelHelper(db, 'best-of-2022');
+
+    // create several labels to exceed collection-label limit
+    labelList = [];
+    labelListIds = [];
+    for (let i = 0; i < config.app.collectionLabelLimit + 1; i++) {
+      labelList.push(
+        await createLabelHelper(
+          db,
+          faker.word.adjective() + '-' + faker.word.adjective()
+        )
+      );
+      labelListIds.push(labelList[i].externalId);
+    }
 
     // re-create the minimum data necessary to create a collection
     minimumData = {
@@ -258,6 +275,48 @@ describe('mutations: Collection', () => {
         });
 
       expect(result.body.data.createCollection.labels).to.have.length(2);
+    });
+
+    it('should create collection with max collection-label limit', async () => {
+      //remove one label id
+      labelListIds.pop();
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_COLLECTION),
+          variables: {
+            data: {
+              ...minimumData,
+              labelExternalIds: labelListIds,
+            },
+          },
+        });
+
+      expect(result.body.data.createCollection.labels).to.have.length(
+        config.app.collectionLabelLimit
+      );
+    });
+
+    it('should throw an error when creating a collection with multiple labels and collection-label limit is exceeded', async () => {
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_COLLECTION),
+          variables: {
+            data: {
+              ...minimumData,
+              labelExternalIds: labelListIds,
+            },
+          },
+        });
+
+      expect(result.body.data).not.to.exist;
+      expect(result.body.errors.length).to.equal(1);
+      expect(result.body.errors[0].message).to.equal(
+        `Too many labels provided: ${config.app.collectionLabelLimit} allowed, ${labelListIds.length} provided.`
+      );
     });
 
     it('should not connect an IAB child category if an IAB parent category is not set', async () => {
@@ -518,6 +577,68 @@ describe('mutations: Collection', () => {
 
       expect(result.body.data.updateCollection.IABParentCategory).not.to.exist;
       expect(result.body.data.updateCollection.IABChildCategory).not.to.exist;
+    });
+
+    it('should throw an error for adding number of labels exceeding collection-label limit', async () => {
+      const input: UpdateCollectionInput = {
+        authorExternalId: author.externalId,
+        externalId: initial.externalId,
+        language: CollectionLanguage.DE,
+        slug: initial.slug,
+        title: 'second iteration',
+        excerpt: 'once upon a time, the internet...',
+        status: CollectionStatus.DRAFT,
+        labelExternalIds: labelListIds,
+      };
+
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(UPDATE_COLLECTION),
+          variables: {
+            data: input,
+          },
+        });
+
+      expect(result.body.data).not.to.exist;
+      expect(result.body.errors.length).to.equal(1);
+      expect(result.body.errors[0].message).to.equal(
+        `Too many labels provided: ${config.app.collectionLabelLimit} allowed, ${labelListIds.length} provided.`
+      );
+    });
+
+    it('should add maximum allowed labels to a collection', async () => {
+      // remove one label id
+      labelListIds.pop();
+      const input: UpdateCollectionInput = {
+        authorExternalId: author.externalId,
+        externalId: initial.externalId,
+        language: CollectionLanguage.DE,
+        slug: initial.slug,
+        title: 'second iteration',
+        excerpt: 'once upon a time, the internet...',
+        status: CollectionStatus.DRAFT,
+        labelExternalIds: labelListIds,
+      };
+
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(UPDATE_COLLECTION),
+          variables: {
+            data: input,
+          },
+        });
+
+      // make sure there are no errors before running other expect() statements
+      expect(result.body.data.errors).to.be.undefined;
+
+      // expect to see max allowed labels
+      expect(result.body.data.updateCollection.labels).to.have.length(
+        config.app.collectionLabelLimit
+      );
     });
 
     it('should add labels to a collection that has not had any previously', async () => {

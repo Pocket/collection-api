@@ -12,6 +12,7 @@ export default {
       authorsPerPage: 20,
       partnersPerPage: 20,
     },
+    collectionLabelLimit: 20,
     upload: {
       maxSize: 10000000, // in bytes => 10MB
       maxFiles: 10,
