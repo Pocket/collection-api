@@ -1,4 +1,5 @@
 import { CollectionStatus, Prisma } from '@prisma/client';
+import { UserInputError } from '@pocket-tools/apollo-utils';
 import {
   CollectionsFilters,
   CollectionLanguage,
@@ -68,4 +69,12 @@ export function buildSearchCollectionsWhereClause(
   }
 
   return where;
+}
+
+export function checkCollectionLabelLimit(labelExternalIds: string[]) {
+  if (labelExternalIds.length > config.app.collectionLabelLimit) {
+    throw new UserInputError(
+      `Too many labels provided: ${config.app.collectionLabelLimit} allowed, ${labelExternalIds.length} provided.`
+    );
+  }
 }
