@@ -1,4 +1,4 @@
-import { NotFoundError } from '@pocket-tools/apollo-utils';
+import { NotFoundError, UserInputError } from '@pocket-tools/apollo-utils';
 import { CollectionComplete } from '../../../database/types';
 import {
   countPublishedCollections,
@@ -51,4 +51,18 @@ export async function getCollections(
     pagination: getPagination(totalResults, page, perPage),
     collections,
   };
+}
+
+export async function resolveReference({ slug }, { dataLoaders }) {
+  if (!slug) {
+    throw new UserInputError('Collection referenced without slug');
+  }
+
+  const collection = await dataLoaders.collectionLoader.load(slug);
+
+  if (!collection) {
+    throw new NotFoundError(slug);
+  }
+
+  return collection;
 }

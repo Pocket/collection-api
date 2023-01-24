@@ -76,6 +76,7 @@ export interface createCollectionHelperOptionalInput {
   addStories?: boolean;
   IABParentCategory?: IABCategory;
   IABChildCategory?: IABCategory;
+  slug?: string;
 }
 
 // the input for the `createCollectionHelper` function is a combo of the
@@ -127,11 +128,12 @@ export async function createCollectionHelper(
     addStories,
     IABParentCategory,
     IABChildCategory,
+    slug,
   } = mergedParams;
 
   const data: Prisma.CollectionCreateInput = {
     title,
-    slug: slugify(title, slugifyConfig),
+    slug: slug || slugify(title, slugifyConfig),
     excerpt: faker.lorem.sentences(2),
     intro: faker.lorem.paragraphs(2),
     status,
