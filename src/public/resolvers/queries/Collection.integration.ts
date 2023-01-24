@@ -4,6 +4,7 @@ import request from 'supertest';
 import { ApolloServer } from '@apollo/server';
 import { PrismaClient } from '@prisma/client';
 import { client } from '../../../database/client';
+import { gql } from 'graphql-tag';
 
 import {
   CollectionLanguage,
@@ -738,6 +739,90 @@ describe('public queries: Collection', () => {
 
       // we should get no collections back
       expect(collections.length).to.equal(0);
+    });
+  });
+
+  describe('resolveReference', () => {
+    const slug = 'ultra-suede';
+    const title = 'ultra suede is a miracle';
+
+    const QUERY_RESOLVED_REFERENCE = gql`
+      query getCollection($slug: String!) {
+        _entities(representations: { slug: $slug, __typename: "Collection" }) {
+          ... on Collection {
+            title
+          }
+        }
+      }
+    `;
+
+    it('returns published collections by slug', async () => {
+      await createCollectionHelper(db, {
+        title,
+        slug,
+        author,
+        status: CollectionStatus.PUBLISHED,
+      });
+
+      const result = await request(app)
+        .post(graphQLUrl)
+        .send({
+          query: print(QUERY_RESOLVED_REFERENCE),
+          variables: { slug },
+        });
+
+      expect(result.body).to.have.nested.property(
+        'data._entities[0].title',
+        title
+      );
+    });
+
+    it('errors NOT_FOUND when collection is not published', async () => {
+      await createCollectionHelper(db, {
+        title: 'ultra suede is a miracle',
+        slug,
+        author,
+        status: CollectionStatus.DRAFT,
+      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .send({
+          query: print(QUERY_RESOLVED_REFERENCE),
+          variables: { slug },
+        });
+
+      expect(result.body).to.have.nested.property(
+        'errors[0].extensions.code',
+        'NOT_FOUND'
+      );
+    });
+
+    it('errors NOT_FOUND when slug is not found', async () => {
+      const result = await request(app)
+        .post(graphQLUrl)
+        .send({
+          query: print(QUERY_RESOLVED_REFERENCE),
+          variables: { slug },
+        });
+
+      expect(result.body).to.have.nested.property(
+        'errors[0].extensions.code',
+        'NOT_FOUND'
+      );
+    });
+
+    it('throws UserInputError when slug is null', async () => {
+      const result = await request(app)
+        .post(graphQLUrl)
+        .send({
+          query: print(QUERY_RESOLVED_REFERENCE),
+          variables: { slug: null },
+        });
+
+      expect(result.body).to.have.nested.property(
+        'errors[0].extensions.code',
+        'BAD_USER_INPUT'
+      );
     });
   });
 

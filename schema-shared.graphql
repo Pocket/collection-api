@@ -83,7 +83,7 @@ type Label {
   name: String!
 }
 
-type Collection {
+type Collection @key(fields: "slug") {
   externalId: ID!
   slug: String!
   title: String!
