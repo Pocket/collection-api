@@ -26,7 +26,7 @@ Documentation here:
 
 - Link to docs
 
-Tickets:
+## Tickets
 
 - Link to JIRA tickets
 

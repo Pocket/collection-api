@@ -29,7 +29,7 @@ export async function createLabel(
 
 /**
  * @param db
- * @param name
+ * @param data
  * @param authenticatedUser
  */
 export async function updateLabel(
@@ -60,7 +60,7 @@ export async function updateLabel(
   // if there is at least one collection-label association, don't allow update
   if (collectionLabelAssociationCount > 0) {
     throw new UserInputError(
-      `Cannot update label ${data.name}; it is associated with at least one collection`
+      `Cannot update label; it is associated with at least one collection`
     );
   }
 
