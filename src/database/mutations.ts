@@ -10,7 +10,7 @@ export {
   updateCollection,
   updateCollectionImageUrl,
 } from './mutations/Collection';
-export { createLabel } from './mutations/Label';
+export { createLabel, updateLabel } from './mutations/Label';
 export {
   createCollectionPartner,
   updateCollectionPartner,
