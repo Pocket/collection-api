@@ -387,7 +387,7 @@ type Mutation {
   """
   createLabel(name: String!): Label!
   """
-  Updates a Label.
+  Updates a Label that is not assigned to any Collection yet.
   """
   updateLabel(data: UpdateLabelInput!): Label!
 }

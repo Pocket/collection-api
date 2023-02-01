@@ -13,6 +13,7 @@ export async function createLabel(
   name: string,
   authenticatedUser: AdminAPIUser
 ): Promise<Label> {
+  // check if label with updated name already exists
   const labelNameCount = await db.label.count({
     where: {
       name: name,
@@ -37,17 +38,6 @@ export async function updateLabel(
   data: UpdateLabelInput,
   authenticatedUser: AdminAPIUser
 ): Promise<Label> {
-  // first check if label with updated name already exists
-  const labelNameCount = await db.label.count({
-    where: {
-      name: data.name,
-    },
-  });
-  if (labelNameCount > 0) {
-    throw new UserInputError(
-      `A label with the name "${data.name}" already exists`
-    );
-  }
   // get count for collection-label association for label to update
   const collectionLabelAssociationCount = await db.collection.count({
     where: {
@@ -61,6 +51,17 @@ export async function updateLabel(
   if (collectionLabelAssociationCount > 0) {
     throw new UserInputError(
       `Cannot update label; it is associated with at least one collection`
+    );
+  }
+  // check if label with updated name already exists
+  const labelNameCount = await db.label.count({
+    where: {
+      name: data.name,
+    },
+  });
+  if (labelNameCount > 0) {
+    throw new UserInputError(
+      `A label with the name "${data.name}" already exists`
     );
   }
 
