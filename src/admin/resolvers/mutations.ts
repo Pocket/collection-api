@@ -27,6 +27,7 @@ import {
   UpdateCollectionStoryImageUrlInput,
   UpdateCollectionStoryInput,
   UpdateCollectionStorySortOrderInput,
+  UpdateLabelInput,
 } from '../../database/types';
 import {
   associateImageWithEntity,
@@ -37,6 +38,7 @@ import {
   createCollectionStory as dbCreateCollectionStory,
   createImage,
   createLabel as dbCreateLabel,
+  updateLabel as dbUpdateLabel,
   deleteCollectionStory as dbDeleteCollectionStory,
   deleteCollectionPartnerAssociation as dbDeleteCollectionPartnerAssociation,
   updateCollectionAuthor as dbUpdateCollectionAuthor,
@@ -461,4 +463,21 @@ export async function createLabel(
   context: IAdminContext
 ): Promise<Label> {
   return await executeMutation<string, Label>(context, name, dbCreateLabel);
+}
+
+/**
+ * @param parent
+ * @param data
+ * @param context
+ */
+export async function updateLabel(
+  parent,
+  { data },
+  context: IAdminContext
+): Promise<Label> {
+  return await executeMutation<UpdateLabelInput, Label>(
+    context,
+    data,
+    dbUpdateLabel
+  );
 }

@@ -34,6 +34,7 @@ import {
   updateCollectionStorySortOrder,
   updateCollectionStoryImageUrl,
   createLabel,
+  updateLabel,
 } from './mutations';
 import {
   collectionLabelsFieldResolvers,
@@ -63,6 +64,7 @@ export const resolvers = {
     updateCollectionStorySortOrder,
     updateCollectionStoryImageUrl,
     createLabel,
+    updateLabel,
   },
   Query: {
     getCollection,

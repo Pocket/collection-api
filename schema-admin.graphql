@@ -57,6 +57,10 @@ input CreateCollectionInput {
   labelExternalIds: [String]
 }
 
+input UpdateLabelInput {
+  externalId: String
+  name: String!
+}
 input UpdateCollectionInput {
   externalId: String
   slug: String!
@@ -382,4 +386,8 @@ type Mutation {
   Creates a Label.
   """
   createLabel(name: String!): Label!
+  """
+  Updates a Label that is not assigned to any Collection yet.
+  """
+  updateLabel(data: UpdateLabelInput!): Label!
 }

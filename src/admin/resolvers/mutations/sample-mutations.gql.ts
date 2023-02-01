@@ -191,3 +191,12 @@ export const CREATE_LABEL = gql`
     }
   }
 `;
+
+export const UPDATE_LABEL = gql`
+  mutation updateLabel($data: UpdateLabelInput!) {
+    updateLabel(data: $data) {
+      name
+      externalId
+    }
+  }
+`;

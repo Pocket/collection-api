@@ -60,6 +60,11 @@ export type CreateCollectionInput = {
   title: string;
 };
 
+export type UpdateLabelInput = {
+  externalId: string;
+  name: string;
+};
+
 export type UpdateCollectionInput = {
   authorExternalId: string;
   curationCategoryExternalId?: string;
