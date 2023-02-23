@@ -129,7 +129,10 @@ const getPartnerById = async (
  * @param db
  * @param id
  */
-const getLabelById = async (db: PrismaClient, id: number): Promise<Label> => {
+export const getLabelById = async (
+  db: PrismaClient,
+  id: number
+): Promise<Label> => {
   return await db.label.findUnique({
     where: { id },
   });

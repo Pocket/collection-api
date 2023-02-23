@@ -223,6 +223,10 @@ class CollectionAPI extends TerraformStack {
               name: 'AWS_S3_BUCKET',
               value: s3.id,
             },
+            {
+              name: 'EVENT_BUS_NAME',
+              value: config.eventBusName,
+            },
           ],
           secretEnvVars: [
             {
@@ -307,6 +311,13 @@ class CollectionAPI extends TerraformStack {
           {
             actions: ['s3:*'],
             resources: [`arn:aws:s3:::${s3.id}`, `arn:aws:s3:::${s3.id}/*`],
+            effect: 'Allow',
+          },
+          {
+            actions: ['events:PutEvents'],
+            resources: [
+              `arn:aws:events:${region.name}:${caller.accountId}:event-bus/${config.eventBusName}`,
+            ],
             effect: 'Allow',
           },
         ],
