@@ -5,8 +5,8 @@ import {
   RemoteBackend,
   TerraformStack,
 } from 'cdktf';
-import { AwsProvider, datasources, kms, sns, s3 } from '@cdktf/provider-aws';
 import { config } from './config';
+import { CollectionAPIMonitoring } from './monitoring';
 import {
   ApplicationRDSCluster,
   PocketALBApplication,
@@ -14,36 +14,38 @@ import {
   PocketPagerDuty,
   PocketVPC,
 } from '@pocket-tools/terraform-modules';
-import { PagerdutyProvider } from '@cdktf/provider-pagerduty';
+import { ArchiveProvider } from '@cdktf/provider-archive';
+import { AwsProvider, datasources, kms, sns, s3 } from '@cdktf/provider-aws';
 import { LocalProvider } from '@cdktf/provider-local';
 import { NullProvider } from '@cdktf/provider-null';
+import { PagerdutyProvider } from '@cdktf/provider-pagerduty';
 import fs from 'fs';
 
 class CollectionAPI extends TerraformStack {
   constructor(scope: Construct, name: string) {
     super(scope, name);
 
+    new ArchiveProvider(this, 'archive');
     new AwsProvider(this, 'aws', { region: 'us-east-1' });
-
-    new PagerdutyProvider(this, 'pagerduty_provider', { token: undefined });
-
     new LocalProvider(this, 'local_provider');
     new NullProvider(this, 'null_provider');
-
+    new PagerdutyProvider(this, 'pagerduty_provider', { token: undefined });
     new RemoteBackend(this, {
       hostname: 'app.terraform.io',
       organization: 'Pocket',
       workspaces: [{ prefix: `${config.name}-` }],
     });
 
+    const caller = new datasources.DataAwsCallerIdentity(this, 'caller');
     const pocketVpc = new PocketVPC(this, 'pocket-vpc');
     const region = new datasources.DataAwsRegion(this, 'region');
-    const caller = new datasources.DataAwsCallerIdentity(this, 'caller');
+
+    const colApiPagerduty = this.createPagerDuty();
 
     const pocketApp = this.createPocketAlbApplication({
       rds: this.createRds(pocketVpc),
       s3: this.createS3Bucket(),
-      pagerDuty: this.createPagerDuty(),
+      pagerDuty: colApiPagerduty,
       secretsManagerKmsAlias: this.getSecretsManagerKmsAlias(),
       snsTopic: this.getCodeDeploySnsTopic(),
       region,
@@ -51,6 +53,14 @@ class CollectionAPI extends TerraformStack {
     });
 
     this.createApplicationCodePipeline(pocketApp);
+
+    const monitoring = new CollectionAPIMonitoring(this, 'monitoring');
+    if (config.environment === 'Prod') {
+      monitoring.createSyntheticCheck(
+        'https://getpocket.com/collections/pocket-best-of-2022-collections',
+        colApiPagerduty.snsCriticalAlarmTopic.arn
+      );
+    }
   }
 
   /**

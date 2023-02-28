@@ -2,6 +2,9 @@
 
 Provides collections: A set of static curated stories around a central theme.
 
+## Application Healthcheck
+For the deployed application, there is a [Cloudwatch healthcheck](https://us-east-1.console.aws.amazon.com/cloudwatch/home?region=us-east-1#synthetics:canary/detail/collectionapi-prod), hooked up to [this alarm (which will page Backend Team via Pagerduty)](https://us-east-1.console.aws.amazon.com/cloudwatch/home?region=us-east-1#alarmsV2:alarm/pocket-collectionapi-prod-synthetic-check-access?~(search~'collection)).
+
 ## Application Overview
 
 [Express](https://expressjs.com/) is the Node framework, [Apollo Server](https://www.apollographql.com/docs/apollo-server/) is used in Express to expose a GraphQL API, and [Prisma](https://www.prisma.io/) is used as the ORM. [MySQL](https://www.mysql.com/) is the relational database, though in AWS this is [Aurora Serverless](https://aws.amazon.com/rds/aurora/serverless/). [S3](https://aws.amazon.com/s3/) is used for image storage, and S3 paths are mapped to entities in MySQL.
