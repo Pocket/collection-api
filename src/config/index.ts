@@ -24,6 +24,12 @@ export default {
       localEndpoint,
       bucket: process.env.AWS_S3_BUCKET || 'collection-api-local-images',
     },
+    region: process.env.AWS_DEFAULT_REGION || 'us-east-1',
+    eventBus: {
+      name:
+        process.env.EVENT_BUS_NAME || 'PocketEventBridge-Dev-Shared-Event-Bus',
+      eventBridge: { source: 'collection-events' },
+    },
   },
   slugify: { lower: true, remove: /[*+~.()'"!:@]/g },
   redis: {

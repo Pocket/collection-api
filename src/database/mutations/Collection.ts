@@ -11,6 +11,8 @@ import {
 import { checkCollectionLabelLimit } from '../utils';
 import { NotFoundError } from '@pocket-tools/apollo-utils';
 import { AdminAPIUser } from '../../admin/context';
+import { sendEventBridgeEvent } from '../../events/events';
+import { EventBridgeEventType } from '../../events/types';
 
 /**
  * @param db
@@ -100,7 +102,7 @@ export async function createCollection(
     dbData.labels = { create: connectIds };
   }
 
-  return db.collection.create({
+  const collection = await db.collection.create({
     data: dbData,
     include: {
       authors: true,
@@ -124,6 +126,21 @@ export async function createCollection(
       },
     },
   });
+
+  // send event bridge event for collection_created event type
+  // note that we are only sending events for collections that are published or archived
+  if (
+    collection.status === CollectionStatus.PUBLISHED ||
+    collection.status === CollectionStatus.ARCHIVED
+  ) {
+    await sendEventBridgeEvent(
+      db,
+      EventBridgeEventType.COLLECTION_CREATED,
+      collection
+    );
+  }
+
+  return collection;
 }
 
 /**
@@ -278,8 +295,7 @@ export async function updateCollection(
     // First, unset links to any previous labels; then attach new labels.
     dbData.labels = { set: [], create: connectIds };
   }
-
-  return db.collection.update({
+  const collection = await db.collection.update({
     where: { externalId: data.externalId },
     data: dbData,
     include: {
@@ -299,6 +315,21 @@ export async function updateCollection(
       },
     },
   });
+
+  // send event bridge event for collection_updated event type
+  // note that we are only sending events for collections that are published or archived
+  if (
+    collection.status === CollectionStatus.PUBLISHED ||
+    collection.status === CollectionStatus.ARCHIVED
+  ) {
+    await sendEventBridgeEvent(
+      db,
+      EventBridgeEventType.COLLECTION_UPDATED,
+      collection
+    );
+  }
+
+  return collection;
 }
 
 export async function updateCollectionImageUrl(

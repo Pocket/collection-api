@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { print } from 'graphql';
 import request from 'supertest';
+import * as sinon from 'sinon';
 
 import { ApolloServer } from '@apollo/server';
 import { Collection, CollectionStatus, PrismaClient } from '@prisma/client';
@@ -31,6 +32,7 @@ import { startServer } from '../../../express';
 import { IAdminContext } from '../../context';
 import { faker } from '@faker-js/faker';
 import config from '../../../config';
+import * as EventBridgeEvents from '../../../events/events';
 
 describe('mutations: Collection', () => {
   let app: Express.Application;
@@ -52,6 +54,11 @@ describe('mutations: Collection', () => {
     username: 'test.user@test.com',
     groups: `group1,group2,${COLLECTION_CURATOR_FULL}`,
   };
+
+  // create a stub for the sendEventBridgeEvent function and make it resolve to null.
+  const sendEventBridgeEventStub = sinon
+    .stub(EventBridgeEvents, 'sendEventBridgeEvent')
+    .resolves(null);
 
   beforeAll(async () => {
     // port 0 tells express to dynamically assign an available port
@@ -103,6 +110,8 @@ describe('mutations: Collection', () => {
       slug: 'walter-bowls',
       title: 'walter bowls',
     };
+
+    sendEventBridgeEventStub.reset();
   });
 
   describe('createCollection', () => {
@@ -348,6 +357,57 @@ describe('mutations: Collection', () => {
         });
 
       expect(result.body.data.createCollection.partnership).not.to.exist;
+    });
+
+    it('should send event bridge event for collection_created event when collection status is PUBLISHED', async () => {
+      await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_COLLECTION),
+          variables: {
+            data: { ...minimumData, status: CollectionStatus.PUBLISHED },
+          },
+        });
+
+      // assert that the event emitter function is called once
+      expect(sendEventBridgeEventStub.calledOnce).to.be.true;
+    });
+
+    it('should send event bridge event for collection_created event when collection status is ARCHIVED', async () => {
+      await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_COLLECTION),
+          variables: {
+            data: {
+              ...minimumData,
+              status: CollectionStatus.ARCHIVED,
+            },
+          },
+        });
+
+      // assert that the event emitter function is called once
+      expect(sendEventBridgeEventStub.calledOnce).to.be.true;
+    });
+
+    it('should NOT send event bridge event for collection_created event when collection status is not PUBLISHED or ARCHIVED', async () => {
+      await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_COLLECTION),
+          variables: {
+            data: {
+              ...minimumData,
+              status: CollectionStatus.DRAFT,
+            },
+          },
+        });
+
+      // assert that the event emitter function is not called
+      expect(sendEventBridgeEventStub.calledOnce).to.be.false;
     });
   });
 
@@ -964,6 +1024,78 @@ describe('mutations: Collection', () => {
       expect(result.body.errors[0].message).to.equal(
         'A collection with the slug "first-iteration" already exists'
       );
+    });
+
+    it('should send event bridge event for collection_updated event when collection status is PUBLISHED', async () => {
+      const input: UpdateCollectionInput = {
+        authorExternalId: author.externalId,
+        externalId: initial.externalId,
+        language: CollectionLanguage.EN,
+        slug: initial.slug,
+        status: CollectionStatus.PUBLISHED,
+        title: 'second iteration',
+        excerpt: 'once upon a time, the internet...',
+      };
+
+      await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(UPDATE_COLLECTION),
+          variables: {
+            data: input,
+          },
+        });
+
+      expect(sendEventBridgeEventStub.calledOnce).to.be.true;
+    });
+
+    it('should send event bridge event for collection_updated event when collection status is ARCHIVED', async () => {
+      const input: UpdateCollectionInput = {
+        authorExternalId: author.externalId,
+        externalId: initial.externalId,
+        language: CollectionLanguage.EN,
+        slug: initial.slug,
+        status: CollectionStatus.ARCHIVED,
+        title: 'second iteration',
+        excerpt: 'once upon a time, the internet...',
+      };
+
+      await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(UPDATE_COLLECTION),
+          variables: {
+            data: input,
+          },
+        });
+
+      expect(sendEventBridgeEventStub.calledOnce).to.be.true;
+    });
+
+    it('should NOT send event bridge event for collection_updated event when collection status is not PUBLISHED or ARCHIVED', async () => {
+      const input: UpdateCollectionInput = {
+        authorExternalId: author.externalId,
+        externalId: initial.externalId,
+        language: CollectionLanguage.EN,
+        slug: initial.slug,
+        status: CollectionStatus.DRAFT,
+        title: 'second iteration',
+        excerpt: 'once upon a time, the internet...',
+      };
+
+      await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(UPDATE_COLLECTION),
+          variables: {
+            data: input,
+          },
+        });
+
+      expect(sendEventBridgeEventStub.calledOnce).to.be.false;
     });
   });
 
