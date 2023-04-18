@@ -41,7 +41,7 @@
     "uuid": "8.3.2"
   },
   "devDependencies": {
-    "@faker-js/faker": "6.3.1",
+    "@faker-js/faker": "7.6.0",
     "@pocket-tools/eslint-config": "2.0.0",
     "@types/chai": "4.3.4",
     "@types/jest": "28.1.8",
