@@ -15,7 +15,7 @@ enum CollectionLanguage {
 
 model IABCategory {
   id                Int           @id @default(autoincrement())
-  externalId        String        @default(uuid()) @db.VarChar(255)
+  externalId        String        @unique @default(uuid()) @db.VarChar(255)
   name              String        @db.VarChar(255)
   slug              String        @db.VarChar(255)
   createdAt         DateTime      @default(now()) @db.Timestamp(0)
@@ -28,7 +28,6 @@ model IABCategory {
   parentCollections Collection[]  @relation("CollectionIABParentCategory")
   childCollections  Collection[]  @relation("CollectionIABChildCategory")
 
-  @@unique([externalId])
   @@index([IABCategoryId])
 }
 
@@ -44,7 +43,7 @@ model CollectionStoryAuthor {
 
 model CollectionStory {
   id           Int                     @id @default(autoincrement())
-  externalId   String                  @default(uuid()) @db.VarChar(255)
+  externalId   String                  @unique @default(uuid()) @db.VarChar(255)
   collectionId Int
   url          String                  @db.VarChar(500)
   title        String                  @db.VarChar(255)
@@ -59,7 +58,6 @@ model CollectionStory {
   collection   Collection              @relation(fields: [collectionId], references: [id])
 
   @@unique([collectionId, url])
-  @@unique([externalId])
   @@index([collectionId])
   @@index([url])
 }
@@ -74,17 +72,16 @@ model Image {
   mimeType      String            @db.VarChar(255)
   fileSizeBytes Int
   fileName      String            @db.VarChar(255)
-  path          String            @db.VarChar(255)
+  path          String            @unique @db.VarChar(255)
   createdAt     DateTime          @default(now()) @db.DateTime(0)
   updatedAt     DateTime          @updatedAt
 
-  @@unique([path])
   @@index([entityId, entityType])
 }
 
 model CollectionAuthor {
   id          Int          @id @default(autoincrement())
-  externalId  String       @default(uuid()) @db.VarChar(255)
+  externalId  String       @unique @default(uuid()) @db.VarChar(255)
   name        String       @unique @db.VarChar(255)
   slug        String?      @db.VarChar(300)
   bio         String?      @db.Text
@@ -94,13 +91,12 @@ model CollectionAuthor {
   active      Boolean?     @default(true)
   collections Collection[]
 
-  @@unique([externalId])
   @@index([name])
 }
 
 model Label {
   id          Int               @id @default(autoincrement())
-  externalId  String            @default(uuid()) @db.VarChar(255)
+  externalId  String            @unique @default(uuid()) @db.VarChar(255)
   name        String            @unique @db.VarChar(255)
   createdAt   DateTime          @default(now()) @db.DateTime(0)
   createdBy   String            @db.VarChar(255)
@@ -108,7 +104,6 @@ model Label {
   updatedBy   String?           @db.VarChar(255)
   collections CollectionLabel[]
 
-  @@unique([externalId])
   @@index([name])
 }
 
@@ -127,7 +122,7 @@ model CollectionLabel {
 
 model Collection {
   id                  Int                    @id @default(autoincrement())
-  externalId          String                 @default(uuid()) @db.VarChar(255)
+  externalId          String                 @unique @default(uuid()) @db.VarChar(255)
   slug                String                 @unique @db.VarChar(300)
   title               String                 @db.VarChar(255)
   excerpt             String?                @db.Text
@@ -149,36 +144,31 @@ model Collection {
   partnership         CollectionPartnership?
   labels              CollectionLabel[]
 
-  @@unique([externalId])
   @@index([slug])
   @@index([title])
 }
 
 model CurationCategory {
   id          Int          @id @default(autoincrement())
-  externalId  String       @default(uuid()) @db.VarChar(255)
+  externalId  String       @unique @default(uuid()) @db.VarChar(255)
   slug        String       @unique @db.VarChar(300)
   name        String       @db.VarChar(255)
   collections Collection[]
-
-  @@unique([externalId])
 }
 
 model CollectionPartner {
   id           Int                     @id @default(autoincrement())
-  externalId   String                  @default(uuid()) @db.VarChar(255)
+  externalId   String                  @unique @default(uuid()) @db.VarChar(255)
   name         String                  @db.VarChar(500)
   url          String                  @db.VarChar(500)
   imageUrl     String                  @db.VarChar(500)
   blurb        String                  @db.Text
   partnerships CollectionPartnership[]
-
-  @@unique([externalId])
 }
 
 model CollectionPartnership {
   id           Int                       @id @default(autoincrement())
-  externalId   String                    @default(uuid()) @db.VarChar(255)
+  externalId   String                    @unique @default(uuid()) @db.VarChar(255)
   type         CollectionPartnershipType @default(PARTNERED)
   partnerId    Int
   collectionId Int                       @unique
@@ -188,8 +178,6 @@ model CollectionPartnership {
   blurb        String?                   @db.Text
   partner      CollectionPartner         @relation(fields: [partnerId], references: [id])
   collection   Collection                @relation(fields: [collectionId], references: [id])
-
-  @@unique([externalId])
 }
 
 enum ImageEntityType {
