@@ -8,11 +8,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum CollectionLanguage {
-  EN
-  DE
-}
-
 model IABCategory {
   id                Int           @id @default(autoincrement())
   externalId        String        @unique @default(uuid()) @db.VarChar(255)
@@ -21,12 +16,14 @@ model IABCategory {
   createdAt         DateTime      @default(now()) @db.Timestamp(0)
   updatedAt         DateTime      @updatedAt
   IABCategoryId     Int?
+
   // parent and children define the one-to-many relationship with this table
+  // these declarations are required to map to the top/sub categories defined in the Collection model below
+  childCollections  Collection[]  @relation("CollectionIABChildCategory")
+  parentCollections Collection[]  @relation("CollectionIABParentCategory")
+
   parent            IABCategory?  @relation("IABCategoryChildren", fields: [IABCategoryId], references: [id])
   children          IABCategory[] @relation("IABCategoryChildren")
-  // these declarations are required to map to the top/sub categories defined in the Collection model below
-  parentCollections Collection[]  @relation("CollectionIABParentCategory")
-  childCollections  Collection[]  @relation("CollectionIABChildCategory")
 
   @@index([IABCategoryId])
 }
@@ -53,9 +50,9 @@ model CollectionStory {
   sortOrder    Int                     @default(0)
   createdAt    DateTime                @default(now()) @db.Timestamp(0)
   updatedAt    DateTime                @updatedAt
-  authors      CollectionStoryAuthor[]
   fromPartner  Boolean                 @default(false)
   collection   Collection              @relation(fields: [collectionId], references: [id])
+  authors      CollectionStoryAuthor[]
 
   @@unique([collectionId, url])
   @@index([collectionId])
@@ -89,7 +86,7 @@ model CollectionAuthor {
   createdAt   DateTime     @default(now()) @db.DateTime(0)
   updatedAt   DateTime     @updatedAt
   active      Boolean?     @default(true)
-  collections Collection[]
+  collections Collection[] @relation("CollectionToCollectionAuthor")
 
   @@index([name])
 }
@@ -108,16 +105,15 @@ model Label {
 }
 
 model CollectionLabel {
-  labelId      Int
   collectionId Int
-  createdAt    DateTime @default(now()) @db.DateTime(0)
-  createdBy    String   @db.VarChar(255)
-
-
-  label      Label      @relation(fields: [labelId], references: [id])
-  collection Collection @relation(fields: [collectionId], references: [id])
+  createdAt    DateTime   @default(now()) @db.DateTime(0)
+  createdBy    String     @db.VarChar(255)
+  labelId      Int
+  collection   Collection @relation(fields: [collectionId], references: [id])
+  label        Label      @relation(fields: [labelId], references: [id])
 
   @@id([labelId, collectionId])
+  @@index([collectionId], map: "CollectionLabel_collectionId_fkey")
 }
 
 model Collection {
@@ -128,24 +124,27 @@ model Collection {
   excerpt             String?                @db.Text
   intro               String?                @db.Text
   imageUrl            String?                @db.VarChar(500)
-  language            CollectionLanguage     @default(EN)
   publishedAt         DateTime?              @db.DateTime(0)
+  status              CollectionStatus?      @default(DRAFT)
   createdAt           DateTime               @default(now()) @db.DateTime(0)
   updatedAt           DateTime               @updatedAt
   curationCategoryId  Int?
-  IABParentCategoryId Int?
   IABChildCategoryId  Int?
-  status              CollectionStatus?      @default(DRAFT)
-  authors             CollectionAuthor[]
-  stories             CollectionStory[]
-  curationCategory    CurationCategory?      @relation(fields: [curationCategoryId], references: [id])
-  IABParentCategory   IABCategory?           @relation("CollectionIABParentCategory", fields: [IABParentCategoryId], references: [id])
+  IABParentCategoryId Int?
+  language            CollectionLanguage     @default(EN)
   IABChildCategory    IABCategory?           @relation("CollectionIABChildCategory", fields: [IABChildCategoryId], references: [id])
-  partnership         CollectionPartnership?
+  IABParentCategory   IABCategory?           @relation("CollectionIABParentCategory", fields: [IABParentCategoryId], references: [id])
+  curationCategory    CurationCategory?      @relation(fields: [curationCategoryId], references: [id])
   labels              CollectionLabel[]
+  partnership         CollectionPartnership?
+  stories             CollectionStory[]
+  authors             CollectionAuthor[]     @relation("CollectionToCollectionAuthor")
 
   @@index([slug])
   @@index([title])
+  @@index([IABChildCategoryId], map: "Collection_IABChildCategoryId_fkey")
+  @@index([IABParentCategoryId], map: "Collection_IABParentCategoryId_fkey")
+  @@index([curationCategoryId], map: "Collection_curationCategoryId_fkey")
 }
 
 model CurationCategory {
@@ -176,8 +175,15 @@ model CollectionPartnership {
   url          String?                   @db.VarChar(500)
   imageUrl     String?                   @db.VarChar(500)
   blurb        String?                   @db.Text
-  partner      CollectionPartner         @relation(fields: [partnerId], references: [id])
   collection   Collection                @relation(fields: [collectionId], references: [id])
+  partner      CollectionPartner         @relation(fields: [partnerId], references: [id])
+
+  @@index([partnerId], map: "CollectionPartnership_partnerId_fkey")
+}
+
+enum CollectionLanguage {
+  EN
+  DE
 }
 
 enum ImageEntityType {
