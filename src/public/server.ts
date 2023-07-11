@@ -44,8 +44,8 @@ export function getPublicServer(
       },
       sendErrors: {
         unmodified: true,
-      }
-    })
+      },
+    }),
   ];
   const nonProdPlugins = [
     ApolloServerPluginLandingPageGraphQLPlayground(),
