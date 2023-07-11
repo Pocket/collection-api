@@ -37,6 +37,14 @@ export function getPublicServer(
   const prodPlugins = [
     ApolloServerPluginLandingPageDisabled(),
     ApolloServerPluginInlineTrace(),
+    ApolloServerPluginUsageReporting({
+      sendVariableValues: {
+        all: true,
+      },
+      sendErrors: {
+        unmodified: true,
+      }
+    })
   ];
   const nonProdPlugins = [
     ApolloServerPluginLandingPageGraphQLPlayground(),
