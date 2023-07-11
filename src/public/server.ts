@@ -14,6 +14,7 @@ import {
 import { ApolloServerPluginInlineTrace } from '@apollo/server/plugin/inlineTrace';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
 import { IPublicContext } from './context';
+import { ApolloServerPluginUsageReporting } from '@apollo/server/plugin/usageReporting';
 
 // export const server = new ApolloServer({
 export function getPublicServer(
@@ -37,6 +38,14 @@ export function getPublicServer(
   const prodPlugins = [
     ApolloServerPluginLandingPageDisabled(),
     ApolloServerPluginInlineTrace(),
+    ApolloServerPluginUsageReporting({
+      sendVariableValues: {
+        all: true,
+      },
+      sendErrors: {
+        unmodified: true,
+      },
+    }),
   ];
   const nonProdPlugins = [
     ApolloServerPluginLandingPageGraphQLPlayground(),
