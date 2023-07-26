@@ -12,6 +12,7 @@ import { getPublicContext, IPublicContext } from './public/context';
 import { getAdminContext, IAdminContext } from './admin/context';
 import { startPublicServer } from './public/server';
 import { startAdminServer } from './admin/server';
+import { client } from './database/client';
 
 /**
  * Initialize an express server with both public and admin graphs.
@@ -49,9 +50,16 @@ export async function startServer(port: number): Promise<{
     })
   );
 
-  // expose a health check url
-  app.get('/.well-known/apollo/server-health', (req, res) => {
-    res.status(200).send('ok');
+  // expose a health check url that ensures we can access the database
+  app.get('/.well-known/apollo/server-health', async (req, res) => {
+    try {
+      const db = client();
+      await db.$queryRaw`SELECT 1`;
+      res.status(200).send('ok');
+      return;
+    } catch (e) {
+      res.status(500).send('fail');
+    }
   });
 
   // set up admin server
