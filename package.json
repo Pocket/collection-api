@@ -29,7 +29,7 @@
     "@prisma/client": "^4.16.2",
     "@sentry/node": "7.11.1",
     "@sentry/tracing": "7.11.1",
-    "aws-sdk": "2.1092.0",
+    "aws-sdk": "2.1423.0",
     "aws-xray-sdk-core": "3.5.1",
     "aws-xray-sdk-express": "3.5.1",
     "cors": "2.8.5",
