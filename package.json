@@ -20,10 +20,10 @@
     "seed": "ts-node --emit=false prisma/seed.ts"
   },
   "dependencies": {
-    "@apollo/server": "4.2.2",
-    "@apollo/server-plugin-landing-page-graphql-playground": "4.0.0",
-    "@apollo/server-plugin-response-cache": "4.1.0",
-    "@apollo/subgraph": "2.2.1",
+    "@apollo/server": "4.9.0",
+    "@apollo/server-plugin-landing-page-graphql-playground": "4.0.1",
+    "@apollo/server-plugin-response-cache": "4.1.3",
+    "@apollo/subgraph": "2.5.1",
     "@aws-sdk/client-eventbridge": "^3.276.0",
     "@pocket-tools/apollo-utils": "3.0.0",
     "@prisma/client": "^4.16.2",
