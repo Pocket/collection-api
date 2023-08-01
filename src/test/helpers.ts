@@ -183,11 +183,11 @@ export async function createCollectionHelper(
         authors: [
           {
             name: faker.person.fullName(),
-            sortOrder: faker.number.int(),
+            sortOrder: faker.number.int({ min: 1, max: 100 }),
           },
           {
             name: faker.person.fullName(),
-            sortOrder: faker.number.int(),
+            sortOrder: faker.number.int({ min: 1, max: 100 }),
           },
         ],
         publisher: faker.company.name(),

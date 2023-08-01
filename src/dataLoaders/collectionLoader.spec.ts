@@ -1,12 +1,7 @@
 import { expect } from 'chai';
 import { faker } from '@faker-js/faker';
 
-import {
-  CollectionLanguage,
-  CollectionComplete,
-  CollectionPartnership,
-  CollectionStoryWithAuthors,
-} from '../database/types';
+import { CollectionLanguage, CollectionComplete } from '../database/types';
 import { sortCollectionsByGivenSlugs } from './collectionLoader';
 import {
   CollectionAuthor,
