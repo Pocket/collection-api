@@ -35,7 +35,7 @@ describe('mutations: CollectionAuthor', () => {
     name: 'Agatha Christie',
     slug: 'agatha-christie',
     bio: faker.lorem.paragraphs(2),
-    imageUrl: faker.image.imageUrl(),
+    imageUrl: faker.image.url(),
     active: true,
   };
 
@@ -209,7 +209,7 @@ describe('mutations: CollectionAuthor', () => {
         name: 'Agatha Christie',
         slug: 'agatha-christie',
         bio: faker.lorem.paragraphs(2),
-        imageUrl: faker.image.imageUrl(),
+        imageUrl: faker.image.url(),
         active: false,
       };
 
@@ -305,7 +305,7 @@ describe('mutations: CollectionAuthor', () => {
         name: 'Agatha Christie',
         slug: 'agatha-christie',
         bio: faker.lorem.paragraphs(2),
-        imageUrl: faker.image.imageUrl(),
+        imageUrl: faker.image.url(),
         active: false,
       };
 
@@ -332,7 +332,7 @@ describe('mutations: CollectionAuthor', () => {
         name: 'Agatha Christie',
         slug: 'agatha-christie',
         bio: faker.lorem.paragraphs(2),
-        imageUrl: faker.image.imageUrl(),
+        imageUrl: faker.image.url(),
         active: false,
       };
 

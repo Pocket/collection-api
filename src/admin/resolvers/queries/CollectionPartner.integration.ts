@@ -166,7 +166,7 @@ describe('queries: CollectionPartner', () => {
       const data: CreateCollectionPartnerInput = {
         name,
         url: faker.internet.url(),
-        imageUrl: faker.image.imageUrl(),
+        imageUrl: faker.image.url(),
         blurb: faker.lorem.paragraphs(2),
       };
       partner = await db.collectionPartner.create({ data });

@@ -27,9 +27,9 @@ describe('mutations: CollectionPartner', () => {
   let db: PrismaClient;
 
   const createData: CreateCollectionPartnerInput = {
-    name: faker.company.companyName(),
+    name: faker.company.name(),
     url: faker.internet.url(),
-    imageUrl: faker.image.imageUrl(),
+    imageUrl: faker.image.url(),
     blurb: faker.lorem.paragraphs(2),
   };
 
@@ -135,17 +135,14 @@ describe('mutations: CollectionPartner', () => {
 
   describe('updateCollectionPartner mutation', () => {
     it('updates a partner', async () => {
-      const partner = await createPartnerHelper(
-        db,
-        faker.company.companyName()
-      );
+      const partner = await createPartnerHelper(db, faker.company.name());
 
       const input: UpdateCollectionPartnerInput = {
         externalId: partner.externalId,
         name: 'Agatha Christie',
         url: faker.internet.url(),
         blurb: faker.lorem.paragraphs(2),
-        imageUrl: faker.image.imageUrl(),
+        imageUrl: faker.image.url(),
       };
 
       const result = await request(app)
@@ -196,17 +193,14 @@ describe('mutations: CollectionPartner', () => {
         groups: `group1,group2,no-access-for-you`,
       };
 
-      const partner = await createPartnerHelper(
-        db,
-        faker.company.companyName()
-      );
+      const partner = await createPartnerHelper(db, faker.company.name());
 
       const input: UpdateCollectionPartnerInput = {
         externalId: partner.externalId,
         name: 'Agatha Christie',
         url: faker.internet.url(),
         blurb: faker.lorem.paragraphs(2),
-        imageUrl: faker.image.imageUrl(),
+        imageUrl: faker.image.url(),
       };
 
       const result = await request(app)
@@ -224,17 +218,14 @@ describe('mutations: CollectionPartner', () => {
     });
 
     it('should fail if request headers are undefined', async () => {
-      const partner = await createPartnerHelper(
-        db,
-        faker.company.companyName()
-      );
+      const partner = await createPartnerHelper(db, faker.company.name());
 
       const input: UpdateCollectionPartnerInput = {
         externalId: partner.externalId,
         name: 'Agatha Christie',
         url: faker.internet.url(),
         blurb: faker.lorem.paragraphs(2),
-        imageUrl: faker.image.imageUrl(),
+        imageUrl: faker.image.url(),
       };
 
       const result = await request(app)
@@ -253,10 +244,7 @@ describe('mutations: CollectionPartner', () => {
 
   describe('updateCollectionPartnerImageUrl', () => {
     it("updates a partner's imageUrl and doesn't touch the other props", async () => {
-      const partner = await createPartnerHelper(
-        db,
-        faker.company.companyName()
-      );
+      const partner = await createPartnerHelper(db, faker.company.name());
       const newImageUrl = 'https://www.example.com/ian-fleming.jpg';
 
       const input: UpdateCollectionPartnerImageUrlInput = {
@@ -291,10 +279,7 @@ describe('mutations: CollectionPartner', () => {
         groups: `group1,group2,no-access-for-you`,
       };
 
-      const partner = await createPartnerHelper(
-        db,
-        faker.company.companyName()
-      );
+      const partner = await createPartnerHelper(db, faker.company.name());
       const newImageUrl = 'https://www.example.com/ian-fleming.jpg';
 
       const input: UpdateCollectionPartnerImageUrlInput = {
@@ -320,10 +305,7 @@ describe('mutations: CollectionPartner', () => {
     });
 
     it('should fail if request headers are undefined', async () => {
-      const partner = await createPartnerHelper(
-        db,
-        faker.company.companyName()
-      );
+      const partner = await createPartnerHelper(db, faker.company.name());
       const newImageUrl = 'https://www.example.com/ian-fleming.jpg';
 
       const input: UpdateCollectionPartnerImageUrlInput = {

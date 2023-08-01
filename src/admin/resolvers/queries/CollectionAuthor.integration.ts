@@ -55,7 +55,7 @@ describe('queries: CollectionAuthor', () => {
         name,
         slug: slugify(name, config.slugify),
         bio: faker.lorem.paragraphs(2),
-        imageUrl: faker.image.imageUrl(),
+        imageUrl: faker.image.url(),
         active: true,
       };
       await db.collectionAuthor.create({ data });
@@ -175,7 +175,7 @@ describe('queries: CollectionAuthor', () => {
         name,
         slug: slugify(name, config.slugify),
         bio: faker.lorem.paragraphs(2),
-        imageUrl: faker.image.imageUrl(),
+        imageUrl: faker.image.url(),
         active: true,
       };
       author = await db.collectionAuthor.create({ data });

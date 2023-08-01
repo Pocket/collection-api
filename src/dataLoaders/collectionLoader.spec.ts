@@ -1,15 +1,26 @@
 import { expect } from 'chai';
 import { faker } from '@faker-js/faker';
 
-import { CollectionLanguage, CollectionComplete } from '../database/types';
+import {
+  CollectionLanguage,
+  CollectionComplete,
+  CollectionPartnership,
+  CollectionStoryWithAuthors,
+} from '../database/types';
 import { sortCollectionsByGivenSlugs } from './collectionLoader';
+import {
+  CollectionAuthor,
+  CollectionLabel,
+  CurationCategory,
+  IABCategory,
+} from '@prisma/client';
 
 const quickCollectionCompleteMaker = (slug: string): CollectionComplete => {
   return {
-    id: faker.datatype.number(),
-    externalId: faker.datatype.uuid(),
+    id: faker.number.int(),
+    externalId: faker.string.uuid(),
     slug,
-    title: faker.random.words(5),
+    title: faker.lorem.words(5),
     excerpt: null,
     intro: null,
     imageUrl: null,
