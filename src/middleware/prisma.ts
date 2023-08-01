@@ -27,7 +27,7 @@ export type CollectionWithStoriesWithItem = Collection & {
 };
 
 export function injectItemIntoCollectionStories(
-  collection: CollectionWithStories
+  collection: CollectionWithStories,
 ): CollectionWithStoriesWithItem {
   // a collection may not have been found - e.g. looking for a collection by
   // an incorrect/no longer available slug.
@@ -61,7 +61,7 @@ export function injectItemIntoCollectionStories(
 // https://www.prisma.io/docs/reference/api-reference/prisma-client-reference/#use
 export async function collectionStoryInjectItemMiddleware(
   params: Prisma.MiddlewareParams,
-  next: (params: Prisma.MiddlewareParams) => any
+  next: (params: Prisma.MiddlewareParams) => any,
 ): Promise<any> {
   // let all other middlewares finish first
   let results = await next(params);

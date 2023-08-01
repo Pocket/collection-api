@@ -19,7 +19,7 @@ import { client } from '../database/client';
  */
 export const sortCollectionsByGivenSlugs = (
   slugs: string[],
-  collections: CollectionComplete[]
+  collections: CollectionComplete[],
 ): CollectionComplete[] => {
   // create a map of slugs to collections
   const slugToCollection = collections.reduce((acc, collection) => {
@@ -44,7 +44,7 @@ export const sortCollectionsByGivenSlugs = (
  * @param slugs
  */
 export const batchFetchBySlugs = async (
-  slugs: string[]
+  slugs: string[],
 ): Promise<Collection[]> => {
   const db: PrismaClient = client();
 

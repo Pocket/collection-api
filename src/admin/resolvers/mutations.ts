@@ -68,7 +68,7 @@ export async function executeMutation<T, U>(
   context: IAdminContext,
   data: T,
   callback: (db, data: T, authenticatedUser?: AdminAPIUser) => Promise<U>,
-  imageEntityType: ImageEntityType = undefined
+  imageEntityType: ImageEntityType = undefined,
 ): Promise<U> {
   const { db, authenticatedUser } = context;
 
@@ -83,7 +83,7 @@ export async function executeMutation<T, U>(
     await associateImageWithEntity(
       db,
       entity as U & { id: number; imageUrl: string },
-      imageEntityType
+      imageEntityType,
     );
   }
 
@@ -98,13 +98,13 @@ export async function executeMutation<T, U>(
 export async function createCollectionAuthor(
   parent,
   { data },
-  context: IAdminContext
+  context: IAdminContext,
 ): Promise<CollectionAuthor> {
   return await executeMutation<CreateCollectionAuthorInput, CollectionAuthor>(
     context,
     data,
     dbCreateCollectionAuthor,
-    ImageEntityType.COLLECTION_AUTHOR
+    ImageEntityType.COLLECTION_AUTHOR,
   );
 }
 
@@ -116,13 +116,13 @@ export async function createCollectionAuthor(
 export async function updateCollectionAuthor(
   parent,
   { data },
-  context: IAdminContext
+  context: IAdminContext,
 ): Promise<CollectionAuthor> {
   return await executeMutation<UpdateCollectionAuthorInput, CollectionAuthor>(
     context,
     data,
     dbUpdateCollectionAuthor,
-    ImageEntityType.COLLECTION_AUTHOR
+    ImageEntityType.COLLECTION_AUTHOR,
   );
 }
 
@@ -134,7 +134,7 @@ export async function updateCollectionAuthor(
 export async function updateCollectionAuthorImageUrl(
   parent,
   { data },
-  context: IAdminContext
+  context: IAdminContext,
 ): Promise<CollectionAuthor> {
   return await executeMutation<
     UpdateCollectionAuthorImageUrlInput,
@@ -143,7 +143,7 @@ export async function updateCollectionAuthorImageUrl(
     context,
     data,
     dbUpdateCollectionAuthorImageUrl,
-    ImageEntityType.COLLECTION_AUTHOR
+    ImageEntityType.COLLECTION_AUTHOR,
   );
 }
 
@@ -155,13 +155,13 @@ export async function updateCollectionAuthorImageUrl(
 export async function createCollection(
   parent,
   { data },
-  context: IAdminContext
+  context: IAdminContext,
 ): Promise<Collection> {
   return await executeMutation<CreateCollectionInput, Collection>(
     context,
     data,
     dbCreateCollection,
-    ImageEntityType.COLLECTION
+    ImageEntityType.COLLECTION,
   );
 }
 
@@ -173,13 +173,13 @@ export async function createCollection(
 export async function updateCollection(
   parent,
   { data },
-  context: IAdminContext
+  context: IAdminContext,
 ): Promise<Collection> {
   return await executeMutation<UpdateCollectionInput, Collection>(
     context,
     data,
     dbUpdateCollection,
-    ImageEntityType.COLLECTION
+    ImageEntityType.COLLECTION,
   );
 }
 
@@ -191,13 +191,13 @@ export async function updateCollection(
 export async function updateCollectionImageUrl(
   parent,
   { data },
-  context: IAdminContext
+  context: IAdminContext,
 ): Promise<Collection> {
   return await executeMutation<UpdateCollectionImageUrlInput, Collection>(
     context,
     data,
     dbUpdateCollectionImageUrl,
-    ImageEntityType.COLLECTION
+    ImageEntityType.COLLECTION,
   );
 }
 
@@ -209,13 +209,13 @@ export async function updateCollectionImageUrl(
 export async function createCollectionPartner(
   parent,
   { data },
-  context: IAdminContext
+  context: IAdminContext,
 ): Promise<CollectionPartner> {
   return await executeMutation<CreateCollectionPartnerInput, CollectionPartner>(
     context,
     data,
     dbCreateCollectionPartner,
-    ImageEntityType.COLLECTION_PARTNER
+    ImageEntityType.COLLECTION_PARTNER,
   );
 }
 
@@ -227,13 +227,13 @@ export async function createCollectionPartner(
 export async function updateCollectionPartner(
   parent,
   { data },
-  context: IAdminContext
+  context: IAdminContext,
 ): Promise<CollectionPartner> {
   return await executeMutation<UpdateCollectionPartnerInput, CollectionPartner>(
     context,
     data,
     dbUpdateCollectionPartner,
-    ImageEntityType.COLLECTION_PARTNER
+    ImageEntityType.COLLECTION_PARTNER,
   );
 }
 
@@ -245,7 +245,7 @@ export async function updateCollectionPartner(
 export async function updateCollectionPartnerImageUrl(
   parent,
   { data },
-  context: IAdminContext
+  context: IAdminContext,
 ): Promise<CollectionPartner> {
   return await executeMutation<
     UpdateCollectionPartnerImageUrlInput,
@@ -254,7 +254,7 @@ export async function updateCollectionPartnerImageUrl(
     context,
     data,
     dbUpdateCollectionPartnerImageUrl,
-    ImageEntityType.COLLECTION_PARTNER
+    ImageEntityType.COLLECTION_PARTNER,
   );
 }
 
@@ -266,7 +266,7 @@ export async function updateCollectionPartnerImageUrl(
 export async function createCollectionPartnerAssociation(
   parent,
   { data },
-  context: IAdminContext
+  context: IAdminContext,
 ): Promise<CollectionPartnerAssociation> {
   return await executeMutation<
     CreateCollectionPartnerAssociationInput,
@@ -275,7 +275,7 @@ export async function createCollectionPartnerAssociation(
     context,
     data,
     dbCreateCollectionPartnerAssociation,
-    ImageEntityType.COLLECTION_PARTNERSHIP
+    ImageEntityType.COLLECTION_PARTNERSHIP,
   );
 }
 
@@ -287,7 +287,7 @@ export async function createCollectionPartnerAssociation(
 export async function updateCollectionPartnerAssociation(
   parent,
   { data },
-  context: IAdminContext
+  context: IAdminContext,
 ): Promise<CollectionPartnerAssociation> {
   return await executeMutation<
     UpdateCollectionPartnerAssociationInput,
@@ -296,7 +296,7 @@ export async function updateCollectionPartnerAssociation(
     context,
     data,
     dbUpdateCollectionPartnerAssociation,
-    ImageEntityType.COLLECTION_PARTNERSHIP
+    ImageEntityType.COLLECTION_PARTNERSHIP,
   );
 }
 
@@ -308,7 +308,7 @@ export async function updateCollectionPartnerAssociation(
 export async function updateCollectionPartnerAssociationImageUrl(
   parent,
   { data },
-  context: IAdminContext
+  context: IAdminContext,
 ): Promise<CollectionPartnerAssociation> {
   return await executeMutation<
     UpdateCollectionPartnerAssociationImageUrlInput,
@@ -317,7 +317,7 @@ export async function updateCollectionPartnerAssociationImageUrl(
     context,
     data,
     dbUpdateCollectionPartnerAssociationImageUrl,
-    ImageEntityType.COLLECTION_PARTNERSHIP
+    ImageEntityType.COLLECTION_PARTNERSHIP,
   );
 }
 
@@ -329,12 +329,12 @@ export async function updateCollectionPartnerAssociationImageUrl(
 export async function deleteCollectionPartnerAssociation(
   parent,
   { externalId },
-  context: IAdminContext
+  context: IAdminContext,
 ): Promise<CollectionPartnerAssociation> {
   return await executeMutation<string, CollectionPartnerAssociation>(
     context,
     externalId,
-    dbDeleteCollectionPartnerAssociation
+    dbDeleteCollectionPartnerAssociation,
   );
 }
 
@@ -346,13 +346,13 @@ export async function deleteCollectionPartnerAssociation(
 export async function createCollectionStory(
   parent,
   { data },
-  context: IAdminContext
+  context: IAdminContext,
 ): Promise<CollectionStory> {
   return await executeMutation<CreateCollectionStoryInput, CollectionStory>(
     context,
     data,
     dbCreateCollectionStory,
-    ImageEntityType.COLLECTION_STORY
+    ImageEntityType.COLLECTION_STORY,
   );
 }
 
@@ -364,13 +364,13 @@ export async function createCollectionStory(
 export async function updateCollectionStory(
   parent,
   { data },
-  context: IAdminContext
+  context: IAdminContext,
 ): Promise<CollectionStory> {
   return await executeMutation<UpdateCollectionStoryInput, CollectionStory>(
     context,
     data,
     dbUpdateCollectionStory,
-    ImageEntityType.COLLECTION_STORY
+    ImageEntityType.COLLECTION_STORY,
   );
 }
 
@@ -382,7 +382,7 @@ export async function updateCollectionStory(
 export async function updateCollectionStorySortOrder(
   parent,
   { data },
-  context: IAdminContext
+  context: IAdminContext,
 ): Promise<CollectionStory> {
   return await executeMutation<
     UpdateCollectionStorySortOrderInput,
@@ -391,7 +391,7 @@ export async function updateCollectionStorySortOrder(
     context,
     data,
     dbUpdateCollectionStorySortOrder,
-    ImageEntityType.COLLECTION_STORY
+    ImageEntityType.COLLECTION_STORY,
   );
 }
 
@@ -403,7 +403,7 @@ export async function updateCollectionStorySortOrder(
 export async function updateCollectionStoryImageUrl(
   parent,
   { data },
-  context: IAdminContext
+  context: IAdminContext,
 ): Promise<CollectionStory> {
   return await executeMutation<
     UpdateCollectionStoryImageUrlInput,
@@ -412,7 +412,7 @@ export async function updateCollectionStoryImageUrl(
     context,
     data,
     dbUpdateCollectionStoryImageUrl,
-    ImageEntityType.COLLECTION_STORY
+    ImageEntityType.COLLECTION_STORY,
   );
 }
 
@@ -424,12 +424,12 @@ export async function updateCollectionStoryImageUrl(
 export async function deleteCollectionStory(
   parent,
   { externalId },
-  context: IAdminContext
+  context: IAdminContext,
 ): Promise<CollectionStory> {
   return await executeMutation<string, CollectionStory>(
     context,
     externalId,
-    dbDeleteCollectionStory
+    dbDeleteCollectionStory,
   );
 }
 
@@ -441,7 +441,7 @@ export async function deleteCollectionStory(
 export async function collectionImageUpload(
   parent,
   { data },
-  context: IAdminContext
+  context: IAdminContext,
 ) {
   const { s3service } = context;
   const { image, ...imageData } = data;
@@ -451,7 +451,7 @@ export async function collectionImageUpload(
   await executeMutation<CreateImageInput, Image>(
     context,
     { ...imageData, ...upload },
-    createImage
+    createImage,
   );
 
   return { url: upload.path };
@@ -460,7 +460,7 @@ export async function collectionImageUpload(
 export async function createLabel(
   parent,
   { name },
-  context: IAdminContext
+  context: IAdminContext,
 ): Promise<Label> {
   return await executeMutation<string, Label>(context, name, dbCreateLabel);
 }
@@ -473,11 +473,11 @@ export async function createLabel(
 export async function updateLabel(
   parent,
   { data },
-  context: IAdminContext
+  context: IAdminContext,
 ): Promise<Label> {
   return await executeMutation<UpdateLabelInput, Label>(
     context,
     data,
-    dbUpdateLabel
+    dbUpdateLabel,
   );
 }

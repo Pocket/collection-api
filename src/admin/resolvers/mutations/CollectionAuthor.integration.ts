@@ -83,13 +83,13 @@ describe('mutations: CollectionAuthor', () => {
 
       expect(result.body.data.createCollectionAuthor.name).to.equal('the dude');
       expect(result.body.data.createCollectionAuthor.slug).to.equal(
-        'his-dudeness'
+        'his-dudeness',
       );
       expect(result.body.data.createCollectionAuthor.bio).to.equal(
-        'the dude abides'
+        'the dude abides',
       );
       expect(result.body.data.createCollectionAuthor.imageUrl).to.equal(
-        'https://i.imgur.com/YeydXfW.gif'
+        'https://i.imgur.com/YeydXfW.gif',
       );
     });
 
@@ -121,7 +121,7 @@ describe('mutations: CollectionAuthor', () => {
 
       expect(result.body.errors.length).to.equal(1);
       expect(result.body.errors[0].message).to.equal(
-        'An author with the slug "his-dudeness" already exists'
+        'An author with the slug "his-dudeness" already exists',
       );
     });
   });
@@ -195,7 +195,7 @@ describe('mutations: CollectionAuthor', () => {
       // there's only one the dude
       expect(result.body.errors.length).to.equal(1);
       expect(result.body.errors[0].message).to.equal(
-        'An author with the slug "the-dude" already exists'
+        'An author with the slug "the-dude" already exists',
       );
     });
   });
@@ -219,7 +219,7 @@ describe('mutations: CollectionAuthor', () => {
         });
 
       expect(result.body.data.updateCollectionAuthorImageUrl.imageUrl).to.equal(
-        input.imageUrl
+        input.imageUrl,
       );
     });
 
@@ -241,16 +241,16 @@ describe('mutations: CollectionAuthor', () => {
         });
 
       expect(result.body.data.updateCollectionAuthorImageUrl.name).to.equal(
-        author.name
+        author.name,
       );
       expect(result.body.data.updateCollectionAuthorImageUrl.slug).to.equal(
-        author.slug
+        author.slug,
       );
       expect(result.body.data.updateCollectionAuthorImageUrl.bio).to.equal(
-        author.bio
+        author.bio,
       );
       expect(result.body.data.updateCollectionAuthorImageUrl.active).to.equal(
-        author.active
+        author.active,
       );
     });
   });

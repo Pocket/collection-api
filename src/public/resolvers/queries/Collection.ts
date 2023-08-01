@@ -17,7 +17,7 @@ import { getPagination } from '../../../utils';
 export async function getCollectionBySlug(
   parent,
   { slug },
-  { db }
+  { db },
 ): Promise<CollectionComplete> {
   const collection = await dbGetCollectionBySlug(db, slug);
 
@@ -42,7 +42,7 @@ export async function getCollections(
     perPage = config.app.pagination.collectionsPerPage,
     filters = {},
   },
-  { db }
+  { db },
 ): Promise<CollectionsResult> {
   const totalResults = await countPublishedCollections(db, filters);
   const collections = await getPublishedCollections(db, page, perPage, filters);

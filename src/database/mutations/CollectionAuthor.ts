@@ -15,7 +15,7 @@ import {
  */
 export async function createCollectionAuthor(
   db: PrismaClient,
-  data: CreateCollectionAuthorInput
+  data: CreateCollectionAuthorInput,
 ): Promise<CollectionAuthor> {
   data.slug = data.slug || slugify(data.name, config.slugify);
 
@@ -25,7 +25,7 @@ export async function createCollectionAuthor(
 
   if (slugExists) {
     throw new UserInputError(
-      `An author with the slug "${data.slug}" already exists`
+      `An author with the slug "${data.slug}" already exists`,
     );
   }
 
@@ -38,7 +38,7 @@ export async function createCollectionAuthor(
  */
 export async function updateCollectionAuthor(
   db: PrismaClient,
-  data: UpdateCollectionAuthorInput
+  data: UpdateCollectionAuthorInput,
 ): Promise<CollectionAuthor> {
   if (!data.externalId) {
     throw new UserInputError('externalId must be provided.');
@@ -50,7 +50,7 @@ export async function updateCollectionAuthor(
 
   if (slugExists) {
     throw new UserInputError(
-      `An author with the slug "${data.slug}" already exists`
+      `An author with the slug "${data.slug}" already exists`,
     );
   }
 
@@ -66,7 +66,7 @@ export async function updateCollectionAuthor(
  */
 export async function updateCollectionAuthorImageUrl(
   db: PrismaClient,
-  data: UpdateCollectionAuthorImageUrlInput
+  data: UpdateCollectionAuthorImageUrlInput,
 ): Promise<CollectionAuthor> {
   if (!data.externalId) {
     throw new UserInputError('externalId must be provided.');

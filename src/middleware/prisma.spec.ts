@@ -106,7 +106,7 @@ describe('prisma middleware', () => {
 
       expect(res.stories[0].item.givenUrl).toEqual('test.com/bowling');
       expect(res.stories[1].item.givenUrl).toEqual(
-        'https://thedude.com/walter/calm'
+        'https://thedude.com/walter/calm',
       );
     });
 
@@ -162,7 +162,7 @@ describe('prisma middleware', () => {
       // spy on inject function
       injectItemSpy = jest.spyOn(
         PrismaMiddleware,
-        'injectItemIntoCollectionStories'
+        'injectItemIntoCollectionStories',
       );
     });
 
@@ -176,7 +176,7 @@ describe('prisma middleware', () => {
 
       await PrismaMiddleware.collectionStoryInjectItemMiddleware(
         params,
-        nextSingle
+        nextSingle,
       );
 
       expect(injectItemSpy).toBeCalledTimes(1);
@@ -187,7 +187,7 @@ describe('prisma middleware', () => {
 
       await PrismaMiddleware.collectionStoryInjectItemMiddleware(
         params,
-        nextSingle
+        nextSingle,
       );
 
       expect(injectItemSpy).toBeCalledTimes(1);
@@ -198,7 +198,7 @@ describe('prisma middleware', () => {
 
       await PrismaMiddleware.collectionStoryInjectItemMiddleware(
         params,
-        nextMany
+        nextMany,
       );
 
       // nextMany returns two collections in an array, so the inject function
@@ -211,7 +211,7 @@ describe('prisma middleware', () => {
 
       await PrismaMiddleware.collectionStoryInjectItemMiddleware(
         params,
-        nextSingle
+        nextSingle,
       );
 
       // param action is update so the inject function should not be called
@@ -223,7 +223,7 @@ describe('prisma middleware', () => {
 
       await PrismaMiddleware.collectionStoryInjectItemMiddleware(
         params,
-        nextSingle
+        nextSingle,
       );
 
       // param action is create so the inject function should not be called
@@ -236,7 +236,7 @@ describe('prisma middleware', () => {
 
       await PrismaMiddleware.collectionStoryInjectItemMiddleware(
         params,
-        nextSingle
+        nextSingle,
       );
 
       // param model is not a Collection so the inject function should not be called

@@ -16,7 +16,7 @@ import {
  */
 export async function createCollectionStory(
   db: PrismaClient,
-  data: CreateCollectionStoryInput
+  data: CreateCollectionStoryInput,
 ): Promise<CollectionStoryWithAuthors> {
   // Use the given collection external ID to fetch the collection ID
   const collection = await getCollection(db, data.collectionExternalId);
@@ -28,7 +28,7 @@ export async function createCollectionStory(
 
   if (storyExists) {
     throw new UserInputError(
-      `A story with the url "${data.url}" already exists in this collection`
+      `A story with the url "${data.url}" already exists in this collection`,
     );
   }
 
@@ -57,7 +57,7 @@ export async function createCollectionStory(
  */
 export async function updateCollectionStory(
   db: PrismaClient,
-  data: UpdateCollectionStoryInput
+  data: UpdateCollectionStoryInput,
 ): Promise<CollectionStoryWithAuthors> {
   // get collectionStory internal id for deleting authors & checking for existing story
   const existingStory = await getCollectionStory(db, data.externalId);
@@ -74,7 +74,7 @@ export async function updateCollectionStory(
 
     if (storyExists) {
       throw new UserInputError(
-        `A story with the url "${data.url}" already exists in this collection`
+        `A story with the url "${data.url}" already exists in this collection`,
       );
     }
   }
@@ -110,7 +110,7 @@ export async function updateCollectionStory(
  */
 export async function updateCollectionStorySortOrder(
   db: PrismaClient,
-  data: UpdateCollectionStorySortOrderInput
+  data: UpdateCollectionStorySortOrderInput,
 ): Promise<CollectionStoryWithAuthors> {
   return db.collectionStory.update({
     where: { externalId: data.externalId },
@@ -133,7 +133,7 @@ export async function updateCollectionStorySortOrder(
  */
 export async function updateCollectionStoryImageUrl(
   db: PrismaClient,
-  data: UpdateCollectionStoryImageUrlInput
+  data: UpdateCollectionStoryImageUrlInput,
 ): Promise<CollectionStoryWithAuthors> {
   return db.collectionStory.update({
     where: { externalId: data.externalId },
@@ -154,14 +154,14 @@ export async function updateCollectionStoryImageUrl(
  */
 export async function deleteCollectionStory(
   db: PrismaClient,
-  externalId: string
+  externalId: string,
 ): Promise<CollectionStoryWithAuthors> {
   // get the existing story for the internal id
   const existingStory = await getCollectionStory(db, externalId);
 
   if (!existingStory) {
     throw new UserInputError(
-      `Cannot delete a collection story with external ID "${externalId}"`
+      `Cannot delete a collection story with external ID "${externalId}"`,
     );
   }
 

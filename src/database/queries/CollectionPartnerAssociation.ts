@@ -6,7 +6,7 @@ import { CollectionPartnerAssociation } from '../types';
  */
 export async function getCollectionPartnerAssociation(
   db: PrismaClient,
-  externalId: string
+  externalId: string,
 ): Promise<CollectionPartnerAssociation> {
   return db.collectionPartnership.findUnique({
     where: { externalId },
@@ -22,7 +22,7 @@ export async function getCollectionPartnerAssociation(
  */
 export async function getCollectionPartnerAssociationForCollection(
   db: PrismaClient,
-  externalId: string
+  externalId: string,
 ): Promise<CollectionPartnerAssociation> {
   return db.collectionPartnership.findFirst({
     where: {

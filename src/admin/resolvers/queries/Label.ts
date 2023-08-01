@@ -14,7 +14,7 @@ import { Label } from '../../../database/types';
 export async function labels(
   parent,
   _,
-  { db, authenticatedUser }
+  { db, authenticatedUser },
 ): Promise<Label[]> {
   // Make sure the user has at least read-only access
   if (!authenticatedUser.canRead) {

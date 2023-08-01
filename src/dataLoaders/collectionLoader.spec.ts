@@ -6,10 +6,10 @@ import { sortCollectionsByGivenSlugs } from './collectionLoader';
 
 const quickCollectionCompleteMaker = (slug: string): CollectionComplete => {
   return {
-    id: faker.datatype.number(),
-    externalId: faker.datatype.uuid(),
+    id: faker.number.int(),
+    externalId: faker.string.uuid(),
     slug,
-    title: faker.random.words(5),
+    title: faker.lorem.words(5),
     excerpt: null,
     intro: null,
     imageUrl: null,

@@ -22,7 +22,7 @@ import { ForbiddenError, NotFoundError } from '@pocket-tools/apollo-utils';
 export async function getCollectionPartners(
   parent,
   { page = 1, perPage = config.app.pagination.partnersPerPage },
-  { db, authenticatedUser }
+  { db, authenticatedUser },
 ): Promise<CollectionPartnersResult> {
   if (!authenticatedUser.canRead) {
     throw new ForbiddenError(ACCESS_DENIED_ERROR);
@@ -45,7 +45,7 @@ export async function getCollectionPartners(
 export async function getCollectionPartner(
   parent,
   { externalId },
-  { db, authenticatedUser }
+  { db, authenticatedUser },
 ): Promise<CollectionPartner> {
   if (!authenticatedUser.canRead) {
     throw new ForbiddenError(ACCESS_DENIED_ERROR);
@@ -68,7 +68,7 @@ export async function getCollectionPartner(
 export async function getCollectionPartnerAssociation(
   parent,
   { externalId },
-  { db, authenticatedUser }
+  { db, authenticatedUser },
 ): Promise<CollectionPartnerAssociation> {
   if (!authenticatedUser.canRead) {
     throw new ForbiddenError(ACCESS_DENIED_ERROR);
@@ -91,7 +91,7 @@ export async function getCollectionPartnerAssociation(
 export async function getCollectionPartnerAssociationForCollection(
   parent,
   { externalId },
-  { db, authenticatedUser }
+  { db, authenticatedUser },
 ): Promise<CollectionPartnerAssociation> {
   if (!authenticatedUser.canRead) {
     throw new ForbiddenError(ACCESS_DENIED_ERROR);

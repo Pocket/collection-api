@@ -153,7 +153,7 @@ describe('queries: CollectionPartner', () => {
       // Expect to see the app defaults for 'page' and 'perPage' variables
       expect(data.pagination.currentPage).to.equal(1);
       expect(data.pagination.perPage).to.equal(
-        config.app.pagination.partnersPerPage
+        config.app.pagination.partnersPerPage,
       );
     });
   });
@@ -166,7 +166,7 @@ describe('queries: CollectionPartner', () => {
       const data: CreateCollectionPartnerInput = {
         name,
         url: faker.internet.url(),
-        imageUrl: faker.image.imageUrl(),
+        imageUrl: faker.image.url(),
         blurb: faker.lorem.paragraphs(2),
       };
       partner = await db.collectionPartner.create({ data });
@@ -201,7 +201,7 @@ describe('queries: CollectionPartner', () => {
 
       expect(result.body.errors.length).to.equal(1);
       expect(result.body.errors[0].message).to.equal(
-        `Error - Not Found: invalid-id`
+        `Error - Not Found: invalid-id`,
       );
       expect(result.body.errors[0].extensions.code).to.equal('NOT_FOUND');
       expect(result.body.data.getCollectionPartner).not.to.exist;
@@ -244,7 +244,7 @@ describe('queries: CollectionPartner', () => {
 
       expect(result.body.errors.length).to.equal(1);
       expect(result.body.errors[0].message).to.equal(
-        `Error - Not Found: invalid-id`
+        `Error - Not Found: invalid-id`,
       );
       expect(result.body.errors[0].extensions.code).to.equal('NOT_FOUND');
       expect(result.body.data.getCollectionPartnerAssociation).not.to.exist;

@@ -66,7 +66,7 @@ export const collectionLabelsFieldResolvers = {
   async externalId(
     parent: Label | CollectionLabel,
     _,
-    { db }
+    { db },
   ): Promise<string> {
     // TypeScript is unhappy while running integration tests without these specific
     // checks in place - if('externalId' in parent) rather than if(parent.externalId).
@@ -116,7 +116,7 @@ export const collectionLabelsFieldResolvers = {
  */
 const getPartnerById = async (
   db: PrismaClient,
-  id: number
+  id: number,
 ): Promise<CollectionPartner> => {
   return await db.collectionPartner.findUnique({
     where: { id },
@@ -131,7 +131,7 @@ const getPartnerById = async (
  */
 export const getLabelById = async (
   db: PrismaClient,
-  id: number
+  id: number,
 ): Promise<Label> => {
   return await db.label.findUnique({
     where: { id },

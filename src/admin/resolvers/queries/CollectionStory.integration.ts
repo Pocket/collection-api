@@ -100,7 +100,7 @@ describe('queries: CollectionStory', () => {
       // the default sort returned from prisma should match our expected
       // manual sort
       expect(retrieved.authors).to.equal(
-        sortCollectionStoryAuthors(retrieved.authors)
+        sortCollectionStoryAuthors(retrieved.authors),
       );
     });
 
@@ -117,7 +117,7 @@ describe('queries: CollectionStory', () => {
 
       expect(result.body.errors.length).to.equal(1);
       expect(result.body.errors[0].message).to.equal(
-        `Error - Not Found: ${story.externalId}typo`
+        `Error - Not Found: ${story.externalId}typo`,
       );
       expect(result.body.errors[0].extensions.code).to.equal('NOT_FOUND');
       expect(result.body.data.getCollectionStory).not.to.exist;

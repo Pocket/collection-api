@@ -10,7 +10,7 @@ import { getCollectionUrlSlug } from '../../test/helpers';
 export async function collection(
   { givenUrl },
   _,
-  { dataLoaders }
+  { dataLoaders },
 ): Promise<Collection> {
   try {
     const slug = getCollectionUrlSlug(givenUrl);

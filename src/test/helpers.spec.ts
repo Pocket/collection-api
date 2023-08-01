@@ -36,7 +36,7 @@ describe('test helpers', () => {
 
       expect(getCollectionUrlSlug(enCollection)).toEqual('multiverse-reader');
       expect(getCollectionUrlSlug(deCollection)).toEqual(
-        'cybersicherheit-kurz-und-bundig'
+        'cybersicherheit-kurz-und-bundig',
       );
     });
 

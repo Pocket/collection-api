@@ -4,7 +4,6 @@ import { buildSubgraphSchema } from '@apollo/subgraph';
 import { typeDefsAdmin } from '../typeDefs';
 import { resolvers as adminResolvers } from './resolvers';
 import { errorHandler, sentryPlugin } from '@pocket-tools/apollo-utils';
-import { ApolloServerPluginLandingPageGraphQLPlayground } from '@apollo/server-plugin-landing-page-graphql-playground';
 import {
   ApolloServerPluginLandingPageDisabled,
   ApolloServerPluginInlineTraceDisabled,
@@ -12,16 +11,16 @@ import {
 } from '@apollo/server/plugin/disabled';
 import { ApolloServerPluginInlineTrace } from '@apollo/server/plugin/inlineTrace';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { IAdminContext } from './context';
 
 /**
  * Sets up and configures an ApolloServer for the application.
- * @param contextFactory function for creating the context with
- * every request
  * @returns ApolloServer
+ * @param httpServer
  */
 export function getAdminServer(
-  httpServer: Server
+  httpServer: Server,
 ): ApolloServer<IAdminContext> {
   const defaultPlugins = [
     sentryPlugin,
@@ -32,7 +31,7 @@ export function getAdminServer(
     ApolloServerPluginInlineTrace(),
   ];
   const nonProdPlugins = [
-    ApolloServerPluginLandingPageGraphQLPlayground(),
+    ApolloServerPluginLandingPageLocalDefault(),
     ApolloServerPluginInlineTraceDisabled(),
     // Usage reporting is enabled by default if you have APOLLO_KEY in your environment
     ApolloServerPluginUsageReportingDisabled(),
@@ -57,7 +56,7 @@ export function getAdminServer(
  * before applying middleware.
  */
 export async function startAdminServer(
-  httpServer: Server
+  httpServer: Server,
 ): Promise<ApolloServer<IAdminContext>> {
   const server = getAdminServer(httpServer);
   await server.start();
