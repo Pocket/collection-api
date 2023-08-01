@@ -4,7 +4,6 @@ import { buildSubgraphSchema } from '@apollo/subgraph';
 import { typeDefsAdmin } from '../typeDefs';
 import { resolvers as adminResolvers } from './resolvers';
 import { errorHandler, sentryPlugin } from '@pocket-tools/apollo-utils';
-import { ApolloServerPluginLandingPageGraphQLPlayground } from '@apollo/server-plugin-landing-page-graphql-playground';
 import {
   ApolloServerPluginLandingPageDisabled,
   ApolloServerPluginInlineTraceDisabled,
@@ -12,6 +11,7 @@ import {
 } from '@apollo/server/plugin/disabled';
 import { ApolloServerPluginInlineTrace } from '@apollo/server/plugin/inlineTrace';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { IAdminContext } from './context';
 
 /**
@@ -31,7 +31,7 @@ export function getAdminServer(
     ApolloServerPluginInlineTrace(),
   ];
   const nonProdPlugins = [
-    ApolloServerPluginLandingPageGraphQLPlayground(),
+    ApolloServerPluginLandingPageLocalDefault(),
     ApolloServerPluginInlineTraceDisabled(),
     // Usage reporting is enabled by default if you have APOLLO_KEY in your environment
     ApolloServerPluginUsageReportingDisabled(),
