@@ -13,7 +13,7 @@ import {
  */
 export async function createCollectionPartner(
   db: PrismaClient,
-  data: CreateCollectionPartnerInput
+  data: CreateCollectionPartnerInput,
 ): Promise<CollectionPartner> {
   return db.collectionPartner.create({ data: { ...data } });
 }
@@ -24,7 +24,7 @@ export async function createCollectionPartner(
  */
 export async function updateCollectionPartner(
   db: PrismaClient,
-  data: UpdateCollectionPartnerInput
+  data: UpdateCollectionPartnerInput,
 ): Promise<CollectionPartner> {
   if (!data.externalId) {
     throw new UserInputError('externalId must be provided.');
@@ -42,7 +42,7 @@ export async function updateCollectionPartner(
  */
 export async function updateCollectionPartnerImageUrl(
   db: PrismaClient,
-  data: UpdateCollectionPartnerImageUrlInput
+  data: UpdateCollectionPartnerImageUrlInput,
 ): Promise<CollectionPartner> {
   if (!data.externalId) {
     throw new UserInputError('externalId must be provided.');

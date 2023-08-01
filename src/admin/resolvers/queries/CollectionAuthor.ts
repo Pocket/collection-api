@@ -15,7 +15,7 @@ import { ForbiddenError, NotFoundError } from '@pocket-tools/apollo-utils';
 export async function getCollectionAuthors(
   parent,
   { page = 1, perPage = config.app.pagination.authorsPerPage },
-  { db, authenticatedUser }
+  { db, authenticatedUser },
 ): Promise<CollectionAuthorsResult> {
   if (!authenticatedUser.canRead) {
     throw new ForbiddenError(ACCESS_DENIED_ERROR);
@@ -38,7 +38,7 @@ export async function getCollectionAuthors(
 export async function getCollectionAuthor(
   parent,
   { externalId },
-  { db, authenticatedUser }
+  { db, authenticatedUser },
 ): Promise<CollectionAuthor> {
   if (!authenticatedUser.canRead) {
     throw new ForbiddenError(ACCESS_DENIED_ERROR);

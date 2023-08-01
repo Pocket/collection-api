@@ -46,7 +46,7 @@ describe('auth: IABCategory', () => {
 
       const iabParent3 = await createIABCategoryHelper(
         db,
-        'Health and Wellness'
+        'Health and Wellness',
       );
       await createIABCategoryHelper(db, 'Coronavirus', iabParent3);
       await createIABCategoryHelper(db, 'Fitness', iabParent3);

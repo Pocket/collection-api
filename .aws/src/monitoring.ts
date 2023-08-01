@@ -38,7 +38,7 @@ export class CollectionAPIMonitoring extends Construct {
       'synthetic_check_artifacts',
       {
         bucket: `pocket-${config.prefix.toLowerCase()}-synthetic-check`,
-      }
+      },
     );
 
     const syntheticCode = new TerraformAsset(this, 'synthetic_check_asset', {
@@ -71,7 +71,7 @@ export class CollectionAPIMonitoring extends Construct {
             ],
           },
         ],
-      }
+      },
     );
 
     const syncheckRole = new iam.IamRole(this, 'synthetic_check_role', {
@@ -125,7 +125,7 @@ export class CollectionAPIMonitoring extends Construct {
             ],
           },
         ],
-      }
+      },
     );
 
     const synCheckAccessPolicy = new iam.IamPolicy(
@@ -134,7 +134,7 @@ export class CollectionAPIMonitoring extends Construct {
       {
         name: `pocket-${config.prefix.toLowerCase()}-synthetic-check-access`,
         policy: dataSynCheckAccess.json,
-      }
+      },
     );
 
     new iam.IamRolePolicyAttachment(this, 'synthetic_check_access_attach', {
@@ -163,7 +163,7 @@ export class CollectionAPIMonitoring extends Construct {
         },
         startCanary: true,
         zipFile: syncheckZipFile.outputPath,
-      }
+      },
     );
 
     new cloudwatch.CloudwatchMetricAlarm(this, 'synthetic_check_alarm', {

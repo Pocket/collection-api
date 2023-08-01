@@ -22,7 +22,7 @@ import { EventBridgeEventType } from '../../events/types';
 export async function createCollection(
   db: PrismaClient,
   data: CreateCollectionInput,
-  authenticatedUser: AdminAPIUser
+  authenticatedUser: AdminAPIUser,
 ): Promise<CollectionComplete> {
   const slugExists = await db.collection.count({
     where: { slug: data.slug },
@@ -30,7 +30,7 @@ export async function createCollection(
 
   if (slugExists) {
     throw new UserInputError(
-      `A collection with the slug "${data.slug}" already exists`
+      `A collection with the slug "${data.slug}" already exists`,
     );
   }
 
@@ -136,7 +136,7 @@ export async function createCollection(
     await sendEventBridgeEvent(
       db,
       EventBridgeEventType.COLLECTION_CREATED,
-      collection
+      collection,
     );
   }
 
@@ -151,7 +151,7 @@ export async function createCollection(
 export async function updateCollection(
   db: PrismaClient,
   data: UpdateCollectionInput,
-  authenticatedUser: AdminAPIUser
+  authenticatedUser: AdminAPIUser,
 ): Promise<CollectionComplete> {
   // retrieve the current record, pre-update
   const existingCollection = await getCollection(db, data.externalId);
@@ -175,7 +175,7 @@ export async function updateCollection(
     // if we found more than one collection with this slug, we have a problem
     if (sameSlugs > 0) {
       throw new UserInputError(
-        `A collection with the slug "${data.slug}" already exists`
+        `A collection with the slug "${data.slug}" already exists`,
       );
     }
   }
@@ -325,7 +325,7 @@ export async function updateCollection(
     await sendEventBridgeEvent(
       db,
       EventBridgeEventType.COLLECTION_UPDATED,
-      collection
+      collection,
     );
   }
 
@@ -334,7 +334,7 @@ export async function updateCollection(
 
 export async function updateCollectionImageUrl(
   db: PrismaClient,
-  data: UpdateCollectionImageUrlInput
+  data: UpdateCollectionImageUrlInput,
 ): Promise<CollectionComplete> {
   if (!data.externalId) {
     throw new UserInputError('externalId must be provided.');

@@ -87,7 +87,7 @@ describe('mutations: CollectionPartner', () => {
       // And the server responds with an error about the first variable in the input
       // that is missing
       expect(result.body.errors[0].message).toMatch(
-        'Variable "$name" of required type "String!" was not provided.'
+        'Variable "$name" of required type "String!" was not provided.',
       );
     });
 
@@ -111,7 +111,7 @@ describe('mutations: CollectionPartner', () => {
 
       // And there is an access denied error
       expect(result.body.errors[0].message).toMatch(
-        `You do not have access to perform this action.`
+        `You do not have access to perform this action.`,
       );
     });
 
@@ -128,7 +128,7 @@ describe('mutations: CollectionPartner', () => {
 
       // And there is an access denied error
       expect(result.body.errors[0].message).toMatch(
-        `You do not have access to perform this action.`
+        `You do not have access to perform this action.`,
       );
     });
   });
@@ -213,7 +213,7 @@ describe('mutations: CollectionPartner', () => {
 
       // And there is an access denied error
       expect(result.body.errors[0].message).toMatch(
-        `You do not have access to perform this action.`
+        `You do not have access to perform this action.`,
       );
     });
 
@@ -237,7 +237,7 @@ describe('mutations: CollectionPartner', () => {
 
       // And there is an access denied error
       expect(result.body.errors[0].message).toMatch(
-        `You do not have access to perform this action.`
+        `You do not have access to perform this action.`,
       );
     });
   });
@@ -300,7 +300,7 @@ describe('mutations: CollectionPartner', () => {
 
       // And there is an access denied error
       expect(result.body.errors[0].message).toMatch(
-        `You do not have access to perform this action.`
+        `You do not have access to perform this action.`,
       );
     });
 
@@ -325,7 +325,7 @@ describe('mutations: CollectionPartner', () => {
 
       // And there is an access denied error
       expect(result.body.errors[0].message).toMatch(
-        `You do not have access to perform this action.`
+        `You do not have access to perform this action.`,
       );
     });
   });

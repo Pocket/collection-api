@@ -6,7 +6,7 @@ import { CollectionPartner, PrismaClient } from '@prisma/client';
  */
 export async function getPartner(
   db: PrismaClient,
-  externalId: string
+  externalId: string,
 ): Promise<CollectionPartner> {
   return db.collectionPartner.findUnique({ where: { externalId } });
 }
@@ -19,7 +19,7 @@ export async function getPartner(
 export async function getPartners(
   db: PrismaClient,
   page: number,
-  perPage: number
+  perPage: number,
 ): Promise<CollectionPartner[]> {
   return db.collectionPartner.findMany({
     take: perPage,

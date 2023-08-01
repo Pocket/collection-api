@@ -7,6 +7,7 @@ import { ACCESS_DENIED_ERROR } from '../../../shared/constants';
  * @param parent
  * @param _ (empty because this takes no params)
  * @param db
+ * @param authenticatedUser
  */
 export function getLanguages(parent, _, { db, authenticatedUser }): any {
   if (!authenticatedUser.canRead) {

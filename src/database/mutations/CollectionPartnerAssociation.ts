@@ -15,7 +15,7 @@ import { getCollectionPartnerAssociation } from '../queries';
  */
 export async function createCollectionPartnerAssociation(
   db: PrismaClient,
-  data: CreateCollectionPartnerAssociationInput
+  data: CreateCollectionPartnerAssociationInput,
 ): Promise<CollectionPartnerAssociation> {
   // this property doesn't exist on the Association type returned by this
   // function, instead we return the CollectionPartner object
@@ -47,7 +47,7 @@ export async function createCollectionPartnerAssociation(
  */
 export async function updateCollectionPartnerAssociation(
   db: PrismaClient,
-  data: UpdateCollectionPartnerAssociationInput
+  data: UpdateCollectionPartnerAssociationInput,
 ): Promise<CollectionPartnerAssociation> {
   if (!data.externalId) {
     throw new UserInputError('externalId must be provided.');
@@ -78,7 +78,7 @@ export async function updateCollectionPartnerAssociation(
  */
 export async function updateCollectionPartnerAssociationImageUrl(
   db: PrismaClient,
-  data: UpdateCollectionPartnerAssociationImageUrlInput
+  data: UpdateCollectionPartnerAssociationImageUrlInput,
 ): Promise<CollectionPartnerAssociation> {
   if (!data.externalId) {
     throw new UserInputError('externalId must be provided.');
@@ -99,7 +99,7 @@ export async function updateCollectionPartnerAssociationImageUrl(
  */
 export async function deleteCollectionPartnerAssociation(
   db: PrismaClient,
-  externalId: string
+  externalId: string,
 ): Promise<CollectionPartnerAssociation> {
   if (!externalId) {
     throw new UserInputError('externalId must be provided.');
@@ -110,7 +110,7 @@ export async function deleteCollectionPartnerAssociation(
 
   if (!association) {
     throw new UserInputError(
-      `Cannot delete a collection partner association with external ID "${externalId}"`
+      `Cannot delete a collection partner association with external ID "${externalId}"`,
     );
   }
 

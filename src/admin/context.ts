@@ -31,7 +31,7 @@ export class AdminContextManager implements IAdminContext {
       request: Express.Request;
       db: PrismaClient;
       s3service: S3;
-    }
+    },
   ) {}
 
   get db(): IAdminContext['db'] {

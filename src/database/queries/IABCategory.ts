@@ -7,7 +7,7 @@ import { IABParentCategory } from '../types';
  * @param db
  */
 export async function getIABCategories(
-  db: PrismaClient
+  db: PrismaClient,
 ): Promise<IABParentCategory[]> {
   return db.iABCategory.findMany({
     where: { IABCategoryId: null }, // only get the parents at this level

@@ -75,7 +75,7 @@ describe('public queries: Collection', () => {
     IABChildCategory = await createIABCategoryHelper(
       db,
       'Bowling',
-      IABParentCategory
+      IABParentCategory,
     );
     label = await createLabelHelper(db, 'test-label', 'test-user');
   });
@@ -135,14 +135,14 @@ describe('public queries: Collection', () => {
         expect(collections[i].authors.length).to.equal(1);
         expect(collections[i].stories.length).to.be.greaterThan(0);
         expect(collections[i].curationCategory.name).to.equal(
-          curationCategory.name
+          curationCategory.name,
         );
         expect(collections[i].stories[0].authors).not.to.be.empty;
         expect(collections[i].IABParentCategory.name).to.equal(
-          IABParentCategory.name
+          IABParentCategory.name,
         );
         expect(collections[i].IABChildCategory.name).to.equal(
-          IABChildCategory.name
+          IABChildCategory.name,
         );
         expect(collections[i].labels[0].externalId).to.equal(label.externalId);
         expect(collections[i].labels[0].name).to.equal(label.name);
@@ -533,7 +533,7 @@ describe('public queries: Collection', () => {
       // the default sort returned from prisma should match our expected
       // manual sort
       expect(collections[0].stories[0].authors).to.equal(
-        sortCollectionStoryAuthors(collections[0].stories[0].authors)
+        sortCollectionStoryAuthors(collections[0].stories[0].authors),
       );
     });
 
@@ -773,7 +773,7 @@ describe('public queries: Collection', () => {
 
       expect(result.body).to.have.nested.property(
         'data._entities[0].title',
-        title
+        title,
       );
     });
 
@@ -793,7 +793,7 @@ describe('public queries: Collection', () => {
 
       expect(result.body).to.have.nested.property(
         'errors[0].extensions.code',
-        'NOT_FOUND'
+        'NOT_FOUND',
       );
     });
 
@@ -807,7 +807,7 @@ describe('public queries: Collection', () => {
 
       expect(result.body).to.have.nested.property(
         'errors[0].extensions.code',
-        'NOT_FOUND'
+        'NOT_FOUND',
       );
     });
 
@@ -821,7 +821,7 @@ describe('public queries: Collection', () => {
 
       expect(result.body).to.have.nested.property(
         'errors[0].extensions.code',
-        'BAD_USER_INPUT'
+        'BAD_USER_INPUT',
       );
     });
   });
@@ -856,7 +856,7 @@ describe('public queries: Collection', () => {
       expect(collection.curationCategory.name).to.equal(curationCategory.name);
       expect(collection.stories[0].authors).not.to.be.empty;
       expect(collection.IABParentCategory.name).to.equal(
-        IABParentCategory.name
+        IABParentCategory.name,
       );
       expect(collection.IABChildCategory.name).to.equal(IABChildCategory.name);
 
@@ -965,7 +965,7 @@ describe('public queries: Collection', () => {
       // the default sort returned from prisma should match our expected
       // manual sort
       expect(collection.stories[0].authors).to.equal(
-        sortCollectionStoryAuthors(collection.stories[0].authors)
+        sortCollectionStoryAuthors(collection.stories[0].authors),
       );
     });
 
@@ -990,7 +990,7 @@ describe('public queries: Collection', () => {
       // the default sort returned from prisma should match our expected
       // manual sort
       expect(collection.stories[0].authors).to.equal(
-        sortCollectionStoryAuthors(collection.stories[0].authors)
+        sortCollectionStoryAuthors(collection.stories[0].authors),
       );
     });
 
@@ -1007,7 +1007,7 @@ describe('public queries: Collection', () => {
       expect(result.body.data?.getCollectionBySlug).not.to.exist;
       expect(result.body.errors.length).to.equal(1);
       expect(result.body.errors[0].message).to.equal(
-        `Error - Not Found: this-is-just-good-timing`
+        `Error - Not Found: this-is-just-good-timing`,
       );
       expect(result.body.errors[0].extensions.code).to.equal('NOT_FOUND');
     });
@@ -1037,7 +1037,7 @@ describe('public queries: Collection', () => {
       expect(result.body.data._entities.length).to.equal(1);
       expect(result.body.data._entities[0].givenUrl).to.equal(givenUrl);
       expect(result.body.data._entities[0].collection.slug).to.equal(
-        collectionItem.slug
+        collectionItem.slug,
       );
     });
 

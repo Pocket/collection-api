@@ -13,14 +13,14 @@ export const typeDefsPublic = gql(
   fs
     .readFileSync(path.join(__dirname, '..', 'schema-public.graphql'))
     .toString()
-    .concat(sharedSchema)
+    .concat(sharedSchema),
 );
 
 export const typeDefsAdmin = gql(
   fs
     .readFileSync(path.join(__dirname, '..', 'schema-admin.graphql'))
     .toString()
-    .concat(sharedSchema)
+    .concat(sharedSchema),
 );
 
 /**

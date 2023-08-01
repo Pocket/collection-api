@@ -6,7 +6,7 @@ import { ACCESS_DENIED_ERROR } from '../../../shared/constants';
 export async function getIABCategories(
   parent,
   _,
-  { db, authenticatedUser }
+  { db, authenticatedUser },
 ): Promise<IABParentCategory[]> {
   if (!authenticatedUser.canRead) {
     throw new ForbiddenError(ACCESS_DENIED_ERROR);

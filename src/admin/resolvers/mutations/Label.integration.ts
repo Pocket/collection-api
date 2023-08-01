@@ -70,7 +70,7 @@ describe('mutations: Label', () => {
         });
       expect(result.body.errors.length).to.equal(1);
       expect(result.body.errors[0].message).to.equal(
-        `A label with the name "simon-le-bon" already exists`
+        `A label with the name "simon-le-bon" already exists`,
       );
     });
 
@@ -98,10 +98,10 @@ describe('mutations: Label', () => {
           variables: { data: input },
         });
       expect(resultUpdate.body.data.updateLabel.name).to.equal(
-        'fake-label-1-update'
+        'fake-label-1-update',
       );
       expect(resultUpdate.body.data.updateLabel.externalId).to.equal(
-        resultCreate.body.data.createLabel.externalId
+        resultCreate.body.data.createLabel.externalId,
       );
     });
 
@@ -131,7 +131,7 @@ describe('mutations: Label', () => {
       expect(resultUpdate.body.data).not.to.exist;
       expect(resultUpdate.body.errors.length).to.equal(1);
       expect(resultUpdate.body.errors[0].message).to.equal(
-        `A label with the name "simon-le-bon" already exists`
+        `A label with the name "simon-le-bon" already exists`,
       );
     });
 
@@ -160,10 +160,10 @@ describe('mutations: Label', () => {
         });
 
       expect(
-        resultCollection.body.data.createCollection.labels[0].externalId
+        resultCollection.body.data.createCollection.labels[0].externalId,
       ).to.equal(label1.externalId);
       expect(
-        resultCollection.body.data.createCollection.labels[0].name
+        resultCollection.body.data.createCollection.labels[0].name,
       ).to.equal(label1.name);
 
       // try to update the label
@@ -182,7 +182,7 @@ describe('mutations: Label', () => {
       expect(resultUpdate.body.data).not.to.exist;
       expect(resultUpdate.body.errors.length).to.equal(1);
       expect(resultUpdate.body.errors[0].message).to.equal(
-        `Cannot update label; it is associated with at least one collection`
+        `Cannot update label; it is associated with at least one collection`,
       );
     });
   });

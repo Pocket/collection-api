@@ -11,7 +11,7 @@ import { ForbiddenError, NotFoundError } from '@pocket-tools/apollo-utils';
 export async function getCollectionStory(
   parent,
   { externalId },
-  { db, authenticatedUser }
+  { db, authenticatedUser },
 ): Promise<CollectionStory> {
   if (!authenticatedUser.canRead) {
     throw new ForbiddenError(ACCESS_DENIED_ERROR);

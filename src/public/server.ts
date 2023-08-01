@@ -17,7 +17,7 @@ import { IPublicContext } from './context';
 
 // export const server = new ApolloServer({
 export function getPublicServer(
-  httpServer: Server
+  httpServer: Server,
 ): ApolloServer<IPublicContext> {
   const defaultPlugins = [
     sentryPlugin,
@@ -26,7 +26,7 @@ export function getPublicServer(
       //https://www.apollographql.com/docs/apollo-server/performance/caching/#saving-full-responses-to-a-cache
       //The user id is added to the request header by the apollo gateway (client api)
       sessionId: async (
-        requestContext: GraphQLRequestContext<IPublicContext>
+        requestContext: GraphQLRequestContext<IPublicContext>,
       ) =>
         requestContext.request.http.headers.has('userId')
           ? requestContext.request.http.headers.get('userId')
@@ -59,7 +59,7 @@ export function getPublicServer(
 }
 
 export async function startPublicServer(
-  httpServer: Server
+  httpServer: Server,
 ): Promise<ApolloServer<IPublicContext>> {
   const server = getPublicServer(httpServer);
   await server.start();

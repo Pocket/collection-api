@@ -3,12 +3,6 @@ import { faker } from '@faker-js/faker';
 
 import { CollectionLanguage, CollectionComplete } from '../database/types';
 import { sortCollectionsByGivenSlugs } from './collectionLoader';
-import {
-  CollectionAuthor,
-  CollectionLabel,
-  CurationCategory,
-  IABCategory,
-} from '@prisma/client';
 
 const quickCollectionCompleteMaker = (slug: string): CollectionComplete => {
   return {

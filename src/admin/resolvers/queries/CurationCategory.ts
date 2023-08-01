@@ -5,12 +5,14 @@ import { ACCESS_DENIED_ERROR } from '../../../shared/constants';
 
 /**
  * @param parent
+ * @param _
  * @param db
+ * @param authenticatedUser
  */
 export async function getCurationCategories(
   parent,
   _,
-  { db, authenticatedUser }
+  { db, authenticatedUser },
 ): Promise<CurationCategory[]> {
   if (!authenticatedUser.canRead) {
     throw new ForbiddenError(ACCESS_DENIED_ERROR);

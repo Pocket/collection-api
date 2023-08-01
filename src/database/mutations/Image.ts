@@ -7,7 +7,7 @@ import { CreateImageInput } from '../types';
  */
 export async function createImage(
   db: PrismaClient,
-  data: CreateImageInput
+  data: CreateImageInput,
 ): Promise<Image> {
   return db.image.create({ data });
 }
@@ -18,11 +18,11 @@ export async function createImage(
  * @param entityType
  */
 export async function associateImageWithEntity<
-  T extends { id: number; imageUrl: string }
+  T extends { id: number; imageUrl: string },
 >(
   db: PrismaClient,
   entity: T,
-  entityType: ImageEntityType
+  entityType: ImageEntityType,
 ): Promise<Image | void> {
   if (!entity.imageUrl) return;
 

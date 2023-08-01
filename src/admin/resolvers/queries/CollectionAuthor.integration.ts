@@ -161,7 +161,7 @@ describe('queries: CollectionAuthor', () => {
       // Expect to see the app defaults for 'page' and 'perPage' variables
       expect(data.pagination.currentPage).to.equal(1);
       expect(data.pagination.perPage).to.equal(
-        config.app.pagination.authorsPerPage
+        config.app.pagination.authorsPerPage,
       );
     });
   });
@@ -210,7 +210,7 @@ describe('queries: CollectionAuthor', () => {
 
       expect(result.body.errors.length).to.equal(1);
       expect(result.body.errors[0].message).to.equal(
-        `Error - Not Found: invalid-id`
+        `Error - Not Found: invalid-id`,
       );
       expect(result.body.errors[0].extensions.code).to.equal('NOT_FOUND');
       expect(result.body.data.getCollectionAuthor).not.to.exist;

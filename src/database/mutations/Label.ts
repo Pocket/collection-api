@@ -11,7 +11,7 @@ import { UpdateLabelInput } from '../types';
 export async function createLabel(
   db: PrismaClient,
   name: string,
-  authenticatedUser: AdminAPIUser
+  authenticatedUser: AdminAPIUser,
 ): Promise<Label> {
   // check if label with updated name already exists
   const labelNameCount = await db.label.count({
@@ -36,7 +36,7 @@ export async function createLabel(
 export async function updateLabel(
   db: PrismaClient,
   data: UpdateLabelInput,
-  authenticatedUser: AdminAPIUser
+  authenticatedUser: AdminAPIUser,
 ): Promise<Label> {
   // get count for collection-label association for label to update
   const collectionLabelAssociationCount = await db.collection.count({
@@ -50,7 +50,7 @@ export async function updateLabel(
   // if there is at least one collection-label association, don't allow update
   if (collectionLabelAssociationCount > 0) {
     throw new UserInputError(
-      `Cannot update label; it is associated with at least one collection`
+      `Cannot update label; it is associated with at least one collection`,
     );
   }
   // check if label with updated name already exists
@@ -61,7 +61,7 @@ export async function updateLabel(
   });
   if (labelNameCount > 0) {
     throw new UserInputError(
-      `A label with the name "${data.name}" already exists`
+      `A label with the name "${data.name}" already exists`,
     );
   }
 

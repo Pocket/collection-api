@@ -16,12 +16,11 @@ import { IAdminContext } from './context';
 
 /**
  * Sets up and configures an ApolloServer for the application.
- * @param contextFactory function for creating the context with
- * every request
  * @returns ApolloServer
+ * @param httpServer
  */
 export function getAdminServer(
-  httpServer: Server
+  httpServer: Server,
 ): ApolloServer<IAdminContext> {
   const defaultPlugins = [
     sentryPlugin,
@@ -57,7 +56,7 @@ export function getAdminServer(
  * before applying middleware.
  */
 export async function startAdminServer(
-  httpServer: Server
+  httpServer: Server,
 ): Promise<ApolloServer<IAdminContext>> {
   const server = getAdminServer(httpServer);
   await server.start();

@@ -129,7 +129,7 @@ describe('mutations: CollectionAuthor', () => {
 
       // And there is the correct error from the resolvers
       expect(result.body.errors[0].message).toMatch(
-        `An author with the slug "${variables.slug}" already exists`
+        `An author with the slug "${variables.slug}" already exists`,
       );
     });
 
@@ -146,7 +146,7 @@ describe('mutations: CollectionAuthor', () => {
       // And the server responds with an error about the first variable in the input
       // that is missing
       expect(result.body.errors[0].message).toMatch(
-        'Variable "$name" of required type "String!" was not provided.'
+        'Variable "$name" of required type "String!" was not provided.',
       );
     });
 
@@ -287,7 +287,7 @@ describe('mutations: CollectionAuthor', () => {
 
       // And there is the correct error from the resolvers
       expect(result.body.errors[0].message).toMatch(
-        `An author with the slug "${input.slug}" already exists`
+        `An author with the slug "${input.slug}" already exists`,
       );
     });
 
