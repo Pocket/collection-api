@@ -36,6 +36,7 @@ import {
   IABCategory as dbIABCategory,
   CollectionLabel,
 } from '@prisma/client';
+import { serverLogger } from '../express';
 
 import { getLabelById } from '../shared/resolvers/types';
 
@@ -274,8 +275,8 @@ export async function sendEventBridgeEvent(
     // Don't halt program, but capture the failure in Sentry and Cloudwatch
     Sentry.addBreadcrumb(failedEventError);
     Sentry.captureException(error);
-    console.log(failedEventError);
-    console.log(error);
+    serverLogger.error(failedEventError);
+    serverLogger.error(error);
   }
 }
 
@@ -310,6 +311,6 @@ export async function sendEvent(eventPayload: any) {
 
     // Don't halt program, but capture the failure in Sentry and Cloudwatch
     Sentry.captureException(failedEventError);
-    console.log(failedEventError);
+    serverLogger.error(failedEventError);
   }
 }

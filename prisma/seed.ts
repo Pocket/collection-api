@@ -17,7 +17,9 @@ import {
   createIABCategoryHelper,
   createPartnerHelper,
 } from '../src/test/helpers';
+import { setLogger } from '@pocket-tools/ts-logger';
 
+const prismaSeedLogger = setLogger();
 const prisma = new PrismaClient();
 
 async function main() {
@@ -216,7 +218,7 @@ async function main() {
 
 main()
   .catch((e) => {
-    console.error(e);
+    prismaSeedLogger.error({ error: e, message: 'primsa seed main() error' });
     process.exit(1);
   })
   .finally(async () => {

@@ -23,6 +23,7 @@ import {
 } from './types';
 import { CollectionComplete } from '../database/types';
 import { PrismaClient } from '@prisma/client';
+import { serverLogger } from '../express';
 
 describe('event helpers: ', () => {
   const dbClient: PrismaClient = client();
@@ -36,7 +37,7 @@ describe('event helpers: ', () => {
 
   const sentryStub = sandbox.stub(Sentry, 'captureException').resolves();
   const crumbStub = sandbox.stub(Sentry, 'addBreadcrumb').resolves();
-  const consoleSpy = sandbox.spy(console, 'log');
+  const serverLoggerStub = sandbox.stub(serverLogger, 'error');
 
   let getCollectionLabelsForSnowplowStub: sinon.SinonStub;
 
@@ -212,7 +213,7 @@ describe('event helpers: ', () => {
         return;
       }, 100);
       expect(sentryStub.callCount).to.equal(0);
-      expect(consoleSpy.callCount).to.equal(0);
+      expect(serverLoggerStub.callCount).to.equal(0);
 
       // Event was sent to Event Bus
       expect(clientStub.callCount).to.equal(1);
@@ -260,8 +261,8 @@ describe('event helpers: ', () => {
       expect(sentryStub.getCall(0).firstArg.message).to.contain(
         `Failed to send event 'collection-created' to event bus`
       );
-      expect(consoleSpy.callCount).to.equal(1);
-      expect(consoleSpy.getCall(0).firstArg.message).to.contain(
+      expect(serverLoggerStub.callCount).to.equal(1);
+      expect(serverLoggerStub.getCall(0).firstArg.message).to.contain(
         `Failed to send event 'collection-created' to event bus`
       );
 
@@ -271,7 +272,7 @@ describe('event helpers: ', () => {
 
       // resetting mocks and spies
       sentryStub.reset();
-      consoleSpy.resetHistory();
+      serverLoggerStub.resetHistory();
 
       payload = await events.generateEventBridgePayload(
         dbClient,
@@ -290,8 +291,8 @@ describe('event helpers: ', () => {
       expect(sentryStub.getCall(0).firstArg.message).to.contain(
         `Failed to send event 'collection-updated' to event bus`
       );
-      expect(consoleSpy.callCount).to.equal(1);
-      expect(consoleSpy.getCall(0).firstArg.message).to.contain(
+      expect(serverLoggerStub.callCount).to.equal(1);
+      expect(serverLoggerStub.getCall(0).firstArg.message).to.contain(
         `Failed to send event 'collection-updated' to event bus`
       );
     });
@@ -321,8 +322,8 @@ describe('event helpers: ', () => {
       expect(crumbStub.getCall(0).firstArg.message).to.contain(
         `Failed to send event 'collection-created' to event bus`
       );
-      expect(consoleSpy.callCount).to.equal(2);
-      expect(consoleSpy.getCall(0).firstArg.message).to.contain(
+      expect(serverLoggerStub.callCount).to.equal(2);
+      expect(serverLoggerStub.getCall(0).firstArg.message).to.contain(
         `Failed to send event 'collection-created' to event bus`
       );
     });
