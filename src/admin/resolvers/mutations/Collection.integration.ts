@@ -78,13 +78,13 @@ describe('mutations: Collection', () => {
     author = await createAuthorHelper(db, 'walter');
     curationCategory = await createCurationCategoryHelper(
       db,
-      'Personal Finance'
+      'Personal Finance',
     );
     IABParentCategory = await createIABCategoryHelper(db, 'Entertainment');
     IABChildCategory = await createIABCategoryHelper(
       db,
       'Bowling',
-      IABParentCategory
+      IABParentCategory,
     );
 
     label1 = await createLabelHelper(db, 'most-read');
@@ -97,8 +97,8 @@ describe('mutations: Collection', () => {
       labelList.push(
         await createLabelHelper(
           db,
-          faker.word.adjective() + '-' + faker.word.adjective()
-        )
+          faker.word.adjective() + '-' + faker.word.adjective(),
+        ),
       );
       labelListIds.push(labelList[i].externalId);
     }
@@ -126,7 +126,7 @@ describe('mutations: Collection', () => {
 
       expect(result.body.data.createCollection).to.exist;
       expect(result.body.data.createCollection.status).to.equal(
-        CollectionStatus.DRAFT
+        CollectionStatus.DRAFT,
       );
     });
 
@@ -177,7 +177,7 @@ describe('mutations: Collection', () => {
       expect(result.body.data).not.to.exist;
       expect(result.body.errors.length).to.equal(1);
       expect(result.body.errors[0].message).to.equal(
-        'A collection with the slug "walter-bowls" already exists'
+        'A collection with the slug "walter-bowls" already exists',
       );
     });
 
@@ -197,7 +197,7 @@ describe('mutations: Collection', () => {
 
       expect(result.body.data.createCollection.authors).to.exist;
       expect(
-        result.body.data.createCollection.curationCategory.externalId
+        result.body.data.createCollection.curationCategory.externalId,
       ).to.equal(curationCategory.externalId);
       expect(result.body.data.createCollection.stories).to.exist;
       // there will never be stories on a freshly created collection
@@ -219,7 +219,7 @@ describe('mutations: Collection', () => {
         });
 
       expect(
-        result.body.data.createCollection.IABParentCategory.externalId
+        result.body.data.createCollection.IABParentCategory.externalId,
       ).to.equal(IABParentCategory.externalId);
     });
 
@@ -239,11 +239,11 @@ describe('mutations: Collection', () => {
         });
 
       expect(
-        result.body.data.createCollection.IABParentCategory.externalId
+        result.body.data.createCollection.IABParentCategory.externalId,
       ).to.equal(IABParentCategory.externalId);
 
       expect(
-        result.body.data.createCollection.IABChildCategory.externalId
+        result.body.data.createCollection.IABChildCategory.externalId,
       ).to.equal(IABChildCategory.externalId);
     });
 
@@ -262,10 +262,10 @@ describe('mutations: Collection', () => {
         });
 
       expect(result.body.data.createCollection.labels[0].externalId).to.equal(
-        label1.externalId
+        label1.externalId,
       );
       expect(result.body.data.createCollection.labels[0].name).to.equal(
-        label1.name
+        label1.name,
       );
     });
 
@@ -303,7 +303,7 @@ describe('mutations: Collection', () => {
         });
 
       expect(result.body.data.createCollection.labels).to.have.length(
-        config.app.collectionLabelLimit
+        config.app.collectionLabelLimit,
       );
     });
 
@@ -324,7 +324,7 @@ describe('mutations: Collection', () => {
       expect(result.body.data).not.to.exist;
       expect(result.body.errors.length).to.equal(1);
       expect(result.body.errors[0].message).to.equal(
-        `Too many labels provided: ${config.app.collectionLabelLimit} allowed, ${labelListIds.length} provided.`
+        `Too many labels provided: ${config.app.collectionLabelLimit} allowed, ${labelListIds.length} provided.`,
       );
     });
 
@@ -446,13 +446,13 @@ describe('mutations: Collection', () => {
 
       // should return the updated info
       expect(result.body.data.updateCollection.title).to.equal(
-        'second iteration'
+        'second iteration',
       );
       expect(result.body.data.updateCollection.language).to.equal('DE');
 
       // should return the updated author
       expect(result.body.data.updateCollection.authors[0].name).to.equal(
-        newAuthor.name
+        newAuthor.name,
       );
     });
 
@@ -483,14 +483,14 @@ describe('mutations: Collection', () => {
 
       // should have updated the updatedAt field
       expect(updated.updatedAt.getTime()).to.be.greaterThan(
-        initial.updatedAt.getTime()
+        initial.updatedAt.getTime(),
       );
     });
 
     it('should update a collection with a curation category', async () => {
       const newCurationCategory = await createCurationCategoryHelper(
         db,
-        'Travel'
+        'Travel',
       );
 
       const newAuthor = await createAuthorHelper(db, 'Leo Tolstoy');
@@ -519,7 +519,7 @@ describe('mutations: Collection', () => {
       // make sure a curation category was connected
       // should return the updated curation category
       expect(result.body.data.updateCollection.curationCategory.name).to.equal(
-        newCurationCategory.name
+        newCurationCategory.name,
       );
     });
 
@@ -571,7 +571,7 @@ describe('mutations: Collection', () => {
         });
 
       expect(result.body.data.updateCollection.IABParentCategory.name).to.equal(
-        IABParentCategory.name
+        IABParentCategory.name,
       );
     });
 
@@ -599,10 +599,10 @@ describe('mutations: Collection', () => {
         });
 
       expect(result.body.data.updateCollection.IABParentCategory.name).to.equal(
-        IABParentCategory.name
+        IABParentCategory.name,
       );
       expect(result.body.data.updateCollection.IABChildCategory.name).to.equal(
-        IABChildCategory.name
+        IABChildCategory.name,
       );
     });
 
@@ -664,7 +664,7 @@ describe('mutations: Collection', () => {
       expect(result.body.data).not.to.exist;
       expect(result.body.errors.length).to.equal(1);
       expect(result.body.errors[0].message).to.equal(
-        `Too many labels provided: ${config.app.collectionLabelLimit} allowed, ${labelListIds.length} provided.`
+        `Too many labels provided: ${config.app.collectionLabelLimit} allowed, ${labelListIds.length} provided.`,
       );
     });
 
@@ -697,7 +697,7 @@ describe('mutations: Collection', () => {
 
       // expect to see max allowed labels
       expect(result.body.data.updateCollection.labels).to.have.length(
-        config.app.collectionLabelLimit
+        config.app.collectionLabelLimit,
       );
     });
 
@@ -824,16 +824,16 @@ describe('mutations: Collection', () => {
 
       // make sure it's the two new labels we provided in the update variables
       expect(result.body.data.updateCollection.labels[0].name).to.equal(
-        label3.name
+        label3.name,
       );
       expect(result.body.data.updateCollection.labels[0].externalId).to.equal(
-        label3.externalId
+        label3.externalId,
       );
       expect(result.body.data.updateCollection.labels[1].name).to.equal(
-        label4.name
+        label4.name,
       );
       expect(result.body.data.updateCollection.labels[1].externalId).to.equal(
-        label4.externalId
+        label4.externalId,
       );
     });
 
@@ -864,10 +864,10 @@ describe('mutations: Collection', () => {
         });
 
       expect(
-        result.body.data.updateCollection.authors.length
+        result.body.data.updateCollection.authors.length,
       ).to.be.greaterThan(0);
       expect(
-        result.body.data.updateCollection.stories.length
+        result.body.data.updateCollection.stories.length,
       ).to.be.greaterThan(0);
 
       for (
@@ -877,7 +877,7 @@ describe('mutations: Collection', () => {
       ) {
         expect(result.body.data.updateCollection.stories[i].authors).to.exist;
         expect(
-          result.body.data.updateCollection.stories[i].authors.length
+          result.body.data.updateCollection.stories[i].authors.length,
         ).to.be.greaterThan(0);
       }
       expect(result.body.data.updateCollection.curationCategory).to.exist;
@@ -910,8 +910,8 @@ describe('mutations: Collection', () => {
 
       expect(result.body.data.updateCollection.stories[0].authors).to.equal(
         sortCollectionStoryAuthors(
-          result.body.data.updateCollection.stories[0].authors
-        )
+          result.body.data.updateCollection.stories[0].authors,
+        ),
       );
     });
 
@@ -987,7 +987,7 @@ describe('mutations: Collection', () => {
 
       // make sure the publishedAt value hasn't changed
       expect(published.publishedAt).to.deep.equal(
-        updatedResult.body.data.updateCollection.publishedAt
+        updatedResult.body.data.updateCollection.publishedAt,
       );
     });
 
@@ -1022,7 +1022,7 @@ describe('mutations: Collection', () => {
       expect(result.body.data).not.to.exist;
       expect(result.body.errors).to.exist;
       expect(result.body.errors[0].message).to.equal(
-        'A collection with the slug "first-iteration" already exists'
+        'A collection with the slug "first-iteration" already exists',
       );
     });
 
@@ -1129,24 +1129,24 @@ describe('mutations: Collection', () => {
 
       // we should have a new image url
       expect(result.body.data.updateCollectionImageUrl.imageUrl).to.equal(
-        randomKitten
+        randomKitten,
       );
 
       // other data should be as it was previously
       expect(result.body.data.updateCollectionImageUrl.title).to.equal(
-        initial.title
+        initial.title,
       );
       expect(result.body.data.updateCollectionImageUrl.slug).to.equal(
-        initial.slug
+        initial.slug,
       );
       expect(result.body.data.updateCollectionImageUrl.excerpt).to.equal(
-        initial.excerpt
+        initial.excerpt,
       );
       expect(result.body.data.updateCollectionImageUrl.intro).to.equal(
-        initial.intro
+        initial.intro,
       );
       expect(result.body.data.updateCollectionImageUrl.status).to.equal(
-        initial.status
+        initial.status,
       );
     });
   });

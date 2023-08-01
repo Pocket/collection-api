@@ -36,13 +36,13 @@ async function main() {
   const katerinaLabel = await createLabelHelper(
     prisma,
     'region-west-africa',
-    'kchinnappan'
+    'kchinnappan',
   );
 
   const herrajLabel = await createLabelHelper(
     prisma,
     'region-east-europe',
-    'hluhano'
+    'hluhano',
   );
 
   // create Label with default values
@@ -53,7 +53,7 @@ async function main() {
 
   const curationCategory1 = await createCurationCategoryHelper(
     prisma,
-    'Lorem Ipsum'
+    'Lorem Ipsum',
   );
 
   // create Collection - Label association
@@ -98,18 +98,18 @@ async function main() {
 
   const curationCategory2 = await createCurationCategoryHelper(
     prisma,
-    'Bowling'
+    'Bowling',
   );
 
   const IABParentCategory = await createIABCategoryHelper(
     prisma,
-    'Entertainment'
+    'Entertainment',
   );
 
   const IABChildCategory = await createIABCategoryHelper(
     prisma,
     'Live Music',
-    IABParentCategory
+    IABParentCategory,
   );
 
   const collection1 = await createCollectionHelper(prisma, {

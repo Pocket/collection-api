@@ -60,7 +60,7 @@ describe('admin queries: Collection', () => {
     IABChildCategory = await createIABCategoryHelper(
       db,
       'Bowling',
-      IABParentCategory
+      IABParentCategory,
     );
   });
 
@@ -97,7 +97,7 @@ describe('admin queries: Collection', () => {
       expect(collection.curationCategory.name).to.equal(curationCategory.name);
       expect(collection.curationCategory.slug).to.equal(curationCategory.slug);
       expect(collection.IABParentCategory.name).to.equal(
-        IABParentCategory.name
+        IABParentCategory.name,
       );
       expect(collection.IABChildCategory.name).to.equal(IABChildCategory.name);
 
@@ -153,7 +153,7 @@ describe('admin queries: Collection', () => {
       // the default sort returned from prisma should match our expected
       // manual sort
       expect(collection.stories[0].authors).to.equal(
-        sortCollectionStoryAuthors(collection.stories[0].authors)
+        sortCollectionStoryAuthors(collection.stories[0].authors),
       );
     });
 
@@ -180,7 +180,7 @@ describe('admin queries: Collection', () => {
       const collection = result.body.data.getCollection;
 
       expect(collection.partnership.externalId).to.equal(
-        association.externalId
+        association.externalId,
       );
       expect(collection.partnership.type).to.equal(association.type);
     });
@@ -195,7 +195,7 @@ describe('admin queries: Collection', () => {
       const testLabel: Label = await createLabelHelper(
         db,
         'test-label',
-        'test-user'
+        'test-user',
       );
 
       const testCollectionLabelInputData: CreateCollectionLabelInput = {
@@ -246,7 +246,7 @@ describe('admin queries: Collection', () => {
 
       expect(result.body.errors.length).to.equal(1);
       expect(result.body.errors[0].message).to.equal(
-        `Error - Not Found: ${created.externalId}type-o`
+        `Error - Not Found: ${created.externalId}type-o`,
       );
       expect(result.body.errors[0].extensions.code).to.equal('NOT_FOUND');
       expect(result.body.data.getCollection).not.to.exist;
@@ -296,12 +296,12 @@ describe('admin queries: Collection', () => {
       fakeLabel2 = await createLabelHelper(
         db,
         'region-south-africa',
-        'fakeUser'
+        'fakeUser',
       );
       fakeLabel3 = await createLabelHelper(
         db,
         'region-west-africa',
-        'fakeUser'
+        'fakeUser',
       );
       const collectionLabelInputData: CreateCollectionLabelInput = {
         collectionId: fakeCollection.id,
@@ -345,10 +345,10 @@ describe('admin queries: Collection', () => {
       expect(collections[0].title).to.equal('the dude abides man');
       expect(collections[0].labels.length).to.equal(2);
       expect(collections[0].labels[0].externalId).to.equal(
-        fakeLabel.externalId
+        fakeLabel.externalId,
       );
       expect(collections[0].labels[1].externalId).to.equal(
-        fakeLabel2.externalId
+        fakeLabel2.externalId,
       );
     });
 
@@ -371,7 +371,7 @@ describe('admin queries: Collection', () => {
       expect(collections[0].title).to.equal('finishing my coffee');
       expect(collections[0].labels.length).to.equal(1);
       expect(collections[0].labels[0].externalId).to.equal(
-        fakeLabel3.externalId
+        fakeLabel3.externalId,
       );
     });
 
@@ -394,10 +394,10 @@ describe('admin queries: Collection', () => {
       expect(collections[0].title).to.equal('the dude abides man');
       expect(collections[0].labels.length).to.equal(2);
       expect(collections[0].labels[0].externalId).to.equal(
-        fakeLabel.externalId
+        fakeLabel.externalId,
       );
       expect(collections[0].labels[1].externalId).to.equal(
-        fakeLabel2.externalId
+        fakeLabel2.externalId,
       );
     });
 
@@ -603,7 +603,7 @@ describe('admin queries: Collection', () => {
       // the default sort returned from prisma should match our expected
       // manual sort
       expect(collections[0].stories[0].authors).to.equal(
-        sortCollectionStoryAuthors(collections[0].stories[0].authors)
+        sortCollectionStoryAuthors(collections[0].stories[0].authors),
       );
     });
   });

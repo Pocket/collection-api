@@ -18,7 +18,7 @@ import {
  */
 export async function getCollection(
   db: PrismaClient,
-  externalId: string
+  externalId: string,
 ): Promise<CollectionComplete> {
   return await db.collection.findUnique({
     where: { externalId },
@@ -50,7 +50,7 @@ export async function getCollection(
  */
 export async function getCollectionBySlug(
   db: PrismaClient,
-  slug: string
+  slug: string,
 ): Promise<CollectionComplete> {
   // slug is unique, but the generated type for `findUnique` here doesn't
   // include `status`, so using `findFirst` instead
@@ -87,7 +87,7 @@ export async function getCollectionBySlug(
  */
 export async function getCollectionsBySlugs(
   db: PrismaClient,
-  slugs: string[]
+  slugs: string[],
 ): Promise<CollectionComplete[]> {
   return await db.collection.findMany({
     where: { slug: { in: slugs }, status: CollectionStatus.PUBLISHED },
@@ -120,7 +120,7 @@ export async function getPublishedCollections(
   db: PrismaClient,
   page: number,
   perPage: number,
-  filters: CollectionsFilters = null
+  filters: CollectionsFilters = null,
 ): Promise<CollectionComplete[]> {
   return db.collection.findMany({
     where: buildGetPublishedCollectionsWhere(filters),
@@ -152,7 +152,7 @@ export async function getPublishedCollections(
  */
 export async function countPublishedCollections(
   db: PrismaClient,
-  filters: CollectionsFilters = null
+  filters: CollectionsFilters = null,
 ): Promise<number> {
   return db.collection.count({
     where: buildGetPublishedCollectionsWhere(filters),
@@ -169,7 +169,7 @@ export async function searchCollections(
   db: PrismaClient,
   filters: SearchCollectionsFilters,
   page: number = undefined,
-  perPage: number = undefined
+  perPage: number = undefined,
 ): Promise<CollectionComplete[]> {
   let queryParams: any = {
     where: buildSearchCollectionsWhereClause(filters),

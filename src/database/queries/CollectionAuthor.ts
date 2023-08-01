@@ -6,7 +6,7 @@ import { CollectionAuthor, PrismaClient } from '@prisma/client';
  */
 export async function getAuthor(
   db: PrismaClient,
-  externalId: string
+  externalId: string,
 ): Promise<CollectionAuthor> {
   return db.collectionAuthor.findUnique({ where: { externalId } });
 }
@@ -19,7 +19,7 @@ export async function getAuthor(
 export async function getAuthors(
   db: PrismaClient,
   page: number,
-  perPage: number
+  perPage: number,
 ): Promise<CollectionAuthor[]> {
   return db.collectionAuthor.findMany({
     take: perPage,

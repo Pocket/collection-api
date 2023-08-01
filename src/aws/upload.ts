@@ -16,7 +16,7 @@ export type ImageUploadResponse = {
  */
 export async function uploadImage(
   s3: S3,
-  image: Upload
+  image: Upload,
 ): Promise<ImageUploadResponse> {
   const { mimetype, createReadStream } = image;
   const stream = createReadStream();

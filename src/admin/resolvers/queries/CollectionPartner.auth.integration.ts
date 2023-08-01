@@ -48,7 +48,7 @@ describe('auth: CollectionPartner', () => {
       const headers = {
         name: 'Test User',
         username: 'test.user@test.com',
-        // missing any collection/readoly group
+        // missing any collection/readonly group
         groups: `group1,group2,${READONLY}`,
       };
 
@@ -67,7 +67,7 @@ describe('auth: CollectionPartner', () => {
       const headers = {
         name: 'Test User',
         username: 'test.user@test.com',
-        // missing any collection/readoly group
+        // missing any collection/readonly group
         groups: `group1,group2`,
       };
 
@@ -104,7 +104,7 @@ describe('auth: CollectionPartner', () => {
       const data: CreateCollectionPartnerInput = {
         name,
         url: faker.internet.url(),
-        imageUrl: faker.image.imageUrl(),
+        imageUrl: faker.image.url(),
         blurb: faker.lorem.paragraphs(2),
       };
       partner = await db.collectionPartner.create({ data });
@@ -114,7 +114,7 @@ describe('auth: CollectionPartner', () => {
       const headers = {
         name: 'Test User',
         username: 'test.user@test.com',
-        // missing any collection/readoly group
+        // missing any collection/readonly group
         groups: `group1,group2,${READONLY}`,
       };
 
@@ -137,7 +137,7 @@ describe('auth: CollectionPartner', () => {
       const headers = {
         name: 'Test User',
         username: 'test.user@test.com',
-        // missing any collection/readoly group
+        // missing any collection/readonly group
         groups: `group1,group2`,
       };
 

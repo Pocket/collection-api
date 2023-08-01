@@ -27,7 +27,7 @@ describe('queries: Collection', () => {
     IABChildCategory = await createIABCategoryHelper(
       db,
       'Bowling',
-      IABParentCategory
+      IABParentCategory,
     );
     label = await createLabelHelper(db, 'test-label', 'test-user');
   });
@@ -76,10 +76,10 @@ describe('queries: Collection', () => {
       expect(collections[1].stories).to.exist;
       expect(collections[0].stories[1].authors.length).to.be.greaterThan(0);
       expect(collections[1].IABParentCategory.name).to.equal(
-        IABParentCategory.name
+        IABParentCategory.name,
       );
       expect(collections[1].IABChildCategory.name).to.equal(
-        IABChildCategory.name
+        IABChildCategory.name,
       );
 
       // Not much to go on given we're testing a database resolver here
@@ -142,7 +142,7 @@ describe('queries: Collection', () => {
       // the default sort returned from prisma should match our expected
       // manual sort
       expect(collections[0].stories[0].authors).to.equal(
-        sortCollectionStoryAuthors(collections[0].stories[0].authors)
+        sortCollectionStoryAuthors(collections[0].stories[0].authors),
       );
     });
   });

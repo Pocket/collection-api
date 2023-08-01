@@ -3,12 +3,11 @@ import { CollectionStoryWithAuthors } from '../types';
 
 /**
  * @param db
- * @param collectionId
- * @param url
+ * @param externalId
  */
 export async function getCollectionStory(
   db: PrismaClient,
-  externalId: string
+  externalId: string,
 ): Promise<CollectionStoryWithAuthors> {
   return await db.collectionStory.findUnique({
     where: { externalId },

@@ -10,7 +10,7 @@ import { UserInputError } from '@pocket-tools/apollo-utils';
 export function getPagination(
   totalResults: number,
   page: number,
-  perPage: number
+  perPage: number,
 ): Pagination {
   return {
     currentPage: page,
@@ -28,7 +28,7 @@ export function getPagination(
 export function collectionFilterValidation(filters: any, properties: string) {
   if (!Object.keys(filters).length) {
     throw new UserInputError(
-      `At least one filter ` + properties + ` is required`
+      `At least one filter ` + properties + ` is required`,
     );
   }
 }

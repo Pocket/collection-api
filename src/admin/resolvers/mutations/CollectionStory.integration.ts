@@ -128,7 +128,7 @@ describe('mutations: CollectionStory', () => {
 
       // default 'fromPartner' value of 'false' should be present
       expect(result.body.data.createCollectionStory.fromPartner).to.equal(
-        false
+        false,
       );
     });
 
@@ -203,7 +203,7 @@ describe('mutations: CollectionStory', () => {
 
       expect(result.body.errors.length).to.equal(1);
       expect(result.body.errors[0].message).to.equal(
-        `A story with the url "${input.url}" already exists in this collection`
+        `A story with the url "${input.url}" already exists in this collection`,
       );
     });
 
@@ -239,7 +239,7 @@ describe('mutations: CollectionStory', () => {
 
       // the urls should be the same
       expect(dataStory2.createCollectionStory.url).to.equal(
-        dataStory1.createCollectionStory.url
+        dataStory1.createCollectionStory.url,
       );
     });
   });
@@ -430,7 +430,7 @@ describe('mutations: CollectionStory', () => {
 
       expect(result.body.errors.length).to.equal(1);
       expect(result.body.errors[0].message).to.equal(
-        `A story with the url "${input.url}" already exists in this collection`
+        `A story with the url "${input.url}" already exists in this collection`,
       );
     });
 
@@ -507,10 +507,10 @@ describe('mutations: CollectionStory', () => {
 
       // The two optional fields should stay as they are
       expect(result.body.data.updateCollectionStory.sortOrder).to.equal(
-        story.sortOrder
+        story.sortOrder,
       );
       expect(result.body.data.updateCollectionStory.fromPartner).to.equal(
-        story.fromPartner
+        story.fromPartner,
       );
     });
   });
@@ -552,7 +552,7 @@ describe('mutations: CollectionStory', () => {
         });
 
       expect(
-        result.body.data.updateCollectionStorySortOrder.sortOrder
+        result.body.data.updateCollectionStorySortOrder.sortOrder,
       ).to.equal(story.sortOrder + 1);
     });
 
@@ -620,7 +620,7 @@ describe('mutations: CollectionStory', () => {
         });
 
       expect(result.body.data.updateCollectionStoryImageUrl.imageUrl).to.equal(
-        randomKitten
+        randomKitten,
       );
     });
 
@@ -639,22 +639,22 @@ describe('mutations: CollectionStory', () => {
         });
 
       expect(result.body.data.updateCollectionStoryImageUrl.title).to.equal(
-        story.title
+        story.title,
       );
       expect(result.body.data.updateCollectionStoryImageUrl.url).to.equal(
-        story.url
+        story.url,
       );
       expect(result.body.data.updateCollectionStoryImageUrl.excerpt).to.equal(
-        story.excerpt
+        story.excerpt,
       );
       expect(result.body.data.updateCollectionStoryImageUrl.sortOrder).to.equal(
-        story.sortOrder
+        story.sortOrder,
       );
       expect(
-        result.body.data.updateCollectionStoryImageUrl.authors.length
+        result.body.data.updateCollectionStoryImageUrl.authors.length,
       ).to.equal(story.authors.length);
       expect(result.body.data.updateCollectionStoryImageUrl.publisher).to.equal(
-        story.publisher
+        story.publisher,
       );
     });
   });
@@ -694,12 +694,12 @@ describe('mutations: CollectionStory', () => {
 
       // should have direct model data
       expect(result.body.data.deleteCollectionStory.title).to.equal(
-        story.title
+        story.title,
       );
 
       // should have related author data
       expect(
-        result.body.data.deleteCollectionStory.authors.length
+        result.body.data.deleteCollectionStory.authors.length,
       ).to.be.greaterThan(0);
 
       // make sure the story is really gone
@@ -721,10 +721,10 @@ describe('mutations: CollectionStory', () => {
 
       // (authors are returned sorted by sortOrder asc)
       expect(result.body.data.deleteCollectionStory.authors[0].name).to.equal(
-        'donny'
+        'donny',
       );
       expect(result.body.data.deleteCollectionStory.authors[1].name).to.equal(
-        'walter'
+        'walter',
       );
     });
 
@@ -761,7 +761,7 @@ describe('mutations: CollectionStory', () => {
 
       expect(result.body.errors.length).to.equal(1);
       expect(result.body.errors[0].message).to.equal(
-        `Cannot delete a collection story with external ID "${story.externalId}typo"`
+        `Cannot delete a collection story with external ID "${story.externalId}typo"`,
       );
     });
   });

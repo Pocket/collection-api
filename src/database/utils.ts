@@ -14,7 +14,7 @@ import config from '../config';
  * @returns Prisma.CollectionWhereInput
  */
 export function buildGetPublishedCollectionsWhere(
-  filters: CollectionsFilters = null
+  filters: CollectionsFilters = null,
 ): Prisma.CollectionWhereInput {
   // our only current use case is for public/PUBLISHED collections, so we don't
   // need status to be a filter/param
@@ -50,7 +50,7 @@ export function buildGetPublishedCollectionsWhere(
  * @returns Prisma.CollectionWhereInput
  */
 export function buildSearchCollectionsWhereClause(
-  filters: SearchCollectionsFilters = null
+  filters: SearchCollectionsFilters = null,
 ): Prisma.CollectionWhereInput {
   const where: Prisma.CollectionWhereInput = {};
   if (filters.labelExternalIds) {
@@ -74,7 +74,7 @@ export function buildSearchCollectionsWhereClause(
 export function checkCollectionLabelLimit(labelExternalIds: string[]) {
   if (labelExternalIds.length > config.app.collectionLabelLimit) {
     throw new UserInputError(
-      `Too many labels provided: ${config.app.collectionLabelLimit} allowed, ${labelExternalIds.length} provided.`
+      `Too many labels provided: ${config.app.collectionLabelLimit} allowed, ${labelExternalIds.length} provided.`,
     );
   }
 }

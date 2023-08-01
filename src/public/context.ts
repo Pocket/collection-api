@@ -18,7 +18,7 @@ export class PublicContextManager implements IPublicContext {
     private config: {
       db: PrismaClient;
       collectionLoader: IPublicContext['dataLoaders']['collectionLoader'];
-    }
+    },
   ) {}
 
   get db(): IPublicContext['db'] {
@@ -34,7 +34,6 @@ export class PublicContextManager implements IPublicContext {
 
 /**
  * Context factory function. Creates a new context upon every request.
- * @param req server request
  *
  * @returns PublicContextManager
  */

@@ -18,7 +18,7 @@ import { ACCESS_DENIED_ERROR } from '../../../shared/constants';
 export async function getCollection(
   parent,
   { externalId },
-  { db, authenticatedUser }
+  { db, authenticatedUser },
 ): Promise<CollectionComplete> {
   if (!authenticatedUser.canRead) {
     throw new ForbiddenError(ACCESS_DENIED_ERROR);
@@ -44,14 +44,14 @@ export async function getCollection(
 export async function searchCollections(
   parent,
   { filters, page = 1, perPage = config.app.pagination.collectionsPerPage },
-  { db, authenticatedUser }
+  { db, authenticatedUser },
 ): Promise<CollectionsResult> {
   if (!authenticatedUser.canRead) {
     throw new ForbiddenError(ACCESS_DENIED_ERROR);
   }
   collectionFilterValidation(
     filters,
-    'author, title, status, labelExternalIds'
+    'author, title, status, labelExternalIds',
   );
 
   const totalResults = (await dbSearchCollections(db, filters)).length;

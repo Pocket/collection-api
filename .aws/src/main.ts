@@ -58,7 +58,7 @@ class CollectionAPI extends TerraformStack {
     if (config.environment === 'Prod') {
       monitoring.createSyntheticCheck(
         'https://getpocket.com/collections/pocket-best-of-2022-collections',
-        colApiPagerduty.snsCriticalAlarmTopic.arn
+        colApiPagerduty.snsCriticalAlarmTopic.arn,
       );
     }
   }
@@ -153,7 +153,7 @@ class CollectionAPI extends TerraformStack {
         workspaces: {
           name: 'incident-management',
         },
-      }
+      },
     );
 
     return new PocketPagerDuty(this, 'pagerduty', {

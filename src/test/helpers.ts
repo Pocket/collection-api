@@ -29,7 +29,7 @@ const slugifyConfig = config.slugify;
 
 export async function createAuthorHelper(
   prisma: PrismaClient,
-  name: string
+  name: string,
 ): Promise<CollectionAuthor> {
   const slug = slugify(name, slugifyConfig);
   const imageUrl = faker.image.avatar();
@@ -43,7 +43,7 @@ export async function createAuthorHelper(
 export async function createLabelHelper(
   prisma: PrismaClient,
   name?: string,
-  createdBy?: string
+  createdBy?: string,
 ): Promise<Label> {
   name = name || faker.lorem.slug();
   createdBy = createdBy || faker.internet.userName();
@@ -55,7 +55,7 @@ export async function createLabelHelper(
 // information required to create a Collection - Label association
 export async function createCollectionLabelHelper(
   prisma: PrismaClient,
-  data: CreateCollectionLabelInput
+  data: CreateCollectionLabelInput,
 ): Promise<CollectionLabel> {
   return await prisma.collectionLabel.create({ data });
 }
@@ -108,13 +108,13 @@ export interface createCollectionPartnerAssociationHelperInput {
 
 export async function createCollectionHelper(
   prisma: PrismaClient,
-  params: createCollectionHelperInput
+  params: createCollectionHelperInput,
 ): Promise<Collection> {
   // start with defaults and override with any user-provided values
   const mergedParams: createCollectionHelperInput = Object.assign(
     {}, // start with an empty object
     createCollectionHelperDefaults, // add in all defaults
-    params // add all specified params, which can/may override defaults
+    params, // add all specified params, which can/may override defaults
   );
 
   const {
@@ -149,8 +149,7 @@ export async function createCollectionHelper(
     data.publishedAt = publishedAt;
   }
 
-  data.imageUrl =
-    imageUrl || faker.image.imageUrl(640, 480, 'arch', true, true);
+  data.imageUrl = imageUrl || faker.image.url({ width: 640, height: 480 });
 
   if (curationCategory) {
     data.curationCategory = { connect: { id: curationCategory.id } };
@@ -180,19 +179,18 @@ export async function createCollectionHelper(
         url: faker.internet.url(),
         title: faker.lorem.sentence(),
         excerpt: faker.lorem.paragraph(),
-        imageUrl:
-          imageUrl || faker.image.imageUrl(640, 480, 'nature', true, true),
+        imageUrl: imageUrl || faker.image.url({ width: 640, height: 480 }),
         authors: [
           {
-            name: `${faker.name.firstName()} ${faker.name.lastName()}`,
-            sortOrder: faker.datatype.number(),
+            name: faker.person.fullName(),
+            sortOrder: faker.number.int({ min: 1, max: 100 }),
           },
           {
-            name: `${faker.name.firstName()} ${faker.name.lastName()}`,
-            sortOrder: faker.datatype.number(),
+            name: faker.person.fullName(),
+            sortOrder: faker.number.int({ min: 1, max: 100 }),
           },
         ],
-        publisher: faker.company.companyName(),
+        publisher: faker.company.name(),
         fromPartner: faker.datatype.boolean(),
       });
     }
@@ -205,7 +203,7 @@ export async function createCollectionStoryHelper(
   prisma: PrismaClient,
   collectionStory: {
     collectionId: number;
-  } & Omit<CreateCollectionStoryInput, 'collectionExternalId'>
+  } & Omit<CreateCollectionStoryInput, 'collectionExternalId'>,
 ): Promise<CollectionStory> {
   const data: any = collectionStory;
   data.authors = {
@@ -219,7 +217,7 @@ export async function createCollectionStoryHelper(
 
 export async function createCurationCategoryHelper(
   prisma: PrismaClient,
-  name: string
+  name: string,
 ): Promise<CurationCategory> {
   const slug = slugify(name, slugifyConfig);
 
@@ -231,7 +229,7 @@ export async function createCurationCategoryHelper(
 export async function createIABCategoryHelper(
   prisma: PrismaClient,
   name: string,
-  parent?: IABCategory
+  parent?: IABCategory,
 ): Promise<IABCategory> {
   const slug = slugify(name, slugifyConfig);
 
@@ -246,12 +244,12 @@ export async function createIABCategoryHelper(
 
 export async function createPartnerHelper(
   prisma: PrismaClient,
-  name?: string
+  name?: string,
 ): Promise<CollectionPartner> {
   const data: Prisma.CollectionPartnerCreateInput = {
-    name: name ? name : faker.company.companyName(),
+    name: name ? name : faker.company.name(),
     url: faker.internet.url(),
-    imageUrl: faker.image.imageUrl(640, 480, 'tech', true, true),
+    imageUrl: faker.image.url({ width: 640, height: 480 }),
     blurb: faker.lorem.paragraphs(2),
   };
 
@@ -260,11 +258,11 @@ export async function createPartnerHelper(
 
 export async function createCollectionPartnerAssociationHelper(
   prisma: PrismaClient,
-  params: createCollectionPartnerAssociationHelperInput
+  params: createCollectionPartnerAssociationHelperInput,
 ): Promise<CollectionPartnerAssociation> {
   let partner: CollectionPartner;
   if (!params.partner) {
-    partner = await createPartnerHelper(prisma, faker.company.companyName());
+    partner = await createPartnerHelper(prisma, faker.company.name());
   } else {
     partner = params.partner;
   }
@@ -272,10 +270,7 @@ export async function createCollectionPartnerAssociationHelper(
   let collection: Collection;
   if (!params.collection) {
     // create a collection author
-    const author = await createAuthorHelper(
-      prisma,
-      `${faker.name.firstName()} ${faker.name.lastName()}`
-    );
+    const author = await createAuthorHelper(prisma, faker.person.fullName());
 
     // use this author to create a collection
     collection = await createCollectionHelper(prisma, {
@@ -332,7 +327,7 @@ export async function clear(prisma: PrismaClient): Promise<void> {
 }
 
 export function sortCollectionStoryAuthors(
-  authors: CollectionStoryAuthor[]
+  authors: CollectionStoryAuthor[],
 ): CollectionStoryAuthor[] {
   // manually sort the authors of the first story by their `sortOrder`
   // property

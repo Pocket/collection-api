@@ -65,16 +65,16 @@ describe('mutations: CollectionPartner', () => {
         });
 
       expect(result.body.data.createCollectionPartner.name).to.equal(
-        'Podcast Kings'
+        'Podcast Kings',
       );
       expect(result.body.data.createCollectionPartner.url).to.equal(
-        'https://test.com'
+        'https://test.com',
       );
       expect(result.body.data.createCollectionPartner.blurb).to.equal(
-        'What else is there to talk on a podcast about? Only kittens'
+        'What else is there to talk on a podcast about? Only kittens',
       );
       expect(result.body.data.createCollectionPartner.imageUrl).to.equal(
-        'https://i.imgur.com/b0O3wZo.jpg'
+        'https://i.imgur.com/b0O3wZo.jpg',
       );
     });
   });
@@ -100,14 +100,14 @@ describe('mutations: CollectionPartner', () => {
         });
 
       expect(result.body.data.updateCollectionPartner.name).to.equal(
-        input.name
+        input.name,
       );
       expect(result.body.data.updateCollectionPartner.url).to.equal(input.url);
       expect(result.body.data.updateCollectionPartner.blurb).to.equal(
-        input.blurb
+        input.blurb,
       );
       expect(result.body.data.updateCollectionPartner.imageUrl).to.equal(
-        input.imageUrl
+        input.imageUrl,
       );
     });
   });
@@ -131,7 +131,7 @@ describe('mutations: CollectionPartner', () => {
         });
 
       expect(
-        result.body.data.updateCollectionPartnerImageUrl.imageUrl
+        result.body.data.updateCollectionPartnerImageUrl.imageUrl,
       ).to.equal(input.imageUrl);
     });
 
@@ -153,13 +153,13 @@ describe('mutations: CollectionPartner', () => {
         });
 
       expect(result.body.data.updateCollectionPartnerImageUrl.name).to.equal(
-        partner.name
+        partner.name,
       );
       expect(result.body.data.updateCollectionPartnerImageUrl.url).to.equal(
-        partner.url
+        partner.url,
       );
       expect(result.body.data.updateCollectionPartnerImageUrl.blurb).to.equal(
-        partner.blurb
+        partner.blurb,
       );
     });
   });

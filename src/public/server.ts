@@ -5,7 +5,6 @@ import { typeDefsPublic } from '../typeDefs';
 import { resolvers as publicResolvers } from './resolvers';
 import { errorHandler, sentryPlugin } from '@pocket-tools/apollo-utils';
 import responseCachePlugin from '@apollo/server-plugin-response-cache';
-import { ApolloServerPluginLandingPageGraphQLPlayground } from '@apollo/server-plugin-landing-page-graphql-playground';
 import {
   ApolloServerPluginLandingPageDisabled,
   ApolloServerPluginInlineTraceDisabled,
@@ -13,11 +12,12 @@ import {
 } from '@apollo/server/plugin/disabled';
 import { ApolloServerPluginInlineTrace } from '@apollo/server/plugin/inlineTrace';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { IPublicContext } from './context';
 
 // export const server = new ApolloServer({
 export function getPublicServer(
-  httpServer: Server
+  httpServer: Server,
 ): ApolloServer<IPublicContext> {
   const defaultPlugins = [
     sentryPlugin,
@@ -26,7 +26,7 @@ export function getPublicServer(
       //https://www.apollographql.com/docs/apollo-server/performance/caching/#saving-full-responses-to-a-cache
       //The user id is added to the request header by the apollo gateway (client api)
       sessionId: async (
-        requestContext: GraphQLRequestContext<IPublicContext>
+        requestContext: GraphQLRequestContext<IPublicContext>,
       ) =>
         requestContext.request.http.headers.has('userId')
           ? requestContext.request.http.headers.get('userId')
@@ -39,7 +39,7 @@ export function getPublicServer(
     ApolloServerPluginInlineTrace(),
   ];
   const nonProdPlugins = [
-    ApolloServerPluginLandingPageGraphQLPlayground(),
+    ApolloServerPluginLandingPageLocalDefault(),
     ApolloServerPluginInlineTraceDisabled(),
     // Usage reporting is enabled by default if you have APOLLO_KEY in your environment
     ApolloServerPluginUsageReportingDisabled(),
@@ -59,7 +59,7 @@ export function getPublicServer(
 }
 
 export async function startPublicServer(
-  httpServer: Server
+  httpServer: Server,
 ): Promise<ApolloServer<IPublicContext>> {
   const server = getPublicServer(httpServer);
   await server.start();

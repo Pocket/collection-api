@@ -43,7 +43,7 @@ import { getLabelById } from '../shared/resolvers/types';
 /** Transformation functions below to map collection object's sub types to the ones in snowplow schema  */
 
 function transformCollectionAuthors(
-  collectionAuthors: dbCollectionAuthor[]
+  collectionAuthors: dbCollectionAuthor[],
 ): CollectionAuthor[] {
   return collectionAuthors.map((author) => {
     const { externalId, name, active, slug, bio, imageUrl } = author;
@@ -59,7 +59,7 @@ function transformCollectionAuthors(
 }
 
 function transformStoryAuthor(
-  collectionStoryAuthors: dbCollectionStoryAuthor[]
+  collectionStoryAuthors: dbCollectionStoryAuthor[],
 ): CollectionStoryAuthor[] {
   return collectionStoryAuthors.map((storyAuthor) => {
     return {
@@ -70,7 +70,7 @@ function transformStoryAuthor(
 }
 
 function transformCollectionStories(
-  collectionStories: dbCollectionStoryWithAuthors[]
+  collectionStories: dbCollectionStoryWithAuthors[],
 ): CollectionStory[] {
   return collectionStories.map((collectionStory) => {
     const {
@@ -109,7 +109,7 @@ function transformCollectionLabels(collectionLabels: dbLabel[]): Label[] {
 }
 
 function transformCollectionCurationCategory(
-  curationCategory: dbCurationCategory
+  curationCategory: dbCurationCategory,
 ): CurationCategory {
   const { externalId, name, slug } = curationCategory;
   return {
@@ -120,7 +120,7 @@ function transformCollectionCurationCategory(
 }
 
 function transformCollectionPartnership(
-  collectionPartnership: dbCollectionPartnership
+  collectionPartnership: dbCollectionPartnership,
 ): CollectionPartnership {
   const { externalId, imageUrl, type, blurb, name, url } =
     collectionPartnership;
@@ -135,7 +135,7 @@ function transformCollectionPartnership(
 }
 
 function transformCollectionIABParentCategory(
-  iabCategory: dbIABCategory
+  iabCategory: dbIABCategory,
 ): IABParentCategory {
   const { externalId, name, slug } = iabCategory;
   return {
@@ -146,7 +146,7 @@ function transformCollectionIABParentCategory(
 }
 
 function transformCollectionIABChildCategory(
-  iabCategory: dbIABCategory
+  iabCategory: dbIABCategory,
 ): IABChildCategory {
   const { externalId, name, slug } = iabCategory;
   return {
@@ -161,7 +161,7 @@ function transformCollectionIABChildCategory(
  */
 export const getCollectionLabelsForSnowplow = async (
   dbClient: PrismaClient,
-  collectionLabels: CollectionLabel[]
+  collectionLabels: CollectionLabel[],
 ): Promise<dbLabel[]> => {
   const labels: dbLabel[] = [];
   // collectionLabel variable here represents the collection-label connection entity
@@ -184,7 +184,7 @@ function getDateInSeconds(date: Date): number {
  */
 export function transformDbCollectionToSnowplowCollection(
   collection: CollectionComplete,
-  collectionLabels: dbLabel[]
+  collectionLabels: dbLabel[],
 ): Collection {
   const hasAuthors = collection.authors && collection.authors.length !== 0;
   const hasStories = collection.stories && collection.stories.length !== 0;
@@ -228,7 +228,7 @@ export function transformDbCollectionToSnowplowCollection(
 export async function generateEventBridgePayload(
   dbClient: PrismaClient,
   eventType: EventBridgeEventType,
-  collection: CollectionComplete
+  collection: CollectionComplete,
 ): Promise<CollectionEventBusPayload> {
   // check if collection has any labels and fetch them
   const hasLabels = collection.labels && collection.labels.length !== 0;
@@ -239,7 +239,7 @@ export async function generateEventBridgePayload(
   return {
     collection: transformDbCollectionToSnowplowCollection(
       collection,
-      collectionLabels // pass in collection labels to the main transform function
+      collectionLabels, // pass in collection labels to the main transform function
     ),
     eventType: eventType,
     object_version: 'new',
@@ -253,12 +253,12 @@ export async function generateEventBridgePayload(
 export async function sendEventBridgeEvent(
   dbClient: PrismaClient,
   eventType: EventBridgeEventType,
-  collection: CollectionComplete
+  collection: CollectionComplete,
 ) {
   const payload = await generateEventBridgePayload(
     dbClient,
     eventType,
-    collection
+    collection,
   );
 
   // Send to Event Bridge. Yay!
@@ -270,7 +270,7 @@ export async function sendEventBridgeEvent(
     const failedEventError = new Error(
       `sendEventBridgeEvent: Failed to send event '${
         payload.eventType
-      }' to event bus. Event Body:\n ${JSON.stringify(payload)}`
+      }' to event bus. Event Body:\n ${JSON.stringify(payload)}`,
     );
     // Don't halt program, but capture the failure in Sentry and Cloudwatch
     Sentry.addBreadcrumb(failedEventError);
@@ -305,14 +305,14 @@ export async function sendEvent(eventPayload: any) {
   });
 
   const output: PutEventsCommandOutput = await eventBridgeClient.send(
-    putEventCommand
+    putEventCommand,
   );
 
   if (output.FailedEntryCount) {
     const failedEventError = new Error(
       `sendEvent: Failed to send event '${
         eventPayload.eventType
-      }' to event bus. Event Body:\n ${JSON.stringify(eventPayload)}`
+      }' to event bus. Event Body:\n ${JSON.stringify(eventPayload)}`,
     );
 
     // Don't halt program, but capture the failure in Sentry and Cloudwatch
