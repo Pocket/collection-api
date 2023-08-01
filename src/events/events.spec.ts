@@ -259,11 +259,17 @@ describe('event helpers: ', () => {
 
       expect(sentryStub.callCount).to.equal(1);
       expect(sentryStub.getCall(0).firstArg.message).to.contain(
-        `Failed to send event 'collection-created' to event bus`
+        `sendEvent: Failed to send event 'collection-created' to event bus`
       );
       expect(serverLoggerStub.callCount).to.equal(1);
-      expect(serverLoggerStub.getCall(0).firstArg.message).to.contain(
-        `Failed to send event 'collection-created' to event bus`
+      expect(serverLoggerStub.getCall(0).firstArg).to.contain(
+        `sendEvent: Failed to send event to event bus`
+      );
+      expect(serverLoggerStub.getCall(0).lastArg.eventType).to.equal(
+        EventBridgeEventType.COLLECTION_CREATED
+      );
+      expect(serverLoggerStub.getCall(0).lastArg.payload).to.equal(
+        JSON.stringify(payload)
       );
 
       /**
@@ -292,8 +298,14 @@ describe('event helpers: ', () => {
         `Failed to send event 'collection-updated' to event bus`
       );
       expect(serverLoggerStub.callCount).to.equal(1);
-      expect(serverLoggerStub.getCall(0).firstArg.message).to.contain(
-        `Failed to send event 'collection-updated' to event bus`
+      expect(serverLoggerStub.getCall(0).firstArg).to.contain(
+        `sendEvent: Failed to send event to event bus`
+      );
+      expect(serverLoggerStub.getCall(0).lastArg.eventType).to.equal(
+        EventBridgeEventType.COLLECTION_UPDATED
+      );
+      expect(serverLoggerStub.getCall(0).lastArg.payload).to.equal(
+        JSON.stringify(payload)
       );
     });
   });
@@ -320,11 +332,14 @@ describe('event helpers: ', () => {
       expect(sentryStub.getCall(0).firstArg.message).to.contain('boo!');
       expect(crumbStub.callCount).to.equal(1);
       expect(crumbStub.getCall(0).firstArg.message).to.contain(
-        `Failed to send event 'collection-created' to event bus`
+        `sendEventBridgeEvent: Failed to send event 'collection-created' to event bus`
       );
-      expect(serverLoggerStub.callCount).to.equal(2);
-      expect(serverLoggerStub.getCall(0).firstArg.message).to.contain(
-        `Failed to send event 'collection-created' to event bus`
+      expect(serverLoggerStub.callCount).to.equal(1);
+      expect(serverLoggerStub.getCall(0).firstArg).to.contain(
+        `sendEventBridgeEvent: Failed to send event to event bus`
+      );
+      expect(serverLoggerStub.getCall(0).lastArg.eventType).to.equal(
+        EventBridgeEventType.COLLECTION_CREATED
       );
     });
   });

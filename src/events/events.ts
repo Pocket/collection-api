@@ -268,15 +268,21 @@ export async function sendEventBridgeEvent(
     // In the unlikely event that the payload generator throws an error,
     // log to Sentry and Cloudwatch but don't halt program
     const failedEventError = new Error(
-      `Failed to send event '${
+      `sendEventBridgeEvent: Failed to send event '${
         payload.eventType
       }' to event bus. Event Body:\n ${JSON.stringify(payload)}`
     );
     // Don't halt program, but capture the failure in Sentry and Cloudwatch
     Sentry.addBreadcrumb(failedEventError);
     Sentry.captureException(error);
-    serverLogger.error(failedEventError);
-    serverLogger.error(error);
+    serverLogger.error(
+      'sendEventBridgeEvent: Failed to send event to event bus',
+      {
+        eventType: payload.eventType,
+        payload: JSON.stringify(payload),
+        error,
+      }
+    );
   }
 }
 
@@ -304,13 +310,16 @@ export async function sendEvent(eventPayload: any) {
 
   if (output.FailedEntryCount) {
     const failedEventError = new Error(
-      `Failed to send event '${
+      `sendEvent: Failed to send event '${
         eventPayload.eventType
       }' to event bus. Event Body:\n ${JSON.stringify(eventPayload)}`
     );
 
     // Don't halt program, but capture the failure in Sentry and Cloudwatch
     Sentry.captureException(failedEventError);
-    serverLogger.error(failedEventError);
+    serverLogger.error('sendEvent: Failed to send event to event bus', {
+      eventType: eventPayload.eventType,
+      payload: JSON.stringify(eventPayload),
+    });
   }
 }
