@@ -281,7 +281,7 @@ export async function sendEventBridgeEvent(
         eventType: payload.eventType,
         payload: JSON.stringify(payload),
         error,
-      }
+      },
     );
   }
 }

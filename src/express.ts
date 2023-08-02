@@ -41,7 +41,7 @@ export async function startServer(port: number): Promise<{
   app.use(
     // JSON parser to enable POST body with JSON
     express.json(),
-    setMorgan(serverLogger)
+    setMorgan(serverLogger),
   );
 
   // Upload middleware
