@@ -43,7 +43,7 @@ services:
     env_file:
       - .docker/local.env
     environment:
-      - NODE_ENV=local
+      - NODE_ENV=development
     command: "bash -c 'cd /app && npm i && npm run start:dev'"
     depends_on:
       - mysql

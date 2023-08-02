@@ -6,6 +6,7 @@ if (!awsEnvironments.includes(process.env.NODE_ENV)) {
 
 export default {
   app: {
+    port: 4004,
     environment: process.env.NODE_ENV || 'development',
     pagination: {
       collectionsPerPage: 30,

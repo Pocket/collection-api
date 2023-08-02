@@ -36,6 +36,7 @@ import {
   IABCategory as dbIABCategory,
   CollectionLabel,
 } from '@prisma/client';
+import { serverLogger } from '../express';
 
 import { getLabelById } from '../shared/resolvers/types';
 
@@ -267,15 +268,21 @@ export async function sendEventBridgeEvent(
     // In the unlikely event that the payload generator throws an error,
     // log to Sentry and Cloudwatch but don't halt program
     const failedEventError = new Error(
-      `Failed to send event '${
+      `sendEventBridgeEvent: Failed to send event '${
         payload.eventType
       }' to event bus. Event Body:\n ${JSON.stringify(payload)}`,
     );
     // Don't halt program, but capture the failure in Sentry and Cloudwatch
     Sentry.addBreadcrumb(failedEventError);
     Sentry.captureException(error);
-    console.log(failedEventError);
-    console.log(error);
+    serverLogger.error(
+      'sendEventBridgeEvent: Failed to send event to event bus',
+      {
+        eventType: payload.eventType,
+        payload: JSON.stringify(payload),
+        error,
+      },
+    );
   }
 }
 
@@ -303,13 +310,16 @@ export async function sendEvent(eventPayload: any) {
 
   if (output.FailedEntryCount) {
     const failedEventError = new Error(
-      `Failed to send event '${
+      `sendEvent: Failed to send event '${
         eventPayload.eventType
       }' to event bus. Event Body:\n ${JSON.stringify(eventPayload)}`,
     );
 
     // Don't halt program, but capture the failure in Sentry and Cloudwatch
     Sentry.captureException(failedEventError);
-    console.log(failedEventError);
+    serverLogger.error('sendEvent: Failed to send event to event bus', {
+      eventType: eventPayload.eventType,
+      payload: JSON.stringify(eventPayload),
+    });
   }
 }
