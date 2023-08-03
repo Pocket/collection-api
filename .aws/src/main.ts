@@ -6,26 +6,32 @@ import {
   TerraformStack,
 } from 'cdktf';
 import { config } from './config';
-import { CollectionAPIMonitoring } from './monitoring';
 import {
   ApplicationRDSCluster,
   PocketALBApplication,
+  PocketAwsSyntheticChecks,
   PocketECSCodePipeline,
   PocketPagerDuty,
   PocketVPC,
 } from '@pocket-tools/terraform-modules';
-import { ArchiveProvider } from '@cdktf/provider-archive';
-import { AwsProvider, datasources, kms, sns, s3 } from '@cdktf/provider-aws';
-import { LocalProvider } from '@cdktf/provider-local';
-import { NullProvider } from '@cdktf/provider-null';
-import { PagerdutyProvider } from '@cdktf/provider-pagerduty';
+import { DataAwsCallerIdentity } from '@cdktf/provider-aws/lib/data-aws-caller-identity';
+import { DataAwsRegion } from '@cdktf/provider-aws/lib/data-aws-region';
+import { DataAwsSnsTopic } from '@cdktf/provider-aws/lib/data-aws-sns-topic';
+import { DataAwsKmsAlias } from '@cdktf/provider-aws/lib/data-aws-kms-alias';
+import { ArchiveProvider } from '@cdktf/provider-archive/lib/provider';
+import { AwsProvider } from '@cdktf/provider-aws/lib/provider';
+import { LocalProvider } from '@cdktf/provider-local/lib/provider';
+import { NullProvider } from '@cdktf/provider-null/lib/provider';
+import { PagerdutyProvider } from '@cdktf/provider-pagerduty/lib/provider';
+import { CloudwatchLogGroup } from '@cdktf/provider-aws/lib/cloudwatch-log-group';
+import { S3Bucket } from '@cdktf/provider-aws/lib/s3-bucket';
 import fs from 'fs';
 
 class CollectionAPI extends TerraformStack {
   constructor(scope: Construct, name: string) {
     super(scope, name);
 
-    new ArchiveProvider(this, 'archive');
+    new ArchiveProvider(this, 'archive-provider');
     new AwsProvider(this, 'aws', { region: 'us-east-1' });
     new LocalProvider(this, 'local_provider');
     new NullProvider(this, 'null_provider');
@@ -36,9 +42,9 @@ class CollectionAPI extends TerraformStack {
       workspaces: [{ prefix: `${config.name}-` }],
     });
 
-    const caller = new datasources.DataAwsCallerIdentity(this, 'caller');
+    const caller = new DataAwsCallerIdentity(this, 'caller');
     const pocketVpc = new PocketVPC(this, 'pocket-vpc');
-    const region = new datasources.DataAwsRegion(this, 'region');
+    const region = new DataAwsRegion(this, 'region');
 
     const colApiPagerduty = this.createPagerDuty();
 
@@ -54,13 +60,32 @@ class CollectionAPI extends TerraformStack {
 
     this.createApplicationCodePipeline(pocketApp);
 
-    const monitoring = new CollectionAPIMonitoring(this, 'monitoring');
-    if (config.environment === 'Prod') {
-      monitoring.createSyntheticCheck(
-        'https://getpocket.com/collections/pocket-best-of-2022-collections',
-        colApiPagerduty.snsCriticalAlarmTopic.arn,
-      );
-    }
+    new PocketAwsSyntheticChecks(this, 'synthetics', {
+      alarmTopicArn:
+        config.environment === 'Prod'
+          ? colApiPagerduty.snsNonCriticalAlarmTopic.arn
+          : '',
+      environment: config.environment,
+      prefix: config.prefix,
+      query: [
+        {
+          endpoint: config.domain,
+          data: '{"query": "query { collectionBySlug(slug: \\"12-gripping-true-crime-reads\\") {slug} }"}',
+          jmespath: 'data.collectionBySlug.slug',
+          response: '12-gripping-true-crime-reads',
+        },
+      ],
+      securityGroupIds: pocketVpc.defaultSecurityGroups.ids,
+      shortName: config.shortName,
+      subnetIds: pocketVpc.privateSubnetIds,
+      tags: config.tags,
+      uptime: [
+        {
+          response: 'ok',
+          url: `${config.domain}/.well-known/apollo/server-health`,
+        },
+      ],
+    });
   }
 
   /**
@@ -68,7 +93,7 @@ class CollectionAPI extends TerraformStack {
    * @private
    */
   private getCodeDeploySnsTopic() {
-    return new sns.DataAwsSnsTopic(this, 'backend_notifications', {
+    return new DataAwsSnsTopic(this, 'backend_notifications', {
       name: `Backend-${config.environment}-ChatBot`,
     });
   }
@@ -78,7 +103,7 @@ class CollectionAPI extends TerraformStack {
    * @private
    */
   private getSecretsManagerKmsAlias() {
-    return new kms.DataAwsKmsAlias(this, 'kms_alias', {
+    return new DataAwsKmsAlias(this, 'kms_alias', {
       name: 'alias/aws/secretsmanager',
     });
   }
@@ -88,8 +113,9 @@ class CollectionAPI extends TerraformStack {
    * @private
    */
   private createS3Bucket() {
-    return new s3.S3Bucket(this, 'image-uploads', {
+    return new S3Bucket(this, 'image-uploads', {
       bucket: `pocket-${config.prefix.toLowerCase()}-images`,
+      tags: config.tags,
     });
   }
 
@@ -171,12 +197,12 @@ class CollectionAPI extends TerraformStack {
 
   private createPocketAlbApplication(dependencies: {
     rds: ApplicationRDSCluster;
-    s3: s3.S3Bucket;
+    s3: S3Bucket;
     pagerDuty: PocketPagerDuty;
-    region: datasources.DataAwsRegion;
-    caller: datasources.DataAwsCallerIdentity;
-    secretsManagerKmsAlias: kms.DataAwsKmsAlias;
-    snsTopic: sns.DataAwsSnsTopic;
+    region: DataAwsRegion;
+    caller: DataAwsCallerIdentity;
+    secretsManagerKmsAlias: DataAwsKmsAlias;
+    snsTopic: DataAwsSnsTopic;
   }): PocketALBApplication {
     const {
       rds,
@@ -228,6 +254,8 @@ class CollectionAPI extends TerraformStack {
               value: config.eventBusName,
             },
           ],
+          logGroup: this.createCustomLogGroup('app'),
+          logMultilinePattern: '^\\S.+',
           secretEnvVars: [
             {
               name: 'SENTRY_DSN',
@@ -238,19 +266,6 @@ class CollectionAPI extends TerraformStack {
               valueFrom: `${rds.secretARN}:database_url::`,
             },
           ],
-        },
-        {
-          name: 'xray-daemon',
-          containerImage: 'amazon/aws-xray-daemon',
-          repositoryCredentialsParam: `arn:aws:secretsmanager:${region.name}:${caller.accountId}:secret:Shared/DockerHub`,
-          portMappings: [
-            {
-              hostPort: 2000,
-              containerPort: 2000,
-              protocol: 'udp',
-            },
-          ],
-          command: ['--region', 'us-east-1', '--local-mode'],
         },
       ],
       codeDeploy: {
@@ -298,17 +313,6 @@ class CollectionAPI extends TerraformStack {
         ],
         taskRolePolicyStatements: [
           {
-            actions: [
-              'xray:PutTraceSegments',
-              'xray:PutTelemetryRecords',
-              'xray:GetSamplingRules',
-              'xray:GetSamplingTargets',
-              'xray:GetSamplingStatisticSummaries',
-            ],
-            resources: ['*'],
-            effect: 'Allow',
-          },
-          {
             actions: ['s3:*'],
             resources: [`arn:aws:s3:::${s3.id}`, `arn:aws:s3:::${s3.id}/*`],
             effect: 'Allow',
@@ -339,6 +343,26 @@ class CollectionAPI extends TerraformStack {
         },
       },
     });
+  }
+
+  /**
+   * Create Custom log group for ECS to share across task revisions
+   * @param containerName
+   * @private
+   */
+  private createCustomLogGroup(containerName: string) {
+    const logGroup = new CloudwatchLogGroup(
+      this,
+      `${containerName}-log-group`,
+      {
+        name: `/Backend/${config.prefix}/ecs/${containerName}`,
+        retentionInDays: 90,
+        skipDestroy: true,
+        tags: config.tags,
+      },
+    );
+
+    return logGroup.name;
   }
 }
 
