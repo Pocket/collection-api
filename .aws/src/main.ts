@@ -70,9 +70,9 @@ class CollectionAPI extends TerraformStack {
       query: [
         {
           endpoint: config.domain,
-          data: '{"query": "query { getCollectionBySlug(slug: \\\\"pocket-best-of-2022-collections\\\\") {slug} }"}',
-          jmespath: 'errors[0].message',
-          response: 'Error - Not Found: A list by that URL could not be found',
+          data: '{"query": "query { collectionBySlug(slug: \\"12-gripping-true-crime-reads\\") {slug} }"}',
+          jmespath: 'data.collectionBySlug.slug',
+          response: '12-gripping-true-crime-reads',
         },
       ],
       securityGroupIds: pocketVpc.defaultSecurityGroups.ids,
@@ -115,7 +115,7 @@ class CollectionAPI extends TerraformStack {
   private createS3Bucket() {
     return new S3Bucket(this, 'image-uploads', {
       bucket: `pocket-${config.prefix.toLowerCase()}-images`,
-      tags: config.tags
+      tags: config.tags,
     });
   }
 
