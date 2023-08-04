@@ -30,7 +30,7 @@
     "@prisma/client": "^4.16.2",
     "@sentry/node": "7.60.1",
     "@sentry/tracing": "7.60.1",
-    "aws-sdk": "2.1423.0",
+    "aws-sdk": "2.1428.0",
     "cors": "2.8.5",
     "dataloader": "^2.2.2",
     "express": "4.18.2",
