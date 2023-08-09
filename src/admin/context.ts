@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { S3 } from 'aws-sdk';
+import { S3 } from '@aws-sdk/client-s3';
 import Express from 'express';
 import { client } from '../database/client';
 import s3service from '../aws/s3';
