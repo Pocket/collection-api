@@ -46,7 +46,7 @@ only_dev: &only_dev
 jobs:
   apollo:
     docker:
-      - image: cimg/node:18.16
+      - image: cimg/node:18.17@sha256:14a6f870f08bf5322123835abca18b6319d6bb7439221e81744497cb20606934
     steps:
       - checkout
       - run:
@@ -163,7 +163,7 @@ jobs:
         description: 'Test scripts to run'
         type: string
     docker:
-      - image: cimg/node:18.16
+      - image: cimg/node:18.17@sha256:14a6f870f08bf5322123835abca18b6319d6bb7439221e81744497cb20606934
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
