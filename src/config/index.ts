@@ -4,6 +4,16 @@ if (!awsEnvironments.includes(process.env.NODE_ENV)) {
   localEndpoint = process.env.AWS_S3_ENDPOINT || 'http://localhost:4566';
 }
 
+let s3path;
+const bucket = process.env.AWS_S3_BUCKET || 'curated-corpus-api-local-images';
+
+if (!awsEnvironments.includes(process.env.NODE_ENV ?? '')) {
+  localEndpoint = process.env.AWS_S3_ENDPOINT || 'http://localhost:4566';
+  s3path = `${localEndpoint}/${bucket}/`;
+} else {
+  s3path = `https://${bucket}.s3.amazonaws.com/`;
+}
+
 export default {
   app: {
     port: 4004,
@@ -23,7 +33,8 @@ export default {
   aws: {
     s3: {
       localEndpoint,
-      bucket: process.env.AWS_S3_BUCKET || 'collection-api-local-images',
+      bucket,
+      path: s3path,
     },
     region: process.env.AWS_DEFAULT_REGION || 'us-east-1',
     eventBus: {
