@@ -223,8 +223,8 @@ class CollectionAPI extends TerraformStack {
       cdn: false,
       domain: config.domain,
       taskSize: {
-          cpu: 1024,
-          memory: 8192,
+        cpu: 1024,
+        memory: 8192,
       },
       containerConfigs: [
         {
@@ -338,7 +338,7 @@ class CollectionAPI extends TerraformStack {
         // Even though task count scaled out to 10, the CPU load was still 80%.
         // Allow for faster auto-scaling to handle request spikes from scheduled tasks.
         targetMinCapacity: config.environment === 'Prod' ? 4 : 1,
-        targetMaxCapacity: config.environment === 'Prod' ? 20: 4,
+        targetMaxCapacity: config.environment === 'Prod' ? 20 : 4,
         scaleOutThreshold: 25,
         scaleInThreshold: 15,
         stepScaleOutAdjustment: 4,
