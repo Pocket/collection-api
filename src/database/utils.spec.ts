@@ -5,6 +5,7 @@ import {
 } from './utils';
 import config from '../config';
 import { v4 as uuidv4 } from 'uuid';
+import { getCollectionUrlSlug } from '../utils';
 
 describe('test utils', () => {
   // TODO: figure out how to mock config
@@ -86,6 +87,31 @@ describe('test utils', () => {
       expect(result.labels).toEqual({
         some: { label: { externalId: { in: [id1, id2] } } },
       });
+    });
+  });
+  describe('getCollectionUrlSlug', () => {
+    it('should return the slug for valid collection url ', () => {
+      const enCollection =
+        'https://getpocket.com/collections/multiverse-reader';
+
+      const deCollection =
+        'https://getpocket.com/de/collections/cybersicherheit-kurz-und-bundig';
+
+      expect(getCollectionUrlSlug(enCollection)).toEqual('multiverse-reader');
+      expect(getCollectionUrlSlug(deCollection)).toEqual(
+        'cybersicherheit-kurz-und-bundig'
+      );
+    });
+
+    it('should return null for invalid collection urls ', () => {
+      const invalidCollection = 'https://getpocket.com/multiverse-reader';
+
+      //unsupported collection language
+      const frCollection =
+        'https://getpocket.com/fr/collections/cybersicherheit-kurz-und-bundig';
+
+      expect(getCollectionUrlSlug(invalidCollection)).toBeNull;
+      expect(getCollectionUrlSlug(frCollection)).toBeNull;
     });
   });
 });
