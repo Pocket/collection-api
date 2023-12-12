@@ -1,5 +1,6 @@
 import { CollectionStoryAuthor } from '../database/types';
-import { sortCollectionStoryAuthors, getCollectionUrlSlug } from './helpers';
+import { sortCollectionStoryAuthors } from './helpers';
+import { getCollectionUrlSlug } from '../utils';
 
 describe('test helpers', () => {
   describe('sortCollectionStoryAuthors', () => {

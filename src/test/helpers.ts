@@ -19,8 +19,8 @@ import {
   CollectionStoryAuthor,
   CreateCollectionAuthorInput,
   CreateCollectionLabelInput,
-  CreateLabelInput,
   CreateCollectionStoryInput,
+  CreateLabelInput,
 } from '../database/types';
 import { faker } from '@faker-js/faker';
 import config from '../config';
@@ -337,28 +337,3 @@ export function sortCollectionStoryAuthors(
     return a.sortOrder - b.sortOrder;
   });
 }
-
-/**
- * Determines if a url is a valid collection url and returns its slug.
- * Returns null for invalid collection urls
- * @param url
- * @returns A collection's slug or null
- */
-export const getCollectionUrlSlug = (url: string): string | null => {
-  // get a string of allowed languages in this format "en|de|..."
-  const allowedLanguages = Object.values(CollectionLanguage).join('|');
-
-  const regExpString = `^https?://(?:getpocket.com)(?:/(?:${allowedLanguages}))?/collections/(.*)`;
-
-  // create a regular expression from the string above and make it case-insensitive
-  const validCollectionUrlRegExp = new RegExp(regExpString, 'i');
-
-  const match = validCollectionUrlRegExp.exec(url);
-  if (!match) {
-    console.log(`${url} is not a valid collection`);
-    return null;
-  }
-
-  // return the slug that is captured as the second match group from the regex
-  return match[1];
-};
