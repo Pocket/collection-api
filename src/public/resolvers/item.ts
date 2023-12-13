@@ -1,7 +1,7 @@
 import { Collection } from '@prisma/client';
 import * as Sentry from '@sentry/node';
-import { getCollectionUrlSlug } from '../../test/helpers';
 import { serverLogger } from '../../express';
+import { getCollectionUrlSlug } from '../../utils';
 
 /**
  * @param givenUrl
