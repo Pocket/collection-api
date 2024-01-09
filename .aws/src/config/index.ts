@@ -6,8 +6,12 @@ const domain = isDev
   ? `${domainPrefix}.getpocket.dev`
   : `${domainPrefix}.readitlater.com`;
 const graphqlVariant = isDev ? 'development' : 'current';
+
+// note that when maxCapacity is left undefined, it will default to 16 (which
+// should be ample for us at this time - 2024-01-09)
+// https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/rds_cluster#max_capacity
 const rds = {
-  minCapacity: 1,
+  minCapacity: isDev ? 1 : 4,
   maxCapacity: isDev ? 1 : undefined,
 };
 const githubConnectionArn = isDev
