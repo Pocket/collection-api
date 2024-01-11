@@ -9,6 +9,8 @@ ENV NODE_ENV=production
 ENV PORT 4004
 ENV GIT_SHA=${GIT_SHA}
 
+ENV NODE_OPTIONS=--max-old-space-size=8192
+
 EXPOSE ${PORT}
 
 CMD ["npm", "start"]
