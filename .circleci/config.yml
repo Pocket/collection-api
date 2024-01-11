@@ -46,7 +46,7 @@ only_dev: &only_dev
 jobs:
   apollo:
     docker:
-      - image: cimg/node:18.17.1@sha256:901508b2cbea0201ac8dab2656bd2e38f58d58f6ff9b32746fb4cca85d5e7dd6
+      - image: cimg/node:20.11
     steps:
       - checkout
       - run:
@@ -110,7 +110,7 @@ jobs:
 
   build:
     docker:
-      - image: circleci/node:16.13.1@sha256:1803e9ed7deec9456ad2609124b7333d40b2eec0cf34998ae766cbf90c9a3625
+      - image: cimg/node:20.11
     steps:
       - checkout
       # Define the working directory for this job
@@ -163,7 +163,7 @@ jobs:
         description: 'Test scripts to run'
         type: string
     docker:
-      - image: cimg/node:18.17.1@sha256:901508b2cbea0201ac8dab2656bd2e38f58d58f6ff9b32746fb4cca85d5e7dd6
+      - image: cimg/node:20.11
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
