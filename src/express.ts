@@ -37,7 +37,7 @@ export async function startServer(port: number): Promise<{
 
   app.use(
     // JSON parser to enable POST body with JSON
-    express.json()
+    express.json(),
   );
 
   // Upload middleware
@@ -45,7 +45,7 @@ export async function startServer(port: number): Promise<{
     graphqlUploadExpress({
       maxFileSize: config.app.upload.maxSize,
       maxFiles: config.app.upload.maxFiles,
-    })
+    }),
   );
 
   // expose a health check url that ensures we can access the database
@@ -69,7 +69,7 @@ export async function startServer(port: number): Promise<{
     cors<cors.CorsRequest>(),
     expressMiddleware<IAdminContext>(adminServer, {
       context: getAdminContext,
-    })
+    }),
   );
 
   // set up public server
@@ -81,7 +81,7 @@ export async function startServer(port: number): Promise<{
     cors<cors.CorsRequest>(),
     expressMiddleware<IPublicContext>(publicServer, {
       context: getPublicContext,
-    })
+    }),
   );
 
   await new Promise<void>((resolve) => httpServer.listen({ port }, resolve));
