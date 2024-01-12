@@ -17,9 +17,7 @@ import {
   createIABCategoryHelper,
   createPartnerHelper,
 } from '../src/test/helpers';
-import { setLogger } from '@pocket-tools/ts-logger';
 
-const prismaSeedLogger = setLogger();
 const prisma = new PrismaClient();
 
 async function main() {
@@ -36,13 +34,13 @@ async function main() {
   const katerinaLabel = await createLabelHelper(
     prisma,
     'region-west-africa',
-    'kchinnappan',
+    'kchinnappan'
   );
 
   const herrajLabel = await createLabelHelper(
     prisma,
     'region-east-europe',
-    'hluhano',
+    'hluhano'
   );
 
   // create Label with default values
@@ -53,7 +51,7 @@ async function main() {
 
   const curationCategory1 = await createCurationCategoryHelper(
     prisma,
-    'Lorem Ipsum',
+    'Lorem Ipsum'
   );
 
   // create Collection - Label association
@@ -98,18 +96,18 @@ async function main() {
 
   const curationCategory2 = await createCurationCategoryHelper(
     prisma,
-    'Bowling',
+    'Bowling'
   );
 
   const IABParentCategory = await createIABCategoryHelper(
     prisma,
-    'Entertainment',
+    'Entertainment'
   );
 
   const IABChildCategory = await createIABCategoryHelper(
     prisma,
     'Live Music',
-    IABParentCategory,
+    IABParentCategory
   );
 
   const collection1 = await createCollectionHelper(prisma, {
@@ -218,7 +216,7 @@ async function main() {
 
 main()
   .catch((e) => {
-    prismaSeedLogger.error({ error: e, message: 'primsa seed main() error' });
+    console.error(e);
     process.exit(1);
   })
   .finally(async () => {

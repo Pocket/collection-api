@@ -23,7 +23,6 @@ import {
 } from './types';
 import { CollectionComplete } from '../database/types';
 import { PrismaClient } from '@prisma/client';
-import { serverLogger } from '../express';
 
 describe('event helpers: ', () => {
   const dbClient: PrismaClient = client();
@@ -37,7 +36,7 @@ describe('event helpers: ', () => {
 
   const sentryStub = sandbox.stub(Sentry, 'captureException').resolves();
   const crumbStub = sandbox.stub(Sentry, 'addBreadcrumb').resolves();
-  const serverLoggerStub = sandbox.stub(serverLogger, 'error');
+  const consoleSpy = sandbox.spy(console, 'log');
 
   let getCollectionLabelsForSnowplowStub: sinon.SinonStub;
 
@@ -61,7 +60,7 @@ describe('event helpers: ', () => {
       const payload = await events.generateEventBridgePayload(
         dbClient,
         EventBridgeEventType.COLLECTION_CREATED,
-        { ...testCollection, status: 'ARCHIVED', publishedAt: undefined },
+        { ...testCollection, status: 'ARCHIVED', publishedAt: undefined }
       );
 
       // assert that db call to fetch labels for collection via CollectionLabel ids is called
@@ -77,7 +76,7 @@ describe('event helpers: ', () => {
 
       expect(payload.collection.status).to.equal('archived');
       expect(payload.collection.language).to.equal(
-        CollectionLanguage[testCollection.language],
+        CollectionLanguage[testCollection.language]
       );
       expect(payload.collection.authors.length).to.equal(0);
       expect(payload.collection.stories.length).to.equal(0);
@@ -97,7 +96,7 @@ describe('event helpers: ', () => {
 
       // assert the remaining two props of the payload object are correct
       expect(payload.eventType).to.equal(
-        EventBridgeEventType.COLLECTION_CREATED,
+        EventBridgeEventType.COLLECTION_CREATED
       );
       expect(payload.object_version).to.equal('new');
     });
@@ -116,11 +115,11 @@ describe('event helpers: ', () => {
       const payload = await events.generateEventBridgePayload(
         dbClient,
         EventBridgeEventType.COLLECTION_UPDATED,
-        dbCollection,
+        dbCollection
       );
 
       expect(payload.collection.status).to.equal(
-        CollectionStatus[testCollection.status],
+        CollectionStatus[testCollection.status]
       );
       expect(payload.collection.publishedAt).to.equal(1672549200);
 
@@ -203,7 +202,7 @@ describe('event helpers: ', () => {
       const payload = await events.generateEventBridgePayload(
         dbClient,
         EventBridgeEventType.COLLECTION_CREATED,
-        testCollection,
+        testCollection
       );
 
       await events.sendEvent(payload);
@@ -213,7 +212,7 @@ describe('event helpers: ', () => {
         return;
       }, 100);
       expect(sentryStub.callCount).to.equal(0);
-      expect(serverLoggerStub.callCount).to.equal(0);
+      expect(consoleSpy.callCount).to.equal(0);
 
       // Event was sent to Event Bus
       expect(clientStub.callCount).to.equal(1);
@@ -230,7 +229,7 @@ describe('event helpers: ', () => {
 
       // Compare to initial payload
       expect(sendCommand.Entries[0]['Detail']).to.equal(
-        JSON.stringify(payload),
+        JSON.stringify(payload)
       );
     });
 
@@ -247,7 +246,7 @@ describe('event helpers: ', () => {
       let payload = await events.generateEventBridgePayload(
         dbClient,
         EventBridgeEventType.COLLECTION_CREATED,
-        testCollection,
+        testCollection
       );
 
       await events.sendEvent(payload);
@@ -259,17 +258,11 @@ describe('event helpers: ', () => {
 
       expect(sentryStub.callCount).to.equal(1);
       expect(sentryStub.getCall(0).firstArg.message).to.contain(
-        `sendEvent: Failed to send event 'collection-created' to event bus`,
+        `sendEvent: Failed to send event 'collection-created' to event bus`
       );
-      expect(serverLoggerStub.callCount).to.equal(1);
-      expect(serverLoggerStub.getCall(0).firstArg).to.contain(
-        `sendEvent: Failed to send event to event bus`,
-      );
-      expect(serverLoggerStub.getCall(0).lastArg.eventType).to.equal(
-        EventBridgeEventType.COLLECTION_CREATED,
-      );
-      expect(serverLoggerStub.getCall(0).lastArg.payload).to.equal(
-        JSON.stringify(payload),
+      expect(consoleSpy.callCount).to.equal(1);
+      expect(consoleSpy.getCall(0).firstArg.message).to.contain(
+        `Failed to send event 'collection-created' to event bus`
       );
 
       /**
@@ -278,12 +271,12 @@ describe('event helpers: ', () => {
 
       // resetting mocks and spies
       sentryStub.reset();
-      serverLoggerStub.resetHistory();
+      consoleSpy.resetHistory();
 
       payload = await events.generateEventBridgePayload(
         dbClient,
         EventBridgeEventType.COLLECTION_UPDATED, // event type i collection-updated
-        testCollection,
+        testCollection
       );
 
       await events.sendEvent(payload);
@@ -295,17 +288,11 @@ describe('event helpers: ', () => {
 
       expect(sentryStub.callCount).to.equal(1);
       expect(sentryStub.getCall(0).firstArg.message).to.contain(
-        `Failed to send event 'collection-updated' to event bus`,
+        `Failed to send event 'collection-updated' to event bus`
       );
-      expect(serverLoggerStub.callCount).to.equal(1);
-      expect(serverLoggerStub.getCall(0).firstArg).to.contain(
-        `sendEvent: Failed to send event to event bus`,
-      );
-      expect(serverLoggerStub.getCall(0).lastArg.eventType).to.equal(
-        EventBridgeEventType.COLLECTION_UPDATED,
-      );
-      expect(serverLoggerStub.getCall(0).lastArg.payload).to.equal(
-        JSON.stringify(payload),
+      expect(consoleSpy.callCount).to.equal(1);
+      expect(consoleSpy.getCall(0).firstArg.message).to.contain(
+        `sendEvent: Failed to send event 'collection-updated' to event bus`
       );
     });
   });
@@ -320,7 +307,7 @@ describe('event helpers: ', () => {
       await events.sendEventBridgeEvent(
         dbClient,
         EventBridgeEventType.COLLECTION_CREATED,
-        testCollection,
+        testCollection
       );
 
       // Wait in case promise needs time to resolve
@@ -332,15 +319,13 @@ describe('event helpers: ', () => {
       expect(sentryStub.getCall(0).firstArg.message).to.contain('boo!');
       expect(crumbStub.callCount).to.equal(1);
       expect(crumbStub.getCall(0).firstArg.message).to.contain(
-        `sendEventBridgeEvent: Failed to send event 'collection-created' to event bus`,
+        `sendEventBridgeEvent: Failed to send event 'collection-created' to event bus`
       );
-      expect(serverLoggerStub.callCount).to.equal(1);
-      expect(serverLoggerStub.getCall(0).firstArg).to.contain(
-        `sendEventBridgeEvent: Failed to send event to event bus`,
+      expect(consoleSpy.callCount).to.equal(2);
+      expect(consoleSpy.getCall(0).firstArg.message).to.contain(
+        `sendEventBridgeEvent: Failed to send event 'collection-created' to event bus`
       );
-      expect(serverLoggerStub.getCall(0).lastArg.eventType).to.equal(
-        EventBridgeEventType.COLLECTION_CREATED,
-      );
+      expect(consoleSpy.getCall(1).firstArg.message).to.equal('boo!');
     });
   });
 });
