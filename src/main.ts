@@ -1,12 +1,12 @@
-import { serverLogger, startServer } from './express';
+import { startServer } from './express';
 import config from './config';
 
 (async () => {
   const { adminUrl, publicUrl } = await startServer(config.app.port);
-  serverLogger.info(
+  console.log(
     `🚀 Public server ready at http://localhost:${config.app.port}${publicUrl}`,
   );
-  serverLogger.info(
+  console.log(
     `🚀 Admin server ready at http://localhost:${config.app.port}${adminUrl}`,
   );
 })();

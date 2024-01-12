@@ -1,7 +1,6 @@
 import { Pagination } from './typeDefs';
 import { UserInputError } from '@pocket-tools/apollo-utils';
 import { CollectionLanguage } from './database/types';
-import { serverLogger } from './express';
 
 // string of allowed languages in the format "en|de|..."
 const allowedLanguages = Object.values(CollectionLanguage).join('|');
@@ -51,7 +50,7 @@ export function collectionFilterValidation(filters: any, properties: string) {
 export function getCollectionUrlSlug(url: string): string | null {
   const match = validCollectionUrlRegExp.exec(url);
   if (!match) {
-    serverLogger.info(`${url} is not a valid collection`);
+    console.log(`${url} is not a valid collection`);
     return null;
   }
 

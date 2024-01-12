@@ -12,9 +12,6 @@ import { getAdminContext, IAdminContext } from './admin/context';
 import { startPublicServer } from './public/server';
 import { startAdminServer } from './admin/server';
 import { client } from './database/client';
-import { setLogger, setMorgan } from '@pocket-tools/ts-logger';
-
-export const serverLogger = setLogger();
 
 /**
  * Initialize an express server with both public and admin graphs.
@@ -41,7 +38,6 @@ export async function startServer(port: number): Promise<{
   app.use(
     // JSON parser to enable POST body with JSON
     express.json(),
-    setMorgan(serverLogger),
   );
 
   // Upload middleware

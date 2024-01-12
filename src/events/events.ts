@@ -36,7 +36,6 @@ import {
   IABCategory as dbIABCategory,
   CollectionLabel,
 } from '@prisma/client';
-import { serverLogger } from '../express';
 
 import { getLabelById } from '../shared/resolvers/types';
 
@@ -275,14 +274,8 @@ export async function sendEventBridgeEvent(
     // Don't halt program, but capture the failure in Sentry and Cloudwatch
     Sentry.addBreadcrumb(failedEventError);
     Sentry.captureException(error);
-    serverLogger.error(
-      'sendEventBridgeEvent: Failed to send event to event bus',
-      {
-        eventType: payload.eventType,
-        payload: JSON.stringify(payload),
-        error,
-      },
-    );
+    console.log(failedEventError);
+    console.log(error);
   }
 }
 
@@ -317,9 +310,6 @@ export async function sendEvent(eventPayload: any) {
 
     // Don't halt program, but capture the failure in Sentry and Cloudwatch
     Sentry.captureException(failedEventError);
-    serverLogger.error('sendEvent: Failed to send event to event bus', {
-      eventType: eventPayload.eventType,
-      payload: JSON.stringify(eventPayload),
-    });
+    console.log(failedEventError);
   }
 }

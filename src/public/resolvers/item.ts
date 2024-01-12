@@ -1,6 +1,5 @@
 import { Collection } from '@prisma/client';
 import * as Sentry from '@sentry/node';
-import { serverLogger } from '../../express';
 import { getCollectionUrlSlug } from '../../utils';
 
 /**
@@ -22,7 +21,7 @@ export async function collection(
       return null;
     }
   } catch (err) {
-    serverLogger.error(err);
+    console.log(err);
     Sentry.captureException(err);
     throw err;
   }
