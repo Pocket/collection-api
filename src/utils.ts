@@ -50,7 +50,6 @@ export function collectionFilterValidation(filters: any, properties: string) {
 export function getCollectionUrlSlug(url: string): string | null {
   const match = validCollectionUrlRegExp.exec(url);
   if (!match) {
-    console.log(`${url} is not a valid collection`);
     return null;
   }
 
