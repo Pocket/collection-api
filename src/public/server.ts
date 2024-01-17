@@ -13,6 +13,7 @@ import {
 import { ApolloServerPluginInlineTrace } from '@apollo/server/plugin/inlineTrace';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
+import { ApolloServerPluginUsageReporting } from '@apollo/server/plugin/usageReporting';
 import { IPublicContext } from './context';
 
 // export const server = new ApolloServer({
@@ -37,6 +38,13 @@ export function getPublicServer(
   const prodPlugins = [
     ApolloServerPluginLandingPageDisabled(),
     ApolloServerPluginInlineTrace(),
+    ApolloServerPluginUsageReporting({
+      // the following variables names do not expose sensitive information and
+      // pertain to the following public queries:
+      // - getCollections(filters, page, perPage)
+      // - collectionBySlug(slug)
+      sendVariableValues: { onlyNames: ['filters', 'page', 'perPage', 'slug'] },
+    }),
   ];
   const nonProdPlugins = [
     ApolloServerPluginLandingPageLocalDefault(),
