@@ -140,6 +140,10 @@ model Collection {
   stories             CollectionStory[]
   authors             CollectionAuthor[]     @relation("CollectionToCollectionAuthor")
 
+  // this compound index is for the public getCollections query
+  // status and language are always present in the WHERE
+  // publishedAt is always the ORDER BY
+  @@index([status, language, publishedAt])
   @@index([slug])
   @@index([title])
   @@index([IABChildCategoryId], map: "Collection_IABChildCategoryId_fkey")
