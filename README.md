@@ -1,5 +1,8 @@
 # Collections API
 
+> [!IMPORTANT]  
+> This repo has been moved to [Content's Monorepo](https://github.com/Pocket/content-monorepo/tree/main/servers/collection-api)
+
 Provides collections: A set of static curated stories around a central theme.
 
 ## Application Healthcheck
